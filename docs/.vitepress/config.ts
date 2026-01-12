@@ -7,11 +7,15 @@ export default defineConfig({
   themeConfig: {
     logo: '/img/logos/mitre-saf.png',
 
+    search: {
+      provider: 'local'
+    },
+
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Framework', link: '/framework/' },
       { text: 'Apps', link: '/apps/' },
-      { text: 'Content', link: '/content/' },
+      { text: 'Validate', link: '/validate/' },
       { text: 'Docs', link: '/docs/' }
     ],
 
