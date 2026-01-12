@@ -1,0 +1,13 @@
+/* Custom MITRE SAF branding */
+
+:root {
+  /* Override Vue.js theme colors with MITRE colors */
+  --vp-c-brand-1: #005288;
+  --vp-c-brand-2: #0066a8;
+  --vp-c-brand-3: #0080cc;
+
+  /* Accent colors */
+  --vp-c-sponsor: #e91e63;
+}
+
+/* Additional custom styles can be added here */

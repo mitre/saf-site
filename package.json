@@ -1,0 +1,19 @@
+{
+  "name": "saf-site-vitepress",
+  "version": "1.0.0",
+  "description": "MITRE SAF documentation site built with VitePress",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "keywords": ["mitre", "saf", "security", "automation", "compliance"],
+  "author": "MITRE SAF Team",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.26.2",
+  "devDependencies": {
+    "@vue/theme": "^2.3.0",
+    "vitepress": "^1.6.4"
+  }
+}
