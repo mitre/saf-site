@@ -8,12 +8,21 @@
     "build": "vitepress build docs",
     "preview": "vitepress preview docs"
   },
-  "keywords": ["mitre", "saf", "security", "automation", "compliance"],
+  "keywords": [
+    "mitre",
+    "saf",
+    "security",
+    "automation",
+    "compliance"
+  ],
   "author": "MITRE SAF Team",
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.26.2",
   "devDependencies": {
     "@vue/theme": "^2.3.0",
     "vitepress": "^1.6.4"
+  },
+  "dependencies": {
+    "reka-ui": "^2.7.0"
   }
 }
