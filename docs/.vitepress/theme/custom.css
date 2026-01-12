@@ -10,4 +10,15 @@
   --vp-c-sponsor: #e91e63;
 }
 
-/* Additional custom styles can be added here */
+/* Full-width doc layout for browse pages */
+.VPDoc .container {
+  max-width: 1400px !important;
+}
+
+.VPDoc .content {
+  max-width: none !important;
+}
+
+.VPDoc .content-container {
+  max-width: none !important;
+}

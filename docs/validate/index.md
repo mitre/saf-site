@@ -1,6 +1,7 @@
 ---
 title: Validation Profiles
-layout: page
+layout: doc
+aside: false
 ---
 
 <script setup>
@@ -68,21 +69,6 @@ InSpec validation profiles for security compliance testing across various platfo
 </div>
 
 <style scoped>
-/* Container for full-width layout */
-:deep(.VPDoc) {
-  max-width: none !important;
-  padding: 0 2rem;
-}
-
-:deep(.container) {
-  max-width: 1400px !important;
-  margin: 0 auto;
-}
-
-:deep(.content) {
-  max-width: none !important;
-}
-
 .results-count {
   margin: 1rem 0;
   padding: 0.75rem 1rem;
@@ -117,10 +103,6 @@ InSpec validation profiles for security compliance testing across various platfo
 @media (max-width: 768px) {
   .profile-grid {
     grid-template-columns: 1fr;
-  }
-
-  :deep(.VPDoc) {
-    padding: 0 1rem;
   }
 }
 </style>
