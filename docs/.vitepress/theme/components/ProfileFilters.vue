@@ -175,12 +175,13 @@ watch(selectedTech, (value) => {
 }
 
 .select-content {
-  background: var(--vp-c-bg);
+  background: var(--vp-c-bg-elv);
   border: 1px solid var(--vp-c-divider);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  z-index: 100;
+  z-index: 9999;
+  min-width: 200px;
 }
 
 .select-viewport {
@@ -193,15 +194,17 @@ watch(selectedTech, (value) => {
   border-radius: 4px;
   outline: none;
   user-select: none;
+  color: var(--vp-c-text-1);
+  transition: all 0.2s;
 }
 
 .select-item:hover {
-  background: var(--vp-c-bg-soft);
+  background: var(--vp-c-default-soft);
 }
 
 .select-item[data-highlighted] {
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-1);
+  color: white;
 }
 
 .search-input {
