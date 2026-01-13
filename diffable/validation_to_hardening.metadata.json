@@ -1,0 +1,8 @@
+{
+    "name": "validation_to_hardening",
+    "columns": [
+        "validation_profile_id",
+        "hardening_profile_id"
+    ],
+    "schema": "CREATE TABLE `validation_to_hardening` (\n\t`validation_profile_id` text NOT NULL,\n\t`hardening_profile_id` text NOT NULL,\n\tPRIMARY KEY(`validation_profile_id`, `hardening_profile_id`),\n\tFOREIGN KEY (`validation_profile_id`) REFERENCES `profiles`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`hardening_profile_id`) REFERENCES `hardening_profiles`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

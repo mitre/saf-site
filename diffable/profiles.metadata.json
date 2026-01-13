@@ -1,0 +1,25 @@
+{
+    "name": "profiles",
+    "columns": [
+        "id",
+        "name",
+        "version",
+        "platform",
+        "framework",
+        "technology",
+        "vendor",
+        "organization",
+        "team",
+        "github",
+        "details",
+        "standard",
+        "standard_version",
+        "short_description",
+        "requirements",
+        "category",
+        "created_at",
+        "last_updated",
+        "status"
+    ],
+    "schema": "CREATE TABLE `profiles` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`version` text,\n\t`platform` text,\n\t`framework` text,\n\t`technology` text,\n\t`vendor` text,\n\t`organization` text,\n\t`team` text,\n\t`github` text,\n\t`details` text,\n\t`standard` text,\n\t`standard_version` text,\n\t`short_description` text,\n\t`requirements` text,\n\t`category` text,\n\t`created_at` integer NOT NULL,\n\t`last_updated` integer NOT NULL,\n\t`status` text DEFAULT 'active' NOT NULL,\n\tFOREIGN KEY (`technology`) REFERENCES `technologies`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`team`) REFERENCES `teams`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`standard`) REFERENCES `standards`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

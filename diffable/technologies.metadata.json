@@ -1,0 +1,16 @@
+{
+    "name": "technologies",
+    "columns": [
+        "id",
+        "name",
+        "description",
+        "website",
+        "logo",
+        "category",
+        "type",
+        "created_at",
+        "last_updated",
+        "status"
+    ],
+    "schema": "CREATE TABLE `technologies` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`description` text,\n\t`website` text,\n\t`logo` text,\n\t`category` text,\n\t`type` text,\n\t`created_at` integer NOT NULL,\n\t`last_updated` integer NOT NULL,\n\t`status` text DEFAULT 'active' NOT NULL\n)"
+}

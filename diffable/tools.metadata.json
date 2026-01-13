@@ -1,0 +1,19 @@
+{
+    "name": "tools",
+    "columns": [
+        "id",
+        "name",
+        "version",
+        "description",
+        "website",
+        "logo",
+        "technology",
+        "organization",
+        "github",
+        "category",
+        "created_at",
+        "last_updated",
+        "status"
+    ],
+    "schema": "CREATE TABLE `tools` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`version` text,\n\t`description` text,\n\t`website` text,\n\t`logo` text,\n\t`technology` text,\n\t`organization` text,\n\t`github` text,\n\t`category` text,\n\t`created_at` integer NOT NULL,\n\t`last_updated` integer NOT NULL,\n\t`status` text DEFAULT 'active' NOT NULL,\n\tFOREIGN KEY (`technology`) REFERENCES `technologies`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

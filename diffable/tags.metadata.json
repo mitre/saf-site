@@ -1,0 +1,12 @@
+{
+    "name": "tags",
+    "columns": [
+        "id",
+        "description",
+        "category",
+        "created_at",
+        "last_updated",
+        "status"
+    ],
+    "schema": "CREATE TABLE `tags` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`description` text,\n\t`category` text,\n\t`created_at` integer NOT NULL,\n\t`last_updated` integer NOT NULL,\n\t`status` text DEFAULT 'active' NOT NULL\n)"
+}

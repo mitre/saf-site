@@ -1,0 +1,13 @@
+{
+    "name": "teams",
+    "columns": [
+        "id",
+        "name",
+        "description",
+        "organization",
+        "created_at",
+        "last_updated",
+        "status"
+    ],
+    "schema": "CREATE TABLE `teams` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`description` text,\n\t`organization` text,\n\t`created_at` integer NOT NULL,\n\t`last_updated` integer NOT NULL,\n\t`status` text DEFAULT 'active' NOT NULL,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

@@ -1,0 +1,8 @@
+{
+    "name": "hardening_profiles_tags",
+    "columns": [
+        "hardening_profile_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `hardening_profiles_tags` (\n\t`hardening_profile_id` text NOT NULL,\n\t`tag_id` text NOT NULL,\n\tPRIMARY KEY(`hardening_profile_id`, `tag_id`),\n\tFOREIGN KEY (`hardening_profile_id`) REFERENCES `hardening_profiles`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}
