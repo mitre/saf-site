@@ -20,14 +20,13 @@
                 <SelectItem value="all" class="select-item">
                   <SelectItemText>All Categories</SelectItemText>
                 </SelectItem>
-                <SelectItem value="STIG" class="select-item">
-                  <SelectItemText>STIG</SelectItemText>
-                </SelectItem>
-                <SelectItem value="CIS" class="select-item">
-                  <SelectItemText>CIS Benchmark</SelectItemText>
-                </SelectItem>
-                <SelectItem value="PCI-DSS" class="select-item">
-                  <SelectItemText>PCI-DSS</SelectItemText>
+                <SelectItem
+                  v-for="category in categories"
+                  :key="category"
+                  :value="category"
+                  class="select-item"
+                >
+                  <SelectItemText>{{ category }}</SelectItemText>
                 </SelectItem>
               </SelectViewport>
             </SelectContent>
@@ -54,14 +53,13 @@
                 <SelectItem value="all" class="select-item">
                   <SelectItemText>All Technologies</SelectItemText>
                 </SelectItem>
-                <SelectItem value="Linux" class="select-item">
-                  <SelectItemText>Linux</SelectItemText>
-                </SelectItem>
-                <SelectItem value="Windows" class="select-item">
-                  <SelectItemText>Windows</SelectItemText>
-                </SelectItem>
-                <SelectItem value="Cloud" class="select-item">
-                  <SelectItemText>Cloud</SelectItemText>
+                <SelectItem
+                  v-for="tech in technologies"
+                  :key="tech"
+                  :value="tech"
+                  class="select-item"
+                >
+                  <SelectItemText>{{ tech }}</SelectItemText>
                 </SelectItem>
               </SelectViewport>
             </SelectContent>
@@ -85,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {
   SelectRoot,
   SelectTrigger,
@@ -98,6 +96,17 @@ import {
   SelectItemText,
 } from 'reka-ui'
 
+interface Profile {
+  id: string
+  category?: string
+  technology?: string
+  technology_name?: string
+}
+
+const props = defineProps<{
+  profiles: Profile[]
+}>()
+
 const emit = defineEmits<{
   'update:category': [value: string]
   'update:technology': [value: string]
@@ -107,6 +116,30 @@ const emit = defineEmits<{
 const selectedCategory = ref('all')
 const selectedTech = ref('all')
 const searchQuery = ref('')
+
+// Extract unique categories from profiles
+const categories = computed(() => {
+  const uniqueCategories = new Set<string>()
+  props.profiles.forEach(profile => {
+    if (profile.category) {
+      uniqueCategories.add(profile.category)
+    }
+  })
+  return Array.from(uniqueCategories).sort()
+})
+
+// Extract unique technologies from profiles
+const technologies = computed(() => {
+  const uniqueTech = new Set<string>()
+  props.profiles.forEach(profile => {
+    // Use technology_name (display name) if available, otherwise technology ID
+    const techName = profile.technology_name || profile.technology
+    if (techName) {
+      uniqueTech.add(techName)
+    }
+  })
+  return Array.from(uniqueTech).sort()
+})
 
 watch(selectedCategory, (value) => {
   emit('update:category', value)

@@ -24,9 +24,12 @@ const filteredProfiles = computed(() => {
     result = result.filter(p => p.category === selectedCategory.value)
   }
 
-  // Filter by technology
+  // Filter by technology (match against technology_name for display)
   if (selectedTech.value !== 'all') {
-    result = result.filter(p => p.technology === selectedTech.value)
+    result = result.filter(p => {
+      const techName = p.technology_name || p.technology
+      return techName === selectedTech.value
+    })
   }
 
   // Filter by search query
@@ -47,6 +50,7 @@ const filteredProfiles = computed(() => {
 InSpec validation profiles for security compliance testing across various platforms and standards.
 
 <ProfileFilters
+  :profiles="allProfiles"
   @update:category="selectedCategory = $event"
   @update:technology="selectedTech = $event"
   @update:search="searchQuery = $event"
