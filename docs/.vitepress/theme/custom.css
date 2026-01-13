@@ -10,6 +10,11 @@
   --vp-c-sponsor: #e91e63;
 }
 
+/* Dark mode support for portaled elements */
+.dark {
+  color-scheme: dark;
+}
+
 /* Full-width doc layout for browse pages */
 .VPDoc .container {
   max-width: 1400px !important;

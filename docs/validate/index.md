@@ -13,6 +13,9 @@ const allProfiles = data.profiles
 // Filter state
 const selectedCategory = ref('all')
 const selectedTech = ref('all')
+const selectedPlatform = ref('all')
+const selectedVendor = ref('all')
+const selectedStandard = ref('all')
 const searchQuery = ref('')
 
 // Computed filtered profiles
@@ -30,6 +33,21 @@ const filteredProfiles = computed(() => {
       const techName = p.technology_name || p.technology
       return techName === selectedTech.value
     })
+  }
+
+  // Filter by platform
+  if (selectedPlatform.value !== 'all') {
+    result = result.filter(p => p.platform === selectedPlatform.value)
+  }
+
+  // Filter by vendor
+  if (selectedVendor.value !== 'all') {
+    result = result.filter(p => p.vendor === selectedVendor.value)
+  }
+
+  // Filter by standard
+  if (selectedStandard.value !== 'all') {
+    result = result.filter(p => p.standard_name === selectedStandard.value)
   }
 
   // Filter by search query
@@ -53,6 +71,9 @@ InSpec validation profiles for security compliance testing across various platfo
   :profiles="allProfiles"
   @update:category="selectedCategory = $event"
   @update:technology="selectedTech = $event"
+  @update:platform="selectedPlatform = $event"
+  @update:vendor="selectedVendor = $event"
+  @update:standard="selectedStandard = $event"
   @update:search="searchQuery = $event"
 />
 
