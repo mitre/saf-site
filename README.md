@@ -26,6 +26,9 @@ pnpm preview
 Use Drizzle Studio to visually edit content with forms, foreign key dropdowns, and validation:
 
 ```bash
+# First time: Initialize database with schema
+pnpm db:push
+
 # Launch Drizzle Studio (opens http://localhost:4983)
 pnpm studio
 
@@ -36,6 +39,8 @@ pnpm studio
 # - Data validation
 # - Export changes to YAML
 ```
+
+**Known issue:** Join tables with composite primary keys may show SQL errors in Studio. Main content tables (profiles, standards, tools, etc.) work fine.
 
 **Alternative:** You can also edit YAML files directly. Zod validates structure on build.
 
