@@ -6,3 +6,15 @@ dist
 .data
 .claude
 .beads/.bdui
+
+# Database
+drizzle/
+*.db
+*.sqlite
+*.pglite
+.pglite/
+
+# Environment
+.env
+.env.local
+.env*.local
