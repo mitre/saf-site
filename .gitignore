@@ -18,3 +18,4 @@ drizzle/
 .env
 .env.local
 .env*.local
+.beads/recovery-context.md

@@ -21,29 +21,23 @@ pnpm preview
 
 ## Content Management
 
-⚠️ **Note:** Drizzle Studio does not currently support PGlite ([Issue #2823](https://github.com/drizzle-team/drizzle-orm/issues/2823)). For now, edit YAML files directly.
+### Visual Editor (Drizzle Studio)
 
-### Edit Content (Current Workflow)
-
-```bash
-# Edit YAML files directly in your editor
-vim content/data/profiles/stig.yml
-
-# Zod validates YAML structure on build
-pnpm build
-# Build will fail if YAML is invalid, showing validation errors
-```
-
-### Future: Visual Editor
-
-When PGlite support is added to Drizzle Studio:
+Use Drizzle Studio to visually edit content with forms, foreign key dropdowns, and validation:
 
 ```bash
-# Launch visual database editor
+# Launch Drizzle Studio (opens http://localhost:4983)
 pnpm studio
-# Edit with forms, FK dropdowns, etc.
-# Export to YAML
+
+# Features:
+# - Visual table editor with forms
+# - Foreign key dropdowns
+# - Relationship visualization
+# - Data validation
+# - Export changes to YAML
 ```
+
+**Alternative:** You can also edit YAML files directly. Zod validates structure on build.
 
 ## Project Structure
 

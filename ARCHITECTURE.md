@@ -264,20 +264,23 @@ pnpm build
 - Netlify, Vercel, GitHub Pages, Cloudflare Pages
 - Any static hosting (no server required)
 
-## Important Limitation: Drizzle Studio + PGlite
+## Content Editing with Drizzle Studio
 
-**Update (January 2026):** Drizzle Studio does not currently support PGlite ([Issue #2823](https://github.com/drizzle-team/drizzle-orm/issues/2823)).
+**Drizzle Studio works with PGlite** and provides visual editing capabilities:
 
-**Current workarounds:**
-1. **Direct YAML editing** - Edit YAML files manually, Zod validates on build
-2. **Local PostgreSQL** - Use real Postgres for Drizzle Studio demo, export to YAML
-3. **Custom admin UI** - Build Option A (integrated admin) sooner
+- Launch with `pnpm studio` (opens http://localhost:4983)
+- Visual table editor with forms and validation
+- Foreign key relationships shown as dropdowns
+- Data persists in PGlite (IndexedDB)
+- Export changes to YAML files for version control
 
-For POC, **direct YAML editing** is recommended until PGlite support is added.
+**Configuration:** See `drizzle.config.ts` for PGlite setup with `driver: 'pglite'`.
 
-## Future: Integrated Admin (Option A)
+**Alternative approach:** Edit YAML files directly - Zod validates structure on build.
 
-When Drizzle Studio adds PGlite support, OR if we build a custom admin UI:
+## Future Option: Integrated Admin UI
+
+If we want to build a custom admin UI embedded in VitePress (instead of using Drizzle Studio):
 
 ```
 VitePress Site
@@ -291,4 +294,4 @@ VitePress Site
 
 This would follow saf-site-v4's architecture but embedded in VitePress.
 
-**For now:** Drizzle Studio is sufficient (Option B approach).
+**Current approach:** Using Drizzle Studio for content editing (works well with PGlite).
