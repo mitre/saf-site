@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, primaryKey } from 'drizzle-orm/pg-core'
+import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core'
 import { relations, sql } from 'drizzle-orm'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
@@ -12,40 +12,40 @@ export const STATUS_DRAFT = 'draft'
 export const STATUS_SUNSET = 'sunset'
 
 // Tags table
-export const tags = pgTable('tags', {
+export const tags = sqliteTable('tags', {
   id: text('id').primaryKey(),
   description: text('description'),
   category: text('category'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Organizations (defined before teams due to FK reference)
-export const organizations = pgTable('organizations', {
+export const organizations = sqliteTable('organizations', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
   website: text('website'),
   logo: text('logo'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Teams
-export const teams = pgTable('teams', {
+export const teams = sqliteTable('teams', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
   organization: text('organization').references(() => organizations.id),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Technologies
-export const technologies = pgTable('technologies', {
+export const technologies = sqliteTable('technologies', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
@@ -53,13 +53,13 @@ export const technologies = pgTable('technologies', {
   logo: text('logo'),
   category: text('category'),
   type: text('type'), // 'validation', 'hardening', or 'both'
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Standards
-export const standards = pgTable('standards', {
+export const standards = sqliteTable('standards', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
@@ -69,13 +69,13 @@ export const standards = pgTable('standards', {
   vendor: text('vendor'),
   version: text('version'),
   logo: text('logo'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Profiles
-export const profiles = pgTable('profiles', {
+export const profiles = sqliteTable('profiles', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   version: text('version'),
@@ -92,13 +92,13 @@ export const profiles = pgTable('profiles', {
   shortDescription: text('short_description'),
   requirements: text('requirements'),
   category: text('category'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Profiles Tags Junction Table
-export const profilesTags = pgTable('profiles_tags', {
+export const profilesTags = sqliteTable('profiles_tags', {
   profileId: text('profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
 }, (table) => ({
@@ -106,7 +106,7 @@ export const profilesTags = pgTable('profiles_tags', {
 }))
 
 // Hardening Profiles
-export const hardeningProfiles = pgTable('hardening_profiles', {
+export const hardeningProfiles = sqliteTable('hardening_profiles', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   version: text('version'),
@@ -124,13 +124,13 @@ export const hardeningProfiles = pgTable('hardening_profiles', {
   requirements: text('requirements'),
   category: text('category'),
   difficulty: text('difficulty'), // easy, medium, hard
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Hardening Profiles Tags Junction Table
-export const hardeningProfilesTags = pgTable('hardening_profiles_tags', {
+export const hardeningProfilesTags = sqliteTable('hardening_profiles_tags', {
   hardeningProfileId: text('hardening_profile_id').notNull().references(() => hardeningProfiles.id, { onDelete: 'cascade' }),
   tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
 }, (table) => ({
@@ -138,7 +138,7 @@ export const hardeningProfilesTags = pgTable('hardening_profiles_tags', {
 }))
 
 // Validation-to-Hardening relationship
-export const validationToHardening = pgTable('validation_to_hardening', {
+export const validationToHardening = sqliteTable('validation_to_hardening', {
   validationProfileId: text('validation_profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   hardeningProfileId: text('hardening_profile_id').notNull().references(() => hardeningProfiles.id, { onDelete: 'cascade' })
 }, (table) => ({
@@ -146,7 +146,7 @@ export const validationToHardening = pgTable('validation_to_hardening', {
 }))
 
 // Tools
-export const tools = pgTable('tools', {
+export const tools = sqliteTable('tools', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   version: text('version'),
@@ -157,19 +157,19 @@ export const tools = pgTable('tools', {
   organization: text('organization').references(() => organizations.id),
   github: text('github'),
   category: text('category'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 
 // Capabilities
-export const capabilities = pgTable('capabilities', {
+export const capabilities = sqliteTable('capabilities', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
   category: text('category'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   status: text('status').notNull().default(STATUS_ACTIVE)
 })
 

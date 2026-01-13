@@ -1,13 +1,12 @@
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
-  dialect: 'postgresql',
+  dialect: 'sqlite',
   schema: './docs/.vitepress/database/schema.ts',
   out: './drizzle',
-  driver: 'pglite',
   dbCredentials: {
-    // PGlite file-based database for local editing
-    // Stores database in .pglite/ directory
-    url: './.pglite'
+    // SQLite database for local editing via libsql
+    // Clean git diffs via sqlite-diffable
+    url: 'file:.data/saf.db'
   }
 })

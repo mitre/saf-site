@@ -9,7 +9,9 @@
     "preview": "vitepress preview docs",
     "studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "db:dump": "sqlite-diffable dump .data/saf.db diffable/ --all",
+    "db:load": "sqlite-diffable load .data/saf.db diffable/"
   },
   "keywords": [
     "mitre",
@@ -28,6 +30,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.14",
+    "@libsql/client": "^0.17.0",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "reka-ui": "^2.7.0",

@@ -3,11 +3,11 @@ docs/.vitepress/cache
 docs/.vitepress/dist
 dist
 .nuxt
-.data
+.data/
 .claude
 .beads/.bdui
 
-# Database
+# Database (SQLite binaries ignored, but diffable/ JSON will be tracked)
 drizzle/
 *.db
 *.sqlite
@@ -19,3 +19,4 @@ drizzle/
 .env.local
 .env*.local
 .beads/recovery-context.md
+.playwright-mcp/
