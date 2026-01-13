@@ -2,75 +2,73 @@
 
 ## Core Principle
 
-**Self-sufficient content management:** VitePress site manages its own content using Drizzle Studio + PGlite for editing, with YAML files as source of truth for production builds.
+**Single source of truth:** Pocketbase relational database manages all content with FK constraints, version-controlled via sqlite-diffable. VitePress queries Pocketbase API at build time for static site generation.
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    CONTENT EDITING LAYER                    │
+│                    CONTENT MANAGEMENT LAYER                 │
 │                                                             │
-│  Drizzle Studio (localhost:4983)                           │
+│  Pocketbase Admin UI (localhost:8090/_/)                   │
 │  ┌───────────────────────────────────────────────────────┐ │
-│  │  Visual Table Editor                                  │ │
+│  │  Visual Table Editor with FK Relations               │ │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │ │
 │  │  │  Profiles   │  │  Standards  │  │   Teams     │   │ │
-│  │  │  (FK pickers)│  │  (Edit rows)│  │  (Forms)   │   │ │
+│  │  │ (FK pickers)│  │ (Edit rows) │  │  (Forms)    │   │ │
+│  │  │ Searchable  │  │ Validation  │  │  Inline     │   │ │
 │  │  └─────────────┘  └─────────────┘  └─────────────┘   │ │
 │  └───────────────────────────────────────────────────────┘ │
 │                           │                                 │
 │                           ▼                                 │
 │  ┌───────────────────────────────────────────────────────┐ │
-│  │  PGlite + Drizzle ORM                                 │ │
+│  │  Pocketbase (SQLite with REST API)                   │ │
 │  │  ┌─────────────────────────────────────────────────┐ │ │
-│  │  │  IndexedDB (persistent in browser)              │ │ │
-│  │  │  - Drizzle schema (relationships)               │ │ │
-│  │  │  - Referential integrity                        │ │ │
-│  │  │  - Survives browser refresh                     │ │ │
+│  │  │  data.db (SQLite binary)                        │ │ │
+│  │  │  - 12 collections (base + FKs + junctions)     │ │ │
+│  │  │  - FK constraints enforced                      │ │ │
+│  │  │  - Automatic FK expansion via API               │ │ │
+│  │  │  - REST API on :8090/api/collections/...       │ │ │
 │  │  └─────────────────────────────────────────────────┘ │ │
 │  └───────────────────────────────────────────────────────┘ │
 │                           │                                 │
 │                           ▼                                 │
 │  ┌───────────────────────────────────────────────────────┐ │
-│  │  Export Script → PGlite → YAML → content/data/       │ │
+│  │  sqlite-diffable export (version control)            │ │
+│  │  .pocketbase/pb_data/diffable/                       │ │
+│  │    - *.metadata.json (table schemas)                 │ │
+│  │    - *.ndjson (data, one record per line)           │ │
 │  └───────────────────────────────────────────────────────┘ │
 └───────────────────────────┼─────────────────────────────────┘
+                            │
+                            │ (git commits)
+                            │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    VITEPRESS BUILD LAYER                    │
 │                                                             │
-│  content/data/*.yml (source of truth)                      │
+│  VitePress Data Loaders (build time)                       │
 │  ┌───────────────────────────────────────────────────────┐ │
-│  │  profiles/stig.yml, cis.yml, pci-dss.yml             │ │
-│  │  hardening/ansible.yml, chef.yml, terraform.yml      │ │
-│  │  standards/, organizations/, teams/, tools/          │ │
-│  └───────────────────────────────────────────────────────┘ │
-│                           │                                 │
-│                           ▼                                 │
-│  ┌───────────────────────────────────────────────────────┐ │
-│  │  VitePress Data Loaders (build time)                 │ │
+│  │  profiles.data.ts                                     │ │
 │  │  ┌─────────────────────────────────────────────────┐ │ │
-│  │  │  profiles.data.ts                               │ │ │
-│  │  │    - Load YAML files                            │ │ │
-│  │  │    - Validate with Zod schemas                  │ │ │
-│  │  │    - Return typed JSON                          │ │ │
-│  │  │                                                  │ │ │
-│  │  │  hardening.data.ts, standards.data.ts, etc.    │ │ │
+│  │  │  Query Pocketbase REST API                      │ │ │
+│  │  │  const pb = new PocketBase('http://localhost')  │ │ │
+│  │  │  const profiles = await pb.collection('profiles')│ │ │
+│  │  │    .getFullList({                               │ │ │
+│  │  │      expand: 'org,team,tech,standard'          │ │ │
+│  │  │    })                                           │ │ │
+│  │  │  return { profiles }  // Fully typed data      │ │ │
 │  │  └─────────────────────────────────────────────────┘ │ │
-│  └───────────────────────────────────────────────────────┘ │
-│                           │                                 │
-│                           ▼                                 │
-│  ┌───────────────────────────────────────────────────────┐ │
-│  │  Composables (filters, search, counts)               │ │
-│  │  - useProfiles, useHardeningProfiles, useStandards  │ │
-│  │  - Ported from saf-site-v4                          │ │
+│  │                                                       │ │
+│  │  hardening.data.ts, standards.data.ts, etc.         │ │
 │  └───────────────────────────────────────────────────────┘ │
 │                           │                                 │
 │                           ▼                                 │
 │  ┌───────────────────────────────────────────────────────┐ │
 │  │  Vue 3 Components                                     │ │
 │  │  - ProfileCard, ProfileFilters                       │ │
-│  │  - Browse pages, detail pages                        │ │
+│  │  - Browse pages with client-side filtering          │ │
+│  │  - Detail pages (dynamic routes)                     │ │
 │  │  - Reka UI components                                │ │
 │  └───────────────────────────────────────────────────────┘ │
 │                           │                                 │
@@ -83,215 +81,289 @@
 
 | Layer | Technology |
 |-------|------------|
-| Content Editing | Drizzle Studio (visual table editor) |
-| Database (dev) | PGlite (Postgres in WASM, IndexedDB) |
-| ORM | Drizzle ORM |
-| Validation | Zod (via drizzle-zod) |
+| Content Management | Pocketbase 0.23.9 (visual admin UI) |
+| Database | SQLite (via Pocketbase) |
+| API | Pocketbase REST API |
+| Version Control | sqlite-diffable (NDJSON exports) |
 | Static Site | VitePress 1.6.4 |
 | UI Framework | Vue 3 |
 | Components | Reka UI 2.7.0 |
-| Data Loading | VitePress Data Loaders |
-| Source of Truth | YAML files |
+| Data Loading | VitePress Data Loaders (query Pocketbase) |
+| Source of Truth | Pocketbase database |
 
 ## Data Flow
 
 ### Content Editing (Development)
 ```
-Drizzle Studio → PGlite (IndexedDB) → Export Script → YAML files
+Pocketbase Admin UI → SQLite Database → sqlite-diffable export → Git commit → Push
 ```
 
-### Production Build (Static Site)
+### Production Build (CI/CD)
 ```
-YAML files → Data Loaders (Zod validation) → Typed JSON → Vue Components → Static HTML
+Git clone → sqlite-diffable restore → Start Pocketbase → VitePress queries API → Build static site → Deploy
 ```
 
-## Key Differences from saf-site-v4
+### Local Development
+```
+Start Pocketbase → VitePress dev (queries Pocketbase) → Hot reload on data changes
+```
 
-### What We Kept
-- ✅ Drizzle + Zod schema (exact same schema.ts)
-- ✅ PGlite for local editing
-- ✅ YAML as source of truth
-- ✅ Composables for filters/search/counts
-- ✅ TypeScript types from schema
+## Collections (12 Total)
 
-### What We Changed
-- ❌ No Nuxt (replaced with VitePress)
-- ❌ No Nuxt Content (replaced with VitePress data loaders)
-- ❌ No custom admin UI (using Drizzle Studio instead)
-- ❌ No Nuxt UI v4 (using Reka UI instead)
+### Base Collections (No Foreign Keys)
+- **tags** - Content tags (ansible, cloud, security, etc.)
+- **organizations** - Organizations (MITRE, DISA, CIS, etc.)
+- **technologies** - Technologies (InSpec, Ansible, Terraform, etc.)
+- **standards** - Standards (STIG, CIS, NIST, PCI-DSS, etc.)
+- **capabilities** - Capabilities (validate, harden, plan, etc.)
+
+### Collections with Foreign Keys
+- **teams** - Teams (FK: organization)
+- **profiles** - Validation profiles (FKs: technology, organization, team, standard)
+- **hardening_profiles** - Hardening profiles (FKs: technology, organization, team, standard)
+- **tools** - Tools (FKs: technology, organization)
+
+### Junction Tables (Many-to-Many)
+- **profiles_tags** - Links profiles to tags
+- **hardening_profiles_tags** - Links hardening profiles to tags
+- **validation_to_hardening** - Links validation profiles to hardening profiles
+
+## Key Differences from PGlite/Drizzle Architecture
+
+### What Changed
+- ❌ No PGlite (replaced with Pocketbase SQLite)
+- ❌ No Drizzle Studio (replaced with Pocketbase admin UI)
+- ❌ No YAML exports (database is source of truth)
+- ❌ No Drizzle ORM (Pocketbase provides REST API)
 
 ### What We Gained
-- ✅ Simpler stack (VitePress vs Nuxt)
-- ✅ Better docs site features (built-in search, sidebar, nav)
-- ✅ No custom admin code to maintain (Drizzle Studio handles it)
-- ✅ Same data management power as v4
+- ✅ Single source of truth (no YAML duplication)
+- ✅ Automatic FK expansion via REST API (`?expand=org,team,tech`)
+- ✅ Better content editing UX (searchable FK pickers, inline editing)
+- ✅ Git-friendly version control (NDJSON format)
+- ✅ Self-contained deployment (single Pocketbase binary)
+- ✅ No intermediate export step (direct API queries)
+
+### What We Kept
+- ✅ SQLite backend (via Pocketbase)
+- ✅ Relational data with FK constraints
+- ✅ VitePress for static site generation
+- ✅ Vue 3 components
+- ✅ TypeScript throughout
 
 ## Directory Structure
 
 ```
 saf-site-vitepress/
-├── content/
-│   └── data/               # YAML source of truth
-│       ├── profiles/
-│       ├── hardening/
-│       ├── standards/
-│       ├── organizations/
-│       ├── teams/
-│       └── tools/
+├── .pocketbase/
+│   ├── pocketbase              # Single binary (not in git)
+│   └── pb_data/
+│       ├── data.db             # SQLite binary (not in git)
+│       ├── data.db-wal         # Write-ahead log (not in git)
+│       ├── data.db-shm         # Shared memory (not in git)
+│       └── diffable/           # Git-tracked exports
+│           ├── *.metadata.json # Table schemas
+│           └── *.ndjson        # Table data
 ├── docs/
 │   ├── .vitepress/
-│   │   ├── config.ts       # VitePress config
-│   │   ├── database/
-│   │   │   └── schema.ts   # Drizzle + Zod schema (from v4)
+│   │   ├── config.ts           # VitePress config
 │   │   ├── loaders/
-│   │   │   ├── profiles.data.ts
-│   │   │   ├── hardening.data.ts
-│   │   │   └── standards.data.ts
-│   │   ├── composables/
-│   │   │   ├── useProfiles.ts
-│   │   │   ├── useHardeningProfiles.ts
-│   │   │   └── useStandards.ts
+│   │   │   ├── profiles.data.ts      # Query Pocketbase API
+│   │   │   ├── hardening.data.ts     # Query Pocketbase API
+│   │   │   └── standards.data.ts     # Query Pocketbase API
 │   │   ├── theme/
 │   │   │   ├── index.ts
 │   │   │   ├── custom.css
 │   │   │   └── components/
-│   │   └── utils/
-│   │       └── yaml.ts     # YAML import/export
+│   │   │       ├── ProfileCard.vue
+│   │   │       └── ProfileFilters.vue
+│   │   └── database/
+│   │       └── schema.ts       # Legacy Drizzle schema (reference only)
 │   ├── public/
-│   │   └── img/            # Logos, icons, badges
-│   ├── index.md            # Home page
+│   │   └── img/                # Logos, icons, badges
+│   ├── index.md                # Home page
 │   ├── validate/
-│   │   ├── index.md        # Browse validation profiles
+│   │   ├── index.md            # Browse validation profiles
 │   │   └── profiles/
-│   │       └── [slug].md   # Dynamic profile pages
+│   │       └── [slug].md       # Dynamic profile pages
 │   └── harden/
-│       ├── index.md        # Browse hardening guides
+│       ├── index.md            # Browse hardening guides
 │       └── guides/
-│           └── [slug].md   # Dynamic guide pages
+│           └── [slug].md       # Dynamic guide pages
 └── scripts/
-    ├── import-yaml.ts      # Import YAML → PGlite
-    └── export-yaml.ts      # Export PGlite → YAML
+    ├── create-all-collections.ts   # Create Pocketbase collections
+    ├── import-yaml-data.ts         # One-time YAML → Pocketbase import
+    ├── verify-collections.ts       # Validate collection structure
+    └── verify-import.ts            # Validate imported data
 ```
 
 ## Content Editing Workflow
 
 ### 1. Initial Setup (First Time)
 ```bash
-# Port schema from saf-site-v4
-cp ../saf-site-v4/app/database/schema.ts docs/.vitepress/database/
+# Clone repository
+git clone <repo>
+cd saf-site-vitepress
 
-# Import existing YAML data
-pnpm run import-yaml
+# Restore database from git
+cd .pocketbase/pb_data
+sqlite-diffable load diffable/ data.db --all
+cd ../..
 
-# Start Drizzle Studio
-npx drizzle-kit studio
-# Opens http://localhost:4983
+# Start Pocketbase
+cd .pocketbase && ./pocketbase serve
+# Opens admin UI: http://localhost:8090/_/
 ```
 
 ### 2. Edit Content
-- Open Drizzle Studio (localhost:4983)
-- Click "profiles" table → See all profiles as rows
-- Click row → Edit form appears
-- Foreign keys show as dropdowns (organizations, teams, standards)
-- Save → Updates PGlite (persists in IndexedDB)
+- Open Pocketbase admin UI: http://localhost:8090/_/
+- Login: admin@localhost.com / test1234567
+- Click collection (e.g., "profiles")
+- Click row to edit or "New record"
+- Foreign keys show as searchable dropdowns with names (not IDs)
+- Save → Updates database immediately
 
 ### 3. Export Changes
 ```bash
-# Export PGlite → YAML
-pnpm run export-yaml
+# Export database to git-friendly format
+cd .pocketbase/pb_data
+sqlite-diffable dump data.db diffable/ --all
 
-# Commit YAML files
-git add content/data/
-git commit -m "feat: add new profiles"
+# Commit changes
+git add .pocketbase/pb_data/diffable/
+git commit -m "content: update profiles"
+git push
 ```
 
 ### 4. Build & Deploy
 ```bash
-# VitePress reads YAML → static site
+# VitePress queries Pocketbase API → builds static site
 pnpm build
 
 # Deploy dist/ to hosting
 ```
 
+## VitePress Data Loader Pattern
+
+**All data loaders query Pocketbase REST API at build time:**
+
+```typescript
+// docs/.vitepress/loaders/profiles.data.ts
+import { defineLoader } from 'vitepress'
+import PocketBase from 'pocketbase'
+
+export interface ProfileData {
+  profiles: Profile[]
+}
+
+export default defineLoader({
+  async load(): Promise<ProfileData> {
+    const pb = new PocketBase(
+      process.env.POCKETBASE_URL || 'http://localhost:8090'
+    )
+
+    // Query with automatic FK expansion
+    const profiles = await pb.collection('profiles').getFullList({
+      expand: 'organization,team,technology,standard',
+      sort: '-created',
+      fields: '*,expand.organization.name,expand.team.name,expand.technology.name,expand.standard.name'
+    })
+
+    return { profiles }
+  }
+})
+```
+
+**Key features:**
+- No `watch` pattern needed (for APIs, watch is only for local files)
+- Automatic FK expansion via `expand` parameter
+- Pocketbase must be running during build
+- Returns fully typed data with expanded relations
+
+## CI/CD Pipeline
+
+**Build process requires Pocketbase running:**
+
+```yaml
+# Example GitHub Actions workflow
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
+
+  - name: Restore Pocketbase database
+    run: |
+      cd .pocketbase/pb_data
+      sqlite-diffable load diffable/ data.db --all
+
+  - name: Start Pocketbase (background)
+    run: |
+      cd .pocketbase
+      ./pocketbase serve &
+      sleep 5  # Wait for startup
+
+  - name: Install dependencies
+    run: pnpm install
+
+  - name: Build VitePress site
+    run: pnpm build
+    env:
+      POCKETBASE_URL: http://localhost:8090
+
+  - name: Stop Pocketbase
+    run: pkill pocketbase
+
+  - name: Deploy
+    run: # ... deploy docs/.vitepress/dist/
+```
+
 ## Why This Architecture?
 
 ### Content Management
-- **Drizzle Studio** handles complex editing (FK relationships, validation)
-- **YAML files** remain simple, git-friendly, contributor-accessible
-- **PGlite** provides full Postgres features for dev (relationships, integrity)
+- **Pocketbase** handles complex editing (FK relationships, validation, searchable pickers)
+- **SQLite** provides full relational database features
+- **REST API** exposes data for build-time queries
+- **Admin UI** included (no custom code needed)
+
+### Version Control
+- **sqlite-diffable** converts binary DB to text-based NDJSON
+- **One JSON record per line** (git-friendly, easy diffs)
+- **Separate schema + data files** (.metadata.json + .ndjson)
+- **No merge conflicts** (JSONL is line-based)
 
 ### Static Site Generation
 - **VitePress** excels at documentation sites (search, nav, sidebar)
-- **Data loaders** transform YAML at build time (no runtime overhead)
-- **Vue 3** provides reactive filtering/search on loaded data
+- **Data loaders** query Pocketbase API at build time
+- **No runtime overhead** (all data pre-loaded at build)
+- **Vue 3** provides reactive filtering/search on static data
 
-### Type Safety
-- **Drizzle schema** defines structure once
-- **Zod schemas** validate YAML on import/build
-- **TypeScript types** auto-generated from schema
-- **Same types** everywhere (editing → build → components)
-
-## Migration from saf-site-v4
-
-### What to Copy
-1. ✅ `app/database/schema.ts` → `docs/.vitepress/database/schema.ts`
-2. ✅ `content/data/**/*.yml` → `content/data/**/*.yml`
-3. ✅ `app/composables/*.ts` → `docs/.vitepress/composables/*.ts` (adapt)
-
-### What NOT to Copy
-- ❌ Nuxt-specific code (pages, server, api)
-- ❌ Nuxt Content queries
-- ❌ Custom admin UI
-- ❌ Repository pattern
-
-### Adaptation Required
-- Composables: Replace `queryCollection()` with data loader imports
-- Remove loading states (data available at build time)
-- Update imports to VitePress paths
+### Single Source of Truth
+- **Database is authoritative** (not YAML, not JSON exports)
+- **No duplicate data** (no YAML + DB to keep in sync)
+- **FK expansion automatic** (via API `?expand=` parameter)
+- **Relational integrity** enforced at database level
 
 ## Production Deployment
 
 **What gets deployed:**
 - Static HTML/CSS/JS (from `docs/.vitepress/dist/`)
-- YAML files are NOT deployed (converted to JSON at build)
+- No database, no Pocketbase runtime
 
 **What does NOT get deployed:**
-- PGlite database (dev-only)
-- Drizzle Studio (dev-only)
-- schema.ts (used at build time only)
+- Pocketbase binary (build-time only)
+- SQLite database (build-time only)
+- Data loader code (build-time only)
 
 **Hosting options:**
 - Netlify, Vercel, GitHub Pages, Cloudflare Pages
 - Any static hosting (no server required)
+- Database queries happen ONLY at build time
 
-## Content Editing with Drizzle Studio
+## Current Data (Session 015)
 
-**Drizzle Studio works with PGlite** and provides visual editing capabilities:
+- **78 validation profiles** with FK relationships
+- **5 hardening profiles**
+- **52 tags**, 16 organizations, 8 technologies, 18 standards
+- **4 teams**, 7 tools, 5 capabilities
+- **92 profile-tag links**, 25 hardening-tag links, 4 validation-hardening links
 
-- Launch with `pnpm studio` (opens http://localhost:4983)
-- Visual table editor with forms and validation
-- Foreign key relationships shown as dropdowns
-- Data persists in PGlite (IndexedDB)
-- Export changes to YAML files for version control
-
-**Configuration:** See `drizzle.config.ts` for PGlite setup with `driver: 'pglite'`.
-
-**Alternative approach:** Edit YAML files directly - Zod validates structure on build.
-
-## Future Option: Integrated Admin UI
-
-If we want to build a custom admin UI embedded in VitePress (instead of using Drizzle Studio):
-
-```
-VitePress Site
-├── /                    # Public documentation
-├── /validate            # Browse profiles
-└── /admin               # PGlite admin UI (auth required)
-    ├── /profiles        # CRUD UI
-    ├── /standards       # CRUD UI
-    └── /export          # Export YAML
-```
-
-This would follow saf-site-v4's architecture but embedded in VitePress.
-
-**Current approach:** Using Drizzle Studio for content editing (works well with PGlite).
+All data imported from YAML files (one-time migration) and now managed in Pocketbase.

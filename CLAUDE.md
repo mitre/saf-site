@@ -19,13 +19,26 @@ VitePress proof-of-concept for MITRE SAF documentation site. This evaluates Vite
 
 ## Content Management (Pocketbase)
 
-**Decision (Session 014)**: Pocketbase approved for content editing after evaluating TrailBase.
+**Decision (Sessions 014-015)**: Pocketbase is the content management system and single source of truth.
 
 **Why Pocketbase**:
-- FK relation UX validated: Shows names (not IDs) in dropdown pickers
-- Searchable, inline editing, can create related records on-the-fly
-- Version control via sqlite-diffable (same approach as libsql)
+- Relational database with FK constraints (enforced at DB level)
+- FK relation UX: Shows names (not IDs) in dropdown pickers, searchable
+- Inline editing, can create related records on-the-fly
+- Version control via sqlite-diffable (git-friendly NDJSON export)
 - Self-contained (single binary, no external services)
+- Automatic FK expansion via REST API (`?expand=org,team,tech`)
+
+**Architecture Decision**:
+- **Pocketbase database is source of truth** (not YAML, not JSON exports)
+- **VitePress data loaders query Pocketbase API at build time**
+- **No intermediate export step** (YAML was rejected as duplicate data)
+- **Database in git via sqlite-diffable** for version control
+
+**Content Workflow**:
+```
+Edit in Pocketbase → Export DB (sqlite-diffable) → Commit → VitePress queries Pocketbase API → Build static site
+```
 
 **Running Pocketbase**:
 ```bash
@@ -38,32 +51,42 @@ cd .pocketbase && ./pocketbase serve
 1. Start Pocketbase: `cd .pocketbase && ./pocketbase serve`
 2. Open admin UI: http://localhost:8090/_/
 3. Edit collections: profiles, organizations, standards, etc.
-4. Export changes: `cd .pocketbase/pb_data && sqlite-diffable dump data.db`
-5. Commit: `git add data.db.metadata.json data.db.ndjson`
+4. Export database: `cd .pocketbase/pb_data && sqlite-diffable dump data.db diffable/ --all`
+5. Commit: `git add .pocketbase/pb_data/diffable/`
+
+**Restoring Database** (clone/pull):
+```bash
+cd .pocketbase/pb_data
+sqlite-diffable load diffable/ data.db --all
+```
 
 **Pocketbase Collection API** (Critical Pattern):
 Field options are DIRECT properties, NOT nested in "options":
-```python
+```typescript
 {
-    "name": "organization",
-    "type": "relation",
-    "collectionId": org_id,      # DIRECT property
-    "cascadeDelete": False,       # DIRECT property
-    "maxSelect": 1                # DIRECT property
+    name: "organization",
+    type: "relation",
+    collectionId: org_id,      // DIRECT property
+    cascadeDelete: false,       // DIRECT property
+    maxSelect: 1                // DIRECT property
 }
 ```
 
 **Collections** (12 total):
-- Base: tags, organizations, technologies, standards, capabilities
-- With FKs: teams, profiles, hardening_profiles, tools
-- Junction: profiles_tags, hardening_profiles_tags, validation_to_hardening
+- **Base** (no FKs): tags, organizations, technologies, standards, capabilities
+- **With FKs**: teams, profiles, hardening_profiles, tools
+- **Junction** (many-to-many): profiles_tags, hardening_profiles_tags, validation_to_hardening
 
-**Import Tool**: Use pb-cli for bulk data import (avoids Python SDK parsing bugs)
-```bash
-pb-cli context add local http://127.0.0.1:8090
-pb-cli auth admin@localhost.com test1234567
-pb-cli record create organizations --data '{"name":"MITRE SAF"}'
-```
+**Data Import Scripts**:
+- `scripts/create-all-collections.ts` - Creates all 12 collections with proper schema
+- `scripts/import-yaml-data.ts` - One-time import from YAML to Pocketbase
+- `scripts/verify-collections.ts` - Validates collection structure
+- `scripts/verify-import.ts` - Validates imported data with FK expansion
+
+**Current Data**:
+- 78 validation profiles, 5 hardening profiles
+- 52 tags, 16 organizations, 8 technologies, 18 standards, 4 teams, 7 tools, 5 capabilities
+- 92 profile-tag links, 25 hardening-tag links, 4 validation-hardening links
 
 ## Development Commands
 
@@ -104,20 +127,27 @@ docs/
 
 ### Key Architectural Patterns
 
-#### 1. VitePress Data Loaders (Build-Time Data)
+#### 1. VitePress Data Loaders (Build-Time Data from Pocketbase)
 
-VitePress data loaders run at build time to load YAML/JSON and make it available as static imports:
+VitePress data loaders run at build time to query Pocketbase API and make data available as static imports:
 
 **Location**: `docs/.vitepress/loaders/*.data.ts`
 
 ```typescript
 // profiles.data.ts
 import { defineLoader } from 'vitepress'
+import PocketBase from 'pocketbase'
 
 export default defineLoader({
-  watch: ['../../content/data/profiles/*.yml'],
   async load(): Promise<ProfileData> {
-    // Read YAML files, process, return typed data
+    const pb = new PocketBase(process.env.POCKETBASE_URL || 'http://localhost:8090')
+
+    // Query with FK expansion
+    const profiles = await pb.collection('profiles').getFullList({
+      expand: 'organization,team,technology,standard',
+      sort: '-created'
+    })
+
     return { profiles }
   }
 })
@@ -132,8 +162,9 @@ const allProfiles = data.profiles  // Available at build time
 ```
 
 **Key Points**:
-- Data loaded once at build time (not runtime)
-- Hot-reloads when watched files change
+- Data loaded once at build time from Pocketbase API (not runtime)
+- Pocketbase must be running during build (single binary, easy to set up)
+- FK expansion automatic via `expand` parameter
 - Returns fully typed TypeScript objects
 - Client-side Vue handles filtering/interactivity on this static data
 
@@ -254,35 +285,43 @@ VitePress uses CSS custom properties for theming. Override these for brand color
 
 ## VitePress Features & Best Practices
 
-### Data Loading (Build-Time)
+### Data Loading (Build-Time from Pocketbase)
 
-**Use extensively** - Already implemented for validation profiles, expand for all content types.
+**Use extensively** - Query Pocketbase API at build time for all content types.
 
 **Pattern:**
 ```typescript
 // docs/.vitepress/loaders/profiles.data.ts
 import { defineLoader } from 'vitepress'
+import PocketBase from 'pocketbase'
 
 export default defineLoader({
-  watch: ['../../content/data/profiles/*.yml'],  // Hot-reload on changes
   async load(): Promise<ProfileData> {
-    // Load YAML, transform, return typed data
-    // Runs at BUILD TIME only (Node.js APIs available)
+    const pb = new PocketBase(process.env.POCKETBASE_URL || 'http://localhost:8090')
+
+    // Query with automatic FK expansion
+    const profiles = await pb.collection('profiles').getFullList({
+      expand: 'organization,team,technology,standard',
+      sort: '-created'
+    })
+
+    return { profiles }  // Fully typed data with expanded relations
   }
 })
 ```
 
 **Benefits:**
-- Data transformation at build time (no client-side YAML parsing)
+- Single source of truth (Pocketbase database)
+- Automatic FK expansion via API (`expand` parameter)
 - Type-safe data imports
-- Hot-reload during development
-- Works with any data source (files, APIs, databases)
+- No duplicate data exports
+- Relational data queries at build time
 
 **Use cases:**
-- ✅ Loading validation profiles from YAML
-- ✅ Loading hardening guides from YAML
-- ✅ Loading standards/frameworks from YAML
-- ✅ Generating navigation from file structure
+- ✅ Loading validation profiles with expanded FKs
+- ✅ Loading hardening guides with expanded FKs
+- ✅ Loading standards/frameworks with relationships
+- ✅ Querying across collections for navigation/filters
 
 ### Dynamic Routes (Programmatic Page Generation)
 
@@ -404,9 +443,10 @@ docs/validate/rhel8-stig.md → /validate/rhel8-stig.html
 - Images, fonts, static files
 - Referenced as `/img/logo.png` (not `/public/img/logo.png`)
 
-**Data Files** (future: `docs/content/data/*.yml`):
-- YAML data for profiles, guides, standards
-- Loaded via data loaders in `docs/.vitepress/loaders/`
+**Content Data** (Pocketbase):
+- All content (profiles, guides, standards, etc.) stored in Pocketbase database
+- Database exported to `.pocketbase/pb_data/diffable/` for version control
+- VitePress data loaders query Pocketbase API at build time
 
 ## Beads Task Tracking
 
@@ -501,10 +541,22 @@ const doubled = computed(() => count.value * 2)
 This is a POC to evaluate VitePress as replacement for existing Nuxt site at `/Users/alippold/github/mitre/saf-site-v4`.
 
 **Success Criteria**:
-1. Handle complex YAML data (profiles, guides, standards)
+1. Handle complex relational data (profiles, guides, standards with FK relationships)
 2. Interactive browse pages with filters/search
 3. Production-quality components and UX
 4. Fast builds and good bundle size
 5. Same UX as Nuxt but simpler stack
 
-**Current Phase**: Core infrastructure (layouts, patterns, component library)
+**Current Phase**: Core infrastructure complete (Pocketbase content management, VitePress data loaders)
+
+**Completed**:
+- ✅ Pocketbase content management (12 collections with FK relations)
+- ✅ Database version control (sqlite-diffable)
+- ✅ Data import (78 profiles, all reference data)
+- ✅ Layout patterns (browse pages, full-width layouts)
+- ✅ Component library (Reka UI)
+
+**Next**:
+- VitePress data loader integration with Pocketbase API
+- Dynamic routes for detail pages
+- Remaining browse pages (hardening, standards, apps)
