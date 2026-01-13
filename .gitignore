@@ -20,3 +20,6 @@ drizzle/
 .env*.local
 .beads/recovery-context.md
 .playwright-mcp/
+
+# YAML data quality fixer backups
+*.bak.*

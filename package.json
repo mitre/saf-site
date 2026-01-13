@@ -11,7 +11,8 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:dump": "sqlite-diffable dump .data/saf.db diffable/ --all",
-    "db:load": "sqlite-diffable load .data/saf.db diffable/"
+    "db:load": "sqlite-diffable load .data/saf.db diffable/",
+    "db:import-v4": "tsx scripts/import-from-v4.ts"
   },
   "keywords": [
     "mitre",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@vue/theme": "^2.3.0",
     "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0",
     "vitepress": "^1.6.4"
   },
   "dependencies": {

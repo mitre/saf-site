@@ -12,8 +12,58 @@ VitePress proof-of-concept for MITRE SAF documentation site. This evaluates Vite
 - Reka UI 2.7.0 (headless component library)
 - pnpm 10.26.2 (package manager)
 - TypeScript for config and data loaders
+- **Pocketbase 0.23.9** (content management - APPROVED session 014)
+- sqlite-diffable (git-friendly database export)
 
 **Repository**: `/Users/alippold/github/mitre/saf-site-vitepress`
+
+## Content Management (Pocketbase)
+
+**Decision (Session 014)**: Pocketbase approved for content editing after evaluating TrailBase.
+
+**Why Pocketbase**:
+- FK relation UX validated: Shows names (not IDs) in dropdown pickers
+- Searchable, inline editing, can create related records on-the-fly
+- Version control via sqlite-diffable (same approach as libsql)
+- Self-contained (single binary, no external services)
+
+**Running Pocketbase**:
+```bash
+cd .pocketbase && ./pocketbase serve
+# Admin UI: http://localhost:8090/_/
+# Login: admin@localhost.com / test1234567
+```
+
+**Editing Content**:
+1. Start Pocketbase: `cd .pocketbase && ./pocketbase serve`
+2. Open admin UI: http://localhost:8090/_/
+3. Edit collections: profiles, organizations, standards, etc.
+4. Export changes: `cd .pocketbase/pb_data && sqlite-diffable dump data.db`
+5. Commit: `git add data.db.metadata.json data.db.ndjson`
+
+**Pocketbase Collection API** (Critical Pattern):
+Field options are DIRECT properties, NOT nested in "options":
+```python
+{
+    "name": "organization",
+    "type": "relation",
+    "collectionId": org_id,      # DIRECT property
+    "cascadeDelete": False,       # DIRECT property
+    "maxSelect": 1                # DIRECT property
+}
+```
+
+**Collections** (12 total):
+- Base: tags, organizations, technologies, standards, capabilities
+- With FKs: teams, profiles, hardening_profiles, tools
+- Junction: profiles_tags, hardening_profiles_tags, validation_to_hardening
+
+**Import Tool**: Use pb-cli for bulk data import (avoids Python SDK parsing bugs)
+```bash
+pb-cli context add local http://127.0.0.1:8090
+pb-cli auth admin@localhost.com test1234567
+pb-cli record create organizations --data '{"name":"MITRE SAF"}'
+```
 
 ## Development Commands
 
