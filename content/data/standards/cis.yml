@@ -1,0 +1,48 @@
+_id: cis-standard
+_metadata:
+  description: Center for Internet Security (CIS) Benchmarks
+  standardURL: https://www.cisecurity.org/cis-benchmarks
+  lastUpdated: '2023-09-10'
+  team: cis-benchmarks
+  organization: cis
+  technology: inspec
+  logo: /img/logos/standards/cis.png
+standards:
+- id: cis
+  name: CIS Benchmarks
+  description: The Center for Internet Security (CIS) Benchmarks are consensus-based
+    configuration guidelines developed by experts to help organizations improve their
+    security posture.
+  website: https://www.cisecurity.org/cis-benchmarks
+  categories:
+  - Security
+  - Compliance
+  - Configuration
+  profileTypes:
+  - Validation
+  - Hardening
+  platforms:
+  - Cloud
+  - Desktop
+  - Server
+  - Mobile
+  - Network
+  relatedProfiles:
+  - aws-cis
+  - docker-ce-cis
+  - kubernetes-cis
+  - gcp-cis-benchmark
+  - gke-cis-benchmark
+  - oracle-mysql-57-cis
+  - oracle-database-19c-cis
+  - aws-rds-mysql-57-cis
+  - aws-rds-cis
+  - tomcat-8-cis
+  - tomcat-7-cis
+  hardeningProfiles:
+  - docker-cis
+  - kubernetes-hardening
+  lastUpdated: '2023-09-10'
+  status: active
+  vendor: CIS
+  logo: /img/logos/standards/cis.png

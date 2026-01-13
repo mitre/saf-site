@@ -1,0 +1,1127 @@
+_id: stig-profiles
+_metadata:
+  standard: STIG
+  description: validation profiles
+profiles:
+- id: red-hat-7-stig
+  name: Red Hat 7 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/redhat-enterprise-linux-7-stig-baseline
+  details: /profiles/red-hat-7-stig
+  status: active
+  lastUpdated: '2022-12-06'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Red Hat 7 STIG
+  requirements: Access to the target system
+- id: windows-2012-stig
+  name: Windows 2012 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-windows-2012r2-memberserver-stig-baseline
+  details: /profiles/windows-2012-stig
+  status: active
+  lastUpdated: '2021-04-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft Windows 2012r2 Member Server STIG
+  requirements: Access to the target system
+- id: windows-2016-stig
+  name: Windows 2016 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-windows-server-2016-stig-baseline
+  details: /profiles/windows-2016-stig
+  status: active
+  lastUpdated: '2022-02-17'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft Windows Server 2016 STIG
+  requirements: Access to the target system
+- id: windows-2019-stig
+  name: Windows 2019 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-windows-server-2019-stig-baseline
+  details: /profiles/windows-2019-stig
+  status: active
+  lastUpdated: '2022-10-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft Windows Server 2019 STIG
+  requirements: Access to the target system
+- id: ubuntu-1604-stig
+  name: Ubuntu 16.04 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/canonical-ubuntu-16.04-lts-stig-baseline
+  details: /profiles/ubuntu-1604-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Canonical Ubuntu 16.04 STIG
+  requirements: Access to the target system
+- id: ubuntu-2004-stig
+  name: Ubuntu 20.04 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/canonical-ubuntu-20.04-lts-stig-baseline
+  details: /profiles/ubuntu-2004-stig
+  status: active
+  lastUpdated: '2022-12-09'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Canonical Ubuntu 20.04 STIG
+  requirements: Access to the target system
+- id: windows-10-stig
+  name: Windows 10 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-windows-10-stig-baseline
+  details: /profiles/windows-10-stig
+  status: active
+  lastUpdated: '2021-04-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft Windows 10 STIG v1r19
+  requirements: Access to the target system
+- id: jre-7-stig
+  name: JRE 7 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/oracle-java-runtime-environment-7-unix-stig-baseline
+  details: /profiles/jre-7-stig
+  status: active
+  lastUpdated: '2021-12-27'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Oracle Java Runtime Environment 7 Unix STIG
+  requirements: Access to the target system
+- id: jre-8-stig
+  name: JRE 8 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/oracle-java-runtime-environment-8-unix-stig-baseline
+  details: /profiles/jre-8-stig
+  status: active
+  lastUpdated: '2021-12-27'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Oracle Java Runtime Environment 8 Unix STIG
+  requirements: Access to the target system
+- id: red-hat-jboss-eap-63-stig
+  name: Red Hat Jboss EAP 6.3 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/redhat-jboss-enterprise-application-platform-6.3-stig-baseline
+  details: /profiles/red-hat-jboss-eap-63-stig
+  status: active
+  lastUpdated: '2021-12-16'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Red Hat Jboss Enterprise Application Server 6.3 STIG
+  requirements: Access to the target system
+- id: iis-85-server-stig
+  name: IIS 8.5 Server STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-iis-8.5-server-stig-baseline
+  details: /profiles/iis-85-server-stig
+  status: active
+  lastUpdated: '2021-04-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft IIS 8.5 Server STIG
+  requirements: Access to the target system
+- id: iis-85-site-stig
+  name: IIS 8.5 Site STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-iis-8.5-site-stig-baseline
+  details: /profiles/iis-85-site-stig
+  status: active
+  lastUpdated: '2021-04-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft IIS 8.5 Site STIG
+  requirements: Access to the target system
+- id: postgresql-9x-stig
+  name: PostgreSQL 9.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/pgstigcheck-inspec
+  details: /profiles/postgresql-9x-stig
+  status: active
+  lastUpdated: '2021-12-27'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Crunchy Data PostgreSQL 9.x STIG
+  requirements: Access to the target system
+- id: aws-rds-postgresql-9x-stig
+  name: AWS RDS PostgreSQL 9.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/aws-rds-crunchy-data-postgresql-9-stig-baseline
+  details: /profiles/aws-rds-postgresql-9x-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: AWS RDS Crunchy Data PostgreSQL 9.x STIG
+  requirements: Access to the target system
+- id: msql-2014-database-stig
+  name: MSQL 2014 Database STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-sql-server-2014-database-stig-baseline
+  details: /profiles/msql-2014-database-stig
+  status: active
+  lastUpdated: '2021-05-10'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft SQL Server 2014 Database STIG
+  requirements: Access to the target system
+- id: msql-2014-instance-stig
+  name: MSQL 2014 Instance STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/microsoft-sql-server-2014-instance-stig-baseline
+  details: /profiles/msql-2014-instance-stig
+  status: active
+  lastUpdated: '2021-05-10'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Microsoft SQL Server 2014 Database STIG
+  requirements: Access to the target system
+- id: aws-rds-oracle-database-12c-stig
+  name: AWS RDS Oracle Database 12c STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/aws-rds-oracle-database-12c-stig-baseline
+  details: /profiles/aws-rds-oracle-database-12c-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: AWS RDS Oracle Database 12c STIG
+  requirements: Access to the target system
+- id: oracle-database-12c-stig
+  name: Oracle Database 12c STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/oracle-database-12c-stig-baseline
+  details: /profiles/oracle-database-12c-stig
+  status: active
+  lastUpdated: '2021-12-27'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Oracle Database 12c STIG
+  requirements: Access to the target system
+- id: mongodb-stig
+  name: MongoDB STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/mongodb-enterprise-advanced-3-stig-baseline
+  details: /profiles/mongodb-stig
+  status: active
+  lastUpdated: '2021-12-14'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: MongoDB STIG
+  requirements: Access to the target system
+- id: vmware-esxi-67-stig
+  name: VMware ESXI 6.7 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vsphere/inspec/vmware-esxi-6.7-stig-baseline
+  details: /profiles/vmware-esxi-67-stig
+  status: active
+  lastUpdated: '2022-04-02'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware ESXI 6.7 STIG
+  requirements: Access to the target system
+- id: vmware-vsphere-vm-67-stig
+  name: VMware vSphere VM 6.7 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vsphere/inspec/vmware-vm-6.7-stig-baseline
+  details: /profiles/vmware-vsphere-vm-67-stig
+  status: active
+  lastUpdated: '2022-04-02'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vSphere Virtual Machines version 6.7 STIG
+  requirements: Access to the target system
+- id: vmware-esxi-65-stig
+  name: VMware ESXI 6.5 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/kclinden/vmware-esxi-6.5-stig-baseline
+  details: /profiles/vmware-esxi-65-stig
+  status: active
+  lastUpdated: '2019-07-12'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware ESXI 6.5 STIG
+  requirements: Access to the target system
+- id: vmware-vcsa-67-stig
+  name: VMware VCSA 6.7 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vcsa/inspec/vmware-vcsa-6.7-stig-baseline
+  details: /profiles/vmware-vcsa-67-stig
+  status: active
+  lastUpdated: '2022-11-21'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vCenter Server Appliance 6.7 STIG
+  requirements: Access to the target system
+- id: vmware-vsphere-70-stig-readiness-guide
+  name: VMware vSphere 7.0 STIG Readiness Guide
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/inspec/vmware-vsphere-7.0-stig-baseline
+  details: /profiles/vmware-vsphere-70-stig-readiness-guide
+  status: active
+  lastUpdated: '2023-01-05'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vSphere(ESXi,vCenter,VMs) 7.0 STIG Readiness Guide
+  requirements: Access to the target system
+- id: red-hat-6-stig
+  name: Red Hat 6 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/redhat-enterprise-linux-6-stig-baseline
+  details: /profiles/red-hat-6-stig
+  status: active
+  lastUpdated: '2021-05-10'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Red Hat 6 STIG
+  requirements: Access to the target system
+- id: kubernetes-cluster-stig
+  name: Kubernetes Cluster STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/k8s-cluster-stig-baseline
+  details: /profiles/kubernetes-cluster-stig
+  status: active
+  lastUpdated: '2023-01-04'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Kubernetes Cluster STIG
+  requirements: Access to the target system
+- id: apache-server-22-stig
+  name: Apache Server 2.2 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/apache-server-2.2-stig-baseline
+  details: /profiles/apache-server-22-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Apache Server 2.2 STIG
+  requirements: Access to the target system
+- id: red-hat-8-stig
+  name: Red Hat 8 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/redhat-enterprise-linux-8-stig-baseline
+  details: /profiles/red-hat-8-stig
+  status: active
+  lastUpdated: '2024-03-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Red Hat 8 STIG
+  requirements: Access to the target system
+- id: apache-site-22-stig
+  name: Apache Site 2.2 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/apache-site-2.2-stig-baseline
+  details: /profiles/apache-site-22-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Apache Site 2.2 STIG
+  requirements: Access to the target system
+- id: apache-server-24x-stig
+  name: Apache Server 2.4x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/apache-server-2.4x-stig-baseline
+  details: /profiles/apache-server-24x-stig
+  status: active
+  lastUpdated: '2022-11-18'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Apache Server 2.4x STIG
+  requirements: Access to the target system
+- id: apache-site-24x-stig
+  name: Apache Site 2.4x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/apache-site-2.4x-stig-baseline
+  details: /profiles/apache-site-24x-stig
+  status: active
+  lastUpdated: '2022-12-05'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Apache Site 2.4x STIG
+  requirements: Access to the target system
+- id: apache-tomcat-9x-stig
+  name: Apache Tomcat 9.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/apache-tomcat-9.x-stig-baseline
+  details: /profiles/apache-tomcat-9x-stig
+  status: active
+  lastUpdated: '2022-12-05'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Apache Tomcat 9.x STIG
+  requirements: Access to the target system
+- id: aws-msql-2014-stig
+  name: AWS MSQL 2014 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/aws-rds-microsoft-sql-server-2014-instance-stig-baseline
+  details: /profiles/aws-msql-2014-stig
+  status: active
+  lastUpdated: '2022-06-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: AWS RDS Microsoft SQL 2014 Server STIG Instance
+  requirements: Access to the target system
+- id: vmware-vcsa-70-stig-readiness-guide
+  name: VMware VCSA 7.0 STIG Readiness Guide
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/inspec/vmware-vcsa-7.0-stig-baseline
+  details: /profiles/vmware-vcsa-70-stig-readiness-guide
+  status: active
+  lastUpdated: '2022-11-21'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vCenter Service Appliance version 7.0 STIG Readiness Guide
+  requirements: Access to the target system
+- id: k3s-node-stig
+  name: K3s Node STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/k3s-node-stig-baseline
+  details: /profiles/k3s-node-stig
+  status: active
+  lastUpdated: '2022-12-05'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: K3s Node STIG
+  requirements: Access to the target system
+- id: k3s-cluster-stig
+  name: K3s Cluster STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/k3s-cluster-stig-baseline
+  details: /profiles/k3s-cluster-stig
+  status: active
+  lastUpdated: '2022-12-05'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: K3s Cluster STIG
+  requirements: Access to the target system
+- id: kubernetes-node-stig
+  name: Kubernetes Node STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/k8s-node-stig-baseline
+  details: /profiles/kubernetes-node-stig
+  status: active
+  lastUpdated: '2023-01-04'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Kubernetes Node STIG
+  requirements: Access to the target system
+- id: oracle-mysql-80-stig
+  name: Oracle MySQL 8.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/oracle-mysql-8-stig-baseline
+  details: /profiles/oracle-mysql-80-stig
+  status: active
+  lastUpdated: '2022-11-15'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: Oracle MySQL 8.0 STIG Baseline
+  requirements: Access to the target system
+- id: postgresql-10+-stig
+  name: PostgreSQL 10+ STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/crunchy-data-postgresql-stig-baseline
+  details: /profiles/postgresql-10+-stig
+  status: active
+  lastUpdated: '2023-09-20'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: PostgreSQL 10+ STIG
+  requirements: Access to the target system
+- id: aws-rds-postgresql-10+-stig
+  name: AWS RDS PostgreSQL 10+ STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/aws-rds-crunchy-data-postgresql-stig-baseline
+  details: /profiles/aws-rds-postgresql-10+-stig
+  status: active
+  lastUpdated: '2023-09-20'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: AWS RDS PostgreSQL 10+ STIG
+  requirements: Access to the target system
+- id: vmware-vsphere-vcenter-70-stig
+  name: VMware vSphere vCenter 7.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/inspec/vmware-vcsa-7.0-stig-baseline
+  details: /profiles/vmware-vsphere-vcenter-70-stig
+  status: active
+  lastUpdated: '2023-08-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vSphere vCenter Appliance 7.0 STIG Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-vsphere-70-stig
+  name: VMware vSphere 7.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/inspec/vmware-vsphere-7.0-stig-baseline
+  details: /profiles/vmware-vsphere-70-stig
+  status: active
+  lastUpdated: '2023-08-03'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vSphere 7.0 STIG Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-vsphere-vcenter-80-stig
+  name: VMware vSphere vCenter 8.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vcsa/inspec/vmware-vcsa-8.0-stig-baseline
+  details: /profiles/vmware-vsphere-vcenter-80-stig
+  status: active
+  lastUpdated: '2023-09-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware vSphere vCenter Appliance 8.0 STIG Readiness Guide Chef
+    InSpec Profile
+  requirements: Access to the target system
+- id: vmware-cloud-director-104-stig
+  name: VMware Cloud Director 10.4 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vcd/10.4/inspec/vmware-cloud-director-10.4-stig-baseline
+  details: /profiles/vmware-cloud-director-104-stig
+  status: active
+  lastUpdated: '2023-07-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Cloud Director 10.4 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-nsx-t-3x-stig
+  name: VMware NSX-T 3.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/3.x/inspec/vmware-nsxt-3.x-stig-baseline
+  details: /profiles/vmware-nsx-t-3x-stig
+  status: active
+  lastUpdated: '2023-08-07'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware NSX-T 3.x STIG Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-nsx-4x-stig
+  name: VMware NSX 4.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/4.x/inspec/vmware-nsx-4.x-stig-baseline
+  details: /profiles/vmware-nsx-4x-stig
+  status: active
+  lastUpdated: '2023-06-29'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware NSX 4.x STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-photon-os-30-stig
+  name: VMware Photon OS 3.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/3.0/inspec/vmware-photon-3.0-stig-inspec-baseline
+  details: /profiles/vmware-photon-os-30-stig
+  status: active
+  lastUpdated: '2023-07-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Photon OS 3.0 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-photon-os-40-stig
+  name: 'VMware Photon OS 4.0 STIG '
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/4.0/inspec/vmware-photon-4.0-stig-baseline
+  details: /profiles/vmware-photon-os-40-stig-
+  status: active
+  lastUpdated: '2023-08-08'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Photon OS 4.0 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-photon-os-50-stig
+  name: VMware Photon OS 5.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/5.0/inspec/vmware-photon-5.0-stig-baseline
+  details: /profiles/vmware-photon-os-50-stig
+  status: active
+  lastUpdated: '2023-09-12'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Photon OS 5.0 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-cloud-foundation-45-stig
+  name: VMware Cloud Foundation 4.5 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/4.x/inspec/vmware-vcf-sddcmgr-4x-stig-baseline
+  details: /profiles/vmware-cloud-foundation-45-stig
+  status: active
+  lastUpdated: '2023-07-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Cloud Foundation 4.5 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-identity-manager-33x-stig
+  name: VMware Identity Manager 3.3.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vidm/3.3.x/inspec/vmware-vidm-3.3.x-stig-baseline
+  details: /profiles/vmware-identity-manager-33x-stig
+  status: active
+  lastUpdated: '2023-08-29'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Identity Manager 3.3.x STIG Readiness Guide Chef InSpec
+    Profile
+  requirements: Access to the target system
+- id: vmware-aria-automation-8x-stig
+  name: VMware Aria Automation 8.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/automation/8.x/inspec/vmware-vra-8x-stig-baseline
+  details: /profiles/vmware-aria-automation-8x-stig
+  status: active
+  lastUpdated: '2023-07-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Aria Automation 8.x STIG  Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-horizon-80-stig
+  name: VMware Horizon 8.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/horizon/8.0/inspec
+  details: /profiles/vmware-horizon-80-stig
+  status: active
+  lastUpdated: '2023-04-26'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Horizon 8.0 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-aria-operations-8x-stig
+  name: VMware Aria Operations 8.x STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/operations/8.x/inspec/vmware-aria-operations-8x-stig-baseline
+  details: /profiles/vmware-aria-operations-8x-stig
+  status: active
+  lastUpdated: '2023-09-12'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Aria Operations 8.x STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: vmware-cloud-foundation-50-stig
+  name: VMware Cloud Foundation 5.0 STIG
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: VMware
+  organization: other
+  team: mitre-saf
+  github: https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/5.x/inspec/vmware-cloud-foundation-sddcmgr-5x-stig-baseline
+  details: /profiles/vmware-cloud-foundation-50-stig
+  status: active
+  lastUpdated: '2023-07-13'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: VMware Cloud Foundation 5.0 STIG Readiness Guide Chef InSpec Profile
+  requirements: Access to the target system
+- id: nginx-stig-ready-baseline
+  name: NGINX STIG Ready Baseline
+  version: v1.0.0
+  platform: Cross Platform
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/nginx-stigready-baseline
+  details: /profiles/nginx-stig-ready-baseline
+  status: active
+  lastUpdated: '2022-09-22'
+  standard: stig
+  standardVersion: 1.0.0
+  tags: []
+  category: Platform Security
+  hardeningProfiles: []
+  shortDescription: NGINX STIG Ready Baseline
+  requirements: Access to the target system

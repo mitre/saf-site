@@ -1,0 +1,33 @@
+_id: pci-dss-profiles
+_metadata:
+  standard: PCI-DSS
+  description: Payment Card Industry Data Security Standard (PCI DSS) validation profiles
+  standardURL: https://www.pcisecuritystandards.org/standards/
+  lastUpdated: 2023-05-18
+profiles:
+- id: gcp-pci-dss
+  name: GCP PCI-DSS 3.2.1
+  version: v3.2.1
+  platform: Cloud Service Providers
+  framework: InSpec
+  technology: inspec
+  vendor: Google
+  organization: other
+  team: inspec-community
+  github: https://github.com/GoogleCloudPlatform/inspec-gcp-pci-profile
+  details: /profiles/gcp-pci-dss
+  status: active
+  lastUpdated: 2023-05-18
+  standard: pci-dss
+  standardVersion: 3.2.1
+  tags:
+  - cloud
+  - gcp
+  - payments
+  - pci
+  - compliance
+  category: Payment Systems
+  hardeningProfiles: []
+  shortDescription: Validates GCP infrastructure against PCI-DSS 3.2.1 compliance
+    requirements for payment card data security.
+  requirements: GCP credentials with viewer permissions

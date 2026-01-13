@@ -1,0 +1,61 @@
+_id: srg-ready-profiles
+_metadata:
+  standard: SRG-Ready
+  description: Security Requirements Guide (SRG) Ready validation profiles
+  standardURL: https://public.cyber.mil/stigs/srg-stig-tools/
+  lastUpdated: 2023-12-01
+profiles:
+- id: apache-srg-ready
+  name: Apache HTTP Server SRG-Ready
+  version: v1.0.0
+  platform: Application Servers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre-saf
+  team: mitre-saf
+  github: https://github.com/mitre/apache-srg-ready-baseline
+  details: /profiles/apache-srg-ready
+  status: active
+  lastUpdated: 2023-12-01
+  standard: stig-ready
+  standardVersion: v1.0.0
+  tags:
+  - apache
+  - http
+  - web
+  - server
+  - srg
+  category: Web Servers
+  hardeningProfiles:
+  - apache-hardening
+  shortDescription: Validates Apache HTTP Server configurations against DoD SRG requirements
+    for baseline security controls.
+  requirements: SSH access to Apache server with root or sudo privileges
+- id: nginx-srg-ready
+  name: NGINX SRG-Ready
+  version: v1.0.0
+  platform: Application Servers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre-saf
+  team: mitre-saf
+  github: https://github.com/mitre/nginx-srg-ready-baseline
+  details: /profiles/nginx-srg-ready
+  status: active
+  lastUpdated: 2023-12-01
+  standard: stig-ready
+  standardVersion: v1.0.0
+  tags:
+  - nginx
+  - http
+  - web
+  - server
+  - srg
+  category: Web Servers
+  hardeningProfiles:
+  - nginx-hardening
+  shortDescription: Validates NGINX web server configurations against DoD SRG requirements
+    for enhanced security posture.
+  requirements: SSH access to NGINX server with root or sudo privileges

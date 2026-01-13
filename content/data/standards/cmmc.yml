@@ -1,0 +1,14 @@
+_id: cmmc-standards
+_metadata:
+  organization: Department of Defense (DoD)
+  website: https://dodcio.defense.gov/cmmc/
+  lastUpdated: 2023-09-15
+  category: Government/Defense
+standards:
+  - id: cmmc
+    name: Cybersecurity Maturity Model Certification (CMMC)
+    description: A unified standard for implementing cybersecurity across the Defense Industrial Base (DIB) to ensure the protection of sensitive unclassified information.
+    website: https://dodcio.defense.gov/cmmc/
+    type: Framework
+    category: Government/Defense
+    version: "2.0"

@@ -14,6 +14,13 @@ drizzle/
 *.pglite
 .pglite/
 
+# Pocketbase (track migrations, ignore binary and runtime data)
+.pocketbase/pocketbase
+.pocketbase/pb_data/
+
+# TrailBase (rejected solution - keep out of git)
+.trailbase/
+
 # Environment
 .env
 .env.local

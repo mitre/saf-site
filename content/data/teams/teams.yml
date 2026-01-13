@@ -1,0 +1,40 @@
+_id: teams
+teams:
+  - id: mitre-saf
+    name: "MITRE SAF Team"
+    description: "Security Automation Framework team at MITRE, focused on developing security automation tools and frameworks"
+    organization: "mitre"
+    website: "https://saf.mitre.org"
+    logo: "/img/logos/teams/mitre-saf.png"
+    contact: "saf@mitre.org"
+    github: "https://github.com/mitre/saf"
+    twitter: "@mitre_saf"
+    members:
+      - name: "Aaron Lippold"
+        role: "Team Lead"
+      - name: "Robert Thew"
+        role: "Developer"
+      - name: "Will Dower"
+        role: "Developer"
+  
+  - id: disa-stig
+    name: "DISA STIG Team"
+    description: "Team responsible for developing and maintaining Security Technical Implementation Guides"
+    organization: "disa"
+    website: "https://public.cyber.mil/stigs/"
+    logo: "/img/logos/teams/disa-stig.png"
+    
+  - id: inspec-community
+    name: "InSpec Community"
+    description: "Open source community contributing to the InSpec security testing framework"
+    organization: "chef"
+    website: "https://community.chef.io/tools/chef-inspec"
+    github: "https://github.com/inspec/inspec"
+    logo: "/img/logos/teams/inspec-community.png"
+    
+  - id: cis-benchmarks
+    name: "CIS Benchmarks Team"
+    description: "Team responsible for creating and maintaining CIS Benchmarks for secure configuration"
+    organization: "cis"
+    website: "https://www.cisecurity.org/cis-benchmarks/"
+    logo: "/img/logos/teams/cis-benchmarks.png"

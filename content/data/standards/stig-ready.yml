@@ -1,0 +1,19 @@
+_id: stig-ready-standard
+_metadata:
+  description: "STIG-Ready validation profiles following DISA STIG guidelines"
+  lastUpdated: '2025-01-13'
+standards:
+  - id: stig-ready
+    name: STIG-Ready
+    description: "Validation profiles that follow STIG guidelines and structure but are not yet officially published by DISA as STIGs. STIG-Ready profiles are community or vendor-maintained implementations awaiting official DISA certification."
+    website: https://www.vmware.com/docs/vmw-stig-program-overview
+    categories:
+      - Security
+      - Compliance
+      - Government
+    profileTypes:
+      - Validation
+    platforms:
+      - Multiple
+    lastUpdated: "2025-01-13"
+    status: "active"

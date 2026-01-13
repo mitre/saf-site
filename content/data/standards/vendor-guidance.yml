@@ -1,0 +1,20 @@
+_id: vendor-guidance-standard
+_metadata:
+  description: "Vendor-specific security guidance and best practices"
+  lastUpdated: '2025-01-13'
+standards:
+  - id: vendor-guidance
+    name: Vendor Security Guidance
+    description: "Security best practices and hardening guidance published by technology vendors (AWS, Azure, VMware, etc.). These are vendor-maintained security recommendations and benchmarks for their products."
+    categories:
+      - Security
+      - Best Practices
+      - Vendor
+    profileTypes:
+      - Validation
+      - Hardening
+    platforms:
+      - Cloud
+      - Multiple
+    lastUpdated: "2025-01-13"
+    status: "active"

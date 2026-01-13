@@ -1,0 +1,22 @@
+_id: pci-dss-standards
+_metadata:
+  organization: PCI Security Standards Council
+  website: https://www.pcisecuritystandards.org/
+  lastUpdated: 2023-09-15
+  category: Financial/Industry
+standards:
+  - id: pci-dss
+    name: Payment Card Industry Data Security Standard (PCI DSS)
+    description: A set of security standards designed to ensure that all companies that accept, process, store or transmit credit card information maintain a secure environment.
+    website: https://www.pcisecuritystandards.org/document_library?category=pcidss
+    type: Framework
+    category: Financial/Industry
+    version: "4.0"
+  
+  - id: pa-dss
+    name: Payment Application Data Security Standard (PA-DSS)
+    description: Security requirements for payment application software developers that support PCI DSS compliance.
+    website: https://www.pcisecuritystandards.org/document_library?category=padss
+    type: Standard
+    category: Financial/Industry
+    version: "3.2"

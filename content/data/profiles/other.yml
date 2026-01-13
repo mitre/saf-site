@@ -1,0 +1,102 @@
+_id: other-profiles
+_metadata:
+  standard: OTHER
+  description: Other miscellaneous validation profiles
+  lastUpdated: 2025-04-02
+profiles:
+  - id: red-hat-cve-scan
+    name: Red Hat CVE Scan
+    version: v1.0.0
+    platform: Linux
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/CMSgov/redhat-enterprise-linux-cve-vulnerability-scan-baseline
+    details: /profiles/red-hat-cve-scan
+    status: active
+    lastUpdated: 2023-03-15
+    standard: OTHER
+    standardVersion: v1.0.0
+    tags:
+      - redhat
+      - cve
+      - vulnerability
+      - scan
+    category: Vulnerability Assessment
+    hardeningProfiles: []
+    shortDescription: "Scans Red Hat Enterprise Linux systems for known CVE vulnerabilities"
+    requirements: SSH access to Red Hat system with privileged access
+  - id: aws-s3-security
+    name: AWS S3 Security
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/aws-s3-security-baseline
+    details: /profiles/aws-s3-security
+    status: active
+    lastUpdated: 2023-04-20
+    standard: OTHER
+    standardVersion: v1.0.0
+    tags:
+      - aws
+      - s3
+      - storage
+      - cloud
+    category: Cloud Security
+    hardeningProfiles: []
+    shortDescription: "Validates AWS S3 bucket security configuration and access controls"
+    requirements: AWS credentials with appropriate permissions
+  - id: azure-security-benchmark
+    name: Azure Security Benchmark
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/azure-security-benchmark-baseline
+    details: /profiles/azure-security-benchmark
+    status: beta
+    lastUpdated: 2023-05-12
+    standard: OTHER
+    standardVersion: v1.0.0
+    tags:
+      - azure
+      - cloud
+      - microsoft
+      - security
+    category: Cloud Security
+    hardeningProfiles: []
+    shortDescription: "Validates Microsoft Azure resources against security best practices"
+    requirements: Azure credentials with appropriate permissions
+  - id: github-security
+    name: GitHub Security
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/github-security-baseline
+    details: /profiles/github-security
+    status: beta
+    lastUpdated: 2023-06-05
+    standard: OTHER
+    standardVersion: v1.0.0
+    tags:
+      - github
+      - scm
+      - devsecops
+      - git
+    category: DevSecOps
+    hardeningProfiles: []
+    shortDescription: "Validates GitHub organization and repository security controls"
+    requirements: GitHub API token with appropriate permissions

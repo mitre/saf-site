@@ -1,0 +1,65 @@
+_id: ansible-hardening-profiles
+_metadata:
+  framework: Ansible
+  technology: ansible
+  description: Ansible playbooks for security hardening
+  lastUpdated: 2023-10-10
+  team: mitre-saf
+  organization: mitre
+  logo: "/img/logos/technologies/ansible.png"
+hardeningProfiles:
+  - id: apache-ansible
+    name: Apache Web Server Hardening
+    version: v1.0.0
+    platform: Web Servers
+    framework: Ansible
+    technology: ansible
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/apache-ansible-hardening
+    details: /profiles/apache-ansible
+    status: active
+    lastUpdated: 2023-10-10
+    difficulty: medium
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - apache
+      - web
+      - ansible
+      - security
+      - httpd
+    category: Web Services
+    validationProfiles:
+      - apache-baseline
+    shortDescription: "Ansible playbook for hardening Apache web server configurations according to security best practices."
+    requirements: Ansible 2.9+ with SSH access to target servers
+
+  - id: docker-cis
+    name: Docker CIS Hardening
+    version: v1.0.0
+    platform: Virtual Platforms
+    framework: Ansible
+    technology: ansible
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/docker-cis-hardening
+    details: /profiles/docker-cis
+    status: active
+    lastUpdated: 2023-09-15
+    difficulty: medium
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - docker
+      - container
+      - engine
+      - security
+      - ansible
+    category: Container Security
+    validationProfiles:
+      - docker-ce-cis
+    shortDescription: "Ansible playbook for hardening Docker CE configurations according to CIS Docker Benchmark."
+    requirements: Ansible 2.9+ with SSH access to Docker hosts

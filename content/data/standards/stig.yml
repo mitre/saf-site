@@ -1,0 +1,30 @@
+_id: stig-standards
+_metadata:
+  organization: Defense Information Systems Agency (DISA)
+  website: https://public.cyber.mil/stigs/
+  lastUpdated: 2023-08-10
+  category: Government/Defense
+standards:
+  - id: stig
+    name: Security Technical Implementation Guides (STIGs)
+    description: Technical guidance for securing information systems and software used by the DoD to ensure compliance with DoD security requirements.
+    website: https://public.cyber.mil/stigs/downloads/
+    type: Configuration
+    category: Government/Defense
+    version: "Quarterly"
+  
+  - id: srg
+    name: Security Requirements Guides (SRGs)
+    description: Generalized security requirements for a technology type that can be applied to all vendor solutions before creating technology-specific STIGs.
+    website: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=all-srgs
+    type: Framework
+    category: Government/Defense
+    version: "Various"
+    
+  - id: disa-cci
+    name: DISA Control Correlation Identifier (CCI)
+    description: Control correlation identifiers that provide a standard mapping between various security controls (e.g., NIST 800-53) and security requirements in implementation guidance documents like STIGs.
+    website: https://public.cyber.mil/stigs/cci/
+    type: Mapping
+    category: Government/Defense
+    version: "2"

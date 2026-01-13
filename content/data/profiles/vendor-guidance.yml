@@ -1,0 +1,104 @@
+_id: vendor-guidance-profiles
+_metadata:
+  standard: Vendor Guidance
+  description: Vendor-specific best practices and security recommendations
+  lastUpdated: 2023-11-15
+profiles:
+- id: aws-rds-best-practices-benchmark
+  name: AWS RDS Best Practices Benchmark
+  version: v1.0.0
+  platform: Cloud Service Providers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/Staggerlee011/rds-bp-benchmark
+  details: /profiles/aws-rds-best-practices-benchmark
+  status: active
+  lastUpdated: 2022-07-08
+  standard: vendor-guidance
+  standardVersion: 1.0.0
+  tags:
+  - aws
+  - rds
+  - benchmark
+  - best
+  - practices
+  category: Cloud Platform
+  hardeningProfiles: []
+  shortDescription: Validates AWS RDS configuration against vendor best practices
+  requirements: AWS credentials with appropriate permissions
+- id: aws-s3
+  name: AWS S3
+  version: v1.0.0
+  platform: Cloud Service Providers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/mitre/aws-s3-baseline
+  details: /profiles/aws-s3
+  status: active
+  lastUpdated: 2022-06-03
+  standard: vendor-guidance
+  standardVersion: 1.0.0
+  tags:
+  - aws
+  - s3
+  category: Cloud Platform
+  hardeningProfiles: []
+  shortDescription: Validates AWS S3 buckets against security best practices
+  requirements: AWS credentials with appropriate permissions
+- id: aws-s3-bp
+  name: AWS S3 Best Practices Benchmark
+  version: n/a
+  platform: Cloud Service Providers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre-saf
+  team: mitre-saf
+  github: https://github.com/mitre/aws-s3-baseline
+  details: /profiles/aws-s3-bp
+  status: active
+  lastUpdated: 2023-11-15
+  standard: vendor-guidance
+  standardVersion: '2023'
+  tags:
+  - cloud
+  - aws
+  - s3
+  - storage
+  category: Cloud Storage
+  hardeningProfiles:
+  - aws-cis
+  shortDescription: Validates AWS S3 bucket security according to best practices including
+    encryption, access policies, and logging.
+  requirements: AWS CLI configured with appropriate read permissions
+- id: aws-s3-best-practices-benchmark
+  name: AWS S3 Best Practices Benchmark
+  version: v1.0.0
+  platform: Cloud Service Providers
+  framework: InSpec
+  technology: inspec
+  vendor: MITRE SAF
+  organization: mitre
+  team: mitre-saf
+  github: https://github.com/Staggerlee011/s3-bp-benchmark
+  details: /profiles/aws-s3-best-practices-benchmark
+  status: active
+  lastUpdated: 2022-07-08
+  standard: vendor-guidance
+  standardVersion: 1.0.0
+  tags:
+  - aws
+  - s3
+  - benchmark
+  - best
+  - practices
+  category: Cloud Platform
+  hardeningProfiles: []
+  shortDescription: Validates AWS S3 bucket configuration against vendor best practices
+  requirements: AWS credentials with appropriate permissions

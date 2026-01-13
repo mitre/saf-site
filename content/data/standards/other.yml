@@ -1,0 +1,19 @@
+_id: other-standard
+_metadata:
+  description: Other miscellaneous security standards
+  lastUpdated: '2025-01-12'
+standards:
+- id: other
+  name: Other Standards
+  description: Miscellaneous security validation profiles that don't fit into a specific
+    standard category
+  website: https://saf.mitre.org
+  categories:
+  - Security
+  - Validation
+  profileTypes:
+  - Validation
+  platforms:
+  - Multiple
+  lastUpdated: '2025-01-12'
+  status: active

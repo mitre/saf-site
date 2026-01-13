@@ -1,0 +1,279 @@
+_id: cis-profiles
+_metadata:
+  standard: CIS
+  description: Center for Internet Security (CIS) Benchmarks validation profiles
+  standardURL: https://www.cisecurity.org/cis-benchmarks
+  lastUpdated: '2023-09-10'
+  team: cis-benchmarks
+  organization: cis
+  technology: inspec
+  logo: /img/logos/standards/cis.png
+profiles:
+  - id: aws-rds-mysql-57-cis
+    name: AWS RDS MySQL 5.7 CIS
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/aws-rds-oracle-mysql-ee-5.7-cis-baseline
+    details: /profiles/aws-rds-mysql-57-cis
+    status: active
+    lastUpdated: '2022-06-03'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - aws
+      - database
+      - mysql
+      - rds
+    category: Cloud Database
+    hardeningProfiles: []
+    shortDescription: AWS RDS MySQL Enterprise Edition 5.7 CIS security validation
+    requirements: Access to the target system with appropriate permissions
+  - id: docker-ce-cis
+    name: Docker CE CIS
+    version: v1.1.0
+    platform: Virtual Platforms
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/docker-ce-cis-baseline
+    details: /profiles/docker-ce-cis
+    status: active
+    lastUpdated: '2023-08-25'
+    standard: CIS
+    standardVersion: 1.1.0
+    tags:
+      - docker
+      - container
+      - engine
+      - security
+    category: Container Security
+    hardeningProfiles:
+      - docker-cis
+      - docker-cis-kitchen
+    shortDescription: "Validates Docker Community Edition installations against CIS Docker Benchmark security requirements"
+    requirements: SSH access to Docker host with privileged access
+  - id: oracle-mysql-57-cis
+    name: Oracle MySQL 5.7 CIS
+    version: v1.0.0
+    platform: Database Systems
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/oracle-mysql-ee-5.7-cis-baseline
+    details: /profiles/oracle-mysql-57-cis
+    status: active
+    lastUpdated: '2021-11-29'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - oracle
+      - mysql
+      - database
+      - sql
+    category: Database Systems
+    hardeningProfiles: []
+    shortDescription: Oracle MySQL Enterprise Edition 5.7 CIS security validation
+    requirements: Access to MySQL database with admin privileges
+  - id: aws-rds-cis
+    name: AWS RDS CIS
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/aws-rds-infrastructure-cis-baseline
+    details: /profiles/aws-rds-cis
+    status: active
+    lastUpdated: '2022-06-03'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - aws
+      - rds
+      - database
+      - cloud
+    category: Cloud Infrastructure
+    hardeningProfiles: []
+    shortDescription: AWS RDS Infrastructure CIS security validation
+    requirements: AWS credentials with appropriate permissions
+  - id: gcp-cis-benchmark
+    name: GCP CIS Benchmark
+    version: v1.2.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: Google
+    organization: cis
+    team: cis-benchmarks
+    github: https://github.com/GoogleCloudPlatform/inspec-gcp-cis-benchmark
+    details: /profiles/gcp-cis-benchmark
+    status: active
+    lastUpdated: '2023-06-30'
+    standard: CIS
+    standardVersion: 1.2.0
+    tags:
+      - cloud
+      - gcp
+      - compliance
+      - cis
+    category: Cloud Platform
+    hardeningProfiles: []
+    shortDescription: "Validates Google Cloud Platform resources against CIS benchmarks for security and compliance"
+    requirements: GCP credentials with viewer permissions
+  - id: gke-cis-benchmark
+    name: GKE CIS Benchmark
+    version: v1.1.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: Google
+    organization: cis
+    team: cis-benchmarks
+    github: https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark
+    details: /profiles/gke-cis-benchmark
+    status: active
+    lastUpdated: '2022-09-07'
+    standard: CIS
+    standardVersion: 1.1.0
+    tags:
+      - cloud
+      - gcp
+      - kubernetes
+      - gke
+      - container
+    category: Cloud Container Orchestration
+    hardeningProfiles: []
+    shortDescription: Google Kubernetes Engine CIS Benchmark
+    requirements: GCP credentials with viewer permissions to GKE resources
+  - id: tomcat-8-cis
+    name: Tomcat 8 CIS
+    version: v1.0.0
+    platform: Application Server
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/apache-tomcat-8-cis-baseline
+    details: /profiles/tomcat-8-cis
+    status: beta
+    lastUpdated: '2022-06-03'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - tomcat
+      - java
+      - application-server
+      - web
+    category: Application Server
+    hardeningProfiles: []
+    shortDescription: Apache Tomcat 8 CIS security validation (Beta)
+    requirements: Access to Tomcat server and configuration files
+  - id: tomcat-7-cis
+    name: Tomcat 7 CIS
+    version: v1.0.0
+    platform: Application Server
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/apache-tomcat-7-cis-baseline
+    details: /profiles/tomcat-7-cis
+    status: beta
+    lastUpdated: '2022-06-03'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - tomcat
+      - java
+      - application-server
+      - web
+    category: Application Server
+    hardeningProfiles: []
+    shortDescription: Apache Tomcat 7 CIS security validation (Beta)
+    requirements: Access to Tomcat server and configuration files
+  - id: kubernetes-cis
+    name: Kubernetes CIS
+    version: v1.1.0
+    platform: Virtual Platforms
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/kubernetes-cis-baseline
+    details: /profiles/kubernetes-cis
+    status: beta
+    lastUpdated: '2023-08-15'
+    standard: CIS
+    standardVersion: 1.6.0
+    tags:
+      - kubernetes
+      - container
+      - orchestration
+      - k8s
+    category: Container Orchestration
+    hardeningProfiles:
+      - kubernetes-hardening
+    shortDescription: "Validates Kubernetes clusters against CIS Kubernetes Benchmark to ensure secure configuration"
+    requirements: Access to Kubernetes API with admin permissions
+  - id: oracle-database-19c-cis
+    name: Oracle Database 19c CIS
+    version: v1.0.0
+    platform: Database Systems
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/oracle-database-19c-cis-baseline
+    details: /profiles/oracle-database-19c-cis
+    status: active
+    lastUpdated: '2023-01-12'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - oracle
+      - database
+      - sql
+      - rdbms
+    category: Database Systems
+    hardeningProfiles: []
+    shortDescription: Oracle Database 19c CIS Benchmark validation
+    requirements: Access to Oracle database with appropriate privileges
+  - id: aws-cis
+    name: AWS CIS
+    version: v1.0.0
+    platform: Cloud Service Providers
+    framework: InSpec
+    technology: inspec
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/aws-foundations-cis-baseline
+    details: /profiles/aws-cis
+    status: active
+    lastUpdated: '2022-12-19'
+    standard: CIS
+    standardVersion: 1.0.0
+    tags:
+      - aws
+      - cloud
+      - foundations
+      - infrastructure
+    category: Cloud Platform
+    hardeningProfiles: []
+    shortDescription: AWS CIS Foundations security validation
+    requirements: AWS credentials with appropriate permissions

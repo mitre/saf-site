@@ -1,0 +1,65 @@
+_id: terraform-hardening-profiles
+_metadata:
+  framework: Terraform
+  technology: terraform
+  description: Terraform configurations for secure infrastructure deployment
+  lastUpdated: 2023-11-10
+  team: mitre-saf
+  organization: mitre
+  logo: "/img/logos/technologies/terraform.png"
+hardeningProfiles:
+  - id: kubernetes-hardening
+    name: Kubernetes CIS Hardening
+    version: v1.0.0
+    platform: Virtual Platforms
+    framework: Terraform
+    technology: terraform
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/kubernetes-hardening
+    details: /profiles/kubernetes-hardening
+    status: beta
+    lastUpdated: 2023-08-25
+    difficulty: hard
+    standard: CIS
+    standardVersion: 1.6.0
+    tags:
+      - kubernetes
+      - container
+      - orchestration
+      - security
+      - terraform
+    category: Container Orchestration
+    validationProfiles:
+      - kubernetes-cis
+    shortDescription: "Terraform configuration for deploying a hardened Kubernetes cluster according to CIS Kubernetes Benchmark."
+    requirements: Terraform 1.0+ with cloud provider credentials
+
+  - id: aws-cis
+    name: AWS CIS Hardening
+    version: v2.0.0
+    platform: Cloud Service Providers
+    framework: Terraform
+    technology: terraform
+    vendor: MITRE SAF
+    organization: mitre
+    team: mitre-saf
+    github: https://github.com/mitre/aws-cis-hardening
+    details: /profiles/aws-cis
+    status: active
+    lastUpdated: 2023-11-10
+    difficulty: medium
+    standard: CIS
+    standardVersion: 2.0.0
+    tags:
+      - aws
+      - cloud
+      - security
+      - terraform
+      - iac
+    category: Cloud Platform
+    validationProfiles:
+      - aws-s3-bp
+    shortDescription: "Terraform configuration for deploying AWS resources according to CIS AWS Benchmark."
+    requirements: Terraform 1.0+ with AWS credentials

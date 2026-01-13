@@ -1,0 +1,70 @@
+_id: nist-standards
+_metadata:
+  organization: National Institute of Standards and Technology (NIST)
+  website: https://www.nist.gov/
+  lastUpdated: 2023-09-15
+  category: Government/Federal
+standards:
+  - id: nist-800-53
+    name: NIST Special Publication 800-53
+    description: Security and Privacy Controls for Information Systems and Organizations - the cornerstone of federal information security requirements.
+    website: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+    type: Framework
+    category: Government/Federal
+    version: "5"
+  
+  - id: nist-800-171
+    name: NIST Special Publication 800-171
+    description: Protecting Controlled Unclassified Information in Non-Federal Information Systems and Organizations.
+    website: https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final
+    type: Framework
+    category: Government/Federal
+    version: "2"
+    
+  - id: rmf
+    name: Risk Management Framework (RMF)
+    description: The NIST Risk Management Framework provides a structured process for managing risk to information systems.
+    website: https://csrc.nist.gov/projects/risk-management/about-rmf
+    type: Process
+    category: Government/Federal
+    version: "2.0"
+    
+  - id: nist-csf
+    name: NIST Cybersecurity Framework
+    description: A voluntary framework consisting of standards, guidelines, and best practices to manage cybersecurity risk.
+    website: https://www.nist.gov/cyberframework
+    type: Framework
+    category: Government/Federal
+    version: "1.1"
+  
+  - id: scap
+    name: Security Content Automation Protocol (SCAP)
+    description: A suite of specifications for standardizing the format and nomenclature of software flaws and configuration issues.
+    website: https://csrc.nist.gov/projects/security-content-automation-protocol
+    type: Automation
+    category: Government/Federal
+    version: "1.3"
+  
+  - id: xccdf
+    name: Extensible Configuration Checklist Description Format (XCCDF)
+    description: A specification language for writing security checklists, benchmarks, and technical documentation.
+    website: https://csrc.nist.gov/Projects/security-content-automation-protocol/specifications/xccdf
+    type: Standard
+    category: Government/Federal
+    version: "1.2"
+  
+  - id: oval
+    name: Open Vulnerability and Assessment Language (OVAL)
+    description: An XML-based language for expressing machine-readable security tests and checks.
+    website: https://oval.cisecurity.org/
+    type: Standard
+    category: Government/Federal
+    version: "5.11.2"
+  
+  - id: oscal
+    name: Open Security Controls Assessment Language (OSCAL)
+    description: A set of formats for expressing security controls, profiles, and assessment results.
+    website: https://pages.nist.gov/OSCAL/
+    type: Standard
+    category: Government/Federal
+    version: "1.0.0"
