@@ -1,0 +1,11 @@
+{
+    "name": "tags",
+    "columns": [
+        "category",
+        "description",
+        "id",
+        "status",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `tags` (`category` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `tag_id` TEXT DEFAULT '' NOT NULL)"
+}

@@ -1,0 +1,24 @@
+{
+    "name": "profiles",
+    "columns": [
+        "category",
+        "details",
+        "framework",
+        "github",
+        "id",
+        "name",
+        "organization",
+        "platform",
+        "profile_id",
+        "requirements",
+        "short_description",
+        "standard",
+        "standard_version",
+        "status",
+        "team",
+        "technology",
+        "vendor",
+        "version"
+    ],
+    "schema": "CREATE TABLE `profiles` (`category` TEXT DEFAULT '' NOT NULL, `details` TEXT DEFAULT '' NOT NULL, `framework` TEXT DEFAULT '' NOT NULL, `github` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `organization` TEXT DEFAULT '' NOT NULL, `platform` TEXT DEFAULT '' NOT NULL, `profile_id` TEXT DEFAULT '' NOT NULL, `requirements` TEXT DEFAULT '' NOT NULL, `short_description` TEXT DEFAULT '' NOT NULL, `standard` TEXT DEFAULT '' NOT NULL, `standard_version` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `team` TEXT DEFAULT '' NOT NULL, `technology` TEXT DEFAULT '' NOT NULL, `vendor` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL)"
+}

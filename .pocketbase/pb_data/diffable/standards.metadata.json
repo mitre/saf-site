@@ -1,0 +1,17 @@
+{
+    "name": "standards",
+    "columns": [
+        "category",
+        "description",
+        "id",
+        "logo",
+        "name",
+        "standard_id",
+        "status",
+        "type",
+        "vendor",
+        "version",
+        "website"
+    ],
+    "schema": "CREATE TABLE `standards` (`category` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `standard_id` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `type` TEXT DEFAULT '' NOT NULL, `vendor` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL)"
+}

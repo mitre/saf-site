@@ -1,0 +1,9 @@
+{
+    "name": "validation_to_hardening",
+    "columns": [
+        "hardening_profile_id",
+        "id",
+        "validation_profile_id"
+    ],
+    "schema": "CREATE TABLE `validation_to_hardening` (`hardening_profile_id` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `validation_profile_id` TEXT DEFAULT '' NOT NULL)"
+}

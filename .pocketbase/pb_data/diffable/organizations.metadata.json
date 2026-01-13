@@ -1,0 +1,13 @@
+{
+    "name": "organizations",
+    "columns": [
+        "description",
+        "id",
+        "logo",
+        "name",
+        "org_id",
+        "status",
+        "website"
+    ],
+    "schema": "CREATE TABLE `organizations` (`description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `org_id` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL)"
+}

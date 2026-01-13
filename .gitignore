@@ -14,9 +14,13 @@ drizzle/
 *.pglite
 .pglite/
 
-# Pocketbase (track migrations, ignore binary and runtime data)
+# Pocketbase (track migrations and diffable exports, ignore binary DB and runtime data)
 .pocketbase/pocketbase
-.pocketbase/pb_data/
+.pocketbase/pb_data/*.db
+.pocketbase/pb_data/*.db-wal
+.pocketbase/pb_data/*.db-shm
+.pocketbase/pb_data/storage/
+.pocketbase/pb_data/types.d.ts
 
 # TrailBase (rejected solution - keep out of git)
 .trailbase/

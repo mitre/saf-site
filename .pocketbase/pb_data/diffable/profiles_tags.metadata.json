@@ -1,0 +1,9 @@
+{
+    "name": "profiles_tags",
+    "columns": [
+        "id",
+        "profile_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `profiles_tags` (`id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `profile_id` TEXT DEFAULT '' NOT NULL, `tag_id` TEXT DEFAULT '' NOT NULL)"
+}

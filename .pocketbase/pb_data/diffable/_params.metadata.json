@@ -1,0 +1,10 @@
+{
+    "name": "_params",
+    "columns": [
+        "id",
+        "value",
+        "created",
+        "updated"
+    ],
+    "schema": "CREATE TABLE `_params` (\n\t\t\t`id`      TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL,\n\t\t\t`value`   JSON DEFAULT NULL,\n\t\t\t`created` TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ')) NOT NULL,\n\t\t\t`updated` TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%fZ')) NOT NULL\n\t\t)"
+}
