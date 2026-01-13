@@ -264,9 +264,20 @@ pnpm build
 - Netlify, Vercel, GitHub Pages, Cloudflare Pages
 - Any static hosting (no server required)
 
+## Important Limitation: Drizzle Studio + PGlite
+
+**Update (January 2026):** Drizzle Studio does not currently support PGlite ([Issue #2823](https://github.com/drizzle-team/drizzle-orm/issues/2823)).
+
+**Current workarounds:**
+1. **Direct YAML editing** - Edit YAML files manually, Zod validates on build
+2. **Local PostgreSQL** - Use real Postgres for Drizzle Studio demo, export to YAML
+3. **Custom admin UI** - Build Option A (integrated admin) sooner
+
+For POC, **direct YAML editing** is recommended until PGlite support is added.
+
 ## Future: Integrated Admin (Option A)
 
-If Drizzle Studio limitations become an issue, we can build an integrated admin UI:
+When Drizzle Studio adds PGlite support, OR if we build a custom admin UI:
 
 ```
 VitePress Site

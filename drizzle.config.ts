@@ -4,6 +4,9 @@ export default defineConfig({
   dialect: 'postgresql',
   schema: './docs/.vitepress/database/schema.ts',
   out: './drizzle',
-  // PGlite connection - will be configured when we set up the database
-  // For now, Drizzle Studio will work with the schema definitions
+  dbCredentials: {
+    // PGlite file-based database for local editing
+    // This creates a local Postgres database in the .pglite directory
+    url: 'file://.pglite/data'
+  }
 })
