@@ -473,10 +473,25 @@ bd list --status=open           # All open tasks
 ## Important Notes
 
 ### Layout Patterns
-- **Home page**: TBD (hero layout pending)
-- **Browse pages**: `layout: doc` + `aside: false` + CSS overrides
-- **Framework pages**: TBD (content pages with sidebars)
-- **Documentation pages**: Standard `layout: doc` with sidebar
+
+**Default Layout** (use for most pages):
+```yaml
+---
+layout: doc
+aside: false
+---
+```
+- Full-width doc layout without sidebar
+- Left-aligned content
+- Consistent margins across site
+- Use for: browse pages, detail pages, apps, framework pages
+
+**Exceptions** (use standard doc layout WITH sidebar):
+- Documentation/guides that need TOC navigation
+- Blog posts with section navigation
+- Long-form content that benefits from outline
+
+**Home page**: TBD (hero layout pending)
 
 ### Component Library: Reka UI
 

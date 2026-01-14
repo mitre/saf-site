@@ -9,10 +9,11 @@
 
     <!-- Header Section -->
     <header class="profile-header">
-      <div class="profile-title-row">
-        <h1 class="profile-title">{{ profile.name }}</h1>
-        <span v-if="profile.version" class="profile-version">v{{ profile.version }}</span>
-      </div>
+      <h1 class="profile-title">{{ profile.name }}</h1>
+
+      <span v-if="profile.benchmark_version" class="benchmark-version">
+        {{ profile.standard_short_name || 'Benchmark' }} {{ formattedBenchmarkVersion }}
+      </span>
 
       <p class="profile-description">{{ profile.description }}</p>
 
@@ -21,11 +22,8 @@
         <span v-if="profile.status" :class="['tag', `tag-${profile.status}`]">
           {{ profile.status }}
         </span>
-        <span v-if="profile.standard_short_name || profile.standard_name" class="tag tag-standard">
-          {{ profile.standard_short_name || profile.standard_name }}
-        </span>
-        <span v-if="profile.technology_name" class="tag tag-tech">
-          {{ profile.technology_name }}
+        <span v-if="profile.version" class="tag tag-version">
+          Profile v{{ profile.version }}
         </span>
         <span v-if="profile.control_count" class="tag tag-controls">
           {{ profile.control_count }} controls
@@ -75,16 +73,18 @@
         <p class="feature-detail">{{ profile.maintainer_name }}</p>
       </article>
 
-      <article v-if="profile.benchmark_version" class="feature-card">
+      <article v-if="profile.stig_id" class="feature-card">
         <div class="feature-icon">📊</div>
-        <h3 class="feature-title">Benchmark</h3>
-        <p class="feature-detail mono">{{ profile.benchmark_version }}</p>
+        <h3 class="feature-title">STIG ID</h3>
+        <p class="feature-detail mono">{{ profile.stig_id }}</p>
       </article>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface Profile {
   id: string
   slug: string
@@ -114,16 +114,41 @@ interface Profile {
   release_date: string
 }
 
-defineProps<{
+const props = defineProps<{
   profile: Profile
 }>()
+
+/**
+ * Format benchmark version based on standard type
+ * STIG: 2.5.3 → V2R5 (Version.Release.ProfilePatch)
+ * CIS/Others: 2.0.0 → v2.0.0 (keep semver)
+ */
+function formatBenchmarkVersion(version: string, standardName: string): string {
+  if (!version) return ''
+
+  // STIG uses V{major}R{minor} format
+  if (standardName?.toLowerCase().includes('stig')) {
+    const parts = version.split('.')
+    const major = parts[0] || '0'
+    const minor = parts[1] || '0'
+    return `V${major}R${minor}`
+  }
+
+  // CIS and others keep semver format
+  return `v${version}`
+}
+
+const formattedBenchmarkVersion = computed(() => {
+  return formatBenchmarkVersion(
+    props.profile.benchmark_version,
+    props.profile.standard_name || props.profile.standard_short_name
+  )
+})
 </script>
 
 <style scoped>
 .profile-detail {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  /* Uses parent doc layout width for consistency with browse page */
 }
 
 /* Breadcrumb */
@@ -154,41 +179,40 @@ defineProps<{
 /* Header */
 .profile-header {
   margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.profile-title-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-  flex-wrap: wrap;
 }
 
 .profile-title {
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--vp-c-text-1);
 }
 
-.profile-version {
+.benchmark-version {
+  display: inline-block;
   font-family: var(--vp-font-family-mono);
   font-size: 0.875rem;
-  color: var(--vp-c-text-2);
-  background: var(--vp-c-bg-soft);
-  padding: 0.25rem 0.625rem;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  padding: 0.25rem 0.75rem;
   border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.tag-version {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  border: 1px solid var(--vp-c-divider);
+  font-family: var(--vp-font-family-mono);
 }
 
 .profile-description {
-  margin: 0 auto 1.25rem;
+  margin: 0 0 1rem;
   font-size: 1.125rem;
   color: var(--vp-c-text-2);
   line-height: 1.6;
-  max-width: 700px;
 }
 
 /* Tags */
@@ -196,7 +220,6 @@ defineProps<{
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: center;
 }
 
 .tag {
@@ -234,7 +257,6 @@ defineProps<{
 .profile-actions {
   display: flex;
   gap: 0.75rem;
-  justify-content: center;
   margin-bottom: 2.5rem;
 }
 
@@ -336,14 +358,9 @@ defineProps<{
     font-size: 1.75rem;
   }
 
-  .profile-title-row {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
   .profile-actions {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .profile-features {
