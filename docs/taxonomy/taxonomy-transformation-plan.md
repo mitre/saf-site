@@ -469,7 +469,7 @@ tsx transform-taxonomy-data.ts
 ```
 
 ### 2.3 Manual Review of Unmatched Profiles
-- Open Pocketbase Admin UI: http://localhost:8090/_/
+- Open Pocketbase Admin UI: `http://localhost:8090/_/`
 - Filter profiles where target_type is empty
 - Manually update 10-20 edge cases
 - Focus on AWS RDS variants (need to distinguish database type)

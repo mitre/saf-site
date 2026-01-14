@@ -5,10 +5,10 @@ aside: false
 
 <script setup>
 import { useData } from 'vitepress'
-import ProfileDetail from '../.vitepress/theme/components/ProfileDetail.vue'
+import ContentDetail from '../.vitepress/theme/components/ContentDetail.vue'
 
 const { params } = useData()
-const profile = params.value.profile
+const content = params.value.content
 </script>
 
-<ProfileDetail :profile="profile" />
+<ContentDetail :content="content" />

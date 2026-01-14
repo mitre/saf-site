@@ -51,8 +51,8 @@ export default {
       return records.map(record => ({
         params: {
           slug: record.slug,
-          // Pass all profile data to the template
-          profile: {
+          // Pass all content data to the template (supports both validation and hardening)
+          content: {
             id: record.id,
             slug: record.slug,
             name: record.name,
@@ -60,6 +60,7 @@ export default {
             long_description: record.long_description || '',
             version: record.version || '',
             status: record.status || 'active',
+            content_type: record.content_type,
             // Target
             target_name: record.expand?.target?.name || '',
             target_slug: record.expand?.target?.slug || '',
