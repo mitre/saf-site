@@ -211,7 +211,7 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50 } },
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'content_type', type: 'select', required: true, values: ['validation', 'hardening'] },
@@ -255,7 +255,7 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50 } },
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'tool_type', type: 'relation', collectionId: collectionIds.tool_types, maxSelect: 1 },
@@ -291,7 +291,7 @@ async function main() {
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50 } },
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },

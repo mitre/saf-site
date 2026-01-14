@@ -259,7 +259,7 @@ export const content = sqliteTable('content', {
   slug: text('slug').notNull().unique(),        // URL-friendly: red-hat-8-stig, ubuntu-20-cis
   description: text('description'),
   longDescription: text('long_description'),
-  version: text('version'),
+  version: text('version'),                      // Semver without "v" prefix (e.g., "1.0.0") - frontend adds "v"
 
   // Classification
   contentType: text('content_type').notNull(),  // 'validation' or 'hardening'
@@ -305,7 +305,7 @@ export const tools = sqliteTable('tools', {
   slug: text('slug').notNull().unique(),        // URL-friendly: heimdall, vulcan, saf-cli
   description: text('description'),
   longDescription: text('long_description'),
-  version: text('version'),
+  version: text('version'),                      // Semver without "v" prefix (e.g., "1.0.0") - frontend adds "v"
 
   // Classification
   toolType: text('tool_type').references(() => toolTypes.id),  // application, cli, library
@@ -479,7 +479,7 @@ export const distributions = sqliteTable('distributions', {
   name: text('name').notNull(),                 // e.g., "heimdall-helm-chart", "saf-cli-npm"
   slug: text('slug').notNull().unique(),        // URL-friendly: heimdall-helm, saf-cli-npm
   description: text('description'),
-  version: text('version'),
+  version: text('version'),                      // Semver without "v" prefix (e.g., "1.0.0") - frontend adds "v"
 
   // Classification
   status: text('status').default('active'),
@@ -515,8 +515,8 @@ export const releases = sqliteTable('releases', {
   entityType: text('entity_type').notNull(),    // 'content', 'tool', 'distribution'
   entityId: text('entity_id').notNull(),        // ID of the entity
 
-  // Version info
-  version: text('version').notNull(),           // e.g., "3.2.0", "V1R3"
+  // Version info (format varies by entity type: semver "3.2.0" for tools, STIG "V1R3" for content)
+  version: text('version').notNull(),           // No pattern validation - supports multiple formats
   releaseDate: integer('release_date', { mode: 'timestamp' }),
   releaseNotes: text('release_notes'),
 
