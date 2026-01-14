@@ -261,10 +261,45 @@ export const tools = sqliteTable('tools', {
   website: text('website'),
   github: text('github'),
   documentationUrl: text('documentation_url'),
+
+  // Media
   logo: text('logo'),
+  screenshot: text('screenshot'),              // Primary screenshot
+  screenshots: text('screenshots'),            // JSON array of screenshot URLs
 
   // Metadata
   license: text('license'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Courses - Training classes and educational content
+ */
+export const courses = sqliteTable('courses', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  longDescription: text('long_description'),
+
+  // Classification
+  courseType: text('course_type'),             // class, workshop, tutorial, webinar
+  level: text('level'),                        // beginner, intermediate, advanced
+  status: text('status').default('active'),
+
+  // Foreign Keys
+  organization: text('organization').references(() => organizations.id),  // Who offers it
+
+  // Links
+  website: text('website'),
+  registrationUrl: text('registration_url'),
+  materialsUrl: text('materials_url'),
+  logo: text('logo'),
+
+  // Duration
+  durationMinutes: integer('duration_minutes'),
+
+  // Metadata
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -373,6 +408,36 @@ export const distributionTags = sqliteTable('distribution_tags', {
   tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
 }, (table) => ({
   pk: primaryKey({ columns: [table.distributionId, table.tagId] })
+}))
+
+/**
+ * Courses ↔ Capabilities (many-to-many) - e.g., InSpec course teaches Validation
+ */
+export const courseCapabilities = sqliteTable('course_capabilities', {
+  courseId: text('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  capabilityId: text('capability_id').notNull().references(() => capabilities.id, { onDelete: 'cascade' })
+}, (table) => ({
+  pk: primaryKey({ columns: [table.courseId, table.capabilityId] })
+}))
+
+/**
+ * Courses ↔ Tools (many-to-many) - e.g., Heimdall course covers Heimdall tool
+ */
+export const courseTools = sqliteTable('course_tools', {
+  courseId: text('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  toolId: text('tool_id').notNull().references(() => tools.id, { onDelete: 'cascade' })
+}, (table) => ({
+  pk: primaryKey({ columns: [table.courseId, table.toolId] })
+}))
+
+/**
+ * Courses ↔ Tags (many-to-many)
+ */
+export const courseTags = sqliteTable('course_tags', {
+  courseId: text('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
+}, (table) => ({
+  pk: primaryKey({ columns: [table.courseId, table.tagId] })
 }))
 
 // ============================================================================
@@ -505,13 +570,25 @@ export const distributionsRelations = relations(distributions, ({ one, many }) =
 export const capabilitiesRelations = relations(capabilities, ({ many }) => ({
   content: many(contentCapabilities),
   tools: many(toolCapabilities),
-  distributions: many(distributionCapabilities)
+  distributions: many(distributionCapabilities),
+  courses: many(courseCapabilities)
+}))
+
+export const coursesRelations = relations(courses, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [courses.organization],
+    references: [organizations.id]
+  }),
+  capabilities: many(courseCapabilities),
+  tools: many(courseTools),
+  tags: many(courseTags)
 }))
 
 export const tagsRelations = relations(tags, ({ many }) => ({
   content: many(contentTags),
   tools: many(toolTags),
-  distributions: many(distributionTags)
+  distributions: many(distributionTags),
+  courses: many(courseTags)
 }))
 
 // ============================================================================
@@ -531,4 +608,5 @@ export type DistributionType = typeof distributionTypes.$inferSelect
 export type Registry = typeof registries.$inferSelect
 export type Content = typeof content.$inferSelect
 export type Tool = typeof tools.$inferSelect
+export type Course = typeof courses.$inferSelect
 export type Distribution = typeof distributions.$inferSelect
