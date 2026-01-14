@@ -55,6 +55,7 @@ export const RelationshipType = {
 export const capabilities = sqliteTable('capabilities', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),        // Validate, Harden, Normalize, Plan, Visualize
+  slug: text('slug').notNull().unique(),        // URL-friendly: validate, harden, normalize, plan, visualize
   description: text('description'),
   icon: text('icon'),                           // Icon name for UI
   color: text('color'),                         // Brand color for UI
@@ -69,6 +70,7 @@ export const capabilities = sqliteTable('capabilities', {
 export const categories = sqliteTable('categories', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),        // Operating System, Database, Container, etc.
+  slug: text('slug').notNull().unique(),        // URL-friendly: operating-system, database, container
   description: text('description'),
   icon: text('icon'),
   sortOrder: integer('sort_order').default(0),
@@ -82,6 +84,7 @@ export const categories = sqliteTable('categories', {
 export const organizations = sqliteTable('organizations', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: mitre, disa, aws, vmware
   description: text('description'),
   website: text('website'),
   logo: text('logo'),
@@ -96,6 +99,7 @@ export const organizations = sqliteTable('organizations', {
 export const teams = sqliteTable('teams', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: saf-team, disa-stig-team
   description: text('description'),
   organization: text('organization').references(() => organizations.id),
   website: text('website'),
@@ -109,6 +113,7 @@ export const teams = sqliteTable('teams', {
 export const standards = sqliteTable('standards', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: stig, cis, pci-dss
   description: text('description'),
   website: text('website'),
   logo: text('logo'),
@@ -124,6 +129,7 @@ export const standards = sqliteTable('standards', {
 export const technologies = sqliteTable('technologies', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: inspec, ansible, chef, terraform
   description: text('description'),
   website: text('website'),
   logo: text('logo'),
@@ -140,6 +146,7 @@ export const technologies = sqliteTable('technologies', {
 export const targets = sqliteTable('targets', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),                 // Red Hat 8, MySQL 8.0, Docker CE, AWS RDS
+  slug: text('slug').notNull().unique(),        // URL-friendly: red-hat-8, mysql-8, docker-ce
   description: text('description'),
   category: text('category').references(() => categories.id),
   vendor: text('vendor').references(() => organizations.id),  // Who makes this product
@@ -154,10 +161,12 @@ export const targets = sqliteTable('targets', {
  */
 export const tags = sqliteTable('tags', {
   id: text('id').primaryKey(),
-  name: text('name').notNull().unique(),        // Slug: linux, windows, cloud, container
-  displayName: text('display_name'),            // Display: Linux, Windows, Cloud, Container
+  name: text('name').notNull().unique(),        // Identifier: linux, windows, cloud
+  slug: text('slug').notNull().unique(),        // URL-friendly: linux, windows, cloud
+  displayName: text('display_name'),            // Display: Linux, Windows, Cloud
   description: text('description'),
-  tagCategory: text('tag_category'),            // platform, compliance, feature
+  tagCategory: text('tag_category'),            // platform, compliance, feature, technology
+  badgeColor: text('badge_color'),              // Color for UI badges
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -168,6 +177,7 @@ export const tags = sqliteTable('tags', {
 export const toolTypes = sqliteTable('tool_types', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),        // application, cli, library
+  slug: text('slug').notNull().unique(),        // URL-friendly: application, cli, library
   description: text('description'),
   icon: text('icon'),
   sortOrder: integer('sort_order').default(0),
@@ -180,7 +190,8 @@ export const toolTypes = sqliteTable('tool_types', {
  */
 export const distributionTypes = sqliteTable('distribution_types', {
   id: text('id').primaryKey(),
-  name: text('name').notNull().unique(),        // helm_chart, npm_package, docker_image, github_action, homebrew, gem, pip
+  name: text('name').notNull().unique(),        // helm_chart, npm_package, docker_image, github_action, homebrew
+  slug: text('slug').notNull().unique(),        // URL-friendly: helm-chart, npm-package, docker-image
   displayName: text('display_name'),            // Helm Chart, npm Package, Docker Image, etc.
   description: text('description'),
   icon: text('icon'),
@@ -194,7 +205,8 @@ export const distributionTypes = sqliteTable('distribution_types', {
  */
 export const registries = sqliteTable('registries', {
   id: text('id').primaryKey(),
-  name: text('name').notNull().unique(),        // artifact_hub, docker_hub, npmjs, github_packages, homebrew, rubygems, pypi
+  name: text('name').notNull().unique(),        // artifact_hub, docker_hub, npmjs, github_packages, homebrew
+  slug: text('slug').notNull().unique(),        // URL-friendly: artifact-hub, docker-hub, npmjs
   displayName: text('display_name'),            // Artifact Hub, Docker Hub, npmjs.com, etc.
   description: text('description'),
   website: text('website'),                     // https://artifacthub.io, https://hub.docker.com, etc.
@@ -213,6 +225,7 @@ export const registries = sqliteTable('registries', {
 export const content = sqliteTable('content', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: red-hat-8-stig, ubuntu-20-cis
   description: text('description'),
   longDescription: text('long_description'),
   version: text('version'),
@@ -232,9 +245,22 @@ export const content = sqliteTable('content', {
   github: text('github'),
   documentationUrl: text('documentation_url'),
 
+  // Domain-specific (validation profiles)
+  controlCount: integer('control_count'),       // Number of controls/checks
+  stigId: text('stig_id'),                      // e.g., "RHEL-08-010010"
+  benchmarkVersion: text('benchmark_version'),  // e.g., "V1R3"
+
+  // Domain-specific (hardening)
+  automationLevel: text('automation_level'),    // full, partial, manual
+
+  // Featured/Curation
+  isFeatured: integer('is_featured', { mode: 'boolean' }).default(false),
+  featuredOrder: integer('featured_order'),
+
   // Metadata
   license: text('license'),
   releaseDate: integer('release_date', { mode: 'timestamp' }),
+  deprecatedAt: integer('deprecated_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -245,6 +271,7 @@ export const content = sqliteTable('content', {
 export const tools = sqliteTable('tools', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: heimdall, vulcan, saf-cli
   description: text('description'),
   longDescription: text('long_description'),
   version: text('version'),
@@ -267,6 +294,10 @@ export const tools = sqliteTable('tools', {
   screenshot: text('screenshot'),              // Primary screenshot
   screenshots: text('screenshots'),            // JSON array of screenshot URLs
 
+  // Featured/Curation
+  isFeatured: integer('is_featured', { mode: 'boolean' }).default(false),
+  featuredOrder: integer('featured_order'),
+
   // Metadata
   license: text('license'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
@@ -279,6 +310,7 @@ export const tools = sqliteTable('tools', {
 export const courses = sqliteTable('courses', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: inspec-developer, heimdall-user
   description: text('description'),
   longDescription: text('long_description'),
 
@@ -296,8 +328,14 @@ export const courses = sqliteTable('courses', {
   materialsUrl: text('materials_url'),
   logo: text('logo'),
 
-  // Duration
+  // Duration & Pricing
   durationMinutes: integer('duration_minutes'),
+  isFree: integer('is_free', { mode: 'boolean' }).default(true),
+  priceUsd: integer('price_usd'),              // Price in USD cents (e.g., 9900 = $99.00)
+
+  // Featured/Curation
+  isFeatured: integer('is_featured', { mode: 'boolean' }).default(false),
+  featuredOrder: integer('featured_order'),
 
   // Metadata
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
@@ -310,6 +348,7 @@ export const courses = sqliteTable('courses', {
 export const distributions = sqliteTable('distributions', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),                 // e.g., "heimdall-helm-chart", "saf-cli-npm"
+  slug: text('slug').notNull().unique(),        // URL-friendly: heimdall-helm, saf-cli-npm
   description: text('description'),
   version: text('version'),
 
