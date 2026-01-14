@@ -22,8 +22,9 @@ async function main() {
   console.log('✓ Authenticated\n')
 
   console.log('='.repeat(70))
-  console.log('SCHEMA V2 - Creating Collections')
+  console.log('SCHEMA V2 - Creating Collections (with v2_ prefix)')
   console.log('='.repeat(70))
+  console.log('All collections prefixed with v2_ to coexist with v1 schema\n')
 
   // Track created collections for FK references
   const collectionIds: Record<string, string> = {}
@@ -33,7 +34,7 @@ async function main() {
   // ========================================================================
 
   // Capabilities
-  collectionIds.capabilities = await createCollection('capabilities', [
+  collectionIds.capabilities = await createCollection('v2_capabilities', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -45,7 +46,7 @@ async function main() {
   })
 
   // Categories
-  collectionIds.categories = await createCollection('categories', [
+  collectionIds.categories = await createCollection('v2_categories', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -56,29 +57,25 @@ async function main() {
   })
 
   // Organizations
-  collectionIds.organizations = await createCollection('organizations', [
+  collectionIds.organizations = await createCollection('v2_organizations', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
-    { name: 'org_type', type: 'select', options: {
-      values: ['vendor', 'government', 'community', 'standards_body']
-    }}
+    { name: 'org_type', type: 'select', values: ['vendor', 'government', 'community', 'standards_body'] }
   ], {
     unique: ['slug'],
     regular: ['org_type']
   })
 
   // Tags
-  collectionIds.tags = await createCollection('tags', [
+  collectionIds.tags = await createCollection('v2_tags', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
-    { name: 'tag_category', type: 'select', options: {
-      values: ['platform', 'compliance', 'feature', 'technology', 'other']
-    }},
+    { name: 'tag_category', type: 'select', values: ['platform', 'compliance', 'feature', 'technology', 'other'] },
     { name: 'badge_color', type: 'text', options: { max: 50 } }
   ], {
     unique: ['name', 'slug'],
@@ -86,7 +83,7 @@ async function main() {
   })
 
   // Tool Types
-  collectionIds.tool_types = await createCollection('tool_types', [
+  collectionIds.tool_types = await createCollection('v2_tool_types', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -97,7 +94,7 @@ async function main() {
   })
 
   // Distribution Types
-  collectionIds.distribution_types = await createCollection('distribution_types', [
+  collectionIds.distribution_types = await createCollection('v2_distribution_types', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'display_name', type: 'text', options: { max: 100 } },
@@ -109,7 +106,7 @@ async function main() {
   })
 
   // Registries
-  collectionIds.registries = await createCollection('registries', [
+  collectionIds.registries = await createCollection('v2_registries', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'display_name', type: 'text', options: { max: 100 } },
@@ -121,7 +118,7 @@ async function main() {
   })
 
   // Resource Types (for course learning resources)
-  collectionIds.resource_types = await createCollection('resource_types', [
+  collectionIds.resource_types = await createCollection('v2_resource_types', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'display_name', type: 'text', options: { max: 100 } },
@@ -133,7 +130,7 @@ async function main() {
   })
 
   // Media Types (for SAF media library)
-  collectionIds.media_types = await createCollection('media_types', [
+  collectionIds.media_types = await createCollection('v2_media_types', [
     { name: 'name', type: 'text', required: true, options: { max: 100 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'display_name', type: 'text', options: { max: 100 } },
@@ -149,7 +146,7 @@ async function main() {
   // ========================================================================
 
   // Teams (depends on organizations)
-  collectionIds.teams = await createCollection('teams', [
+  collectionIds.teams = await createCollection('v2_teams', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -161,23 +158,21 @@ async function main() {
   })
 
   // Standards (depends on organizations)
-  collectionIds.standards = await createCollection('standards', [
+  collectionIds.standards = await createCollection('v2_standards', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'standard_type', type: 'select', options: {
-      values: ['regulatory', 'industry', 'government', 'vendor']
-    }}
+    { name: 'standard_type', type: 'select', values: ['regulatory', 'industry', 'government', 'vendor'] }
   ], {
     unique: ['slug'],
     regular: ['organization', 'standard_type']
   })
 
   // Technologies (depends on organizations)
-  collectionIds.technologies = await createCollection('technologies', [
+  collectionIds.technologies = await createCollection('v2_technologies', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -192,7 +187,7 @@ async function main() {
   })
 
   // Targets (depends on categories, organizations)
-  collectionIds.targets = await createCollection('targets', [
+  collectionIds.targets = await createCollection('v2_targets', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -210,7 +205,7 @@ async function main() {
   // ========================================================================
 
   // Content (unified profiles)
-  collectionIds.content = await createCollection('content', [
+  collectionIds.content = await createCollection('v2_content', [
     { name: 'name', type: 'text', required: true, options: { max: 300 } },
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
     { name: 'description', type: 'text' },
@@ -218,12 +213,8 @@ async function main() {
     { name: 'version', type: 'text', options: { max: 50 } },
 
     // Classification
-    { name: 'content_type', type: 'select', required: true, options: {
-      values: ['validation', 'hardening']
-    }},
-    { name: 'status', type: 'select', options: {
-      values: ['active', 'beta', 'deprecated', 'draft']
-    }},
+    { name: 'content_type', type: 'select', required: true, values: ['validation', 'hardening'] },
+    { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
 
     // Foreign Keys
     { name: 'target', type: 'relation', collectionId: collectionIds.targets, maxSelect: 1 },
@@ -242,9 +233,7 @@ async function main() {
     { name: 'benchmark_version', type: 'text', options: { max: 50 } },
 
     // Domain-specific (hardening)
-    { name: 'automation_level', type: 'select', options: {
-      values: ['full', 'partial', 'manual']
-    }},
+    { name: 'automation_level', type: 'select', values: ['full', 'partial', 'manual'] },
 
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
@@ -260,7 +249,7 @@ async function main() {
   })
 
   // Tools
-  collectionIds.tools = await createCollection('tools', [
+  collectionIds.tools = await createCollection('v2_tools', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
@@ -269,9 +258,7 @@ async function main() {
 
     // Classification
     { name: 'tool_type', type: 'relation', collectionId: collectionIds.tool_types, maxSelect: 1 },
-    { name: 'status', type: 'select', options: {
-      values: ['active', 'beta', 'deprecated', 'draft']
-    }},
+    { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
 
     // Foreign Keys
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
@@ -299,16 +286,14 @@ async function main() {
   })
 
   // Distributions
-  collectionIds.distributions = await createCollection('distributions', [
+  collectionIds.distributions = await createCollection('v2_distributions', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'version', type: 'text', options: { max: 50 } },
 
     // Classification
-    { name: 'status', type: 'select', options: {
-      values: ['active', 'beta', 'deprecated', 'draft']
-    }},
+    { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
 
     // Foreign Keys
     { name: 'tool', type: 'relation', collectionId: collectionIds.tools, maxSelect: 1 },
@@ -331,22 +316,16 @@ async function main() {
   })
 
   // Courses (training classes and educational content)
-  collectionIds.courses = await createCollection('courses', [
+  collectionIds.courses = await createCollection('v2_courses', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
 
     // Classification
-    { name: 'course_type', type: 'select', options: {
-      values: ['class', 'workshop', 'tutorial', 'webinar']
-    }},
-    { name: 'level', type: 'select', options: {
-      values: ['beginner', 'intermediate', 'advanced']
-    }},
-    { name: 'status', type: 'select', options: {
-      values: ['active', 'beta', 'deprecated', 'draft']
-    }},
+    { name: 'course_type', type: 'select', values: ['class', 'workshop', 'tutorial', 'webinar'] },
+    { name: 'level', type: 'select', values: ['beginner', 'intermediate', 'advanced'] },
+    { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
 
     // Foreign Keys
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
@@ -377,7 +356,7 @@ async function main() {
   })
 
   // Course Resources (learning materials for courses)
-  collectionIds.course_resources = await createCollection('course_resources', [
+  collectionIds.course_resources = await createCollection('v2_course_resources', [
     { name: 'title', type: 'text', required: true, options: { max: 200 } },
     { name: 'description', type: 'text' },
     { name: 'url', type: 'url', required: true },
@@ -393,7 +372,7 @@ async function main() {
   })
 
   // Course Sessions (scheduled training dates - past and future)
-  collectionIds.course_sessions = await createCollection('course_sessions', [
+  collectionIds.course_sessions = await createCollection('v2_course_sessions', [
     { name: 'title', type: 'text', options: { max: 200 } },  // Optional override like "Spring 2026 Cohort"
 
     // Foreign Keys
@@ -405,9 +384,7 @@ async function main() {
     { name: 'timezone', type: 'text', options: { max: 50 } },
 
     // Location
-    { name: 'location_type', type: 'select', options: {
-      values: ['virtual', 'in_person', 'hybrid']
-    }},
+    { name: 'location_type', type: 'select', values: ['virtual', 'in_person', 'hybrid'] },
     { name: 'location', type: 'text' },  // Room/venue or video platform
     { name: 'meeting_url', type: 'url' },
 
@@ -419,15 +396,13 @@ async function main() {
     { name: 'recording_url', type: 'url' },
 
     // Status
-    { name: 'status', type: 'select', options: {
-      values: ['scheduled', 'in_progress', 'completed', 'cancelled']
-    }}
+    { name: 'status', type: 'select', values: ['scheduled', 'in_progress', 'completed', 'cancelled'] }
   ], {
     regular: ['course', 'start_date', 'status', 'location_type']
   })
 
   // Media (SAF media library - presentations, PDFs, videos, etc.)
-  collectionIds.media = await createCollection('media', [
+  collectionIds.media = await createCollection('v2_media', [
     { name: 'name', type: 'text', required: true, options: { max: 300 } },
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
     { name: 'description', type: 'text' },
@@ -466,13 +441,11 @@ async function main() {
   })
 
   // Releases (version history - polymorphic)
-  collectionIds.releases = await createCollection('releases', [
+  collectionIds.releases = await createCollection('v2_releases', [
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
 
     // Polymorphic reference
-    { name: 'entity_type', type: 'select', required: true, options: {
-      values: ['content', 'tool', 'distribution']
-    }},
+    { name: 'entity_type', type: 'select', required: true, values: ['content', 'tool', 'distribution'] },
     { name: 'entity_id', type: 'text', required: true, options: { max: 50 } },
 
     // Version info
@@ -497,7 +470,7 @@ async function main() {
   // ========================================================================
 
   // Content ↔ Capabilities
-  await createCollection('content_capabilities', [
+  await createCollection('v2_content_capabilities', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
     { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -505,7 +478,7 @@ async function main() {
   })
 
   // Content ↔ Tags
-  await createCollection('content_tags', [
+  await createCollection('v2_content_tags', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
     { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -513,18 +486,16 @@ async function main() {
   })
 
   // Content ↔ Content (relationships)
-  await createCollection('content_relationships', [
+  await createCollection('v2_content_relationships', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
     { name: 'related_content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'relationship_type', type: 'select', required: true, options: {
-      values: ['validates', 'hardens', 'complements']
-    }}
+    { name: 'relationship_type', type: 'select', required: true, values: ['validates', 'hardens', 'complements'] }
   ], {
     regular: ['content', 'related_content', 'relationship_type']
   })
 
   // Tools ↔ Capabilities
-  await createCollection('tool_capabilities', [
+  await createCollection('v2_tool_capabilities', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
     { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -532,7 +503,7 @@ async function main() {
   })
 
   // Tools ↔ Tags
-  await createCollection('tool_tags', [
+  await createCollection('v2_tool_tags', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
     { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -540,7 +511,7 @@ async function main() {
   })
 
   // Distributions ↔ Capabilities
-  await createCollection('distribution_capabilities', [
+  await createCollection('v2_distribution_capabilities', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
     { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -548,7 +519,7 @@ async function main() {
   })
 
   // Distributions ↔ Tags
-  await createCollection('distribution_tags', [
+  await createCollection('v2_distribution_tags', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
     { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -556,7 +527,7 @@ async function main() {
   })
 
   // Courses ↔ Capabilities
-  await createCollection('course_capabilities', [
+  await createCollection('v2_course_capabilities', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
     { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -564,7 +535,7 @@ async function main() {
   })
 
   // Courses ↔ Tools
-  await createCollection('course_tools', [
+  await createCollection('v2_course_tools', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -572,7 +543,7 @@ async function main() {
   })
 
   // Courses ↔ Tags
-  await createCollection('course_tags', [
+  await createCollection('v2_course_tags', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
     { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -580,7 +551,7 @@ async function main() {
   })
 
   // Media ↔ Capabilities
-  await createCollection('media_capabilities', [
+  await createCollection('v2_media_capabilities', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
     { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -588,7 +559,7 @@ async function main() {
   })
 
   // Media ↔ Tags
-  await createCollection('media_tags', [
+  await createCollection('v2_media_tags', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
     { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
   ], {
@@ -600,59 +571,64 @@ async function main() {
   // ========================================================================
 
   console.log('\n' + '='.repeat(70))
-  console.log('SUMMARY')
+  console.log('SUMMARY - All collections prefixed with v2_')
   console.log('='.repeat(70))
   console.log('\nLookup Tables (no dependencies):')
-  console.log('  • capabilities - SAF pillars (Validate, Harden, Normalize, Plan, Visualize)')
-  console.log('  • categories - Target groupings (OS, Database, Container, etc.)')
-  console.log('  • organizations - Companies/agencies (MITRE, DISA, AWS, VMware)')
-  console.log('  • tags - Flexible labels (linux, windows, cloud)')
-  console.log('  • tool_types - Tool classification (application, cli, library)')
-  console.log('  • distribution_types - Distribution methods (helm_chart, npm, docker)')
-  console.log('  • registries - Package registries (Artifact Hub, Docker Hub, npmjs)')
-  console.log('  • resource_types - Course resource types (video, article, internal_course)')
-  console.log('  • media_types - Media library types (presentation, pdf, video, webinar)')
+  console.log('  • v2_capabilities - SAF pillars (Validate, Harden, Normalize, Plan, Visualize)')
+  console.log('  • v2_categories - Target groupings (OS, Database, Container, etc.)')
+  console.log('  • v2_organizations - Companies/agencies (MITRE, DISA, AWS, VMware)')
+  console.log('  • v2_tags - Flexible labels (linux, windows, cloud)')
+  console.log('  • v2_tool_types - Tool classification (application, cli, library)')
+  console.log('  • v2_distribution_types - Distribution methods (helm_chart, npm, docker)')
+  console.log('  • v2_registries - Package registries (Artifact Hub, Docker Hub, npmjs)')
+  console.log('  • v2_resource_types - Course resource types (video, article, internal_course)')
+  console.log('  • v2_media_types - Media library types (presentation, pdf, video, webinar)')
 
   console.log('\nWith FK Dependencies (Level 1):')
-  console.log('  • teams → organizations')
-  console.log('  • standards → organizations')
-  console.log('  • technologies → organizations')
-  console.log('  • targets → categories, organizations')
+  console.log('  • v2_teams → v2_organizations')
+  console.log('  • v2_standards → v2_organizations')
+  console.log('  • v2_technologies → v2_organizations')
+  console.log('  • v2_targets → v2_categories, v2_organizations')
 
   console.log('\nMain Content Tables (Level 2):')
-  console.log('  • content → targets, standards, technologies, organizations, teams')
+  console.log('  • v2_content → v2_targets, v2_standards, v2_technologies, v2_organizations, v2_teams')
   console.log('    + slug, is_featured, control_count, stig_id, benchmark_version')
-  console.log('  • tools → tool_types, organizations, technologies')
+  console.log('  • v2_tools → v2_tool_types, v2_organizations, v2_technologies')
   console.log('    + slug, is_featured, screenshot, screenshots')
-  console.log('  • courses → organizations')
+  console.log('  • v2_courses → v2_organizations')
   console.log('    + slug, is_featured, is_free, price_usd, target_audience, registration_active')
-  console.log('  • distributions → tools, distribution_types, registries')
+  console.log('  • v2_distributions → v2_tools, v2_distribution_types, v2_registries')
   console.log('    + slug')
-  console.log('  • media → media_types, organizations')
+  console.log('  • v2_media → v2_media_types, v2_organizations')
   console.log('    + slug, author, url, file (binary), thumbnail, event_name, is_featured')
-  console.log('  • releases (polymorphic version history)')
+  console.log('  • v2_releases (polymorphic version history)')
   console.log('    + entity_type, entity_id, version, sha256, is_latest')
 
   console.log('\nCourse-Related Tables:')
-  console.log('  • course_resources → courses, resource_types (learning materials)')
+  console.log('  • v2_course_resources → v2_courses, v2_resource_types (learning materials)')
   console.log('    + title, url, description, sort_order')
-  console.log('  • course_sessions → courses (scheduled training dates)')
+  console.log('  • v2_course_sessions → v2_courses (scheduled training dates)')
   console.log('    + start_date, end_date, location_type, instructor, recording_url, status')
 
   console.log('\nJunction Tables (with cascadeDelete):')
-  console.log('  • content_capabilities, content_tags, content_relationships')
-  console.log('  • tool_capabilities, tool_tags')
-  console.log('  • distribution_capabilities, distribution_tags')
-  console.log('  • course_capabilities, course_tools, course_tags')
-  console.log('  • media_capabilities, media_tags')
+  console.log('  • v2_content_capabilities, v2_content_tags, v2_content_relationships')
+  console.log('  • v2_tool_capabilities, v2_tool_tags')
+  console.log('  • v2_distribution_capabilities, v2_distribution_tags')
+  console.log('  • v2_course_capabilities, v2_course_tools, v2_course_tags')
+  console.log('  • v2_media_capabilities, v2_media_tags')
 
   console.log('\nIndexes:')
   console.log('  • UNIQUE indexes on all slug fields')
   console.log('  • Regular indexes on all FK columns')
   console.log('  • Regular indexes on status, content_type, is_featured')
-  console.log('  • Composite index on releases (entity_type, entity_id, is_latest)')
+  console.log('  • Composite index on v2_releases (entity_type, entity_id, is_latest)')
 
   console.log('\n✓ Schema v2 collections created successfully!')
+  console.log('\nNext steps:')
+  console.log('  1. Export v1 data: pb collections profiles list -o json > v1-profiles.json')
+  console.log('  2. Transform v1 → v2 format')
+  console.log('  3. Import to v2: pb collections v2_content create --file ...')
+  console.log('  4. After validation, delete v1 collections and rename v2 (remove prefix)')
 }
 
 // Helper function to create a collection with proper indexes
@@ -715,6 +691,9 @@ async function createCollection(
     return collection.id
   } catch (error: any) {
     console.error(`  ✗ Failed to create ${name}:`, error.message)
+    if (error.response?.data) {
+      console.error(`      Details:`, JSON.stringify(error.response.data, null, 2))
+    }
     throw error
   }
 }

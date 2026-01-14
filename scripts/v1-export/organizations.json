@@ -1,0 +1,178 @@
+[
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "A not-for-profit organization that operates federally funded research and development centers",
+    "id": "hb8k0jz9q464632",
+    "logo": "/img/logos/organizations/mitre.png",
+    "name": "The MITRE Corporation",
+    "org_id": "mitre",
+    "status": "active",
+    "website": "https://www.mitre.org"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "DoD combat support agency that provides IT and communications support",
+    "id": "zqo705x38y2uz6k",
+    "logo": "/img/logos/organizations/disa.png",
+    "name": "Defense Information Systems Agency",
+    "org_id": "disa",
+    "status": "active",
+    "website": "https://disa.mil"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Non-profit organization focused on developing best practice solutions for cyber defense",
+    "id": "r806nc4431gby20",
+    "logo": "/img/logos/organizations/cis.png",
+    "name": "Center for Internet Security",
+    "org_id": "cis",
+    "status": "active",
+    "website": "https://www.cisecurity.org"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Cloud computing and virtualization technology company",
+    "id": "05zd42mfhr86ky8",
+    "logo": "/img/logos/organizations/vmware.png",
+    "name": "VMware",
+    "org_id": "vmware",
+    "status": "active",
+    "website": "https://vmware.com"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Enterprise automation platform company, now part of Progress",
+    "id": "6r6695656jv32ff",
+    "logo": "/img/logos/organizations/chef.svg",
+    "name": "Progress Chef",
+    "org_id": "chef",
+    "status": "active",
+    "website": "https://www.chef.io"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Global organization that develops and maintains security standards for payment card data protection",
+    "id": "m3na862ih3xaa34",
+    "logo": "/img/logos/organizations/pci-ssc.png",
+    "name": "PCI Security Standards Council",
+    "org_id": "pci-ssc",
+    "status": "active",
+    "website": "https://www.pcisecuritystandards.org"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Community-driven project that provides hardened configurations for common software platforms",
+    "id": "vvz9qqzhed93x10",
+    "logo": "/img/logos/organizations/ansible-lockdown.png",
+    "name": "Ansible Lockdown",
+    "org_id": "ansible-lockdown",
+    "status": "active",
+    "website": "https://github.com/ansible-lockdown"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Global aerospace, defense, security and advanced technologies company",
+    "id": "1992av8zdqkac3p",
+    "logo": "/img/logos/organizations/lockheed-martin.png",
+    "name": "Lockheed Martin",
+    "org_id": "lockheed-martin",
+    "status": "active",
+    "website": "https://www.lockheedmartin.com"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Platform and cloud-based service for software development and version control using Git",
+    "id": "klf0w4c8s399xzi",
+    "logo": "/img/logos/organizations/github.svg",
+    "name": "GitHub",
+    "org_id": "github",
+    "status": "active",
+    "website": "https://github.com"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "National public health agency of the United States",
+    "id": "pr3a4u7em474je3",
+    "logo": "/img/logos/organizations/cdc.svg",
+    "name": "Centers for Disease Control and Prevention",
+    "org_id": "cdc",
+    "status": "active",
+    "website": "https://www.cdc.gov"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Federal agency responsible for conducting background investigations and securing the trustworthiness of the U.S. government workforce",
+    "id": "6nq1xqzi71169vv",
+    "logo": "/img/logos/organizations/dcsa.png",
+    "name": "Defense Counterintelligence and Security Agency",
+    "org_id": "dcsa",
+    "status": "active",
+    "website": "https://www.dcsa.mil"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Framework for automating security testing and compliance validation",
+    "id": "hkbn24lq3o1l4q6",
+    "logo": "/img/logos/organizations/mitre-saf.png",
+    "name": "MITRE Security Automation Framework",
+    "org_id": "mitre-saf",
+    "status": "active",
+    "website": "https://saf.mitre.org"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "British security software and hardware company that develops products for network security",
+    "id": "q61mm590qvqebkx",
+    "logo": "/img/logos/organizations/sophos.png",
+    "name": "Sophos",
+    "org_id": "sophos",
+    "status": "active",
+    "website": "https://www.sophos.com"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "U.S. agency responsible for providing financial and technical assistance to foreign partners and allies",
+    "id": "1cdg3jc37n36r74",
+    "logo": "/img/logos/organizations/dsca.jpg",
+    "name": "Defense Security Cooperation Agency",
+    "org_id": "dsca",
+    "status": "active",
+    "website": "https://www.dsca.mil"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Division responsible for content management and analysis within the U.S. Army",
+    "id": "07396rdo1b9p843",
+    "logo": "/img/logos/organizations/us-army-ecma.png",
+    "name": "US Army Enterprise Content Management and Analysis",
+    "org_id": "us-army-ecma",
+    "status": "active",
+    "website": "https://www.army.mil"
+  },
+  {
+    "collectionId": "pbc_2873630990",
+    "collectionName": "organizations",
+    "description": "Community-maintained profiles and guidance from various sources not affiliated with a specific organization",
+    "id": "6wr0xpylh9lhjj5",
+    "logo": "",
+    "name": "Other Organizations",
+    "org_id": "other",
+    "status": "active",
+    "website": "https://saf.mitre.org"
+  }
+]

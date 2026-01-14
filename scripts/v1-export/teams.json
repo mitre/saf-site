@@ -1,0 +1,94 @@
+[
+  {
+    "collectionId": "pbc_1568971955",
+    "collectionName": "teams",
+    "description": "Security Automation Framework team at MITRE, focused on developing security automation tools and frameworks",
+    "expand": {
+      "organization": {
+        "collectionId": "pbc_2873630990",
+        "collectionName": "organizations",
+        "description": "A not-for-profit organization that operates federally funded research and development centers",
+        "id": "hb8k0jz9q464632",
+        "logo": "/img/logos/organizations/mitre.png",
+        "name": "The MITRE Corporation",
+        "org_id": "mitre",
+        "status": "active",
+        "website": "https://www.mitre.org"
+      }
+    },
+    "id": "d4zn8oj957609y7",
+    "name": "MITRE SAF Team",
+    "organization": "hb8k0jz9q464632",
+    "status": "active",
+    "team_id": "mitre-saf"
+  },
+  {
+    "collectionId": "pbc_1568971955",
+    "collectionName": "teams",
+    "description": "Team responsible for developing and maintaining Security Technical Implementation Guides",
+    "expand": {
+      "organization": {
+        "collectionId": "pbc_2873630990",
+        "collectionName": "organizations",
+        "description": "DoD combat support agency that provides IT and communications support",
+        "id": "zqo705x38y2uz6k",
+        "logo": "/img/logos/organizations/disa.png",
+        "name": "Defense Information Systems Agency",
+        "org_id": "disa",
+        "status": "active",
+        "website": "https://disa.mil"
+      }
+    },
+    "id": "e10u7p7s894t91w",
+    "name": "DISA STIG Team",
+    "organization": "zqo705x38y2uz6k",
+    "status": "active",
+    "team_id": "disa-stig"
+  },
+  {
+    "collectionId": "pbc_1568971955",
+    "collectionName": "teams",
+    "description": "Open source community contributing to the InSpec security testing framework",
+    "expand": {
+      "organization": {
+        "collectionId": "pbc_2873630990",
+        "collectionName": "organizations",
+        "description": "Enterprise automation platform company, now part of Progress",
+        "id": "6r6695656jv32ff",
+        "logo": "/img/logos/organizations/chef.svg",
+        "name": "Progress Chef",
+        "org_id": "chef",
+        "status": "active",
+        "website": "https://www.chef.io"
+      }
+    },
+    "id": "37370dpufi43m55",
+    "name": "InSpec Community",
+    "organization": "6r6695656jv32ff",
+    "status": "active",
+    "team_id": "inspec-community"
+  },
+  {
+    "collectionId": "pbc_1568971955",
+    "collectionName": "teams",
+    "description": "Team responsible for creating and maintaining CIS Benchmarks for secure configuration",
+    "expand": {
+      "organization": {
+        "collectionId": "pbc_2873630990",
+        "collectionName": "organizations",
+        "description": "Non-profit organization focused on developing best practice solutions for cyber defense",
+        "id": "r806nc4431gby20",
+        "logo": "/img/logos/organizations/cis.png",
+        "name": "Center for Internet Security",
+        "org_id": "cis",
+        "status": "active",
+        "website": "https://www.cisecurity.org"
+      }
+    },
+    "id": "86ibv5qdl4ldemh",
+    "name": "CIS Benchmarks Team",
+    "organization": "r806nc4431gby20",
+    "status": "active",
+    "team_id": "cis-benchmarks"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "capability_id": "validate",
+    "category": "Security Capability",
+    "collectionId": "pbc_1252223483",
+    "collectionName": "capabilities",
+    "description": "Generate detailed security testing results throughout the lifecycle of a system through automated tests and manual attestation. Use InSpec content from the MITRE SAF© Validation Library to assess security control compliance.",
+    "id": "0zk50120z1ei769",
+    "name": "Validate",
+    "status": "active"
+  },
+  {
+    "capability_id": "harden",
+    "category": "Security Capability",
+    "collectionId": "pbc_1252223483",
+    "collectionName": "capabilities",
+    "description": "Implement security baselines using verified Ansible, Chef, and Terraform content. Use Ansible, Terraform, Chef, and Puppet content from the MITRE SAF© Hardening Library to implement security baselines.",
+    "id": "194b5vk9k65k23j",
+    "name": "Harden",
+    "status": "active"
+  },
+  {
+    "capability_id": "plan",
+    "category": "Security Capability",
+    "collectionId": "pbc_1252223483",
+    "collectionName": "capabilities",
+    "description": "Select, tailor, and create security guidance content appropriate for your mission. Use Vulcan© to create and manage security baselines to implement security requirements.",
+    "id": "k400j3l1694cxd3",
+    "name": "Plan",
+    "status": "active"
+  },
+  {
+    "capability_id": "normalize",
+    "category": "Security Capability",
+    "collectionId": "pbc_1252223483",
+    "collectionName": "capabilities",
+    "description": "Convert security results from all your security tools into a common data format. Use the MITRE SAF© command line interface (CLI) to normalize security tool output in the OASIS Heimdall Data Format (OHDF).",
+    "id": "u8f3vevjv7w4jzo",
+    "name": "Normalize",
+    "status": "active"
+  },
+  {
+    "capability_id": "visualize",
+    "category": "Security Capability",
+    "collectionId": "pbc_1252223483",
+    "collectionName": "capabilities",
+    "description": "Identify overall security status and deep-dive to resolve specific security defects. Use the MITRE SAF© Heimdall Lite/Server© to visualize security status across all security tools and even to share with your organization's reporting / GRC tools.",
+    "id": "8ub7k3f0i806s0b",
+    "name": "Visualize",
+    "status": "active"
+  }
+]

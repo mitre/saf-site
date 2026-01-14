@@ -1,0 +1,470 @@
+[
+  {
+    "category": "tools",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Configuration management and automation tool",
+    "id": "1928bzlb995b71j",
+    "status": "active",
+    "tag_id": "ansible"
+  },
+  {
+    "category": "web",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Apache HTTP Server and related technologies",
+    "id": "uio6je2q6lx32b3",
+    "status": "active",
+    "tag_id": "apache"
+  },
+  {
+    "category": "servers",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Server software that hosts applications",
+    "id": "591k293a4q1l3bm",
+    "status": "active",
+    "tag_id": "application-server"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Amazon Web Services cloud platform",
+    "id": "q7w4c3eh1m83603",
+    "status": "active",
+    "tag_id": "aws"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Microsoft Azure cloud platform",
+    "id": "840306396y8ccl8",
+    "status": "active",
+    "tag_id": "azure"
+  },
+  {
+    "category": "assessment",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Standardized testing metrics and evaluations",
+    "id": "y2l4k7ft5448yz4",
+    "status": "active",
+    "tag_id": "benchmark"
+  },
+  {
+    "category": "guidance",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Best practices and recommended configurations",
+    "id": "g914o0b983p108x",
+    "status": "active",
+    "tag_id": "best"
+  },
+  {
+    "category": "tools",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Configuration management tool",
+    "id": "b66k8b15xkn041n",
+    "status": "active",
+    "tag_id": "chef"
+  },
+  {
+    "category": "standards",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Center for Internet Security guidelines",
+    "id": "671451o9qh802y0",
+    "status": "active",
+    "tag_id": "cis"
+  },
+  {
+    "category": "infrastructure",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Cloud-based services and infrastructure",
+    "id": "hmgm188i07esz9x",
+    "status": "active",
+    "tag_id": "cloud"
+  },
+  {
+    "category": "governance",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Standards compliance and regulatory requirements",
+    "id": "rwn1u868j8q3el0",
+    "status": "active",
+    "tag_id": "compliance"
+  },
+  {
+    "category": "infrastructure",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Containerization technologies",
+    "id": "o3w8xo08l9c3a9o",
+    "status": "active",
+    "tag_id": "container"
+  },
+  {
+    "category": "security",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Common Vulnerabilities and Exposures",
+    "id": "t8823nl73xz2ajs",
+    "status": "active",
+    "tag_id": "cve"
+  },
+  {
+    "category": "data",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Database systems and management",
+    "id": "22j333bmh4b3949",
+    "status": "active",
+    "tag_id": "database"
+  },
+  {
+    "category": "process",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Development, security, and operations integration",
+    "id": "l779d807mimo956",
+    "status": "active",
+    "tag_id": "devsecops"
+  },
+  {
+    "category": "containers",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Docker containerization platform",
+    "id": "d91428c1blqdyz6",
+    "status": "active",
+    "tag_id": "docker"
+  },
+  {
+    "category": "software",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Software engines and runtime environments",
+    "id": "079daib92xi7h92",
+    "status": "active",
+    "tag_id": "engine"
+  },
+  {
+    "category": "infrastructure",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Core components and fundamental technologies",
+    "id": "0zch6tlvo6s6931",
+    "status": "active",
+    "tag_id": "foundations"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Google Cloud Platform",
+    "id": "896g9lo8y5pnnyf",
+    "status": "active",
+    "tag_id": "gcp"
+  },
+  {
+    "category": "tools",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Git version control system",
+    "id": "363fev12836kfk5",
+    "status": "active",
+    "tag_id": "git"
+  },
+  {
+    "category": "tools",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "GitHub platform and services",
+    "id": "k4jg3o7s0f03nfn",
+    "status": "active",
+    "tag_id": "github"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Google Kubernetes Engine",
+    "id": "vzf73xma9y6057j",
+    "status": "active",
+    "tag_id": "gke"
+  },
+  {
+    "category": "web",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "HTTP protocol and related technologies",
+    "id": "285x1m92nu7j8v4",
+    "status": "active",
+    "tag_id": "http"
+  },
+  {
+    "category": "web",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "HTTP daemon servers",
+    "id": "0m3jfx78476u3x9",
+    "status": "active",
+    "tag_id": "httpd"
+  },
+  {
+    "category": "automation",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Infrastructure as Code",
+    "id": "fh82ko5754t4aj1",
+    "status": "active",
+    "tag_id": "iac"
+  },
+  {
+    "category": "systems",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "IT infrastructure components and systems",
+    "id": "1946s5vb6a917p5",
+    "status": "active",
+    "tag_id": "infrastructure"
+  },
+  {
+    "category": "languages",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Java programming language and platform",
+    "id": "7m9kzt712u330ml",
+    "status": "active",
+    "tag_id": "java"
+  },
+  {
+    "category": "containers",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Kubernetes (shorthand)",
+    "id": "n23odn7ig8v9vri",
+    "status": "active",
+    "tag_id": "k8s"
+  },
+  {
+    "category": "containers",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Kubernetes container orchestration",
+    "id": "9133q5145dwc50c",
+    "status": "active",
+    "tag_id": "kubernetes"
+  },
+  {
+    "category": "vendors",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Microsoft technologies and platforms",
+    "id": "k27fvw1g4dqojmc",
+    "status": "active",
+    "tag_id": "microsoft"
+  },
+  {
+    "category": "databases",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "MySQL database system",
+    "id": "5t3021lx137e0i9",
+    "status": "active",
+    "tag_id": "mysql"
+  },
+  {
+    "category": "web",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "NGINX web server and proxy",
+    "id": "m18920tw1k6420t",
+    "status": "active",
+    "tag_id": "nginx"
+  },
+  {
+    "category": "vendors",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Oracle technologies and products",
+    "id": "z9d347i9m09m9j1",
+    "status": "active",
+    "tag_id": "oracle"
+  },
+  {
+    "category": "automation",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "System orchestration and management",
+    "id": "9kes0ame7al75i1",
+    "status": "active",
+    "tag_id": "orchestration"
+  },
+  {
+    "category": "financial",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Payment processing and systems",
+    "id": "56rigutyrr99c88",
+    "status": "active",
+    "tag_id": "payments"
+  },
+  {
+    "category": "compliance",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Payment Card Industry standards",
+    "id": "989wdvu720793g0",
+    "status": "active",
+    "tag_id": "pci"
+  },
+  {
+    "category": "guidance",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Recommended practices and guidelines",
+    "id": "994vkzh37jk94es",
+    "status": "active",
+    "tag_id": "practices"
+  },
+  {
+    "category": "databases",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Relational Database Management Systems",
+    "id": "wyeq60e41848fft",
+    "status": "active",
+    "tag_id": "rdbms"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "AWS Relational Database Service",
+    "id": "elnf72ipqq8g16f",
+    "status": "active",
+    "tag_id": "rds"
+  },
+  {
+    "category": "vendors",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Red Hat technologies and products",
+    "id": "tit42oux9tq0yq5",
+    "status": "active",
+    "tag_id": "redhat"
+  },
+  {
+    "category": "cloud",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "AWS Simple Storage Service",
+    "id": "9ac0jm0wg23wff6",
+    "status": "active",
+    "tag_id": "s3"
+  },
+  {
+    "category": "security",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Security scanning and vulnerability assessment",
+    "id": "43f5s40y23h8n91",
+    "status": "active",
+    "tag_id": "scan"
+  },
+  {
+    "category": "development",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Source Code Management",
+    "id": "hloy5en93b8y12p",
+    "status": "active",
+    "tag_id": "scm"
+  },
+  {
+    "category": "security",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Security-related frameworks and tools",
+    "id": "882b8x60x06jsoa",
+    "status": "active",
+    "tag_id": "security"
+  },
+  {
+    "category": "infrastructure",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Server hardware and software",
+    "id": "4sz6qt7b90326k3",
+    "status": "active",
+    "tag_id": "server"
+  },
+  {
+    "category": "databases",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Structured Query Language and databases",
+    "id": "01wf4ux563266n8",
+    "status": "active",
+    "tag_id": "sql"
+  },
+  {
+    "category": "standards",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Security Requirements Guide",
+    "id": "6sh3iu24p272z27",
+    "status": "active",
+    "tag_id": "srg"
+  },
+  {
+    "category": "infrastructure",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Data storage systems and technologies",
+    "id": "vdnaz0q225029s5",
+    "status": "active",
+    "tag_id": "storage"
+  },
+  {
+    "category": "tools",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "HashiCorp Terraform IaC tool",
+    "id": "9d8zn5556nl4347",
+    "status": "active",
+    "tag_id": "terraform"
+  },
+  {
+    "category": "servers",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Apache Tomcat application server",
+    "id": "5198ped3i5pb672",
+    "status": "active",
+    "tag_id": "tomcat"
+  },
+  {
+    "category": "security",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Security vulnerabilities and mitigations",
+    "id": "mi3uhyfkk04ypx1",
+    "status": "active",
+    "tag_id": "vulnerability"
+  },
+  {
+    "category": "web",
+    "collectionId": "pbc_1219621782",
+    "collectionName": "tags",
+    "description": "Web technologies and applications",
+    "id": "yvkxs690398gas1",
+    "status": "active",
+    "tag_id": "web"
+  }
+]
