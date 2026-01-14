@@ -1,20 +1,34 @@
+# Dependencies
 node_modules
+
+# VitePress build output
 docs/.vitepress/cache
 docs/.vitepress/dist
 dist
-.nuxt
-.data/
-.claude
-.beads/.bdui
 
-# Database (SQLite binaries ignored, but diffable/ JSON will be tracked)
-drizzle/
-*.db
-*.sqlite
-*.pglite
-.pglite/
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
 
-# Pocketbase (track migrations and diffable exports, ignore binary DB and runtime data)
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor (optional - some teams track .vscode for shared settings)
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Pocketbase (track migrations and diffable, ignore runtime)
 .pocketbase/pocketbase
 .pocketbase/pb_data/*.db
 .pocketbase/pb_data/*.db-wal
@@ -22,15 +36,26 @@ drizzle/
 .pocketbase/pb_data/storage/
 .pocketbase/pb_data/types.d.ts
 
-# TrailBase (rejected solution - keep out of git)
-.trailbase/
-
-# Environment
-.env
-.env.local
-.env*.local
+# Claude Code / Beads
+.claude
+.beads/.bdui
 .beads/recovery-context.md
 .playwright-mcp/
 
-# YAML data quality fixer backups
+# Test coverage
+coverage/
+
+# Temp/backup files
 *.bak.*
+tmp/
+temp/
+
+# Legacy (can remove if not used)
+.nuxt
+.data/
+drizzle/
+*.db
+*.sqlite
+*.pglite
+.pglite/
+.trailbase/
