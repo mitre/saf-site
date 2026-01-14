@@ -1,27 +1,28 @@
 import { defineLoader } from 'vitepress'
 import PocketBase from 'pocketbase'
 
-// Pocketbase record types
-interface PBProfile {
+// Pocketbase v2_content record types (Schema v2)
+interface PBContent {
   id: string
-  profile_id: string
   name: string
+  slug: string
+  description?: string
+  long_description?: string
   version?: string
-  platform?: string
-  framework?: string
-  vendor?: string
+  content_type: 'validation' | 'hardening'
+  status?: 'active' | 'beta' | 'deprecated' | 'draft'
   github?: string
-  details?: string
-  standard_version?: string
-  short_description?: string
-  requirements?: string
-  category?: string
-  status?: string
+  documentation_url?: string
+  control_count?: number
+  stig_id?: string
+  benchmark_version?: string
+  is_featured?: boolean
   expand?: {
-    technology?: { id: string; name: string; tech_id: string }
-    organization?: { id: string; name: string; org_id: string }
-    team?: { id: string; name: string; team_id: string }
-    standard?: { id: string; name: string; standard_id: string }
+    target?: { id: string; name: string; slug: string; category?: string }
+    standard?: { id: string; name: string; short_name?: string; slug: string; standard_type?: string }
+    technology?: { id: string; name: string; slug: string; logo?: string }
+    vendor?: { id: string; name: string; slug: string; org_type?: string }
+    maintainer?: { id: string; name: string; slug: string; organization?: string }
   }
 }
 
@@ -31,23 +32,39 @@ export interface Profile {
   slug: string
   name: string
   description?: string
-  category?: string
+  long_description?: string
   version?: string
-  platform?: string
-  framework?: string
-  technology?: string
-  technology_name?: string
-  vendor?: string
-  organization?: string
-  organization_name?: string
-  team?: string
-  team_name?: string
+  status?: string
+  // Target (what this profile validates)
+  target?: string
+  target_name?: string
+  target_slug?: string
+  // Standard (compliance framework)
   standard?: string
   standard_name?: string
-  standard_version?: string
+  standard_short_name?: string
+  standard_slug?: string
+  // Technology (InSpec, Ansible, etc.)
+  technology?: string
+  technology_name?: string
+  technology_slug?: string
+  technology_logo?: string
+  // Vendor (who made it)
+  vendor?: string
+  vendor_name?: string
+  vendor_slug?: string
+  // Maintainer (team responsible)
+  maintainer?: string
+  maintainer_name?: string
+  maintainer_slug?: string
+  // Links
   github_url?: string
-  requirements?: string
-  status?: string
+  documentation_url?: string
+  // Domain-specific
+  control_count?: number
+  stig_id?: string
+  benchmark_version?: string
+  is_featured?: boolean
 }
 
 export interface ProfileData {
@@ -64,44 +81,61 @@ export default defineLoader({
         process.env.POCKETBASE_URL || 'http://localhost:8090'
       )
 
-      // Authenticate for build-time access
-      // In production CI/CD, use environment variables
-      await pb.admins.authWithPassword(
+      // PocketBase 0.23+ uses _superusers collection for admin auth
+      await pb.collection('_superusers').authWithPassword(
         process.env.POCKETBASE_ADMIN_EMAIL || 'admin@localhost.com',
-        process.env.POCKETBASE_ADMIN_PASSWORD || 'test1234567'
+        process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
       )
 
-      // Query with automatic FK expansion
-      const records = await pb.collection('profiles').getFullList<PBProfile>({
-        expand: 'technology,organization,team,standard'
+      // Query v2_content with FK expansion, filter for validation profiles only
+      const records = await pb.collection('v2_content').getFullList<PBContent>({
+        filter: 'content_type = "validation"',
+        expand: 'target,standard,technology,vendor,maintainer',
+        sort: 'name'
       })
 
       // Transform Pocketbase records to flattened Profile format
       const profiles: Profile[] = records.map(record => ({
-        id: record.profile_id,
-        slug: record.profile_id, // Use profile_id as slug
+        id: record.id,
+        slug: record.slug,
         name: record.name,
-        description: record.short_description,
-        category: record.category,
+        description: record.description,
+        long_description: record.long_description,
         version: record.version,
-        platform: record.platform,
-        framework: record.framework,
-        technology: record.expand?.technology?.tech_id,
-        technology_name: record.expand?.technology?.name,
-        vendor: record.vendor,
-        organization: record.expand?.organization?.org_id,
-        organization_name: record.expand?.organization?.name,
-        team: record.expand?.team?.team_id,
-        team_name: record.expand?.team?.name,
-        standard: record.expand?.standard?.standard_id,
+        status: record.status,
+        // Target
+        target: record.expand?.target?.id,
+        target_name: record.expand?.target?.name,
+        target_slug: record.expand?.target?.slug,
+        // Standard
+        standard: record.expand?.standard?.id,
         standard_name: record.expand?.standard?.name,
-        standard_version: record.standard_version,
+        standard_short_name: record.expand?.standard?.short_name,
+        standard_slug: record.expand?.standard?.slug,
+        // Technology
+        technology: record.expand?.technology?.id,
+        technology_name: record.expand?.technology?.name,
+        technology_slug: record.expand?.technology?.slug,
+        technology_logo: record.expand?.technology?.logo,
+        // Vendor
+        vendor: record.expand?.vendor?.id,
+        vendor_name: record.expand?.vendor?.name,
+        vendor_slug: record.expand?.vendor?.slug,
+        // Maintainer
+        maintainer: record.expand?.maintainer?.id,
+        maintainer_name: record.expand?.maintainer?.name,
+        maintainer_slug: record.expand?.maintainer?.slug,
+        // Links
         github_url: record.github,
-        requirements: record.requirements,
-        status: record.status
+        documentation_url: record.documentation_url,
+        // Domain-specific
+        control_count: record.control_count,
+        stig_id: record.stig_id,
+        benchmark_version: record.benchmark_version,
+        is_featured: record.is_featured
       }))
 
-      console.log(`✓ Loaded ${profiles.length} validation profiles from Pocketbase`)
+      console.log(`✓ Loaded ${profiles.length} validation profiles from Pocketbase v2_content`)
       return { profiles }
     } catch (error) {
       console.error('Failed to load profiles from Pocketbase:', error)

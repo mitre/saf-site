@@ -44,8 +44,13 @@ Edit in Pocketbase → Export DB (sqlite-diffable) → Commit → VitePress quer
 ```bash
 cd .pocketbase && ./pocketbase serve
 # Admin UI: http://localhost:8090/_/
-# Login: admin@localhost.com / test1234567
+# Login: admin@localhost.com / testpassword123
 ```
+
+**PocketBase 0.23+ API Changes** (CRITICAL):
+- Admin auth moved from `/api/admins/auth-with-password` to `/api/collections/_superusers/auth-with-password`
+- In TypeScript SDK: Use `pb.collection('_superusers').authWithPassword()` instead of `pb.admins.authWithPassword()`
+- This affects all data loaders and migration scripts
 
 **Editing Content**:
 1. Start Pocketbase: `cd .pocketbase && ./pocketbase serve`
@@ -72,10 +77,14 @@ Field options are DIRECT properties, NOT nested in "options":
 }
 ```
 
-**Collections** (12 total):
-- **Base** (no FKs): tags, organizations, technologies, standards, capabilities
-- **With FKs**: teams, profiles, hardening_profiles, tools
-- **Junction** (many-to-many): profiles_tags, hardening_profiles_tags, validation_to_hardening
+**Schema v2 Collections** (28 total, all prefixed with `v2_`):
+- **Lookup Tables** (9): capabilities, categories, organizations, tags, tool_types, distribution_types, registries, resource_types, media_types
+- **Reference Tables** (4): teams, technologies, standards, targets
+- **Main Content** (5): content (unified validation+hardening), tools, courses, distributions, media
+- **Junction Tables** (10): content_tags, content_capabilities, content_relationships, tool_tags, tool_capabilities, distribution_tags, distribution_capabilities, course_tags, course_capabilities, course_tools, media_tags, media_capabilities
+
+**Legacy v1 Collections** (being deprecated):
+- profiles, hardening_profiles, profiles_tags, hardening_profiles_tags, validation_to_hardening
 
 **Data Import Scripts**:
 - `scripts/create-all-collections.ts` - Creates all 12 collections with proper schema

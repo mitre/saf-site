@@ -1,12 +1,12 @@
 <template>
   <div class="profile-filters">
     <div class="filter-group">
-      <!-- Category Filter -->
+      <!-- Target Filter (what the profile validates) -->
       <div class="filter-item">
-        <label class="filter-label">Category</label>
-        <SelectRoot v-model="selectedCategory">
-          <SelectTrigger class="select-trigger" aria-label="Select category">
-            <SelectValue placeholder="All Categories" />
+        <label class="filter-label">Target</label>
+        <SelectRoot v-model="selectedTarget">
+          <SelectTrigger class="select-trigger" aria-label="Select target">
+            <SelectValue placeholder="All Targets" />
             <SelectIcon class="select-icon">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -18,15 +18,15 @@
             <SelectContent class="select-content" :side-offset="5">
               <SelectViewport class="select-viewport">
                 <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Categories</SelectItemText>
+                  <SelectItemText>All Targets</SelectItemText>
                 </SelectItem>
                 <SelectItem
-                  v-for="category in categories"
-                  :key="category"
-                  :value="category"
+                  v-for="target in targets"
+                  :key="target"
+                  :value="target"
                   class="select-item"
                 >
-                  <SelectItemText>{{ category }}</SelectItemText>
+                  <SelectItemText>{{ target }}</SelectItemText>
                 </SelectItem>
               </SelectViewport>
             </SelectContent>
@@ -60,39 +60,6 @@
                   class="select-item"
                 >
                   <SelectItemText>{{ tech }}</SelectItemText>
-                </SelectItem>
-              </SelectViewport>
-            </SelectContent>
-          </SelectPortal>
-        </SelectRoot>
-      </div>
-
-      <!-- Platform Filter -->
-      <div class="filter-item">
-        <label class="filter-label">Platform</label>
-        <SelectRoot v-model="selectedPlatform">
-          <SelectTrigger class="select-trigger" aria-label="Select platform">
-            <SelectValue placeholder="All Platforms" />
-            <SelectIcon class="select-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </SelectIcon>
-          </SelectTrigger>
-
-          <SelectPortal>
-            <SelectContent class="select-content" :side-offset="5">
-              <SelectViewport class="select-viewport">
-                <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Platforms</SelectItemText>
-                </SelectItem>
-                <SelectItem
-                  v-for="platform in platforms"
-                  :key="platform"
-                  :value="platform"
-                  class="select-item"
-                >
-                  <SelectItemText>{{ platform }}</SelectItemText>
                 </SelectItem>
               </SelectViewport>
             </SelectContent>
@@ -197,11 +164,9 @@ import {
 
 interface Profile {
   id: string
-  category?: string
-  technology?: string
+  target_name?: string
   technology_name?: string
-  platform?: string
-  vendor?: string
+  vendor_name?: string
   standard_name?: string
 }
 
@@ -210,88 +175,69 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:category': [value: string]
+  'update:target': [value: string]
   'update:technology': [value: string]
-  'update:platform': [value: string]
   'update:vendor': [value: string]
   'update:standard': [value: string]
   'update:search': [value: string]
 }>()
 
-const selectedCategory = ref('all')
+const selectedTarget = ref('all')
 const selectedTech = ref('all')
-const selectedPlatform = ref('all')
 const selectedVendor = ref('all')
 const selectedStandard = ref('all')
 const searchQuery = ref('')
 
-// Extract unique categories from profiles
-const categories = computed(() => {
-  const uniqueCategories = new Set<string>()
+// Extract unique targets from profiles
+const targets = computed(() => {
+  const unique = new Set<string>()
   props.profiles.forEach(profile => {
-    if (profile.category) {
-      uniqueCategories.add(profile.category)
+    if (profile.target_name) {
+      unique.add(profile.target_name)
     }
   })
-  return Array.from(uniqueCategories).sort()
+  return Array.from(unique).sort()
 })
 
 // Extract unique technologies from profiles
 const technologies = computed(() => {
-  const uniqueTech = new Set<string>()
+  const unique = new Set<string>()
   props.profiles.forEach(profile => {
-    // Use technology_name (display name) if available, otherwise technology ID
-    const techName = profile.technology_name || profile.technology
-    if (techName) {
-      uniqueTech.add(techName)
+    if (profile.technology_name) {
+      unique.add(profile.technology_name)
     }
   })
-  return Array.from(uniqueTech).sort()
-})
-
-// Extract unique platforms from profiles
-const platforms = computed(() => {
-  const uniquePlatforms = new Set<string>()
-  props.profiles.forEach(profile => {
-    if (profile.platform) {
-      uniquePlatforms.add(profile.platform)
-    }
-  })
-  return Array.from(uniquePlatforms).sort()
+  return Array.from(unique).sort()
 })
 
 // Extract unique vendors from profiles
 const vendors = computed(() => {
-  const uniqueVendors = new Set<string>()
+  const unique = new Set<string>()
   props.profiles.forEach(profile => {
-    if (profile.vendor) {
-      uniqueVendors.add(profile.vendor)
+    if (profile.vendor_name) {
+      unique.add(profile.vendor_name)
     }
   })
-  return Array.from(uniqueVendors).sort()
+  return Array.from(unique).sort()
 })
 
 // Extract unique standards from profiles
 const standards = computed(() => {
-  const uniqueStandards = new Set<string>()
+  const unique = new Set<string>()
   props.profiles.forEach(profile => {
     if (profile.standard_name) {
-      uniqueStandards.add(profile.standard_name)
+      unique.add(profile.standard_name)
     }
   })
-  return Array.from(uniqueStandards).sort()
+  return Array.from(unique).sort()
 })
 
-watch(selectedCategory, (value) => {
-  emit('update:category', value)
+watch(selectedTarget, (value) => {
+  emit('update:target', value)
 })
 
 watch(selectedTech, (value) => {
   emit('update:technology', value)
-})
-
-watch(selectedPlatform, (value) => {
-  emit('update:platform', value)
 })
 
 watch(selectedVendor, (value) => {
@@ -325,7 +271,7 @@ watch(selectedStandard, (value) => {
 }
 
 .filter-search {
-  grid-column: span 3;
+  grid-column: span 2;
 }
 
 .filter-label {

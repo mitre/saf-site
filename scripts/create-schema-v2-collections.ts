@@ -160,6 +160,7 @@ async function main() {
   // Standards (depends on organizations)
   collectionIds.standards = await createCollection('v2_standards', [
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
+    { name: 'short_name', type: 'text', options: { max: 50 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },

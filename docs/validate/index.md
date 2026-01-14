@@ -11,9 +11,8 @@ import { data } from '../.vitepress/loaders/profiles.data'
 const allProfiles = data.profiles
 
 // Filter state
-const selectedCategory = ref('all')
+const selectedTarget = ref('all')
 const selectedTech = ref('all')
-const selectedPlatform = ref('all')
 const selectedVendor = ref('all')
 const selectedStandard = ref('all')
 const searchQuery = ref('')
@@ -22,30 +21,22 @@ const searchQuery = ref('')
 const filteredProfiles = computed(() => {
   let result = allProfiles
 
-  // Filter by category
-  if (selectedCategory.value !== 'all') {
-    result = result.filter(p => p.category === selectedCategory.value)
+  // Filter by target (what the profile validates)
+  if (selectedTarget.value !== 'all') {
+    result = result.filter(p => p.target_name === selectedTarget.value)
   }
 
-  // Filter by technology (match against technology_name for display)
+  // Filter by technology (InSpec, Ansible, etc.)
   if (selectedTech.value !== 'all') {
-    result = result.filter(p => {
-      const techName = p.technology_name || p.technology
-      return techName === selectedTech.value
-    })
+    result = result.filter(p => p.technology_name === selectedTech.value)
   }
 
-  // Filter by platform
-  if (selectedPlatform.value !== 'all') {
-    result = result.filter(p => p.platform === selectedPlatform.value)
-  }
-
-  // Filter by vendor
+  // Filter by vendor (who made it)
   if (selectedVendor.value !== 'all') {
-    result = result.filter(p => p.vendor === selectedVendor.value)
+    result = result.filter(p => p.vendor_name === selectedVendor.value)
   }
 
-  // Filter by standard
+  // Filter by standard (STIG, CIS, etc.)
   if (selectedStandard.value !== 'all') {
     result = result.filter(p => p.standard_name === selectedStandard.value)
   }
@@ -69,9 +60,8 @@ InSpec validation profiles for security compliance testing across various platfo
 
 <ProfileFilters
   :profiles="allProfiles"
-  @update:category="selectedCategory = $event"
+  @update:target="selectedTarget = $event"
   @update:technology="selectedTech = $event"
-  @update:platform="selectedPlatform = $event"
   @update:vendor="selectedVendor = $event"
   @update:standard="selectedStandard = $event"
   @update:search="searchQuery = $event"

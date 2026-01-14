@@ -113,6 +113,7 @@ export const teams = sqliteTable('teams', {
 export const standards = sqliteTable('standards', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  shortName: text('short_name'),                // Display-friendly: STIG, CIS, PCI DSS
   slug: text('slug').notNull().unique(),        // URL-friendly: stig, cis, pci-dss
   description: text('description'),
   website: text('website'),
