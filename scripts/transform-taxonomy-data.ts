@@ -71,6 +71,17 @@ const transformationRules: TransformationRule[] = [
     profile_maintainer: 'MITRE SAF'
   },
 
+  // Cloud Databases - AWS RDS (MUST come before generic DB rules)
+  {
+    pattern: /AWS.*RDS/i,
+    target_type: 'Cloud Database Service',
+    target_subtype: 'RDS',
+    os_family: 'Cloud-Native',
+    category: 'Cloud Infrastructure',
+    vendor: 'AWS',
+    profile_maintainer: 'MITRE SAF'
+  },
+
   // Databases - SQL Server
   {
     pattern: /MSQL 2014|SQL Server/i,
@@ -301,15 +312,6 @@ const transformationRules: TransformationRule[] = [
   },
 
   // Cloud Services - AWS (order matters)
-  {
-    pattern: /AWS.*RDS/i,
-    target_type: 'Cloud Database Service',
-    target_subtype: 'RDS',
-    os_family: 'Cloud-Native',
-    category: 'Cloud Infrastructure',
-    vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
-  },
   {
     pattern: /AWS.*S3/i,
     target_type: 'Cloud Storage Service',
