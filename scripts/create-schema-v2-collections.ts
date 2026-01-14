@@ -120,6 +120,30 @@ async function main() {
     unique: ['name', 'slug']
   })
 
+  // Resource Types (for course learning resources)
+  collectionIds.resource_types = await createCollection('resource_types', [
+    { name: 'name', type: 'text', required: true, options: { max: 100 } },
+    { name: 'slug', type: 'text', required: true, options: { max: 100 } },
+    { name: 'display_name', type: 'text', options: { max: 100 } },
+    { name: 'description', type: 'text' },
+    { name: 'icon', type: 'text', options: { max: 100 } },
+    { name: 'sort_order', type: 'number', options: { min: 0 } }
+  ], {
+    unique: ['name', 'slug']
+  })
+
+  // Media Types (for SAF media library)
+  collectionIds.media_types = await createCollection('media_types', [
+    { name: 'name', type: 'text', required: true, options: { max: 100 } },
+    { name: 'slug', type: 'text', required: true, options: { max: 100 } },
+    { name: 'display_name', type: 'text', options: { max: 100 } },
+    { name: 'description', type: 'text' },
+    { name: 'icon', type: 'text', options: { max: 100 } },
+    { name: 'sort_order', type: 'number', options: { min: 0 } }
+  ], {
+    unique: ['name', 'slug']
+  })
+
   // ========================================================================
   // TABLES WITH FK DEPENDENCIES (Level 1)
   // ========================================================================
@@ -338,12 +362,134 @@ async function main() {
     { name: 'is_free', type: 'bool' },
     { name: 'price_usd', type: 'number', options: { min: 0 } },
 
+    // Audience
+    { name: 'target_audience', type: 'text' },
+
+    // Registration
+    { name: 'registration_active', type: 'bool' },
+
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
     { name: 'featured_order', type: 'number', options: { min: 0 } }
   ], {
     unique: ['slug'],
     regular: ['course_type', 'level', 'status', 'organization', 'is_featured']
+  })
+
+  // Course Resources (learning materials for courses)
+  collectionIds.course_resources = await createCollection('course_resources', [
+    { name: 'title', type: 'text', required: true, options: { max: 200 } },
+    { name: 'description', type: 'text' },
+    { name: 'url', type: 'url', required: true },
+
+    // Foreign Keys
+    { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
+    { name: 'resource_type', type: 'relation', required: true, collectionId: collectionIds.resource_types, maxSelect: 1 },
+
+    // Display
+    { name: 'sort_order', type: 'number', options: { min: 0 } }
+  ], {
+    regular: ['course', 'resource_type']
+  })
+
+  // Course Sessions (scheduled training dates - past and future)
+  collectionIds.course_sessions = await createCollection('course_sessions', [
+    { name: 'title', type: 'text', options: { max: 200 } },  // Optional override like "Spring 2026 Cohort"
+
+    // Foreign Keys
+    { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
+
+    // Schedule
+    { name: 'start_date', type: 'date', required: true },
+    { name: 'end_date', type: 'date' },
+    { name: 'timezone', type: 'text', options: { max: 50 } },
+
+    // Location
+    { name: 'location_type', type: 'select', options: {
+      values: ['virtual', 'in_person', 'hybrid']
+    }},
+    { name: 'location', type: 'text' },  // Room/venue or video platform
+    { name: 'meeting_url', type: 'url' },
+
+    // Capacity
+    { name: 'instructor', type: 'text', options: { max: 200 } },
+    { name: 'max_attendees', type: 'number', options: { min: 0 } },
+
+    // Recording (YouTube or other)
+    { name: 'recording_url', type: 'url' },
+
+    // Status
+    { name: 'status', type: 'select', options: {
+      values: ['scheduled', 'in_progress', 'completed', 'cancelled']
+    }}
+  ], {
+    regular: ['course', 'start_date', 'status', 'location_type']
+  })
+
+  // Media (SAF media library - presentations, PDFs, videos, etc.)
+  collectionIds.media = await createCollection('media', [
+    { name: 'name', type: 'text', required: true, options: { max: 300 } },
+    { name: 'slug', type: 'text', required: true, options: { max: 150 } },
+    { name: 'description', type: 'text' },
+
+    // Classification
+    { name: 'media_type', type: 'relation', required: true, collectionId: collectionIds.media_types, maxSelect: 1 },
+
+    // Author/Source
+    { name: 'author', type: 'text', options: { max: 200 } },
+    { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
+    { name: 'published_at', type: 'date' },
+
+    // Content - URL or File (one or both)
+    { name: 'url', type: 'url' },                          // External link (YouTube, SlideShare, etc.)
+    { name: 'file', type: 'file', options: {              // Binary upload (PDF, PPT, etc.)
+      maxSelect: 1,
+      maxSize: 52428800  // 50MB
+    }},
+    { name: 'file_size', type: 'number', options: { min: 0 } },
+    { name: 'thumbnail', type: 'file', options: {
+      maxSelect: 1,
+      maxSize: 2097152,  // 2MB
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp']
+    }},
+
+    // Event context (optional - for conference talks, webinars)
+    { name: 'event_name', type: 'text', options: { max: 200 } },
+    { name: 'event_date', type: 'date' },
+
+    // Featured/Curation
+    { name: 'is_featured', type: 'bool' },
+    { name: 'featured_order', type: 'number', options: { min: 0 } }
+  ], {
+    unique: ['slug'],
+    regular: ['media_type', 'organization', 'published_at', 'is_featured']
+  })
+
+  // Releases (version history - polymorphic)
+  collectionIds.releases = await createCollection('releases', [
+    { name: 'slug', type: 'text', required: true, options: { max: 150 } },
+
+    // Polymorphic reference
+    { name: 'entity_type', type: 'select', required: true, options: {
+      values: ['content', 'tool', 'distribution']
+    }},
+    { name: 'entity_id', type: 'text', required: true, options: { max: 50 } },
+
+    // Version info
+    { name: 'version', type: 'text', required: true, options: { max: 50 } },
+    { name: 'release_date', type: 'date' },
+    { name: 'release_notes', type: 'text' },
+
+    // Download/verification
+    { name: 'download_url', type: 'url' },
+    { name: 'sha256', type: 'text', options: { max: 64 } },
+
+    // Status
+    { name: 'is_latest', type: 'bool' }
+  ], {
+    unique: ['slug'],
+    regular: ['entity_type', 'entity_id', 'is_latest'],
+    composite: [['entity_type', 'entity_id', 'is_latest']]  // For "get latest" queries
   })
 
   // ========================================================================
@@ -433,6 +579,22 @@ async function main() {
     regular: ['course', 'tag']
   })
 
+  // Media ↔ Capabilities
+  await createCollection('media_capabilities', [
+    { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+  ], {
+    regular: ['media', 'capability']
+  })
+
+  // Media ↔ Tags
+  await createCollection('media_tags', [
+    { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+  ], {
+    regular: ['media', 'tag']
+  })
+
   // ========================================================================
   // SUMMARY
   // ========================================================================
@@ -448,6 +610,8 @@ async function main() {
   console.log('  • tool_types - Tool classification (application, cli, library)')
   console.log('  • distribution_types - Distribution methods (helm_chart, npm, docker)')
   console.log('  • registries - Package registries (Artifact Hub, Docker Hub, npmjs)')
+  console.log('  • resource_types - Course resource types (video, article, internal_course)')
+  console.log('  • media_types - Media library types (presentation, pdf, video, webinar)')
 
   console.log('\nWith FK Dependencies (Level 1):')
   console.log('  • teams → organizations')
@@ -461,28 +625,41 @@ async function main() {
   console.log('  • tools → tool_types, organizations, technologies')
   console.log('    + slug, is_featured, screenshot, screenshots')
   console.log('  • courses → organizations')
-  console.log('    + slug, is_featured, is_free, price_usd')
+  console.log('    + slug, is_featured, is_free, price_usd, target_audience, registration_active')
   console.log('  • distributions → tools, distribution_types, registries')
   console.log('    + slug')
+  console.log('  • media → media_types, organizations')
+  console.log('    + slug, author, url, file (binary), thumbnail, event_name, is_featured')
+  console.log('  • releases (polymorphic version history)')
+  console.log('    + entity_type, entity_id, version, sha256, is_latest')
+
+  console.log('\nCourse-Related Tables:')
+  console.log('  • course_resources → courses, resource_types (learning materials)')
+  console.log('    + title, url, description, sort_order')
+  console.log('  • course_sessions → courses (scheduled training dates)')
+  console.log('    + start_date, end_date, location_type, instructor, recording_url, status')
 
   console.log('\nJunction Tables (with cascadeDelete):')
   console.log('  • content_capabilities, content_tags, content_relationships')
   console.log('  • tool_capabilities, tool_tags')
   console.log('  • distribution_capabilities, distribution_tags')
   console.log('  • course_capabilities, course_tools, course_tags')
+  console.log('  • media_capabilities, media_tags')
 
   console.log('\nIndexes:')
   console.log('  • UNIQUE indexes on all slug fields')
   console.log('  • Regular indexes on all FK columns')
   console.log('  • Regular indexes on status, content_type, is_featured')
+  console.log('  • Composite index on releases (entity_type, entity_id, is_latest)')
 
   console.log('\n✓ Schema v2 collections created successfully!')
 }
 
 // Helper function to create a collection with proper indexes
 interface IndexConfig {
-  unique?: string[]    // Fields that need UNIQUE indexes
-  regular?: string[]   // Fields that need regular indexes (FKs, filters)
+  unique?: string[]       // Fields that need UNIQUE indexes
+  regular?: string[]      // Fields that need regular indexes (FKs, filters)
+  composite?: string[][]  // Composite indexes (array of field arrays)
 }
 
 async function createCollection(
@@ -512,6 +689,14 @@ async function createCollection(
     if (indexConfig?.regular) {
       for (const field of indexConfig.regular) {
         indexes.push(`CREATE INDEX idx_${name}_${field} ON ${name} (${field})`)
+      }
+    }
+
+    if (indexConfig?.composite) {
+      for (const fields of indexConfig.composite) {
+        const fieldList = fields.join(', ')
+        const indexName = fields.join('_')
+        indexes.push(`CREATE INDEX idx_${name}_${indexName} ON ${name} (${fieldList})`)
       }
     }
 

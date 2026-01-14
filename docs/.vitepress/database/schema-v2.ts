@@ -215,6 +215,36 @@ export const registries = sqliteTable('registries', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 
+/**
+ * Resource Types - Classification of learning resources for courses
+ */
+export const resourceTypes = sqliteTable('resource_types', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),        // internal_course, video, article, documentation, tool, external_course
+  slug: text('slug').notNull().unique(),        // URL-friendly: internal-course, video, article
+  displayName: text('display_name'),            // Internal Course, Video, Article, etc.
+  description: text('description'),
+  icon: text('icon'),                           // Icon for UI (play-circle, book, link, etc.)
+  sortOrder: integer('sort_order').default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Media Types - Classification of SAF media library items
+ */
+export const mediaTypes = sqliteTable('media_types', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),        // presentation, pdf, video, webinar, conference_talk, whitepaper, infographic
+  slug: text('slug').notNull().unique(),        // URL-friendly: presentation, pdf, video
+  displayName: text('display_name'),            // Presentation, PDF, Video, etc.
+  description: text('description'),
+  icon: text('icon'),                           // Icon for UI (file-ppt, file-pdf, play-circle, etc.)
+  sortOrder: integer('sort_order').default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
 // ============================================================================
 // MAIN CONTENT TABLES
 // ============================================================================
@@ -333,6 +363,104 @@ export const courses = sqliteTable('courses', {
   isFree: integer('is_free', { mode: 'boolean' }).default(true),
   priceUsd: integer('price_usd'),              // Price in USD cents (e.g., 9900 = $99.00)
 
+  // Audience
+  targetAudience: text('target_audience'),     // "developers", "security analysts", "devops"
+
+  // Registration
+  registrationActive: integer('registration_active', { mode: 'boolean' }).default(false),
+
+  // Featured/Curation
+  isFeatured: integer('is_featured', { mode: 'boolean' }).default(false),
+  featuredOrder: integer('featured_order'),
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Course Resources - Learning materials for courses (prerequisites, references, etc.)
+ */
+export const courseResources = sqliteTable('course_resources', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),               // "Introduction to Ruby", "GitHub Actions Basics"
+  description: text('description'),
+  url: text('url').notNull(),                   // Internal or external link
+
+  // Foreign Keys
+  course: text('course').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  resourceType: text('resource_type').notNull().references(() => resourceTypes.id),
+
+  // Display
+  sortOrder: integer('sort_order').default(0),
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Course Sessions - Scheduled training dates (past and future)
+ */
+export const courseSessions = sqliteTable('course_sessions', {
+  id: text('id').primaryKey(),
+  title: text('title'),                         // Optional override like "Spring 2026 Cohort"
+
+  // Foreign Keys
+  course: text('course').notNull().references(() => courses.id, { onDelete: 'cascade' }),
+
+  // Schedule
+  startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
+  endDate: integer('end_date', { mode: 'timestamp' }),
+  timezone: text('timezone'),                   // e.g., "America/New_York"
+
+  // Location
+  locationType: text('location_type'),          // virtual, in_person, hybrid
+  location: text('location'),                   // Room/venue or video platform
+  meetingUrl: text('meeting_url'),
+
+  // Capacity
+  instructor: text('instructor'),
+  maxAttendees: integer('max_attendees'),
+
+  // Recording (YouTube or other)
+  recordingUrl: text('recording_url'),
+
+  // Status
+  status: text('status').default('scheduled'), // scheduled, in_progress, completed, cancelled
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Media - SAF media library (presentations, PDFs, videos, webinars, conference talks)
+ */
+export const media = sqliteTable('media', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: saf-overview-2026, inspec-deep-dive
+  description: text('description'),
+
+  // Classification
+  mediaType: text('media_type').notNull().references(() => mediaTypes.id),
+
+  // Author/Source
+  author: text('author'),                       // External speakers, presenters
+  organization: text('organization').references(() => organizations.id),
+  publishedAt: integer('published_at', { mode: 'timestamp' }),
+
+  // Content - URL or File (one or both)
+  url: text('url'),                             // External link (YouTube, SlideShare, etc.)
+  file: text('file'),                           // Pocketbase file path for binary uploads
+  fileSize: integer('file_size'),               // Size in bytes
+  thumbnail: text('thumbnail'),                 // Thumbnail image path
+
+  // Event context (optional - for conference talks, webinars)
+  eventName: text('event_name'),
+  eventDate: integer('event_date', { mode: 'timestamp' }),
+
   // Featured/Curation
   isFeatured: integer('is_featured', { mode: 'boolean' }).default(false),
   featuredOrder: integer('featured_order'),
@@ -370,6 +498,35 @@ export const distributions = sqliteTable('distributions', {
 
   // Metadata
   license: text('license'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+/**
+ * Releases - Version history for content, tools, and distributions
+ * Polymorphic table: entityType + entityId pattern
+ */
+export const releases = sqliteTable('releases', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),        // URL-friendly: heimdall-v3-2-0, rhel8-stig-v1r3
+
+  // Polymorphic reference
+  entityType: text('entity_type').notNull(),    // 'content', 'tool', 'distribution'
+  entityId: text('entity_id').notNull(),        // ID of the entity
+
+  // Version info
+  version: text('version').notNull(),           // e.g., "3.2.0", "V1R3"
+  releaseDate: integer('release_date', { mode: 'timestamp' }),
+  releaseNotes: text('release_notes'),
+
+  // Download/verification
+  downloadUrl: text('download_url'),
+  sha256: text('sha256'),                       // For integrity verification
+
+  // Status
+  isLatest: integer('is_latest', { mode: 'boolean' }).default(false),
+
+  // Metadata
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -477,6 +634,26 @@ export const courseTags = sqliteTable('course_tags', {
   tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
 }, (table) => ({
   pk: primaryKey({ columns: [table.courseId, table.tagId] })
+}))
+
+/**
+ * Media ↔ Capabilities (many-to-many)
+ */
+export const mediaCapabilities = sqliteTable('media_capabilities', {
+  mediaId: text('media_id').notNull().references(() => media.id, { onDelete: 'cascade' }),
+  capabilityId: text('capability_id').notNull().references(() => capabilities.id, { onDelete: 'cascade' })
+}, (table) => ({
+  pk: primaryKey({ columns: [table.mediaId, table.capabilityId] })
+}))
+
+/**
+ * Media ↔ Tags (many-to-many)
+ */
+export const mediaTags = sqliteTable('media_tags', {
+  mediaId: text('media_id').notNull().references(() => media.id, { onDelete: 'cascade' }),
+  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
+}, (table) => ({
+  pk: primaryKey({ columns: [table.mediaId, table.tagId] })
 }))
 
 // ============================================================================
@@ -610,7 +787,8 @@ export const capabilitiesRelations = relations(capabilities, ({ many }) => ({
   content: many(contentCapabilities),
   tools: many(toolCapabilities),
   distributions: many(distributionCapabilities),
-  courses: many(courseCapabilities)
+  courses: many(courseCapabilities),
+  media: many(mediaCapabilities)
 }))
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
@@ -620,14 +798,78 @@ export const coursesRelations = relations(courses, ({ one, many }) => ({
   }),
   capabilities: many(courseCapabilities),
   tools: many(courseTools),
-  tags: many(courseTags)
+  tags: many(courseTags),
+  resources: many(courseResources),
+  sessions: many(courseSessions)
+}))
+
+export const resourceTypesRelations = relations(resourceTypes, ({ many }) => ({
+  resources: many(courseResources)
+}))
+
+export const courseResourcesRelations = relations(courseResources, ({ one }) => ({
+  course: one(courses, {
+    fields: [courseResources.course],
+    references: [courses.id]
+  }),
+  resourceType: one(resourceTypes, {
+    fields: [courseResources.resourceType],
+    references: [resourceTypes.id]
+  })
+}))
+
+export const courseSessionsRelations = relations(courseSessions, ({ one }) => ({
+  course: one(courses, {
+    fields: [courseSessions.course],
+    references: [courses.id]
+  })
+}))
+
+export const mediaTypesRelations = relations(mediaTypes, ({ many }) => ({
+  media: many(media)
+}))
+
+export const mediaRelations = relations(media, ({ one, many }) => ({
+  mediaType: one(mediaTypes, {
+    fields: [media.mediaType],
+    references: [mediaTypes.id]
+  }),
+  organization: one(organizations, {
+    fields: [media.organization],
+    references: [organizations.id]
+  }),
+  capabilities: many(mediaCapabilities),
+  tags: many(mediaTags)
+}))
+
+export const mediaCapabilitiesRelations = relations(mediaCapabilities, ({ one }) => ({
+  media: one(media, {
+    fields: [mediaCapabilities.mediaId],
+    references: [media.id]
+  }),
+  capability: one(capabilities, {
+    fields: [mediaCapabilities.capabilityId],
+    references: [capabilities.id]
+  })
+}))
+
+export const mediaTagsRelations = relations(mediaTags, ({ one }) => ({
+  media: one(media, {
+    fields: [mediaTags.mediaId],
+    references: [media.id]
+  }),
+  tag: one(tags, {
+    fields: [mediaTags.tagId],
+    references: [tags.id]
+  })
 }))
 
 export const tagsRelations = relations(tags, ({ many }) => ({
   content: many(contentTags),
   tools: many(toolTags),
   distributions: many(distributionTags),
-  courses: many(courseTags)
+  courses: many(courseTags),
+  media: many(mediaTags)
 }))
 
 // ============================================================================
@@ -649,3 +891,9 @@ export type Content = typeof content.$inferSelect
 export type Tool = typeof tools.$inferSelect
 export type Course = typeof courses.$inferSelect
 export type Distribution = typeof distributions.$inferSelect
+export type Release = typeof releases.$inferSelect
+export type ResourceType = typeof resourceTypes.$inferSelect
+export type CourseResource = typeof courseResources.$inferSelect
+export type CourseSession = typeof courseSessions.$inferSelect
+export type MediaType = typeof mediaTypes.$inferSelect
+export type Media = typeof media.$inferSelect
