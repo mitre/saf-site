@@ -2,6 +2,34 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Context Restoration (Start Here After Compact/New Session)
+
+This project uses **beads** for task tracking and context preservation. After a `/compact` or starting a new session:
+
+```bash
+# 1. Load architecture overview (READ FIRST)
+bd show saf-site-vitepress-ga0
+
+# 2. Load database workflow reference
+bd show saf-site-vitepress-35u
+
+# 3. Check for session recovery card
+bd list --status=open | grep -i recovery
+
+# 4. See available work
+bd ready
+```
+
+**Key Cards (Hub & Spoke Pattern):**
+- **HUB:** `saf-site-vitepress-ga0` - Architecture overview, tech stack, key directories
+- **SPOKE:** `saf-site-vitepress-35u` - Database & Pocketbase workflow details
+
+**Related Documentation:**
+- [README.md](README.md) - Setup, commands, workflows
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow, PR process
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
+- [AGENT.md](AGENT.md) - AI agent-specific guidance
+
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
