@@ -1,0 +1,9 @@
+{
+    "name": "v2_distribution_tags",
+    "columns": [
+        "distribution",
+        "id",
+        "tag"
+    ],
+    "schema": "CREATE TABLE `v2_distribution_tags` (`distribution` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `tag` TEXT DEFAULT '' NOT NULL)"
+}

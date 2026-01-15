@@ -1,0 +1,9 @@
+{
+    "name": "v2_course_tools",
+    "columns": [
+        "course",
+        "id",
+        "tool"
+    ],
+    "schema": "CREATE TABLE `v2_course_tools` (`course` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `tool` TEXT DEFAULT '' NOT NULL)"
+}

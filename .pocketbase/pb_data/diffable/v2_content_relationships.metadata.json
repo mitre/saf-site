@@ -1,0 +1,10 @@
+{
+    "name": "v2_content_relationships",
+    "columns": [
+        "content",
+        "id",
+        "related_content",
+        "relationship_type"
+    ],
+    "schema": "CREATE TABLE `v2_content_relationships` (`content` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `related_content` TEXT DEFAULT '' NOT NULL, `relationship_type` TEXT DEFAULT '' NOT NULL)"
+}

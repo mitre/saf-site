@@ -1,0 +1,22 @@
+{
+    "name": "v2_media",
+    "columns": [
+        "author",
+        "description",
+        "event_date",
+        "event_name",
+        "featured_order",
+        "file",
+        "file_size",
+        "id",
+        "is_featured",
+        "media_type",
+        "name",
+        "organization",
+        "published_at",
+        "slug",
+        "thumbnail",
+        "url"
+    ],
+    "schema": "CREATE TABLE `v2_media` (`author` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `event_date` TEXT DEFAULT '' NOT NULL, `event_name` TEXT DEFAULT '' NOT NULL, `featured_order` NUMERIC DEFAULT 0 NOT NULL, `file` TEXT DEFAULT '' NOT NULL, `file_size` NUMERIC DEFAULT 0 NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `is_featured` BOOLEAN DEFAULT FALSE NOT NULL, `media_type` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `organization` TEXT DEFAULT '' NOT NULL, `published_at` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `thumbnail` TEXT DEFAULT '' NOT NULL, `url` TEXT DEFAULT '' NOT NULL)"
+}

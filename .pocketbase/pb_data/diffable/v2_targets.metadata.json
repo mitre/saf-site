@@ -1,0 +1,14 @@
+{
+    "name": "v2_targets",
+    "columns": [
+        "category",
+        "description",
+        "id",
+        "logo",
+        "name",
+        "slug",
+        "vendor",
+        "website"
+    ],
+    "schema": "CREATE TABLE `v2_targets` (`category` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `vendor` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL)"
+}

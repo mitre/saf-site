@@ -1,0 +1,13 @@
+{
+    "name": "v2_tags",
+    "columns": [
+        "badge_color",
+        "description",
+        "display_name",
+        "id",
+        "name",
+        "slug",
+        "tag_category"
+    ],
+    "schema": "CREATE TABLE `v2_tags` (`badge_color` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `display_name` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `tag_category` TEXT DEFAULT '' NOT NULL)"
+}

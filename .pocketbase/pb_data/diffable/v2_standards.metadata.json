@@ -1,0 +1,15 @@
+{
+    "name": "v2_standards",
+    "columns": [
+        "description",
+        "id",
+        "logo",
+        "name",
+        "organization",
+        "short_name",
+        "slug",
+        "standard_type",
+        "website"
+    ],
+    "schema": "CREATE TABLE `v2_standards` (`description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `organization` TEXT DEFAULT '' NOT NULL, `short_name` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `standard_type` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL)"
+}
