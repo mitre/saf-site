@@ -1,0 +1,5 @@
+# Python dependencies for SAF Site development
+# Install with: pip install -r requirements.txt
+
+# Database export/import (git-friendly SQLite)
+sqlite-diffable>=0.3.0

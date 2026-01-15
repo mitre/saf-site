@@ -4,34 +4,64 @@ Thank you for your interest in contributing to the MITRE SAF Site!
 
 ## Getting Started
 
-1. Fork the repository
-2. Clone your fork
-3. Install dependencies: `pnpm install`
-4. Start Pocketbase: `cd .pocketbase && ./pocketbase serve`
-5. Start dev server: `pnpm dev`
+```bash
+# Fork and clone your fork
+git clone https://github.com/YOUR_USERNAME/saf-site-vitepress.git
+cd saf-site-vitepress
+
+# Run setup (handles everything)
+./scripts/setup.sh
+
+# Start Pocketbase (terminal 1)
+cd .pocketbase && ./pocketbase serve
+
+# Start dev server (terminal 2)
+pnpm dev
+```
+
+See [README.md](README.md#setup) for detailed setup options and troubleshooting.
 
 ## Development Workflow
 
-### Making Changes
+### Daily Development
+
+```bash
+# After git pull, sync any database changes
+pnpm setup
+
+# Start Pocketbase (terminal 1)
+cd .pocketbase && ./pocketbase serve
+
+# Start dev server (terminal 2)
+pnpm dev
+```
+
+### Making Code Changes
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run tests: `pnpm test:run`
-4. Commit with clear messages
-5. Push and open a pull request
+3. Add tests for new code (colocated `*.spec.ts` files)
+4. Run tests: `pnpm test:run`
+5. Commit with clear messages
+6. Push and open a pull request
 
-### Content Changes
+### Making Content Changes
 
-1. Edit content in Pocketbase admin UI (http://localhost:8090/_/)
-2. Run `pnpm reload-data` to see changes in dev
-3. Export database: `cd .pocketbase/pb_data && sqlite-diffable dump data.db diffable/ --all`
-4. Commit the diffable/ changes
+1. Edit in Pocketbase admin UI: http://localhost:8090/_/
+2. Refresh dev server: `pnpm reload-data`
+3. Export to git: `pnpm db:export`
+4. Review: `git diff .pocketbase/pb_data/diffable/`
+5. Commit: `git add .pocketbase/pb_data/diffable/ && git commit`
 
-### Code Changes
+### Before Committing
 
-- Follow existing code patterns
-- Add tests for new composables/components
-- Run `pnpm test:run` before committing
+```bash
+# Run tests
+pnpm test:run
+
+# For content changes, export database
+pnpm db:export
+```
 
 ## Code Style
 

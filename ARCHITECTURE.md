@@ -86,10 +86,77 @@
 | API | Pocketbase REST API |
 | Version Control | sqlite-diffable (NDJSON exports) |
 | Static Site | VitePress 1.6.4 |
-| UI Framework | Vue 3 |
+| UI Framework | Vue 3.5 |
 | Components | Reka UI 2.7.0 |
+| Testing | Vitest 4 |
 | Data Loading | VitePress Data Loaders (query Pocketbase) |
 | Source of Truth | Pocketbase database |
+
+## Prerequisites
+
+### Required
+
+| Tool | Version | Installation |
+|------|---------|--------------|
+| Node.js | 22.x | https://nodejs.org/ or `nvm use` |
+| pnpm | 10.x | `npm install -g pnpm` |
+| Python | 3.8+ | System Python or pyenv |
+| pip | latest | Included with Python |
+
+### Python Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs:
+- `sqlite-diffable` - Git-friendly database export/import
+
+## Pocketbase Setup
+
+### What is Pocketbase?
+
+Pocketbase is a single-binary backend providing:
+- SQLite database with admin UI
+- REST API with automatic CRUD
+- FK relations with searchable dropdowns
+- No Docker or external services required
+
+### Binary Installation
+
+The repository includes a Pocketbase binary for **macOS ARM64 (Apple Silicon)**.
+
+**For other platforms**, download from https://pocketbase.io/docs/:
+
+| Platform | Download |
+|----------|----------|
+| macOS Intel | `pocketbase_darwin_amd64.zip` |
+| macOS Apple Silicon | `pocketbase_darwin_arm64.zip` ← included |
+| Linux x64 | `pocketbase_linux_amd64.zip` |
+| Linux ARM64 | `pocketbase_linux_arm64.zip` |
+| Windows | `pocketbase_windows_amd64.zip` |
+
+```bash
+# Download and extract for your platform
+cd .pocketbase
+rm pocketbase  # Remove existing
+# Extract new binary here
+chmod +x pocketbase
+```
+
+### Running Pocketbase
+
+```bash
+cd .pocketbase && ./pocketbase serve
+```
+
+**Endpoints:**
+- Admin UI: http://localhost:8090/_/
+- REST API: http://localhost:8090/api/
+
+**Credentials:**
+- Email: `admin@localhost.com`
+- Password: `testpassword123`
 
 ## Data Flow
 
@@ -190,57 +257,94 @@ saf-site-vitepress/
 │       ├── index.md            # Browse hardening guides
 │       └── guides/
 │           └── [slug].md       # Dynamic guide pages
-└── scripts/
-    ├── create-all-collections.ts   # Create Pocketbase collections
-    ├── import-yaml-data.ts         # One-time YAML → Pocketbase import
-    ├── verify-collections.ts       # Validate collection structure
-    └── verify-import.ts            # Validate imported data
+├── scripts/
+│   ├── setup.sh                    # Idempotent setup script
+│   ├── export-db.sh                # Export database to diffable/
+│   ├── create-all-collections.ts   # Create Pocketbase collections
+│   ├── import-yaml-data.ts         # One-time YAML → Pocketbase import
+│   └── *.ts                        # Various migration/import scripts
+└── requirements.txt                # Python dependencies
 ```
 
 ## Content Editing Workflow
 
 ### 1. Initial Setup (First Time)
+
 ```bash
 # Clone repository
-git clone <repo>
+git clone https://github.com/mitre/saf-site-vitepress.git
 cd saf-site-vitepress
 
-# Restore database from git
-cd .pocketbase/pb_data
-sqlite-diffable load diffable/ data.db --all
-cd ../..
+# Run setup script (handles everything)
+./scripts/setup.sh
 
-# Start Pocketbase
-cd .pocketbase && ./pocketbase serve
-# Opens admin UI: http://localhost:8090/_/
+# Or use pnpm
+pnpm setup
 ```
 
-### 2. Edit Content
-- Open Pocketbase admin UI: http://localhost:8090/_/
-- Login: admin@localhost.com / test1234567
-- Click collection (e.g., "profiles")
-- Click row to edit or "New record"
-- Foreign keys show as searchable dropdowns with names (not IDs)
-- Save → Updates database immediately
+The setup script:
+1. Checks prerequisites (Node.js, pnpm, sqlite-diffable)
+2. Installs Node dependencies
+3. Restores database from `diffable/` (if not exists)
+4. Clears migrations (prevents startup errors)
+5. Validates Pocketbase binary
 
-### 3. Export Changes
+**Script options:**
+```bash
+pnpm setup              # Normal setup (idempotent)
+pnpm setup:check        # Validate without changes
+pnpm setup:force        # Force fresh database restore
+./scripts/setup.sh -h   # Show all options
+```
+
+### 2. Start Development
+
+```bash
+# Terminal 1: Start Pocketbase
+cd .pocketbase && ./pocketbase serve
+
+# Terminal 2: Start VitePress
+pnpm dev
+```
+
+### 3. Edit Content
+
+1. Open Pocketbase admin UI: http://localhost:8090/_/
+2. Login: `admin@localhost.com` / `testpassword123`
+3. Click collection (e.g., "profiles")
+4. Click row to edit or "New record"
+5. Foreign keys show as searchable dropdowns (names, not IDs)
+6. Save → Updates database immediately
+7. Run `pnpm reload-data` to refresh VitePress dev server
+
+### 4. Export Changes for Git
+
 ```bash
 # Export database to git-friendly format
-cd .pocketbase/pb_data
-sqlite-diffable dump data.db diffable/ --all
+pnpm db:export
 
-# Commit changes
+# Or with diff preview
+pnpm db:export:diff
+
+# Review changes
+git diff .pocketbase/pb_data/diffable/
+
+# Commit
 git add .pocketbase/pb_data/diffable/
 git commit -m "content: update profiles"
 git push
 ```
 
-### 4. Build & Deploy
+### 5. Build & Deploy
+
 ```bash
-# VitePress queries Pocketbase API → builds static site
+# Pocketbase must be running
+cd .pocketbase && ./pocketbase serve &
+
+# Build static site
 pnpm build
 
-# Deploy dist/ to hosting
+# Deploy docs/.vitepress/dist/ to hosting
 ```
 
 ## VitePress Data Loader Pattern

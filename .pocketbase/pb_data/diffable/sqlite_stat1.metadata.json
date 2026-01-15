@@ -1,9 +1,0 @@
-{
-    "name": "sqlite_stat1",
-    "columns": [
-        "tbl",
-        "idx",
-        "stat"
-    ],
-    "schema": "CREATE TABLE sqlite_stat1(tbl,idx,stat)"
-}
