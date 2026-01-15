@@ -1,0 +1,13 @@
+{
+    "name": "media_types",
+    "columns": [
+        "description",
+        "display_name",
+        "icon",
+        "id",
+        "name",
+        "slug",
+        "sort_order"
+    ],
+    "schema": "CREATE TABLE \"media_types\" (`description` TEXT DEFAULT '' NOT NULL, `display_name` TEXT DEFAULT '' NOT NULL, `icon` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `sort_order` NUMERIC DEFAULT 0 NOT NULL)"
+}

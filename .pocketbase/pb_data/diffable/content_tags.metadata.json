@@ -1,0 +1,9 @@
+{
+    "name": "content_tags",
+    "columns": [
+        "content",
+        "id",
+        "tag"
+    ],
+    "schema": "CREATE TABLE \"content_tags\" (`content` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `tag` TEXT DEFAULT '' NOT NULL)"
+}

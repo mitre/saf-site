@@ -1,9 +1,0 @@
-{
-    "name": "v2_course_tags",
-    "columns": [
-        "course",
-        "id",
-        "tag"
-    ],
-    "schema": "CREATE TABLE `v2_course_tags` (`course` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `tag` TEXT DEFAULT '' NOT NULL)"
-}

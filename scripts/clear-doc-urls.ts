@@ -8,13 +8,13 @@ async function clearBadDocUrls() {
     'testpassword123'
   );
 
-  const records = await pb.collection('v2_content').getFullList();
+  const records = await pb.collection('content').getFullList();
 
   let cleared = 0;
   for (const record of records) {
     if (record.documentation_url) {
       console.log(`Clearing: ${record.slug} -> ${record.documentation_url}`);
-      await pb.collection('v2_content').update(record.id, {
+      await pb.collection('content').update(record.id, {
         documentation_url: ''
       });
       cleared++;

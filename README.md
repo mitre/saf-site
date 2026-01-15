@@ -329,7 +329,7 @@ cd .pocketbase && ./pocketbase serve
 
 1. Start Pocketbase
 2. Open admin UI at http://localhost:8090/_/
-3. Edit collections (v2_content, v2_standards, v2_technologies, etc.)
+3. Edit collections (content, standards, technologies, etc.)
 4. Run `pnpm reload-data` to refresh dev server
 
 ### Database Version Control

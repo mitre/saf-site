@@ -1,7 +1,7 @@
 import { defineLoader } from 'vitepress'
 import PocketBase from 'pocketbase'
 
-// Pocketbase v2_content record types (Schema v2)
+// Pocketbase content record types
 interface PBContent {
   id: string
   name: string
@@ -87,8 +87,8 @@ export default defineLoader({
         process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
       )
 
-      // Query v2_content with FK expansion, filter for validation profiles only
-      const records = await pb.collection('v2_content').getFullList<PBContent>({
+      // Query content with FK expansion, filter for validation profiles only
+      const records = await pb.collection('content').getFullList<PBContent>({
         filter: 'content_type = "validation"',
         expand: 'target,standard,technology,vendor,maintainer',
         sort: 'name'
@@ -135,7 +135,7 @@ export default defineLoader({
         is_featured: record.is_featured
       }))
 
-      console.log(`✓ Loaded ${profiles.length} validation profiles from Pocketbase v2_content`)
+      console.log(`✓ Loaded ${profiles.length} validation profiles from Pocketbase`)
       return { profiles }
     } catch (error) {
       console.error('Failed to load profiles from Pocketbase:', error)

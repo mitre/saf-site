@@ -1,0 +1,9 @@
+{
+    "name": "content_capabilities",
+    "columns": [
+        "capability",
+        "content",
+        "id"
+    ],
+    "schema": "CREATE TABLE \"content_capabilities\" (`capability` TEXT DEFAULT '' NOT NULL, `content` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL)"
+}

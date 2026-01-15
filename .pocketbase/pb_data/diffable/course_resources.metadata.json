@@ -1,0 +1,13 @@
+{
+    "name": "course_resources",
+    "columns": [
+        "course",
+        "description",
+        "id",
+        "resource_type",
+        "sort_order",
+        "title",
+        "url"
+    ],
+    "schema": "CREATE TABLE \"course_resources\" (`course` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `resource_type` TEXT DEFAULT '' NOT NULL, `sort_order` NUMERIC DEFAULT 0 NOT NULL, `title` TEXT DEFAULT '' NOT NULL, `url` TEXT DEFAULT '' NOT NULL)"
+}

@@ -138,32 +138,44 @@ scripts/
 3. **Commit:** `git add .pocketbase/pb_data/diffable/ && git commit`
 4. **Others restore:** `pnpm setup` (restores from diffable/)
 
-### Current Collections (v1 - Active)
+### Current Collections
 
+**Core Content:**
 | Collection | Records | Purpose |
 |------------|---------|---------|
-| profiles | 78 | Validation profiles (InSpec) |
-| hardening_profiles | 5 | Hardening guides (Ansible/Chef) |
-| organizations | 16 | MITRE, CIS, DISA, etc. |
+| content | 82 | Unified profiles (validation + hardening) |
+| content_tags | 117 | Content-tag junction |
+| content_relationships | 4 | Links between content items |
+
+**Reference Data:**
+| Collection | Records | Purpose |
+|------------|---------|---------|
+| organizations | 16 | MITRE, CIS, DISA, AWS, etc. |
 | standards | 18 | STIG, CIS Benchmark, etc. |
-| technologies | 8 | RHEL, Ubuntu, Windows, etc. |
-| teams | 4 | SAF, Heimdall, etc. |
+| technologies | 8 | InSpec, Ansible, Chef, etc. |
+| targets | 26 | What gets secured (RHEL 8, MySQL, etc.) |
+| categories | 7 | Target groupings (OS, Database, etc.) |
+| teams | 4 | Maintainer groups |
 | tags | 52 | Categorization tags |
 | tools | 7 | SAF CLI, Heimdall, etc. |
-| capabilities | 5 | validate, harden, visualize, etc. |
+| capabilities | 5 | SAF pillars (validate, harden, etc.) |
+
+**Schema source of truth:** `docs/.vitepress/database/schema.ts` (Drizzle)
 
 ### Pocketbase API Patterns
 
 ```typescript
-// Query with FK expansion
-const profiles = await pb.collection('profiles').getFullList({
-  expand: 'organization,team,technology,standard',
-  sort: '-created'
+// Query content with FK expansion
+const profiles = await pb.collection('content').getFullList({
+  filter: 'content_type = "validation"',
+  expand: 'target,standard,technology,vendor,maintainer',
+  sort: 'name'
 })
 
 // Access expanded relations
-profile.expand?.organization?.name  // "MITRE"
-profile.expand?.standard?.name      // "DISA STIG"
+profile.expand?.vendor?.name       // "MITRE"
+profile.expand?.standard?.name     // "DISA STIG"
+profile.expand?.target?.name       // "Red Hat Enterprise Linux 8"
 ```
 
 ## Key Patterns
@@ -178,10 +190,12 @@ import PocketBase from 'pocketbase'
 export default defineLoader({
   async load() {
     const pb = new PocketBase('http://localhost:8090')
-    const profiles = await pb.collection('profiles').getFullList({
-      expand: 'organization,team,technology,standard'
+    await pb.collection('_superusers').authWithPassword(email, password)
+    const records = await pb.collection('content').getFullList({
+      filter: 'content_type = "validation"',
+      expand: 'target,standard,technology,vendor,maintainer'
     })
-    return { profiles }
+    return { profiles: records }
   }
 })
 ```
@@ -193,8 +207,11 @@ export default defineLoader({
 export default {
   async paths() {
     const pb = new PocketBase('http://localhost:8090')
-    const profiles = await pb.collection('profiles').getFullList()
-    return profiles.map(p => ({ params: { slug: p.slug, ...p } }))
+    await pb.collection('_superusers').authWithPassword(email, password)
+    const records = await pb.collection('content').getFullList({
+      filter: 'content_type = "validation"'
+    })
+    return records.map(r => ({ params: { slug: r.slug, content: r } }))
   }
 }
 ```

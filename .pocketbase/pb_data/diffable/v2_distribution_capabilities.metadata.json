@@ -1,9 +1,0 @@
-{
-    "name": "v2_distribution_capabilities",
-    "columns": [
-        "capability",
-        "distribution",
-        "id"
-    ],
-    "schema": "CREATE TABLE `v2_distribution_capabilities` (`capability` TEXT DEFAULT '' NOT NULL, `distribution` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL)"
-}
