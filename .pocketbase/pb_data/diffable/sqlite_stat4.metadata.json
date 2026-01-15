@@ -1,0 +1,12 @@
+{
+    "name": "sqlite_stat4",
+    "columns": [
+        "tbl",
+        "idx",
+        "neq",
+        "nlt",
+        "ndlt",
+        "sample"
+    ],
+    "schema": "CREATE TABLE sqlite_stat4(tbl,idx,neq,nlt,ndlt,sample)"
+}

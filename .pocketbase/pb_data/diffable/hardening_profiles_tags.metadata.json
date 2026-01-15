@@ -1,9 +1,0 @@
-{
-    "name": "hardening_profiles_tags",
-    "columns": [
-        "hardening_profile_id",
-        "id",
-        "tag_id"
-    ],
-    "schema": "CREATE TABLE `hardening_profiles_tags` (`hardening_profile_id` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `tag_id` TEXT DEFAULT '' NOT NULL)"
-}
