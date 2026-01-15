@@ -360,38 +360,119 @@ check_pocketbase() {
     echo ""
 
     local pb_binary="$POCKETBASE_DIR/pocketbase"
+    local pb_version="0.23.4"
 
+    # Detect platform
+    local os arch pb_os pb_arch
+    os="$(uname -s)"
+    arch="$(uname -m)"
+
+    case "$os" in
+        Darwin) pb_os="darwin" ;;
+        Linux)  pb_os="linux" ;;
+        MINGW*|MSYS*|CYGWIN*) pb_os="windows" ;;
+        *)
+            error "Unsupported OS: $os"
+            exit 1
+            ;;
+    esac
+
+    case "$arch" in
+        x86_64|amd64) pb_arch="amd64" ;;
+        arm64|aarch64) pb_arch="arm64" ;;
+        *)
+            error "Unsupported architecture: $arch"
+            exit 1
+            ;;
+    esac
+
+    local platform="${pb_os}_${pb_arch}"
+    info "Platform: $platform"
+
+    # Check if binary exists and works
+    local need_download=false
     if [ ! -f "$pb_binary" ]; then
-        error "Pocketbase binary not found"
-        echo "    Download from: https://pocketbase.io/docs/"
-        echo "    Place at: $pb_binary"
-        exit 1
+        warn "Pocketbase binary not found"
+        need_download=true
+    elif [ ! -x "$pb_binary" ]; then
+        chmod +x "$pb_binary" 2>/dev/null || true
     fi
 
-    if [ ! -x "$pb_binary" ]; then
+    # Try to run it to verify it's the right platform
+    if [ "$need_download" = false ] && [ -f "$pb_binary" ]; then
+        if ! "$pb_binary" --version &>/dev/null; then
+            warn "Pocketbase binary exists but won't run (wrong platform?)"
+            need_download=true
+        fi
+    fi
+
+    # Download if needed
+    if [ "$need_download" = true ]; then
         if [ "$CHECK_MODE" = true ]; then
-            check_only "Would make pocketbase executable"
+            check_only "Would download Pocketbase $pb_version for $platform"
         elif [ "$DRY_RUN" = true ]; then
-            dry "Would run: chmod +x $pb_binary"
+            dry "Would download Pocketbase $pb_version for $platform"
         else
-            chmod +x "$pb_binary"
-            ok "Made pocketbase executable"
+            download_pocketbase "$pb_version" "$platform"
         fi
     else
-        ok "Pocketbase binary ready"
-    fi
-
-    # Platform check
-    local platform
-    platform="$(uname -s)-$(uname -m)"
-    if [[ "$platform" != "Darwin-arm64" ]]; then
-        warn "Binary may be for different platform"
-        echo "    Your platform: $platform"
-        echo "    Included binary: macOS ARM64"
-        echo "    Download yours: https://pocketbase.io/docs/"
+        local current_version
+        current_version=$("$pb_binary" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        ok "Pocketbase $current_version ready"
     fi
 
     echo ""
+}
+
+download_pocketbase() {
+    local version="$1"
+    local platform="$2"
+    local ext="zip"
+    local download_url="https://github.com/pocketbase/pocketbase/releases/download/v${version}/pocketbase_${version}_${platform}.${ext}"
+
+    info "Downloading Pocketbase $version for $platform..."
+
+    # Create directory if needed
+    mkdir -p "$POCKETBASE_DIR"
+
+    # Download
+    local tmp_file="/tmp/pocketbase_${version}_${platform}.${ext}"
+    if command -v curl &>/dev/null; then
+        curl -fsSL "$download_url" -o "$tmp_file" || {
+            error "Failed to download Pocketbase"
+            echo "    URL: $download_url"
+            exit 1
+        }
+    elif command -v wget &>/dev/null; then
+        wget -q "$download_url" -O "$tmp_file" || {
+            error "Failed to download Pocketbase"
+            echo "    URL: $download_url"
+            exit 1
+        }
+    else
+        error "Neither curl nor wget found"
+        exit 1
+    fi
+
+    # Extract
+    info "Extracting..."
+    if command -v unzip &>/dev/null; then
+        unzip -o -q "$tmp_file" -d "$POCKETBASE_DIR" pocketbase || {
+            error "Failed to extract Pocketbase"
+            exit 1
+        }
+    else
+        error "unzip not found - please install it"
+        exit 1
+    fi
+
+    # Cleanup
+    rm -f "$tmp_file"
+
+    # Make executable
+    chmod +x "$POCKETBASE_DIR/pocketbase"
+
+    ok "Pocketbase $version installed"
 }
 
 print_summary() {
