@@ -76,9 +76,40 @@ pnpm db:export
 3. Request review from maintainers
 4. Squash commits on merge
 
+## Task Tracking with Beads
+
+This project uses [Beads](https://github.com/steveyegge/beads) for task tracking. Tasks live in the repo (`.beads/`) and sync with git.
+
+```bash
+# See available work
+bd ready
+
+# View all open tasks
+bd list --status=open
+
+# View task details
+bd show <task-id>
+
+# Claim a task
+bd update <task-id> --status=in_progress
+
+# Complete a task
+bd close <task-id>
+
+# Sync with remote
+bd sync
+```
+
+When contributing:
+1. Run `bd ready` to find tasks to work on
+2. Claim a task with `bd update <id> --status=in_progress`
+3. Complete your work and close with `bd close <id>`
+4. Run `bd sync` before pushing
+
 ## Reporting Issues
 
-- Use GitHub Issues
+- Use GitHub Issues for bugs and feature requests
+- Use Beads (`bd create "description"`) for development tasks
 - Include reproduction steps
 - Provide browser/environment details
 

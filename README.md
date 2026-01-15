@@ -144,6 +144,19 @@ pnpm dev
 | `pnpm test:run` | Run tests once |
 | `pnpm test:coverage` | Run tests with coverage |
 
+### Task Tracking (Beads)
+
+This project uses [Beads](https://github.com/steveyegge/beads) for task tracking. Tasks live in `.beads/` and sync with git.
+
+| Command | Description |
+|---------|-------------|
+| `bd ready` | See available work (unblocked tasks) |
+| `bd list --status=open` | List all open tasks |
+| `bd show <id>` | View task details |
+| `bd update <id> --status=in_progress` | Claim a task |
+| `bd close <id>` | Complete a task |
+| `bd sync` | Sync tasks with git remote |
+
 ## Common Workflows
 
 ### Daily Development
