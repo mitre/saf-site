@@ -47,6 +47,7 @@ coverage/
 
 # Temp/backup files
 *.bak.*
+*.backup-*
 tmp/
 temp/
 
