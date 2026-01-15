@@ -1,6 +1,6 @@
 import PocketBase from 'pocketbase'
 
-// Pocketbase v2_content record types
+// Pocketbase content record types
 interface PBContent {
   id: string
   name: string
@@ -39,8 +39,8 @@ export default {
         process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
       )
 
-      // Query v2_content with FK expansion, filter for validation profiles only
-      const records = await pb.collection('v2_content').getFullList<PBContent>({
+      // Query content with FK expansion, filter for validation profiles only
+      const records = await pb.collection('content').getFullList<PBContent>({
         filter: 'content_type = "validation"',
         expand: 'target,standard,technology,vendor,maintainer',
         sort: 'name'
