@@ -260,6 +260,24 @@ bd show <id>                # Task details
 
 ## Common Issues
 
+### bd sync fails with "unstaged changes"
+**IMPORTANT:** `bd sync` does a git pull internally. If ANY files are modified (not just .beads/), it will fail.
+
+**Correct workflow:**
+```bash
+# 1. Commit ALL modified files first (including CLAUDE.md, any work in progress)
+git add <files>
+git commit -m "your message"
+
+# 2. Push your changes
+git push
+
+# 3. NOW run bd sync (it can pull cleanly)
+bd sync
+```
+
+**Never run `bd sync` with uncommitted changes.** Commit everything first.
+
 ### Pocketbase won't start (migration errors)
 ```bash
 rm -rf .pocketbase/pb_migrations/*
