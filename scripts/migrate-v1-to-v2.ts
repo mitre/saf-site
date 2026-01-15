@@ -493,7 +493,7 @@ async function migrateTools() {
       slug: toolSlug,
       description: item.description || '',
       long_description: item.long_description || '',
-      version: item.version || '',
+      version: normalizeVersion(item.version),
       status: mapStatus(item.status),
       website: normalizeUrl(item.website),
       github: normalizeUrl(item.github),
@@ -558,11 +558,11 @@ async function migrateProfiles() {
         slug: profileSlug,
         description: item.short_description || item.description || '',
         long_description: item.long_description || item.requirements || '',
-        version: item.version || '',
+        version: normalizeVersion(item.version),
         content_type: 'validation',
         status: mapStatus(item.status),
         github: normalizeUrl(item.github),
-        documentation_url: normalizeUrl(item.details),
+        documentation_url: '', // Only set if explicit override needed; default shows README
         control_count: item.control_count || 0,
         stig_id: item.stig_id || '',
         benchmark_version: item.standard_version || item.benchmark_version || '',
@@ -632,11 +632,11 @@ async function migrateHardeningProfiles() {
         slug: hardeningSlug,
         description: item.short_description || item.description || '',
         long_description: item.long_description || item.requirements || '',
-        version: item.version || '',
+        version: normalizeVersion(item.version),
         content_type: 'hardening',
         status: mapStatus(item.status),
         github: normalizeUrl(item.github),
-        documentation_url: normalizeUrl(item.details),
+        documentation_url: '', // Only set if explicit override needed; default shows README
         automation_level: automationLevel,
         is_featured: item.is_featured || false,
         featured_order: item.featured_order || 0,
@@ -842,6 +842,14 @@ function normalizeUrl(url: string | undefined): string {
 
   // Invalid URL format - return empty
   return ''
+}
+
+function normalizeVersion(version: string | undefined): string {
+  if (!version) return ''
+
+  // Strip leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
+  // The display layer (Vue components) adds the "v" prefix for presentation
+  return version.replace(/^[vV]/, '')
 }
 
 main().catch(console.error)

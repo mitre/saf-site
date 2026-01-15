@@ -106,6 +106,28 @@ When contributing:
 3. Complete your work and close with `bd close <id>`
 4. Run `bd sync` before pushing
 
+## Database Management with pb-cli
+
+For advanced database operations, install [pb-cli](https://github.com/skeeeon/pb-cli):
+
+```bash
+# Install (requires Go)
+go install github.com/skeeeon/pb-cli/cmd/pb@latest
+
+# Setup context (one-time)
+pb context create local --url http://127.0.0.1:8090
+pb auth pb --collection _superusers --email admin@localhost.com --password testpassword123
+
+# Common operations
+pb collections <collection> list              # List records
+pb collections <collection> get <id>          # Get single record
+pb collections <collection> update <id> '{}'  # Update record
+pb backup create                              # Create backup
+pb backup list                                # List backups
+```
+
+See [README.md](README.md#database-backup-pb-cli) for more details.
+
 ## Reporting Issues
 
 - Use GitHub Issues for bugs and feature requests

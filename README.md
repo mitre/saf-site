@@ -136,6 +136,29 @@ pnpm dev
 | `pnpm db:export` | Export database to git-friendly format |
 | `pnpm db:export:diff` | Export and show git diff |
 
+### Database Backup (pb-cli)
+
+Binary backups for disaster recovery. Requires [pb-cli](https://github.com/skeeeon/pb-cli).
+
+| Command | Description |
+|---------|-------------|
+| `pnpm db:backup` | Create a binary backup |
+| `pnpm db:backup:list` | List available backups |
+| `pnpm db:backup:download <name>` | Download a backup file |
+| `pnpm db:backup:restore <name>` | Restore from a backup |
+
+**First-time pb-cli setup:**
+```bash
+# Install pb-cli (Go required)
+go install github.com/skeeeon/pb-cli/cmd/pb@latest
+
+# Create context for this project
+pb context create local --url http://127.0.0.1:8090
+
+# Authenticate (Pocketbase must be running)
+pb auth pb --collection _superusers --email admin@localhost.com --password testpassword123
+```
+
 ### Testing
 
 | Command | Description |

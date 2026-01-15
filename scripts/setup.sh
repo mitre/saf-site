@@ -213,6 +213,17 @@ check_prerequisites() {
         # Not fatal - might have existing data.db
     fi
 
+    # pb-cli (optional - for advanced database operations)
+    if command_exists pb; then
+        local pb_version
+        pb_version=$(pb --version 2>/dev/null | head -1 || echo "unknown")
+        ok "pb-cli $pb_version"
+    else
+        skip "pb-cli not found (optional)"
+        echo "    Install: go install github.com/skeeeon/pb-cli/cmd/pb@latest"
+        echo "    Enables: backup, CRUD operations, advanced DB management"
+    fi
+
     echo ""
 
     if [ $missing -eq 1 ]; then

@@ -15,6 +15,10 @@
     "setup:force": "./scripts/setup.sh --force",
     "db:export": "./scripts/export-db.sh",
     "db:export:diff": "./scripts/export-db.sh --diff",
+    "db:backup": "pb backup create",
+    "db:backup:list": "pb backup list",
+    "db:backup:download": "pb backup download",
+    "db:backup:restore": "pb backup restore",
     "reload-data": "touch 'docs/validate/[slug].paths.ts'"
   },
   "keywords": [
