@@ -1,33 +1,7 @@
-<template>
-  <a :href="`/validate/${profile.slug}.html`" class="profile-card">
-    <!-- Header: Title + Badges on same line -->
-    <div class="card-header">
-      <h3 class="card-title">{{ profile.name }}</h3>
-      <div class="card-badges">
-        <span v-if="profile.status" :class="['badge', `badge-${profile.status}`]">
-          {{ profile.status }}
-        </span>
-        <span v-if="profile.standard_short_name || profile.standard_name" class="badge badge-standard">
-          {{ profile.standard_short_name || profile.standard_name }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Content: Description -->
-    <p class="card-description">{{ profile.description }}</p>
-
-    <!-- Footer: Tech + Meta -->
-    <div class="card-footer">
-      <span class="card-tech">{{ profile.technology_name }}</span>
-      <div class="card-meta">
-        <span v-if="profile.version" class="card-version">v{{ profile.version }}</span>
-        <span v-if="profile.target_name" class="badge badge-outline">{{ profile.target_name }}</span>
-      </div>
-    </div>
-  </a>
-</template>
-
 <script setup lang="ts">
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+
 interface Profile {
   id: string
   slug: string
@@ -44,150 +18,62 @@ interface Profile {
 defineProps<{
   profile: Profile
 }>()
+
+// Map status to badge variant
+const statusVariant = (status?: string) => {
+  switch (status) {
+    case 'active': return 'success'
+    case 'beta': return 'warning'
+    case 'deprecated': return 'destructive'
+    case 'draft': return 'secondary'
+    default: return 'default'
+  }
+}
 </script>
 
+<template>
+  <a :href="`/validate/${profile.slug}.html`" class="profile-card-link">
+    <Card class="h-full min-h-[160px] flex flex-col hover:border-primary transition-colors">
+      <CardHeader class="p-4 pb-2">
+        <div class="flex items-start justify-between gap-3">
+          <CardTitle class="!text-base !leading-tight !text-[var(--vp-c-text-1)]">{{ profile.name }}</CardTitle>
+          <div class="flex flex-wrap gap-1 shrink-0">
+            <Badge v-if="profile.status" :variant="statusVariant(profile.status)" class="uppercase text-[10px]">
+              {{ profile.status }}
+            </Badge>
+            <Badge v-if="profile.standard_short_name || profile.standard_name" class="text-[10px]">
+              {{ profile.standard_short_name || profile.standard_name }}
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent class="flex-1 p-4 pt-0">
+        <p class="text-sm text-[var(--vp-c-text-2)] line-clamp-2 m-0">
+          {{ profile.description }}
+        </p>
+      </CardContent>
+
+      <CardFooter class="p-4 pt-3 border-t border-[var(--vp-c-divider)] text-xs text-[var(--vp-c-text-3)]">
+        <span class="font-medium">{{ profile.technology_name }}</span>
+        <div class="flex items-center gap-1.5 ml-auto">
+          <span v-if="profile.version" class="font-mono text-[11px]">v{{ profile.version }}</span>
+          <Badge v-if="profile.target_name" variant="outline" class="text-[10px] max-w-[140px] truncate">
+            {{ profile.target_name }}
+          </Badge>
+        </div>
+      </CardFooter>
+    </Card>
+  </a>
+</template>
+
 <style scoped>
-/* Card Container - shadcn pattern */
-.profile-card {
-  display: flex;
-  flex-direction: column;
-  padding: 1.25rem;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 0.5rem;
-  background: var(--vp-c-bg);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-  min-height: 160px;
+.profile-card-link {
+  display: block;
+  text-decoration: none !important;
+  color: inherit !important;
 }
-
-.profile-card:hover {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-/* Card Header - title + badges inline */
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.card-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--vp-c-text-1);
-  flex: 1;
-  min-width: 0;
-}
-
-.card-badges {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-/* Badge Base - shadcn pattern */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.65rem;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  transition: background-color 0.2s;
-}
-
-/* Badge Variants */
-.badge-active {
-  background: #10b981;
-  color: white;
-  text-transform: uppercase;
-}
-
-.badge-beta {
-  background: #f59e0b;
-  color: white;
-  text-transform: uppercase;
-}
-
-.badge-deprecated {
-  background: #ef4444;
-  color: white;
-  text-transform: uppercase;
-}
-
-.badge-draft {
-  background: #6b7280;
-  color: white;
-  text-transform: uppercase;
-}
-
-.badge-standard {
-  background: var(--vp-c-brand-1);
-  color: white;
-}
-
-.badge-outline {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Card Description */
-.card-description {
-  margin: 0;
-  padding-bottom: 0.75rem;
-  color: var(--vp-c-text-2);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Card Footer */
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--vp-c-divider-light);
-  font-size: 0.75rem;
-  color: var(--vp-c-text-3);
-  margin-top: auto;
-}
-
-.card-tech {
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.card-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
-}
-
-.card-version {
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.6875rem;
-  color: var(--vp-c-text-3);
-  flex-shrink: 0;
+.profile-card-link:hover {
+  text-decoration: none !important;
 }
 </style>

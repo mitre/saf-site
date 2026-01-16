@@ -1,9 +1,15 @@
 import { defineConfig } from 'vitepress'
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./theme', import.meta.url))
+      }
+    }
   },
   title: 'MITRE SAF',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
