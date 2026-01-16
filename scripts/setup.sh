@@ -371,7 +371,7 @@ check_pocketbase() {
     echo ""
 
     local pb_binary="$POCKETBASE_DIR/pocketbase"
-    local pb_version="0.23.4"
+    local pb_version="0.36.0"
 
     # Detect platform
     local os arch pb_os pb_arch
