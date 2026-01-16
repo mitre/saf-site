@@ -37,8 +37,10 @@ MITRE SAF documentation site built with VitePress. Static site with content mana
 **Tech Stack:**
 - VitePress 1.6.4 (static site generator)
 - Vue 3.5 with Composition API
-- Reka UI 2.7.0 (headless components)
-- Pocketbase 0.23 (content database)
+- Tailwind CSS 4 (utility-first styling)
+- shadcn-vue (component library)
+- Reka UI (headless primitives, via shadcn-vue)
+- Pocketbase 0.36 (content database)
 - Vitest 4 (testing)
 - pnpm 10.x (package manager)
 - TypeScript
@@ -103,10 +105,16 @@ docs/
 │       ├── index.ts              # Theme setup, component registration
 │       ├── custom.css            # MITRE branding
 │       ├── components/           # Vue components
+│       │   ├── ui/               # shadcn-vue components
+│       │   │   ├── badge/
+│       │   │   ├── button/
+│       │   │   ├── card/
+│       │   │   └── input/
 │       │   ├── ProfileCard.vue
 │       │   ├── ProfileFilters.vue
 │       │   ├── ContentDetail.vue
 │       │   └── *.spec.ts         # Component tests
+│       ├── lib/utils.ts          # cn() utility for class merging
 │       └── composables/          # Logic extraction
 │           ├── useContentDetail.ts
 │           └── *.spec.ts         # Unit tests
@@ -313,10 +321,64 @@ pnpm setup  # Restores from diffable/
 ### Wrong platform binary
 Download correct binary from https://pocketbase.io/docs/
 
+## shadcn-vue Components
+
+The project uses [shadcn-vue](https://www.shadcn-vue.com/) for UI components, built on Reka UI primitives with Tailwind CSS styling.
+
+### Adding Components
+
+```bash
+# Add a new shadcn-vue component
+pnpm dlx shadcn-vue@latest add <component-name>
+
+# Examples:
+pnpm dlx shadcn-vue@latest add dialog
+pnpm dlx shadcn-vue@latest add select
+pnpm dlx shadcn-vue@latest add table
+```
+
+Components are installed to `docs/.vitepress/theme/components/ui/`.
+
+### Using Components
+
+```vue
+<script setup lang="ts">
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+</script>
+
+<template>
+  <Card>
+    <CardHeader>
+      <CardTitle>Title</CardTitle>
+      <Badge variant="default">Status</Badge>
+    </CardHeader>
+    <CardContent>Content here</CardContent>
+  </Card>
+</template>
+```
+
+### Available Components
+
+| Component | Path | Usage |
+|-----------|------|-------|
+| Badge | `ui/badge` | Status indicators, tags |
+| Button | `ui/button` | Actions, links |
+| Card | `ui/card` | Content containers |
+| Input | `ui/input` | Form text inputs |
+
+### CSS Variables
+
+MITRE branding colors are mapped to shadcn CSS variables in `custom.css`:
+- `--primary`: MITRE blue (#005288)
+- `--ring`: Focus ring color
+- Light/dark mode variants auto-switch with VitePress theme toggle
+
 ## Conventions
 
 - Vue 3 Composition API with `<script setup lang="ts">`
-- Reka UI for headless components (styled with VitePress CSS vars)
+- shadcn-vue for pre-built components (Card, Badge, Button, etc.)
+- Tailwind CSS 4 for utility styling
 - Logic in composables, presentation in components
 - Tests colocated with source files
-- No Tailwind - use VitePress CSS custom properties
+- Path alias `@/` maps to `docs/.vitepress/theme/`
