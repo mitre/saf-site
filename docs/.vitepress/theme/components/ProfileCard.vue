@@ -1,20 +1,27 @@
 <template>
   <a :href="`/validate/${profile.slug}.html`" class="profile-card">
-    <div class="profile-card-header">
-      <h3 class="profile-card-title">{{ profile.name }}</h3>
-      <div class="profile-card-badges">
-        <span v-if="profile.status" :class="['status-badge', `status-${profile.status}`]">
+    <!-- Header: Title + Badges on same line -->
+    <div class="card-header">
+      <h3 class="card-title">{{ profile.name }}</h3>
+      <div class="card-badges">
+        <span v-if="profile.status" :class="['badge', `badge-${profile.status}`]">
           {{ profile.status }}
         </span>
-        <span v-if="profile.standard_short_name || profile.standard_name" class="standard-badge">{{ profile.standard_short_name || profile.standard_name }}</span>
+        <span v-if="profile.standard_short_name || profile.standard_name" class="badge badge-standard">
+          {{ profile.standard_short_name || profile.standard_name }}
+        </span>
       </div>
     </div>
-    <p class="profile-card-description">{{ profile.description }}</p>
-    <div class="profile-card-footer">
-      <span class="profile-card-tech">{{ profile.technology_name }}</span>
-      <div class="profile-card-meta">
-        <span v-if="profile.version" class="profile-card-version">v{{ profile.version }}</span>
-        <span v-if="profile.target_name" class="profile-card-target">{{ profile.target_name }}</span>
+
+    <!-- Content: Description -->
+    <p class="card-description">{{ profile.description }}</p>
+
+    <!-- Footer: Tech + Meta -->
+    <div class="card-footer">
+      <span class="card-tech">{{ profile.technology_name }}</span>
+      <div class="card-meta">
+        <span v-if="profile.version" class="card-version">v{{ profile.version }}</span>
+        <span v-if="profile.target_name" class="badge badge-outline">{{ profile.target_name }}</span>
       </div>
     </div>
   </a>
@@ -40,119 +47,147 @@ defineProps<{
 </script>
 
 <style scoped>
+/* Card Container - shadcn pattern */
 .profile-card {
-  display: block;
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
-  transition: all 0.3s;
+  border-radius: 0.5rem;
+  background: var(--vp-c-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
   text-decoration: none;
   color: inherit;
+  overflow: hidden;
+  min-height: 160px;
 }
 
 .profile-card:hover {
   border-color: var(--vp-c-brand-1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.profile-card-header {
+/* Card Header - title + badges inline */
+.card-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.profile-card-title {
+.card-title {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
+  line-height: 1.4;
   color: var(--vp-c-text-1);
   flex: 1;
+  min-width: 0;
 }
 
-.profile-card-badges {
-  display: flex;
-  gap: 0.375rem;
+.card-badges {
+  display: inline-flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 
-.standard-badge {
-  padding: 0.2rem 0.5rem;
-  background: var(--vp-c-brand-1);
-  color: white;
-  border-radius: 10px;
-  font-size: 0.65rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.status-badge {
-  padding: 0.2rem 0.5rem;
-  border-radius: 10px;
+/* Badge Base - shadcn pattern */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
   font-size: 0.65rem;
   font-weight: 600;
-  text-transform: uppercase;
+  line-height: 1;
   white-space: nowrap;
+  transition: background-color 0.2s;
 }
 
-.status-active {
+/* Badge Variants */
+.badge-active {
   background: #10b981;
   color: white;
+  text-transform: uppercase;
 }
 
-.status-beta {
+.badge-beta {
   background: #f59e0b;
   color: white;
+  text-transform: uppercase;
 }
 
-.status-deprecated {
+.badge-deprecated {
   background: #ef4444;
   color: white;
+  text-transform: uppercase;
 }
 
-.status-draft {
+.badge-draft {
   background: #6b7280;
+  color: white;
+  text-transform: uppercase;
+}
+
+.badge-standard {
+  background: var(--vp-c-brand-1);
   color: white;
 }
 
-.profile-card-description {
-  margin: 0 0 1rem 0;
+.badge-outline {
+  background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  border: 1px solid var(--vp-c-divider);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.profile-card-footer {
+/* Card Description */
+.card-description {
+  margin: 0;
+  padding-bottom: 0.75rem;
+  color: var(--vp-c-text-2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Card Footer */
+.card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
-  color: var(--vp-c-text-3);
-}
-
-.profile-card-tech {
-  font-weight: 500;
-}
-
-.profile-card-meta {
-  display: flex;
   gap: 0.5rem;
-  align-items: center;
-}
-
-.profile-card-version {
-  font-family: var(--vp-font-family-mono);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--vp-c-divider-light);
   font-size: 0.75rem;
   color: var(--vp-c-text-3);
+  margin-top: auto;
 }
 
-.profile-card-target {
-  padding: 0.125rem 0.5rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 4px;
-  font-size: 0.75rem;
+.card-tech {
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.card-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.card-version {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.6875rem;
+  color: var(--vp-c-text-3);
+  flex-shrink: 0;
 }
 </style>
