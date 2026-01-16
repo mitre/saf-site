@@ -5,67 +5,112 @@
 @source '../../**/*.{vue,ts,md}';
 @source '../**/*.{vue,ts}';
 
-/* Custom MITRE SAF branding */
+/* ==========================================================================
+   MITRE SAF Theme System
+
+   ARCHITECTURE: VitePress → Tailwind 4 → shadcn-vue
+
+   We bridge VitePress's CSS variables to Tailwind's @theme directive.
+   This creates a single source of truth (VitePress) that flows through
+   to all shadcn-vue components automatically.
+
+   Benefits:
+   - Light/dark mode handled by VitePress (automatic)
+   - Consistent colors between VitePress chrome and custom components
+   - shadcn-vue components inherit VitePress styling
+
+   MAPPING REFERENCE:
+   ┌─────────────────────┬──────────────────────┬─────────────────────┐
+   │ Tailwind Class      │ Maps To              │ Use For             │
+   ├─────────────────────┼──────────────────────┼─────────────────────┤
+   │ bg-background       │ --vp-c-bg            │ Page backgrounds    │
+   │ bg-card             │ --vp-c-bg            │ Card backgrounds    │
+   │ bg-popover          │ --vp-c-bg-elv        │ Elevated surfaces   │
+   │ bg-muted            │ --vp-c-bg-soft       │ Subtle backgrounds  │
+   │ bg-primary          │ --vp-c-brand-1       │ Primary actions     │
+   │ bg-secondary        │ --vp-c-bg-soft       │ Secondary actions   │
+   │ bg-accent           │ --vp-c-bg-soft       │ Hover states        │
+   │ bg-destructive      │ --vp-c-red-1         │ Danger/delete       │
+   ├─────────────────────┼──────────────────────┼─────────────────────┤
+   │ text-foreground     │ --vp-c-text-1        │ Primary text        │
+   │ text-muted-foreground│ --vp-c-text-2       │ Secondary text      │
+   │ border-border       │ --vp-c-divider       │ Borders, dividers   │
+   └─────────────────────┴──────────────────────┴─────────────────────┘
+
+   ADDING NEW COLORS:
+   1. Find the VitePress variable in node_modules/vitepress/.../vars.css
+   2. Add mapping in @theme below
+   3. Use the Tailwind class in components (not the VitePress var directly)
+
+   ========================================================================== */
 
 :root {
-  /* Override Vue.js theme colors with MITRE colors */
+  /* Override VitePress brand colors with MITRE blue */
   --vp-c-brand-1: #005288;
   --vp-c-brand-2: #0066a8;
   --vp-c-brand-3: #0080cc;
-
-  /* Accent colors */
   --vp-c-sponsor: #e91e63;
-
-  /* shadcn-vue CSS variables (light mode) */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 203 100% 27%;  /* MITRE blue #005288 */
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 203 100% 27%;  /* MITRE blue */
-  --radius: 0.5rem;
 }
 
-/* Dark mode support for portaled elements */
-.dark {
-  color-scheme: dark;
+/* Tailwind 4 @theme directive - bridges VitePress vars to utility classes */
+@theme {
+  /* Backgrounds */
+  --color-background: var(--vp-c-bg);
+  --color-card: var(--vp-c-bg);
+  --color-popover: var(--vp-c-bg-elv);
+  --color-muted: var(--vp-c-bg-soft);
+  --color-secondary: var(--vp-c-bg-soft);
+  --color-accent: var(--vp-c-bg-soft);
 
-  /* shadcn-vue CSS variables (dark mode) */
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 203 80% 50%;  /* Lighter MITRE blue for dark mode */
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 203 80% 50%;
+  /* Text */
+  --color-foreground: var(--vp-c-text-1);
+  --color-card-foreground: var(--vp-c-text-1);
+  --color-popover-foreground: var(--vp-c-text-1);
+  --color-muted-foreground: var(--vp-c-text-2);
+  --color-secondary-foreground: var(--vp-c-text-1);
+  --color-accent-foreground: var(--vp-c-text-1);
+
+  /* Brand colors */
+  --color-primary: var(--vp-c-brand-1);
+  --color-primary-foreground: #ffffff;
+  --color-destructive: var(--vp-c-red-1);
+  --color-destructive-foreground: #ffffff;
+
+  /* Borders */
+  --color-border: var(--vp-c-divider);
+  --color-input: var(--vp-c-divider);
+  --color-ring: var(--vp-c-brand-1);
+
+  /* Radius tokens */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
-/* Full-width doc layout for browse pages */
+/* ==========================================================================
+   VitePress Transition Override
+
+   VitePress applies slow transitions (0.5s) to elements inside .VPDoc.
+   This interferes with our component hover states. We reset transitions
+   for Tailwind utility classes to use their intended durations.
+   ========================================================================== */
+
+.VPDoc [class*="transition-"] {
+  transition-duration: revert-layer;
+}
+
+/* Ensure our components use fast, responsive transitions */
+.VPDoc [class*="hover:border-"],
+.VPDoc [class*="hover:shadow-"],
+.VPDoc [class*="hover:bg-"] {
+  transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+}
+
+/* ==========================================================================
+   Full-width doc layout for browse pages
+   ========================================================================== */
+
 .VPDoc .container {
   max-width: 1400px !important;
 }

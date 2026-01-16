@@ -321,20 +321,47 @@ pnpm setup  # Restores from diffable/
 ### Wrong platform binary
 Download correct binary from https://pocketbase.io/docs/
 
-## shadcn-vue Components
+## shadcn-vue + VitePress Theme Integration
 
-The project uses [shadcn-vue](https://www.shadcn-vue.com/) for UI components, built on Reka UI primitives with Tailwind CSS styling.
+The project uses [shadcn-vue](https://www.shadcn-vue.com/) for UI components, integrated with VitePress's theme system via Tailwind CSS 4.
+
+### Architecture: VitePress → Tailwind 4 → shadcn-vue
+
+```
+VitePress CSS Variables     Tailwind @theme          Utility Classes
+─────────────────────────────────────────────────────────────────────
+--vp-c-bg            →    --color-card        →    bg-card
+--vp-c-text-1        →    --color-foreground  →    text-foreground
+--vp-c-divider       →    --color-border      →    border-border
+--vp-c-brand-1       →    --color-primary     →    bg-primary
+```
+
+**Key insight**: VitePress is the single source of truth for colors. The `@theme` directive in `custom.css` bridges VitePress variables to Tailwind utilities, which shadcn components use.
+
+**Benefits**:
+- Light/dark mode works automatically (VitePress handles it)
+- Consistent colors between VitePress chrome and custom components
+- No duplicate color systems to maintain
+
+### Theme Color Reference
+
+| Tailwind Class | VitePress Variable | Use For |
+|----------------|-------------------|---------|
+| `bg-background` | `--vp-c-bg` | Page backgrounds |
+| `bg-card` | `--vp-c-bg` | Card backgrounds |
+| `bg-muted` | `--vp-c-bg-soft` | Subtle backgrounds |
+| `bg-primary` | `--vp-c-brand-1` | Primary actions (MITRE blue) |
+| `text-foreground` | `--vp-c-text-1` | Primary text |
+| `text-muted-foreground` | `--vp-c-text-2` | Secondary text |
+| `border-border` | `--vp-c-divider` | Borders, dividers |
+
+See `custom.css` for the complete mapping table.
 
 ### Adding Components
 
 ```bash
-# Add a new shadcn-vue component
 pnpm dlx shadcn-vue@latest add <component-name>
-
-# Examples:
-pnpm dlx shadcn-vue@latest add dialog
-pnpm dlx shadcn-vue@latest add select
-pnpm dlx shadcn-vue@latest add table
+# Examples: dialog, select, table, dropdown-menu
 ```
 
 Components are installed to `docs/.vitepress/theme/components/ui/`.
@@ -348,12 +375,15 @@ import { Badge } from '@/components/ui/badge'
 </script>
 
 <template>
-  <Card>
+  <!-- Use Tailwind classes that map to VitePress colors -->
+  <Card class="bg-card border-border">
     <CardHeader>
-      <CardTitle>Title</CardTitle>
+      <CardTitle class="text-foreground">Title</CardTitle>
       <Badge variant="default">Status</Badge>
     </CardHeader>
-    <CardContent>Content here</CardContent>
+    <CardContent class="text-muted-foreground">
+      Content here
+    </CardContent>
   </Card>
 </template>
 ```
@@ -367,12 +397,33 @@ import { Badge } from '@/components/ui/badge'
 | Card | `ui/card` | Content containers |
 | Input | `ui/input` | Form text inputs |
 
-### CSS Variables
+### Adding New Theme Colors
 
-MITRE branding colors are mapped to shadcn CSS variables in `custom.css`:
-- `--primary`: MITRE blue (#005288)
-- `--ring`: Focus ring color
-- Light/dark mode variants auto-switch with VitePress theme toggle
+1. Find the VitePress variable in `node_modules/vitepress/.../vars.css`
+2. Add mapping in `custom.css` `@theme` block:
+   ```css
+   @theme {
+     --color-my-color: var(--vp-c-some-var);
+   }
+   ```
+3. Use the Tailwind class in components: `bg-my-color`, `text-my-color`
+
+**Important**: Never define separate HSL values for shadcn. Always map to VitePress variables to maintain consistency.
+
+### VitePress Transition Override
+
+VitePress applies slow 0.5s transitions to elements inside `.VPDoc`. This makes hover states feel sluggish. We fix this globally in `custom.css`:
+
+```css
+/* Any element with Tailwind hover classes gets fast 0.1s transitions */
+.VPDoc [class*="hover:border-"],
+.VPDoc [class*="hover:shadow-"],
+.VPDoc [class*="hover:bg-"] {
+  transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+}
+```
+
+This means you can use Tailwind hover classes normally (`hover:border-primary`, `hover:shadow-md`) and they'll respond quickly.
 
 ## Conventions
 
