@@ -1,0 +1,3 @@
+# Pocketbase auto-generated migrations
+# Source of truth is pb_data/diffable/ (git-tracked NDJSON)
+pb_migrations/
