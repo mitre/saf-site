@@ -14,7 +14,9 @@ export default defineConfig({
     // Test file patterns
     include: [
       'docs/.vitepress/theme/**/*.spec.ts',
-      'docs/.vitepress/theme/**/*.test.ts'
+      'docs/.vitepress/theme/**/*.test.ts',
+      'scripts/**/*.spec.ts',
+      'scripts/**/*.test.ts'
     ],
 
     // Coverage configuration

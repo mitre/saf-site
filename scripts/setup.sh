@@ -203,14 +203,16 @@ check_prerequisites() {
         missing=1
     fi
 
-    # sqlite-diffable (REQUIRED for database restore)
-    if command_exists sqlite-diffable; then
-        ok "sqlite-diffable"
+    # tsx (REQUIRED for database restore script)
+    if command_exists tsx; then
+        ok "tsx (for db-diffable.ts)"
     else
-        error "sqlite-diffable not found"
-        echo "    Install: pip install sqlite-diffable"
-        echo "    Required for database restore - cannot proceed without it"
-        missing=1
+        # tsx is installed via pnpm, check if node_modules exists
+        if [ -f "$PROJECT_ROOT/node_modules/.bin/tsx" ]; then
+            ok "tsx (via node_modules)"
+        else
+            warn "tsx not found - will be available after pnpm install"
+        fi
     fi
 
     # pb-cli (optional - for advanced database operations)
