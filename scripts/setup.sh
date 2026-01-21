@@ -203,14 +203,14 @@ check_prerequisites() {
         missing=1
     fi
 
-    # sqlite-diffable
+    # sqlite-diffable (REQUIRED for database restore)
     if command_exists sqlite-diffable; then
         ok "sqlite-diffable"
     else
-        warn "sqlite-diffable not found"
+        error "sqlite-diffable not found"
         echo "    Install: pip install sqlite-diffable"
-        echo "    Required for database restore/export"
-        # Not fatal - might have existing data.db
+        echo "    Required for database restore - cannot proceed without it"
+        missing=1
     fi
 
     # pb-cli (optional - for advanced database operations)
@@ -326,12 +326,31 @@ restore_database() {
     # Remove existing database files
     rm -f data.db data.db-shm data.db-wal
 
-    # Restore
-    sqlite-diffable load data.db diffable/
+    # Restore with error checking
+    if ! sqlite-diffable load data.db diffable/; then
+        error "Database restore FAILED"
+        echo "    Check that diffable/ directory contains valid exports"
+        echo "    Try: sqlite-diffable load data.db diffable/"
+        exit 1
+    fi
+
+    # Verify database was created and has content
+    if [ ! -f "data.db" ]; then
+        error "Database file was not created"
+        exit 1
+    fi
+
+    local db_size
+    db_size=$(stat -f "%z" data.db 2>/dev/null || stat -c "%s" data.db 2>/dev/null)
+    if [ "$db_size" -lt 10000 ]; then
+        error "Database seems empty (only $db_size bytes)"
+        echo "    Expected at least 10KB of data"
+        exit 1
+    fi
 
     cd "$PROJECT_ROOT"
 
-    ok "Database restored"
+    ok "Database restored ($db_size bytes)"
 }
 
 setup_migrations() {
