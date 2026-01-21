@@ -12,7 +12,6 @@ Before setting up the project, ensure you have the following installed:
 |------|---------|--------------|
 | Node.js | 22.x | [nodejs.org](https://nodejs.org/) or use nvm |
 | pnpm | 10.x | `npm install -g pnpm` or `corepack enable` |
-| sqlite-diffable | latest | `pip install -r requirements.txt` |
 
 **Optional but recommended:**
 - [nvm](https://github.com/nvm-sh/nvm) - Node version manager (auto-switches via `.nvmrc`)
@@ -67,9 +66,7 @@ pnpm install
 The database content is stored in a git-friendly format and must be restored before first use:
 
 ```bash
-cd .pocketbase/pb_data
-sqlite-diffable load data.db diffable/
-cd ../..
+pnpm db:load
 ```
 
 This creates `data.db` from the version-controlled `diffable/` directory.
@@ -334,14 +331,14 @@ cd .pocketbase && ./pocketbase serve
 
 ### Database Version Control
 
-The database is exported to git-friendly NDJSON format using sqlite-diffable:
+The database is exported to git-friendly NDJSON format:
 
 ```bash
 # Export (after editing in Pocketbase)
-cd .pocketbase/pb_data && sqlite-diffable dump data.db diffable/ --all
+pnpm db:dump
 
 # Import (after cloning/pulling)
-cd .pocketbase/pb_data && sqlite-diffable load data.db diffable/
+pnpm db:load
 ```
 
 ## Architecture
@@ -436,13 +433,11 @@ VitePress data loaders run at build time. After editing in Pocketbase:
 pnpm reload-data
 ```
 
-### sqlite-diffable Not Found
+### Database Commands Not Working
 
-Install via pip:
+Ensure dependencies are installed:
 ```bash
-pip install sqlite-diffable
-# or
-pip3 install sqlite-diffable
+pnpm install
 ```
 
 ## Contributing

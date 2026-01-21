@@ -99,13 +99,12 @@ fi
 echo "=========================================="
 echo ""
 
-# Check prerequisites
-if ! command -v sqlite-diffable &> /dev/null; then
-    error "sqlite-diffable not found"
-    echo "    Install: pip install sqlite-diffable"
+# Check prerequisites (tsx for TypeScript db-diffable script)
+if [ ! -f "$PROJECT_ROOT/node_modules/.bin/tsx" ]; then
+    error "tsx not found - run pnpm install first"
     exit 1
 fi
-ok "sqlite-diffable available"
+ok "tsx available"
 
 # Check database exists
 if [ ! -f "$DB_PATH" ]; then
@@ -126,17 +125,13 @@ echo ""
 # Export
 if [ "$DRY_RUN" = true ]; then
     echo -e "${BLUE}[DRY RUN]${NC} Would run:"
-    echo "    cd $PROJECT_ROOT/.pocketbase/pb_data"
-    echo "    sqlite-diffable dump data.db diffable/ --all"
+    echo "    pnpm db:dump"
 else
     info "Exporting database..."
-    cd "$PROJECT_ROOT/.pocketbase/pb_data"
-    sqlite-diffable dump data.db diffable/ --all
-
-    # Remove SQLite internal statistics tables (cannot be restored, breaks sqlite-diffable load)
-    rm -f diffable/sqlite_stat*.metadata.json diffable/sqlite_stat*.ndjson 2>/dev/null || true
-
     cd "$PROJECT_ROOT"
+
+    # Use TypeScript db-diffable script
+    npx tsx scripts/db-diffable.ts dump "$DB_PATH" "$DIFFABLE_DIR"
 
     NEW_TABLES=$(find "$DIFFABLE_DIR" -name "*.ndjson" | wc -l | tr -d ' ')
     ok "Exported $NEW_TABLES tables to diffable/"
