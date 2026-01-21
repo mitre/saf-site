@@ -27,7 +27,7 @@ See [README.md](README.md#setup) for detailed setup options and troubleshooting.
 
 ```bash
 # After git pull, sync any database changes
-pnpm setup
+pnpm dev:setup
 
 # Start Pocketbase (terminal 1)
 cd .pocketbase && ./pocketbase serve

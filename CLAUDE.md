@@ -49,7 +49,7 @@ MITRE SAF documentation site built with VitePress. Static site with content mana
 
 ```bash
 # Setup (first-time or after git pull)
-pnpm setup
+pnpm dev:setup
 
 # Development
 cd .pocketbase && ./pocketbase serve  # Terminal 1
@@ -144,7 +144,7 @@ scripts/
 1. **Edit content:** Pocketbase Admin UI (http://localhost:8090/_/)
 2. **Export to git:** `pnpm db:export`
 3. **Commit:** `git add .pocketbase/pb_data/diffable/ && git commit`
-4. **Others restore:** `pnpm setup` (restores from diffable/)
+4. **Others restore:** `pnpm dev:setup` (restores from diffable/)
 
 ### Current Collections
 
@@ -269,9 +269,9 @@ pnpm test            # Watch mode
 
 | Script | Purpose |
 |--------|---------|
-| `pnpm setup` | Idempotent setup (deps, database, migrations) |
-| `pnpm setup:check` | Validate setup without changes |
-| `pnpm setup:force` | Force fresh database restore |
+| `pnpm dev:setup` | Idempotent setup (deps, database, migrations) |
+| `pnpm dev:setup:check` | Validate setup without changes |
+| `pnpm dev:setup:force` | Force fresh database restore |
 | `pnpm db:export` | Export Pocketbase to diffable/ |
 | `pnpm reload-data` | Trigger data loader refresh |
 
@@ -315,7 +315,7 @@ pnpm reload-data
 
 ### Database out of sync after git pull
 ```bash
-pnpm setup  # Restores from diffable/
+pnpm dev:setup  # Restores from diffable/
 ```
 
 ### Wrong platform binary

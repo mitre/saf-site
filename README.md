@@ -130,9 +130,9 @@ pnpm dev
 
 | Command | Description |
 |---------|-------------|
-| `pnpm setup` | Run setup (idempotent, safe anytime) |
-| `pnpm setup:check` | Validate setup without changes |
-| `pnpm setup:force` | Force fresh database restore |
+| `pnpm dev:setup` | Run setup (idempotent, safe anytime) |
+| `pnpm dev:setup:check` | Validate setup without changes |
+| `pnpm dev:setup:force` | Force fresh database restore |
 | `pnpm db:export` | Export database to git-friendly format |
 | `pnpm db:export:diff` | Export and show git diff |
 
@@ -198,7 +198,7 @@ Site available at http://localhost:5173
 
 ```bash
 # Run setup to restore any database changes
-pnpm setup
+pnpm dev:setup
 
 # Restart Pocketbase if it was running
 cd .pocketbase && ./pocketbase serve
@@ -274,7 +274,7 @@ pnpm reload-data
 
 ```bash
 # Force restore from git
-pnpm setup:force
+pnpm dev:setup:force
 ```
 
 ### Troubleshooting: Pocketbase Won't Start

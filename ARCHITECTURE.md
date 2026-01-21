@@ -279,7 +279,7 @@ cd saf-site-vitepress
 ./scripts/setup.sh
 
 # Or use pnpm
-pnpm setup
+pnpm dev:setup
 ```
 
 The setup script:
@@ -291,9 +291,9 @@ The setup script:
 
 **Script options:**
 ```bash
-pnpm setup              # Normal setup (idempotent)
-pnpm setup:check        # Validate without changes
-pnpm setup:force        # Force fresh database restore
+pnpm dev:setup              # Normal setup (idempotent)
+pnpm dev:setup:check        # Validate without changes
+pnpm dev:setup:force        # Force fresh database restore
 ./scripts/setup.sh -h   # Show all options
 ```
 
