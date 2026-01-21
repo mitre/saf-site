@@ -132,6 +132,10 @@ else
     info "Exporting database..."
     cd "$PROJECT_ROOT/.pocketbase/pb_data"
     sqlite-diffable dump data.db diffable/ --all
+
+    # Remove SQLite internal statistics tables (cannot be restored, breaks sqlite-diffable load)
+    rm -f diffable/sqlite_stat*.metadata.json diffable/sqlite_stat*.ndjson 2>/dev/null || true
+
     cd "$PROJECT_ROOT"
 
     NEW_TABLES=$(find "$DIFFABLE_DIR" -name "*.ndjson" | wc -l | tr -d ' ')
