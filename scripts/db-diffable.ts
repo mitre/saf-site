@@ -35,11 +35,15 @@ const SKIP_TABLES = new Set([
 ])
 
 /**
- * Custom JSON serializer that handles non-JSON types
- * Mimics Python's `default=repr` behavior
+ * Convert a value to JSON-serializable format
+ * Handles Buffer, Date, BigInt, and other non-JSON types
+ * Must be called BEFORE JSON.stringify (not as replacer) for Buffers
  */
-function jsonReplacer(_key: string, value: unknown): unknown {
-  if (value instanceof Buffer) {
+function toJsonValue(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value
+  }
+  if (Buffer.isBuffer(value)) {
     return value.toString('base64')
   }
   if (value instanceof Date) {
@@ -51,8 +55,10 @@ function jsonReplacer(_key: string, value: unknown): unknown {
   return value
 }
 
-export function dump(dbPath: string, outDir: string, options: { quiet?: boolean } = {}): number {
+export function dump(dbPath: string, outDir: string, options: { quiet?: boolean; exclude?: string[]; tables?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
+  const excludeSet = new Set(options.exclude || [])
+  const tablesSet = options.tables ? new Set(options.tables) : null
 
   if (!existsSync(dbPath)) {
     console.error(`Error: Database not found: ${dbPath}`)
@@ -85,6 +91,15 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean 
       continue
     }
 
+    if (excludeSet.has(table.name)) {
+      log(`  Skipping ${table.name} (excluded)`)
+      continue
+    }
+
+    if (tablesSet && !tablesSet.has(table.name)) {
+      continue // Not in the requested tables list
+    }
+
     // Get column info
     const columns = db.prepare(`PRAGMA table_info("${table.name}")`).all() as {
       cid: number
@@ -105,11 +120,11 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean 
     }
     writeFileSync(join(outDir, `${table.name}.metadata.json`), JSON.stringify(metadata, null, 4) + '\n')
 
-    // Write data as NDJSON (using custom replacer for non-JSON types)
+    // Write data as NDJSON (convert non-JSON types before serializing)
     const rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
     const ndjsonLines = rows.map((row) => {
-      const values = columnNames.map((col) => row[col])
-      return JSON.stringify(values, jsonReplacer)
+      const values = columnNames.map((col) => toJsonValue(row[col]))
+      return JSON.stringify(values)
     })
     writeFileSync(join(outDir, `${table.name}.ndjson`), ndjsonLines.join('\n') + (ndjsonLines.length ? '\n' : ''))
 
@@ -236,42 +251,133 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
   return 0
 }
 
+/**
+ * Convert NDJSON file to JSON objects (debugging utility)
+ * Reads metadata to get column names, then outputs rows as objects
+ */
+export function objects(ndjsonPath: string, options: { asArray?: boolean } = {}): number {
+  if (!ndjsonPath.endsWith('.ndjson')) {
+    console.error('Error: Must be a .ndjson file')
+    return 1
+  }
+
+  if (!existsSync(ndjsonPath)) {
+    console.error(`Error: File not found: ${ndjsonPath}`)
+    return 1
+  }
+
+  const metadataPath = ndjsonPath.replace('.ndjson', '.metadata.json')
+  if (!existsSync(metadataPath)) {
+    console.error(`Error: No accompanying .metadata.json file: ${metadataPath}`)
+    return 1
+  }
+
+  const metadata: TableMetadata = JSON.parse(readFileSync(metadataPath, 'utf-8'))
+  const content = readFileSync(ndjsonPath, 'utf-8').trim()
+
+  if (!content) {
+    if (options.asArray) {
+      console.log('[]')
+    }
+    // For newline-delimited, output nothing (empty = no records)
+    return 0
+  }
+
+  const lines = content.split('\n')
+  const objects = lines.map((line) => {
+    const values = JSON.parse(line) as unknown[]
+    const obj: Record<string, unknown> = {}
+    metadata.columns.forEach((col, i) => {
+      obj[col] = values[i]
+    })
+    return obj
+  })
+
+  if (options.asArray) {
+    console.log(JSON.stringify(objects, null, 2))
+  } else {
+    objects.forEach((obj) => {
+      console.log(JSON.stringify(obj))
+    })
+  }
+
+  return 0
+}
+
 // CLI - only run when executed directly
 if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('db-diffable.ts')) {
   const args = process.argv.slice(2)
   const command = args[0]
-  const dbPath = args[1]
-  const dirPath = args[2]
-  const flags = args.slice(3)
 
-  const hasReplace = flags.includes('--replace')
-
-  if (!command || !dbPath || !dirPath) {
+  if (!command) {
     console.log(`
 SQLite Diffable - Export/import SQLite to git-friendly format
 
 Usage:
-  tsx scripts/db-diffable.ts dump <database.db> <output-dir>
+  tsx scripts/db-diffable.ts dump <database.db> <output-dir> [--exclude table1 ...]
   tsx scripts/db-diffable.ts load <database.db> <source-dir> [--replace]
+  tsx scripts/db-diffable.ts objects <file.ndjson> [--array]
+
+Commands:
+  dump      Export database to NDJSON format
+  load      Restore database from NDJSON format
+  objects   Convert NDJSON to JSON objects (debugging)
 
 Options:
-  --replace    Drop existing tables before loading (for load command)
+  --replace    Drop existing tables before loading (load command)
+  --exclude    Skip specific tables (dump command)
+  --array      Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
   tsx scripts/db-diffable.ts dump .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
+  tsx scripts/db-diffable.ts dump data.db diffable/ --exclude temp_table log_table
   tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
-  tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable --replace
+  tsx scripts/db-diffable.ts load data.db diffable/ --replace
+  tsx scripts/db-diffable.ts objects diffable/users.ndjson
+  tsx scripts/db-diffable.ts objects diffable/users.ndjson --array
 `)
     process.exit(1)
   }
 
   let exitCode: number
+
   if (command === 'dump') {
-    exitCode = dump(dbPath, dirPath)
+    const dbPath = args[1]
+    const dirPath = args[2]
+    const excludeArgs: string[] = []
+    let i = 3
+    while (i < args.length) {
+      if (args[i] === '--exclude' && args[i + 1]) {
+        excludeArgs.push(args[i + 1])
+        i += 2
+      } else {
+        i++
+      }
+    }
+    if (!dbPath || !dirPath) {
+      console.error('Error: dump requires <database.db> <output-dir>')
+      process.exit(1)
+    }
+    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined })
   } else if (command === 'load') {
+    const dbPath = args[1]
+    const dirPath = args[2]
+    const hasReplace = args.slice(3).includes('--replace')
+    if (!dbPath || !dirPath) {
+      console.error('Error: load requires <database.db> <source-dir>')
+      process.exit(1)
+    }
     exitCode = load(dbPath, dirPath, { replace: hasReplace })
+  } else if (command === 'objects') {
+    const ndjsonPath = args[1]
+    const hasArray = args.slice(2).includes('--array')
+    if (!ndjsonPath) {
+      console.error('Error: objects requires <file.ndjson>')
+      process.exit(1)
+    }
+    exitCode = objects(ndjsonPath, { asArray: hasArray })
   } else {
-    console.error(`Unknown command: ${command}. Use 'dump' or 'load'.`)
+    console.error(`Unknown command: ${command}. Use 'dump', 'load', or 'objects'.`)
     exitCode = 1
   }
 

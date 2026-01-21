@@ -5,10 +5,48 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
+/**
+ * Test suite for db-diffable.ts
+ *
+ * Modeled after sqlite-diffable Python tests by Simon Willison
+ * https://github.com/simonw/sqlite-diffable/tree/main/tests
+ *
+ * Extended with additional edge cases for TypeScript implementation.
+ */
+
 describe('db-diffable', () => {
   let testDir: string
   let dbPath: string
   let diffableDir: string
+
+  // Helper to create a test database with one table (matches Python fixture)
+  function createOneTableDb(path: string): void {
+    const db = new Database(path)
+    db.exec(`
+      CREATE TABLE one_table (
+        id INTEGER PRIMARY KEY,
+        name TEXT
+      );
+      INSERT INTO one_table (id, name) VALUES (1, 'Stacey');
+      INSERT INTO one_table (id, name) VALUES (2, 'Tilda');
+      INSERT INTO one_table (id, name) VALUES (3, 'Bartek');
+    `)
+    db.close()
+  }
+
+  // Helper to create a test database with two tables (matches Python fixture)
+  function createTwoTablesDb(path: string): void {
+    createOneTableDb(path)
+    const db = new Database(path)
+    db.exec(`
+      CREATE TABLE second_table (
+        id INTEGER PRIMARY KEY,
+        name TEXT
+      );
+      INSERT INTO second_table (id, name) VALUES (1, 'Cleo');
+    `)
+    db.close()
+  }
 
   beforeEach(() => {
     // Create unique test directory
@@ -25,64 +63,75 @@ describe('db-diffable', () => {
     }
   })
 
-  describe('dump', () => {
-    it('exports tables to NDJSON format', () => {
-      // Create test database
-      const db = new Database(dbPath)
-      db.exec(`
-        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT);
-        INSERT INTO users (id, name, email) VALUES (1, 'Alice', 'alice@example.com');
-        INSERT INTO users (id, name, email) VALUES (2, 'Bob', 'bob@example.com');
-      `)
-      db.close()
+  // ==========================================================================
+  // DUMP TESTS (matching Python test_dump.py)
+  // ==========================================================================
 
-      // Dump
+  describe('dump', () => {
+    it('exports single table with correct content (test_dump equivalent)', () => {
+      createOneTableDb(dbPath)
+
       const result = dump(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
-      // Verify metadata file
-      const metadataPath = join(diffableDir, 'users.metadata.json')
+      // Verify files exist
+      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
+      const metadataPath = join(diffableDir, 'one_table.metadata.json')
+      expect(existsSync(ndjsonPath)).toBe(true)
       expect(existsSync(metadataPath)).toBe(true)
 
-      const metadata: TableMetadata = JSON.parse(readFileSync(metadataPath, 'utf-8'))
-      expect(metadata.name).toBe('users')
-      expect(metadata.columns).toEqual(['id', 'name', 'email'])
-      expect(metadata.schema).toContain('CREATE TABLE users')
-
-      // Verify NDJSON file
-      const ndjsonPath = join(diffableDir, 'users.ndjson')
-      expect(existsSync(ndjsonPath)).toBe(true)
-
+      // Verify exact NDJSON content (matches Python test)
       const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
-      expect(lines).toHaveLength(2)
+      expect(lines.map(l => JSON.parse(l))).toEqual([
+        [1, 'Stacey'],
+        [2, 'Tilda'],
+        [3, 'Bartek'],
+      ])
 
-      const row1 = JSON.parse(lines[0])
-      expect(row1).toEqual([1, 'Alice', 'alice@example.com'])
-
-      const row2 = JSON.parse(lines[1])
-      expect(row2).toEqual([2, 'Bob', 'bob@example.com'])
+      // Verify metadata content
+      const metadata: TableMetadata = JSON.parse(readFileSync(metadataPath, 'utf-8'))
+      expect(metadata.name).toBe('one_table')
+      expect(metadata.columns).toEqual(['id', 'name'])
+      expect(metadata.schema).toContain('CREATE TABLE')
+      expect(metadata.schema).toContain('one_table')
+      expect(metadata.schema).toContain('id')
+      expect(metadata.schema).toContain('name')
     })
 
-    it('skips sqlite internal tables', () => {
-      // Create database with sqlite_stat tables (via ANALYZE)
+    it('exports all tables with --all equivalent (test_dump_all equivalent)', () => {
+      createTwoTablesDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      // Both tables should be exported
+      expect(existsSync(join(diffableDir, 'one_table.ndjson'))).toBe(true)
+      expect(existsSync(join(diffableDir, 'one_table.metadata.json'))).toBe(true)
+      expect(existsSync(join(diffableDir, 'second_table.ndjson'))).toBe(true)
+      expect(existsSync(join(diffableDir, 'second_table.metadata.json'))).toBe(true)
+    })
+
+    it('skips sqlite internal tables (sqlite_stat*)', () => {
       const db = new Database(dbPath)
       db.exec(`
         CREATE TABLE data (id INTEGER PRIMARY KEY, value TEXT);
         INSERT INTO data VALUES (1, 'test');
       `)
-      db.exec('ANALYZE')
+      db.exec('ANALYZE') // Creates sqlite_stat1/sqlite_stat4
       db.close()
 
-      // Dump
       const result = dump(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
-      // Verify sqlite_stat1 was not exported
+      // sqlite_stat tables should NOT be exported
       expect(existsSync(join(diffableDir, 'sqlite_stat1.metadata.json'))).toBe(false)
       expect(existsSync(join(diffableDir, 'sqlite_stat1.ndjson'))).toBe(false)
+      expect(existsSync(join(diffableDir, 'sqlite_stat4.metadata.json'))).toBe(false)
+      expect(existsSync(join(diffableDir, 'sqlite_stat4.ndjson'))).toBe(false)
 
-      // Verify data table was exported
+      // Data table SHOULD be exported
       expect(existsSync(join(diffableDir, 'data.metadata.json'))).toBe(true)
+      expect(existsSync(join(diffableDir, 'data.ndjson'))).toBe(true)
     })
 
     it('handles empty tables', () => {
@@ -96,8 +145,9 @@ describe('db-diffable', () => {
       expect(existsSync(join(diffableDir, 'empty_table.metadata.json'))).toBe(true)
       expect(existsSync(join(diffableDir, 'empty_table.ndjson'))).toBe(true)
 
+      // NDJSON should be empty (or just whitespace)
       const content = readFileSync(join(diffableDir, 'empty_table.ndjson'), 'utf-8')
-      expect(content).toBe('')
+      expect(content.trim()).toBe('')
     })
 
     it('handles special characters in data', () => {
@@ -106,7 +156,9 @@ describe('db-diffable', () => {
         CREATE TABLE special (id INTEGER PRIMARY KEY, data TEXT);
         INSERT INTO special VALUES (1, 'line1\nline2');
         INSERT INTO special VALUES (2, 'quote"test');
-        INSERT INTO special VALUES (3, 'unicode: 日本語');
+        INSERT INTO special VALUES (3, 'backslash\\test');
+        INSERT INTO special VALUES (4, 'unicode: 日本語');
+        INSERT INTO special VALUES (5, 'tab\there');
       `)
       db.close()
 
@@ -116,106 +168,191 @@ describe('db-diffable', () => {
       const lines = readFileSync(join(diffableDir, 'special.ndjson'), 'utf-8').trim().split('\n')
       expect(JSON.parse(lines[0])).toEqual([1, 'line1\nline2'])
       expect(JSON.parse(lines[1])).toEqual([2, 'quote"test'])
-      expect(JSON.parse(lines[2])).toEqual([3, 'unicode: 日本語'])
+      expect(JSON.parse(lines[2])).toEqual([3, 'backslash\\test'])
+      expect(JSON.parse(lines[3])).toEqual([4, 'unicode: 日本語'])
+      expect(JSON.parse(lines[4])).toEqual([5, 'tab\there'])
+    })
+
+    it('handles NULL values', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE nullable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER);
+        INSERT INTO nullable VALUES (1, 'has value', 100);
+        INSERT INTO nullable VALUES (2, NULL, NULL);
+        INSERT INTO nullable VALUES (3, 'only name', NULL);
+      `)
+      db.close()
+
+      const result = dump(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const lines = readFileSync(join(diffableDir, 'nullable.ndjson'), 'utf-8').trim().split('\n')
+      expect(JSON.parse(lines[0])).toEqual([1, 'has value', 100])
+      expect(JSON.parse(lines[1])).toEqual([2, null, null])
+      expect(JSON.parse(lines[2])).toEqual([3, 'only name', null])
+    })
+
+    it('handles various data types', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE types (
+          id INTEGER PRIMARY KEY,
+          int_val INTEGER,
+          real_val REAL,
+          text_val TEXT,
+          blob_val BLOB
+        );
+        INSERT INTO types VALUES (1, 42, 3.14159, 'hello', X'48454C4C4F');
+        INSERT INTO types VALUES (2, -100, 0.0, '', NULL);
+        INSERT INTO types VALUES (3, 0, -1.5, 'a', X'00');
+      `)
+      db.close()
+
+      const result = dump(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const lines = readFileSync(join(diffableDir, 'types.ndjson'), 'utf-8').trim().split('\n')
+      const row1 = JSON.parse(lines[0])
+      expect(row1[0]).toBe(1)
+      expect(row1[1]).toBe(42)
+      expect(row1[2]).toBeCloseTo(3.14159)
+      expect(row1[3]).toBe('hello')
+      // BLOB is base64 encoded
+      expect(typeof row1[4]).toBe('string')
     })
 
     it('returns error for non-existent database', () => {
       const result = dump('/nonexistent/path.db', diffableDir, { quiet: true })
       expect(result).toBe(1)
     })
+
+    it('creates output directory if it does not exist', () => {
+      createOneTableDb(dbPath)
+      const nestedDir = join(testDir, 'nested', 'deeply', 'dir')
+
+      const result = dump(dbPath, nestedDir, { quiet: true })
+      expect(result).toBe(0)
+      expect(existsSync(nestedDir)).toBe(true)
+      expect(existsSync(join(nestedDir, 'one_table.ndjson'))).toBe(true)
+    })
   })
 
+  // ==========================================================================
+  // LOAD TESTS (matching Python test_dump.py test_load)
+  // ==========================================================================
+
   describe('load', () => {
-    it('restores database from NDJSON files', () => {
-      // Create diffable files manually
+    it('restores database from NDJSON files (test_load equivalent part 1)', () => {
+      // Create diffable files manually (matches Python test structure)
       mkdirSync(diffableDir, { recursive: true })
 
       const metadata: TableMetadata = {
-        name: 'products',
-        columns: ['id', 'name', 'price'],
-        schema: 'CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price REAL)',
+        name: 'one_table',
+        columns: ['id', 'name'],
+        schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
       }
-      writeFileSync(join(diffableDir, 'products.metadata.json'), JSON.stringify(metadata, null, 4))
+      writeFileSync(join(diffableDir, 'one_table.metadata.json'), JSON.stringify(metadata, null, 4))
       writeFileSync(
-        join(diffableDir, 'products.ndjson'),
-        '[1,"Widget",9.99]\n[2,"Gadget",19.99]\n'
+        join(diffableDir, 'one_table.ndjson'),
+        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n'
       )
 
-      // Load
       const result = load(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
-      // Verify database
+      // Verify database content (matches Python test assertions)
       const db = new Database(dbPath, { readonly: true })
-      const rows = db.prepare('SELECT * FROM products ORDER BY id').all() as { id: number; name: string; price: number }[]
-      expect(rows).toHaveLength(2)
-      expect(rows[0]).toEqual({ id: 1, name: 'Widget', price: 9.99 })
-      expect(rows[1]).toEqual({ id: 2, name: 'Gadget', price: 19.99 })
+      const rows = db.prepare('SELECT * FROM one_table ORDER BY id').all() as { id: number; name: string }[]
+      expect(rows).toEqual([
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+        { id: 3, name: 'Bartek' },
+      ])
       db.close()
     })
 
-    it('handles multiple tables', () => {
+    it('restores multiple tables (test_load equivalent part 2)', () => {
       mkdirSync(diffableDir, { recursive: true })
 
       // Table 1
       writeFileSync(
-        join(diffableDir, 'users.metadata.json'),
+        join(diffableDir, 'one_table.metadata.json'),
         JSON.stringify({
-          name: 'users',
+          name: 'one_table',
           columns: ['id', 'name'],
-          schema: 'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)',
+          schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
         })
       )
-      writeFileSync(join(diffableDir, 'users.ndjson'), '[1,"Alice"]\n')
+      writeFileSync(join(diffableDir, 'one_table.ndjson'), '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n')
 
       // Table 2
       writeFileSync(
-        join(diffableDir, 'posts.metadata.json'),
+        join(diffableDir, 'second_table.metadata.json'),
         JSON.stringify({
-          name: 'posts',
-          columns: ['id', 'user_id', 'title'],
-          schema: 'CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT)',
+          name: 'second_table',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE second_table (id INTEGER PRIMARY KEY, name TEXT)',
         })
       )
-      writeFileSync(join(diffableDir, 'posts.ndjson'), '[1,1,"Hello World"]\n')
+      writeFileSync(join(diffableDir, 'second_table.ndjson'), '[1,"Cleo"]\n')
 
       const result = load(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
       const db = new Database(dbPath, { readonly: true })
-      expect(db.prepare('SELECT COUNT(*) as c FROM users').get()).toEqual({ c: 1 })
-      expect(db.prepare('SELECT COUNT(*) as c FROM posts').get()).toEqual({ c: 1 })
+
+      // Verify table names
+      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as { name: string }[]
+      const tableNames = tables.map(t => t.name)
+      expect(tableNames).toContain('one_table')
+      expect(tableNames).toContain('second_table')
+
+      // Verify content
+      expect(db.prepare('SELECT * FROM one_table ORDER BY id').all()).toEqual([
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+        { id: 3, name: 'Bartek' },
+      ])
+      expect(db.prepare('SELECT * FROM second_table ORDER BY id').all()).toEqual([
+        { id: 1, name: 'Cleo' },
+      ])
+
       db.close()
     })
 
-    it('supports --replace option', () => {
-      // First load
+    it('supports --replace option (test_load equivalent part 3)', () => {
       mkdirSync(diffableDir, { recursive: true })
+
+      // Initial data
       writeFileSync(
-        join(diffableDir, 'items.metadata.json'),
+        join(diffableDir, 'one_table.metadata.json'),
         JSON.stringify({
-          name: 'items',
+          name: 'one_table',
           columns: ['id', 'name'],
-          schema: 'CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT)',
+          schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
         })
       )
-      writeFileSync(join(diffableDir, 'items.ndjson'), '[1,"First"]\n')
+      writeFileSync(join(diffableDir, 'one_table.ndjson'), '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n')
 
+      // First load
       load(dbPath, diffableDir, { quiet: true })
 
-      // Modify diffable data
-      writeFileSync(join(diffableDir, 'items.ndjson'), '[1,"Replaced"]\n[2,"New"]\n')
+      // Modify data (matches Python test - remove Bartek)
+      writeFileSync(join(diffableDir, 'one_table.ndjson'), '[1,"Stacey"]\n[2,"Tilda"]\n')
+
+      // Remove existing DB for fresh load with replace
+      rmSync(dbPath)
 
       // Load again with replace
-      rmSync(dbPath) // Remove to simulate fresh load
       const result = load(dbPath, diffableDir, { replace: true, quiet: true })
       expect(result).toBe(0)
 
       const db = new Database(dbPath, { readonly: true })
-      const rows = db.prepare('SELECT * FROM items ORDER BY id').all() as { id: number; name: string }[]
-      expect(rows).toHaveLength(2)
-      expect(rows[0].name).toBe('Replaced')
-      expect(rows[1].name).toBe('New')
+      const rows = db.prepare('SELECT * FROM one_table ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+      ])
       db.close()
     })
 
@@ -224,41 +361,99 @@ describe('db-diffable', () => {
       expect(result).toBe(1)
     })
 
-    it('verifies minimum database size', () => {
+    it('handles empty NDJSON files', () => {
       mkdirSync(diffableDir, { recursive: true })
 
-      // Create a very small table that results in tiny database
       writeFileSync(
-        join(diffableDir, 'tiny.metadata.json'),
+        join(diffableDir, 'empty.metadata.json'),
         JSON.stringify({
-          name: 'tiny',
-          columns: ['id'],
-          schema: 'CREATE TABLE tiny (id INTEGER)',
+          name: 'empty',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE empty (id INTEGER PRIMARY KEY, name TEXT)',
         })
       )
-      writeFileSync(join(diffableDir, 'tiny.ndjson'), '')
+      writeFileSync(join(diffableDir, 'empty.ndjson'), '')
 
       const result = load(dbPath, diffableDir, { quiet: true })
-      // Should warn about small database (but still succeed since table exists)
-      // The warning is only logged, function returns 0 if tables loaded
-      expect(existsSync(dbPath)).toBe(true)
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const count = db.prepare('SELECT COUNT(*) as c FROM empty').get() as { c: number }
+      expect(count.c).toBe(0)
+      db.close()
+    })
+
+    it('preserves NULL values through load', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      writeFileSync(
+        join(diffableDir, 'nullable.metadata.json'),
+        JSON.stringify({
+          name: 'nullable',
+          columns: ['id', 'name', 'value'],
+          schema: 'CREATE TABLE nullable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)',
+        })
+      )
+      writeFileSync(
+        join(diffableDir, 'nullable.ndjson'),
+        '[1,"has value",100]\n[2,null,null]\n[3,"only name",null]\n'
+      )
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const rows = db.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number; name: string | null; value: number | null }[]
+      expect(rows[0]).toEqual({ id: 1, name: 'has value', value: 100 })
+      expect(rows[1]).toEqual({ id: 2, name: null, value: null })
+      expect(rows[2]).toEqual({ id: 3, name: 'only name', value: null })
+      db.close()
+    })
+
+    it('skips sqlite internal tables in diffable dir', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Create a valid table
+      writeFileSync(
+        join(diffableDir, 'data.metadata.json'),
+        JSON.stringify({
+          name: 'data',
+          columns: ['id'],
+          schema: 'CREATE TABLE data (id INTEGER PRIMARY KEY)',
+        })
+      )
+      writeFileSync(join(diffableDir, 'data.ndjson'), '[1]\n')
+
+      // Create sqlite_stat1 files (should be skipped)
+      writeFileSync(
+        join(diffableDir, 'sqlite_stat1.metadata.json'),
+        JSON.stringify({
+          name: 'sqlite_stat1',
+          columns: ['tbl', 'idx', 'stat'],
+          schema: 'CREATE TABLE sqlite_stat1 (tbl TEXT, idx TEXT, stat TEXT)',
+        })
+      )
+      writeFileSync(join(diffableDir, 'sqlite_stat1.ndjson'), '["data",null,"1"]\n')
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+      const tableNames = tables.map(t => t.name)
+      expect(tableNames).toContain('data')
+      expect(tableNames).not.toContain('sqlite_stat1')
+      db.close()
     })
   })
 
-  describe('roundtrip', () => {
-    it('dump then load preserves data', () => {
-      // Create original database
-      const db1 = new Database(dbPath)
-      db1.exec(`
-        CREATE TABLE config (key TEXT PRIMARY KEY, value TEXT);
-        INSERT INTO config VALUES ('version', '1.0.0');
-        INSERT INTO config VALUES ('name', 'Test App');
+  // ==========================================================================
+  // ROUNDTRIP TESTS (dump -> load -> verify)
+  // ==========================================================================
 
-        CREATE TABLE numbers (id INTEGER PRIMARY KEY, n INTEGER, f REAL);
-        INSERT INTO numbers VALUES (1, 42, 3.14159);
-        INSERT INTO numbers VALUES (2, -100, 0.0);
-      `)
-      db1.close()
+  describe('roundtrip', () => {
+    it('dump then load preserves all data exactly', () => {
+      createTwoTablesDb(dbPath)
 
       // Dump
       const dumpResult = dump(dbPath, diffableDir, { quiet: true })
@@ -270,46 +465,332 @@ describe('db-diffable', () => {
       expect(loadResult).toBe(0)
 
       // Compare data
-      const db2 = new Database(newDbPath, { readonly: true })
+      const original = new Database(dbPath, { readonly: true })
+      const restored = new Database(newDbPath, { readonly: true })
 
-      const config = db2.prepare('SELECT * FROM config ORDER BY key').all()
-      expect(config).toEqual([
-        { key: 'name', value: 'Test App' },
-        { key: 'version', value: '1.0.0' },
-      ])
+      // Compare one_table
+      const origRows1 = original.prepare('SELECT * FROM one_table ORDER BY id').all()
+      const restRows1 = restored.prepare('SELECT * FROM one_table ORDER BY id').all()
+      expect(restRows1).toEqual(origRows1)
 
-      const numbers = db2.prepare('SELECT * FROM numbers ORDER BY id').all()
-      expect(numbers).toEqual([
-        { id: 1, n: 42, f: 3.14159 },
-        { id: 2, n: -100, f: 0.0 },
-      ])
+      // Compare second_table
+      const origRows2 = original.prepare('SELECT * FROM second_table ORDER BY id').all()
+      const restRows2 = restored.prepare('SELECT * FROM second_table ORDER BY id').all()
+      expect(restRows2).toEqual(origRows2)
 
-      db2.close()
+      original.close()
+      restored.close()
     })
 
-    it('preserves NULL values', () => {
-      const db1 = new Database(dbPath)
-      db1.exec(`
+    it('roundtrip preserves NULL values', () => {
+      const db = new Database(dbPath)
+      db.exec(`
         CREATE TABLE nullable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER);
         INSERT INTO nullable VALUES (1, 'has value', 100);
         INSERT INTO nullable VALUES (2, NULL, NULL);
         INSERT INTO nullable VALUES (3, 'only name', NULL);
       `)
-      db1.close()
+      db.close()
 
       dump(dbPath, diffableDir, { quiet: true })
 
       const newDbPath = join(testDir, 'restored.db')
       load(newDbPath, diffableDir, { quiet: true })
 
-      const db2 = new Database(newDbPath, { readonly: true })
-      const rows = db2.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number; name: string | null; value: number | null }[]
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number; name: string | null; value: number | null }[]
 
       expect(rows[0]).toEqual({ id: 1, name: 'has value', value: 100 })
       expect(rows[1]).toEqual({ id: 2, name: null, value: null })
       expect(rows[2]).toEqual({ id: 3, name: 'only name', value: null })
 
-      db2.close()
+      restored.close()
+    })
+
+    it('roundtrip preserves special characters', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE special (id INTEGER PRIMARY KEY, data TEXT);
+        INSERT INTO special VALUES (1, 'line1\nline2');
+        INSERT INTO special VALUES (2, 'quote"test');
+        INSERT INTO special VALUES (3, 'unicode: 日本語');
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM special ORDER BY id').all() as { id: number; data: string }[]
+
+      expect(rows[0].data).toBe('line1\nline2')
+      expect(rows[1].data).toBe('quote"test')
+      expect(rows[2].data).toBe('unicode: 日本語')
+
+      restored.close()
+    })
+
+    it('roundtrip preserves numeric precision', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE numbers (id INTEGER PRIMARY KEY, n INTEGER, f REAL);
+        INSERT INTO numbers VALUES (1, 9007199254740991, 3.141592653589793);
+        INSERT INTO numbers VALUES (2, -9007199254740991, -0.000000001);
+        INSERT INTO numbers VALUES (3, 0, 0.0);
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM numbers ORDER BY id').all() as { id: number; n: number; f: number }[]
+
+      expect(rows[0].n).toBe(9007199254740991)
+      expect(rows[0].f).toBeCloseTo(3.141592653589793, 10)
+      expect(rows[1].n).toBe(-9007199254740991)
+      expect(rows[2].n).toBe(0)
+      expect(rows[2].f).toBe(0.0)
+
+      restored.close()
+    })
+
+    it('roundtrip with many tables', () => {
+      const db = new Database(dbPath)
+      for (let i = 0; i < 10; i++) {
+        db.exec(`
+          CREATE TABLE table_${i} (id INTEGER PRIMARY KEY, value TEXT);
+          INSERT INTO table_${i} VALUES (1, 'value_${i}');
+        `)
+      }
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      for (let i = 0; i < 10; i++) {
+        const row = restored.prepare(`SELECT * FROM table_${i}`).get() as { id: number; value: string }
+        expect(row.value).toBe(`value_${i}`)
+      }
+      restored.close()
+    })
+  })
+
+  // ==========================================================================
+  // EDGE CASES AND ERROR HANDLING
+  // ==========================================================================
+
+  describe('edge cases', () => {
+    it('handles table with no primary key', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE no_pk (name TEXT, value INTEGER);
+        INSERT INTO no_pk VALUES ('a', 1);
+        INSERT INTO no_pk VALUES ('b', 2);
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM no_pk ORDER BY value').all()
+      expect(rows).toEqual([
+        { name: 'a', value: 1 },
+        { name: 'b', value: 2 },
+      ])
+      restored.close()
+    })
+
+    it('handles table with composite primary key', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE composite_pk (a INTEGER, b INTEGER, value TEXT, PRIMARY KEY (a, b));
+        INSERT INTO composite_pk VALUES (1, 1, 'one-one');
+        INSERT INTO composite_pk VALUES (1, 2, 'one-two');
+        INSERT INTO composite_pk VALUES (2, 1, 'two-one');
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM composite_pk ORDER BY a, b').all()
+      expect(rows).toEqual([
+        { a: 1, b: 1, value: 'one-one' },
+        { a: 1, b: 2, value: 'one-two' },
+        { a: 2, b: 1, value: 'two-one' },
+      ])
+      restored.close()
+    })
+
+    it('handles very long text values', () => {
+      const longText = 'x'.repeat(100000)
+      const db = new Database(dbPath)
+      db.exec(`CREATE TABLE long_text (id INTEGER PRIMARY KEY, data TEXT)`)
+      db.prepare('INSERT INTO long_text VALUES (1, ?)').run(longText)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const row = restored.prepare('SELECT * FROM long_text').get() as { id: number; data: string }
+      expect(row.data.length).toBe(100000)
+      expect(row.data).toBe(longText)
+      restored.close()
+    })
+
+    it('handles table names with special characters', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE "table-with-dashes" (id INTEGER PRIMARY KEY);
+        INSERT INTO "table-with-dashes" VALUES (1);
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const row = restored.prepare('SELECT * FROM "table-with-dashes"').get()
+      expect(row).toEqual({ id: 1 })
+      restored.close()
+    })
+
+    it('handles column names with special characters', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE special_cols ("col-with-dash" TEXT, "col with space" TEXT);
+        INSERT INTO special_cols VALUES ('a', 'b');
+      `)
+      db.close()
+
+      dump(dbPath, diffableDir, { quiet: true })
+
+      const newDbPath = join(testDir, 'restored.db')
+      load(newDbPath, diffableDir, { quiet: true })
+
+      const restored = new Database(newDbPath, { readonly: true })
+      const row = restored.prepare('SELECT * FROM special_cols').get() as Record<string, string>
+      expect(row['col-with-dash']).toBe('a')
+      expect(row['col with space']).toBe('b')
+      restored.close()
+    })
+  })
+
+  // ==========================================================================
+  // OBJECTS COMMAND TESTS (matching Python test_objects.py)
+  // ==========================================================================
+
+  describe('objects', () => {
+    beforeEach(() => {
+      // Create test NDJSON and metadata files
+      mkdirSync(diffableDir, { recursive: true })
+
+      const metadata: TableMetadata = {
+        name: 'one_table',
+        columns: ['id', 'name'],
+        schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
+      }
+      writeFileSync(join(diffableDir, 'one_table.metadata.json'), JSON.stringify(metadata, null, 4))
+      writeFileSync(
+        join(diffableDir, 'one_table.ndjson'),
+        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n'
+      )
+    })
+
+    it('converts NDJSON to newline-delimited JSON objects (test_objects equivalent)', async () => {
+      const { objects } = await import('./db-diffable')
+
+      // Capture stdout
+      const originalLog = console.log
+      const output: string[] = []
+      console.log = (msg: string) => output.push(msg)
+
+      const result = objects(join(diffableDir, 'one_table.ndjson'))
+
+      console.log = originalLog
+
+      expect(result).toBe(0)
+      expect(output).toHaveLength(3)
+      expect(JSON.parse(output[0])).toEqual({ id: 1, name: 'Stacey' })
+      expect(JSON.parse(output[1])).toEqual({ id: 2, name: 'Tilda' })
+      expect(JSON.parse(output[2])).toEqual({ id: 3, name: 'Bartek' })
+    })
+
+    it('converts NDJSON to JSON array with --array flag', async () => {
+      const { objects } = await import('./db-diffable')
+
+      const originalLog = console.log
+      const output: string[] = []
+      console.log = (msg: string) => output.push(msg)
+
+      const result = objects(join(diffableDir, 'one_table.ndjson'), { asArray: true })
+
+      console.log = originalLog
+
+      expect(result).toBe(0)
+      expect(output).toHaveLength(1)
+      const parsed = JSON.parse(output[0])
+      expect(parsed).toEqual([
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+        { id: 3, name: 'Bartek' },
+      ])
+    })
+
+    it('returns error if file is not .ndjson', async () => {
+      const { objects } = await import('./db-diffable')
+      const result = objects(join(diffableDir, 'one_table.metadata.json'))
+      expect(result).toBe(1)
+    })
+
+    it('returns error if metadata file is missing', async () => {
+      const { objects } = await import('./db-diffable')
+
+      // Create NDJSON without metadata
+      writeFileSync(join(diffableDir, 'orphan.ndjson'), '[1,"test"]\n')
+
+      const result = objects(join(diffableDir, 'orphan.ndjson'))
+      expect(result).toBe(1)
+    })
+
+    it('handles empty NDJSON file', async () => {
+      const { objects } = await import('./db-diffable')
+
+      writeFileSync(join(diffableDir, 'empty.ndjson'), '')
+      writeFileSync(
+        join(diffableDir, 'empty.metadata.json'),
+        JSON.stringify({ name: 'empty', columns: ['id'], schema: 'CREATE TABLE empty (id INTEGER)' })
+      )
+
+      const originalLog = console.log
+      const output: string[] = []
+      console.log = (msg: string) => output.push(msg)
+
+      const result = objects(join(diffableDir, 'empty.ndjson'), { asArray: false })
+
+      console.log = originalLog
+
+      expect(result).toBe(0)
+      expect(output).toHaveLength(0) // Newline-delimited: empty = no output
     })
   })
 })
