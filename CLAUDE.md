@@ -8,10 +8,10 @@ This project uses **beads** for task tracking and context preservation. After a 
 
 ```bash
 # 1. Load architecture overview (READ FIRST)
-bd show saf-site-vitepress-ga0
+bd show saf-site-ga0
 
 # 2. Load database workflow reference
-bd show saf-site-vitepress-35u
+bd show saf-site-35u
 
 # 3. Check for session recovery card
 bd list --status=open | grep -i recovery
@@ -21,8 +21,8 @@ bd ready
 ```
 
 **Key Cards (Hub & Spoke Pattern):**
-- **HUB:** `saf-site-vitepress-ga0` - Architecture overview, tech stack, key directories
-- **SPOKE:** `saf-site-vitepress-35u` - Database & Pocketbase workflow details
+- **HUB:** `saf-site-ga0` - Architecture overview, tech stack, key directories
+- **SPOKE:** `saf-site-35u` - Database & Pocketbase workflow details
 
 **Related Documentation:**
 - [README.md](README.md) - Setup, commands, workflows
