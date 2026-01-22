@@ -48,17 +48,59 @@
     </div>
 
     <!-- Feature Cards -->
-    <div class="content-features" v-if="featureCards.length">
-      <article
-        v-for="card in featureCards"
-        :key="card.title"
-        class="feature-card"
-      >
-        <div class="feature-icon">{{ card.icon }}</div>
-        <h3 class="feature-title">{{ card.title }}</h3>
-        <p :class="['feature-detail', card.title === 'STIG ID' ? 'mono' : '']">
-          {{ card.value }}
-        </p>
+    <div class="content-features">
+      <!-- Target -->
+      <article v-if="content.target_name" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon :name="content.target_name" :size="28" />
+        </div>
+        <h3 class="feature-title">Target</h3>
+        <p class="feature-detail">{{ content.target_name }}</p>
+      </article>
+
+      <!-- Standard -->
+      <article v-if="content.standard_name" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon :name="content.standard_name" :size="28" />
+        </div>
+        <h3 class="feature-title">Standard</h3>
+        <p class="feature-detail">{{ content.standard_name }}</p>
+      </article>
+
+      <!-- Technology -->
+      <article v-if="content.technology_name" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon :name="content.technology_name" :size="28" />
+        </div>
+        <h3 class="feature-title">Technology</h3>
+        <p class="feature-detail">{{ content.technology_name }}</p>
+      </article>
+
+      <!-- Vendor -->
+      <article v-if="content.vendor_name" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon :name="content.vendor_name" :size="28" />
+        </div>
+        <h3 class="feature-title">Vendor</h3>
+        <p class="feature-detail">{{ content.vendor_name }}</p>
+      </article>
+
+      <!-- Maintainer -->
+      <article v-if="content.maintainer_name" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon :name="content.maintainer_name" :size="28" />
+        </div>
+        <h3 class="feature-title">Maintainer</h3>
+        <p class="feature-detail">{{ content.maintainer_name }}</p>
+      </article>
+
+      <!-- STIG ID (validation-specific) -->
+      <article v-if="isValidation && content.stig_id" class="feature-card">
+        <div class="feature-icon">
+          <BrandIcon name="stig" :size="28" />
+        </div>
+        <h3 class="feature-title">STIG ID</h3>
+        <p class="feature-detail mono">{{ content.stig_id }}</p>
       </article>
     </div>
 
@@ -83,7 +125,10 @@
             />
           </div>
           <p class="related-card-description">{{ related.description }}</p>
-          <span class="related-card-tech">{{ related.technology_name }}</span>
+          <div class="related-card-footer">
+            <BrandIcon :name="related.technology_name" :size="16" />
+            <span class="related-card-tech">{{ related.technology_name }}</span>
+          </div>
         </a>
       </div>
     </section>
@@ -94,6 +139,7 @@
 import { computed } from 'vue'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
+import BrandIcon from './icons/BrandIcon.vue'
 
 interface RelatedContentItem {
   id: string
@@ -298,10 +344,14 @@ const relatedContent = computed(() => props.relatedContent || [])
   justify-content: center;
   width: 48px;
   height: 48px;
-  font-size: 24px;
   background: var(--vp-c-bg-elv);
   border-radius: 8px;
   margin-bottom: 1rem;
+  color: var(--vp-c-text-1);
+}
+
+.feature-icon.emoji {
+  font-size: 24px;
 }
 
 .feature-title {
@@ -415,10 +465,16 @@ const relatedContent = computed(() => props.relatedContent || [])
   overflow: hidden;
 }
 
+.related-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vp-c-text-3);
+}
+
 .related-card-tech {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--vp-c-text-3);
 }
 
 @media (max-width: 480px) {
