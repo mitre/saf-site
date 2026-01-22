@@ -4,142 +4,97 @@
       <!-- Target Filter (what the profile validates) -->
       <div class="filter-item">
         <label class="filter-label">Target</label>
-        <SelectRoot v-model="selectedTarget">
-          <SelectTrigger class="select-trigger" aria-label="Select target">
+        <Select v-model="selectedTarget">
+          <SelectTrigger aria-label="Filter by target platform">
             <SelectValue placeholder="All Targets" />
-            <SelectIcon class="select-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </SelectIcon>
           </SelectTrigger>
-
-          <SelectPortal>
-            <SelectContent class="select-content" :side-offset="5">
-              <SelectViewport class="select-viewport">
-                <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Targets</SelectItemText>
-                </SelectItem>
-                <SelectItem
-                  v-for="target in targets"
-                  :key="target"
-                  :value="target"
-                  class="select-item"
-                >
-                  <SelectItemText>{{ target }}</SelectItemText>
-                </SelectItem>
-              </SelectViewport>
-            </SelectContent>
-          </SelectPortal>
-        </SelectRoot>
+          <SelectContent>
+            <SelectItem value="all">
+              <SelectItemText>All Targets</SelectItemText>
+            </SelectItem>
+            <SelectItem
+              v-for="target in targets"
+              :key="target"
+              :value="target"
+            >
+              <SelectItemText>{{ target }}</SelectItemText>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <!-- Technology Filter -->
       <div class="filter-item">
         <label class="filter-label">Technology</label>
-        <SelectRoot v-model="selectedTech">
-          <SelectTrigger class="select-trigger" aria-label="Select technology">
+        <Select v-model="selectedTech">
+          <SelectTrigger aria-label="Filter by automation technology">
             <SelectValue placeholder="All Technologies" />
-            <SelectIcon class="select-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </SelectIcon>
           </SelectTrigger>
-
-          <SelectPortal>
-            <SelectContent class="select-content" :side-offset="5">
-              <SelectViewport class="select-viewport">
-                <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Technologies</SelectItemText>
-                </SelectItem>
-                <SelectItem
-                  v-for="tech in technologies"
-                  :key="tech"
-                  :value="tech"
-                  class="select-item"
-                >
-                  <SelectItemText>{{ tech }}</SelectItemText>
-                </SelectItem>
-              </SelectViewport>
-            </SelectContent>
-          </SelectPortal>
-        </SelectRoot>
+          <SelectContent>
+            <SelectItem value="all">
+              <SelectItemText>All Technologies</SelectItemText>
+            </SelectItem>
+            <SelectItem
+              v-for="tech in technologies"
+              :key="tech"
+              :value="tech"
+            >
+              <SelectItemText>{{ tech }}</SelectItemText>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <!-- Vendor Filter -->
       <div class="filter-item">
         <label class="filter-label">Vendor</label>
-        <SelectRoot v-model="selectedVendor">
-          <SelectTrigger class="select-trigger" aria-label="Select vendor">
+        <Select v-model="selectedVendor">
+          <SelectTrigger aria-label="Filter by vendor or organization">
             <SelectValue placeholder="All Vendors" />
-            <SelectIcon class="select-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </SelectIcon>
           </SelectTrigger>
-
-          <SelectPortal>
-            <SelectContent class="select-content" :side-offset="5">
-              <SelectViewport class="select-viewport">
-                <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Vendors</SelectItemText>
-                </SelectItem>
-                <SelectItem
-                  v-for="vendor in vendors"
-                  :key="vendor"
-                  :value="vendor"
-                  class="select-item"
-                >
-                  <SelectItemText>{{ vendor }}</SelectItemText>
-                </SelectItem>
-              </SelectViewport>
-            </SelectContent>
-          </SelectPortal>
-        </SelectRoot>
+          <SelectContent>
+            <SelectItem value="all">
+              <SelectItemText>All Vendors</SelectItemText>
+            </SelectItem>
+            <SelectItem
+              v-for="vendor in vendors"
+              :key="vendor"
+              :value="vendor"
+            >
+              <SelectItemText>{{ vendor }}</SelectItemText>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <!-- Standard Filter -->
       <div class="filter-item">
         <label class="filter-label">Standard</label>
-        <SelectRoot v-model="selectedStandard">
-          <SelectTrigger class="select-trigger" aria-label="Select standard">
+        <Select v-model="selectedStandard">
+          <SelectTrigger aria-label="Filter by compliance standard">
             <SelectValue placeholder="All Standards" />
-            <SelectIcon class="select-icon">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M4 6L7.5 9.5L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </SelectIcon>
           </SelectTrigger>
-
-          <SelectPortal>
-            <SelectContent class="select-content" :side-offset="5">
-              <SelectViewport class="select-viewport">
-                <SelectItem value="all" class="select-item">
-                  <SelectItemText>All Standards</SelectItemText>
-                </SelectItem>
-                <SelectItem
-                  v-for="standard in standards"
-                  :key="standard"
-                  :value="standard"
-                  class="select-item"
-                >
-                  <SelectItemText>{{ standard }}</SelectItemText>
-                </SelectItem>
-              </SelectViewport>
-            </SelectContent>
-          </SelectPortal>
-        </SelectRoot>
+          <SelectContent>
+            <SelectItem value="all">
+              <SelectItemText>All Standards</SelectItemText>
+            </SelectItem>
+            <SelectItem
+              v-for="standard in standards"
+              :key="standard.fullName"
+              :value="standard.fullName"
+            >
+              <SelectItemText>{{ standard.shortName }}</SelectItemText>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <!-- Search Input -->
       <div class="filter-item filter-search">
         <label class="filter-label">Search</label>
-        <input
+        <Input
           v-model="searchQuery"
           type="text"
-          class="search-input"
           placeholder="Search profiles..."
           @input="$emit('update:search', searchQuery)"
         />
@@ -151,16 +106,19 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-  SelectIcon,
-  SelectPortal,
+  Select,
   SelectContent,
-  SelectViewport,
+  SelectGroup,
   SelectItem,
   SelectItemText,
-} from 'reka-ui'
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 
 interface Profile {
   id: string
@@ -168,6 +126,7 @@ interface Profile {
   technology_name?: string
   vendor_name?: string
   standard_name?: string
+  standard_short_name?: string
 }
 
 const props = defineProps<{
@@ -221,15 +180,20 @@ const vendors = computed(() => {
   return Array.from(unique).sort()
 })
 
-// Extract unique standards from profiles
+// Extract unique standards with both full and short names
 const standards = computed(() => {
-  const unique = new Set<string>()
+  const standardsMap = new Map<string, string>()
   props.profiles.forEach(profile => {
     if (profile.standard_name) {
-      unique.add(profile.standard_name)
+      standardsMap.set(
+        profile.standard_name,
+        profile.standard_short_name || profile.standard_name
+      )
     }
   })
-  return Array.from(unique).sort()
+  return Array.from(standardsMap.entries())
+    .map(([fullName, shortName]) => ({ fullName, shortName }))
+    .sort((a, b) => a.shortName.localeCompare(b.shortName))
 })
 
 watch(selectedTarget, (value) => {
@@ -278,88 +242,6 @@ watch(selectedStandard, (value) => {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--vp-c-text-2);
-}
-
-.select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.select-trigger:hover {
-  border-color: var(--vp-c-brand-1);
-}
-
-.select-trigger:focus {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
-}
-
-.select-icon {
-  display: flex;
-  color: var(--vp-c-text-3);
-}
-
-/* Portal content needs global styles (teleports outside component) */
-:global(.select-content) {
-  background: var(--vp-c-bg-elv);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  box-shadow: var(--vp-shadow-3);
-  overflow: hidden;
-  z-index: 9999;
-  min-width: 200px;
-}
-
-:global(.select-viewport) {
-  padding: 0.5rem;
-  background: var(--vp-c-bg-elv);
-}
-
-:global(.select-item) {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  border-radius: 4px;
-  outline: none;
-  user-select: none;
-  color: var(--vp-c-text-1);
-  background: transparent;
-  transition: all 0.2s;
-}
-
-:global(.select-item:hover) {
-  background: var(--vp-c-bg-soft);
-}
-
-:global(.select-item[data-highlighted]) {
-  background: var(--vp-c-brand-1);
-  color: white;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-}
-
-.search-input:hover {
-  border-color: var(--vp-c-brand-1);
-}
-
-.search-input:focus {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
-  border-color: var(--vp-c-brand-1);
 }
 
 @media (max-width: 768px) {
