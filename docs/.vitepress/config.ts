@@ -25,7 +25,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Framework', link: '/framework/' },
       { text: 'Apps', link: '/apps/' },
-      { text: 'Validate', link: '/validate/' },
+      { text: 'Content', link: '/content/' },
       { text: 'Docs', link: '/docs/' }
     ],
 

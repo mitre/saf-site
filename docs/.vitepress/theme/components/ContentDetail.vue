@@ -2,14 +2,17 @@
   <div class="content-detail">
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-      <a :href="breadcrumbUrl">{{ breadcrumbLabel }}</a>
+      <a href="/content/">Content Library</a>
       <span class="separator">/</span>
       <span class="current">{{ content.name }}</span>
     </nav>
 
     <!-- Header Section -->
     <header class="content-header">
-      <h1 class="content-title">{{ content.name }}</h1>
+      <div class="title-row">
+        <h1 class="content-title">{{ content.name }}</h1>
+        <PillarBadge :pillar="pillar" size="md" />
+      </div>
 
       <span v-if="benchmarkLabel" class="benchmark-version">
         {{ benchmarkLabel }}
@@ -58,15 +61,52 @@
         </p>
       </article>
     </div>
+
+    <!-- Related Content Section -->
+    <section v-if="relatedContent.length > 0" class="related-content">
+      <h2 class="related-title">Related Content</h2>
+      <p class="related-description">
+        Other security content for {{ content.target_name }}
+      </p>
+      <div class="related-grid">
+        <a
+          v-for="related in relatedContent"
+          :key="related.id"
+          :href="`/content/${related.slug}.html`"
+          class="related-card"
+        >
+          <div class="related-card-header">
+            <span class="related-card-name">{{ related.name }}</span>
+            <PillarBadge
+              :pillar="related.content_type === 'validation' ? 'validate' : 'harden'"
+              size="sm"
+            />
+          </div>
+          <p class="related-card-description">{{ related.description }}</p>
+          <span class="related-card-tech">{{ related.technology_name }}</span>
+        </a>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
+import PillarBadge, { type PillarType } from './PillarBadge.vue'
+
+interface RelatedContentItem {
+  id: string
+  slug: string
+  name: string
+  description: string
+  content_type: 'validation' | 'hardening'
+  technology_name: string
+}
 
 const props = defineProps<{
   content: ContentItem
+  relatedContent?: RelatedContentItem[]
 }>()
 
 // Use composable for all logic
@@ -78,14 +118,13 @@ const {
   isValidation
 } = useContentDetail(props.content)
 
-// Breadcrumb configuration based on content type
-const breadcrumbUrl = computed(() => {
-  return isValidation.value ? '/validate/' : '/harden/'
+// Map content_type to pillar
+const pillar = computed<PillarType>(() => {
+  return isValidation.value ? 'validate' : 'harden'
 })
 
-const breadcrumbLabel = computed(() => {
-  return isValidation.value ? 'Validate' : 'Harden'
-})
+// Related content with default empty array
+const relatedContent = computed(() => props.relatedContent || [])
 </script>
 
 <style scoped>
@@ -123,8 +162,15 @@ const breadcrumbLabel = computed(() => {
   margin-bottom: 1.5rem;
 }
 
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .content-title {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
@@ -295,6 +341,88 @@ const breadcrumbLabel = computed(() => {
   }
 
   .content-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Related Content Section */
+.related-content {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.related-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.related-description {
+  margin: 0 0 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--vp-c-text-2);
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.related-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.related-card:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.related-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.related-card-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  line-height: 1.3;
+}
+
+.related-card-description {
+  flex: 1;
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--vp-c-text-2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-card-tech {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--vp-c-text-3);
+}
+
+@media (max-width: 480px) {
+  .related-grid {
     grid-template-columns: 1fr;
   }
 }
