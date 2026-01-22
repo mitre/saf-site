@@ -396,6 +396,7 @@ import { Badge } from '@/components/ui/badge'
 | Button | `ui/button` | Actions, links |
 | Card | `ui/card` | Content containers |
 | Input | `ui/input` | Form text inputs |
+| Select | `ui/select` | Dropdown selects (filters) |
 
 ### Adding New Theme Colors
 
@@ -433,3 +434,47 @@ This means you can use Tailwind hover classes normally (`hover:border-primary`, 
 - Logic in composables, presentation in components
 - Tests colocated with source files
 - Path alias `@/` maps to `docs/.vitepress/theme/`
+
+## Icon Libraries
+
+Two icon libraries for different purposes:
+
+| Library | Purpose | Import |
+|---------|---------|--------|
+| `lucide-vue-next` | UI icons (actions, pillar badges) | `import { Shield } from 'lucide-vue-next'` |
+| `vue3-simple-icons` | Brand logos (Ansible, AWS, etc.) | `import { AnsibleIcon } from 'vue3-simple-icons'` |
+
+```vue
+<script setup>
+import { Shield, Hammer } from 'lucide-vue-next'
+import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
+</script>
+```
+
+## Unified Content Library (Planned Feature)
+
+**Goal:** Replace separate `/validate/` and `/harden/` pages with unified `/content/` browse.
+
+**Design Decisions:**
+- URL: `/content/`
+- Default: Show all content
+- Sort: By name
+- Related content: Cross-link on detail pages
+
+**SAF Pillars (Color-Coded Badges):**
+
+| Pillar | Tailwind | Lucide Icon | Use Case |
+|--------|----------|-------------|----------|
+| Validate | `blue-500` | `Shield` | InSpec profiles |
+| Harden | `green-500` | `Hammer` | Ansible, Chef, Terraform |
+| Plan | `purple-500` | `ClipboardList` | Vulcan, guidance |
+| Normalize | `orange-500` | `RefreshCw` | CLI converters |
+| Visualize | `cyan-500` | `BarChart3` | Heimdall, reports |
+
+**Implementation Tasks:**
+1. Create PillarBadge component
+2. Generalize ProfileCard → ContentCard
+3. Generalize ProfileFilters → ContentFilters (add Pillar filter)
+4. Create `/content/` route (replaces `/validate/`)
+5. Update data loader to fetch all content types
+6. Add related content section to detail pages
