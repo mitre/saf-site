@@ -7,12 +7,16 @@ const props = defineProps<{
   size?: number | string
 }>()
 
+// Local SVG files in /public/icons/
+const localSvgMap: Record<string, string> = {
+  'inspec': '/icons/inspec.svg',
+}
+
 // Map names to Iconify icon names
 // Simple Icons: https://icon-sets.iconify.design/simple-icons/
 // Lucide: https://icon-sets.iconify.design/lucide/
 const iconMap: Record<string, string> = {
   // Technologies
-  'inspec': 'simple-icons:chef', // InSpec is part of Chef ecosystem
   'ansible': 'simple-icons:ansible',
   'chef': 'simple-icons:chef',
   'terraform': 'simple-icons:terraform',
@@ -63,7 +67,20 @@ const iconMap: Record<string, string> = {
   'nist': 'lucide:landmark',
 }
 
+// Check for local SVG first
+const localSvg = computed(() => {
+  const key = props.name.toLowerCase()
+  if (localSvgMap[key]) return localSvgMap[key]
+  for (const [name, path] of Object.entries(localSvgMap)) {
+    if (key.includes(name) || name.includes(key)) {
+      return path
+    }
+  }
+  return null
+})
+
 const iconName = computed(() => {
+  if (localSvg.value) return null // Use local SVG instead
   const key = props.name.toLowerCase()
   // Try exact match first
   if (iconMap[key]) return iconMap[key]
@@ -80,8 +97,16 @@ const iconSize = computed(() => props.size || 24)
 </script>
 
 <template>
+  <img
+    v-if="localSvg"
+    :src="localSvg"
+    :width="iconSize"
+    :height="iconSize"
+    class="brand-icon brand-icon-local"
+    :alt="name"
+  />
   <Icon
-    v-if="iconName"
+    v-else-if="iconName"
     :icon="iconName"
     :width="iconSize"
     :height="iconSize"
