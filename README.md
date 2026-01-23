@@ -431,7 +431,7 @@ Test files are colocated with source:
 
 | Layer | Technology |
 |-------|------------|
-| Static Site | VitePress 1.6 |
+| Static Site | VitePress 2.0 (alpha) |
 | UI Framework | Vue 3.5 |
 | Components | Reka UI (shadcn-vue) |
 | Styling | Tailwind CSS 4 |

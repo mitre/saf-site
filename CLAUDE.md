@@ -35,7 +35,7 @@ bd ready
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
 
 **Tech Stack:**
-- VitePress 1.6.4 (static site generator)
+- VitePress 2.0.0-alpha.15 (static site generator)
 - Vue 3.5 with Composition API
 - Tailwind CSS 4 (utility-first styling)
 - shadcn-vue (component library)
