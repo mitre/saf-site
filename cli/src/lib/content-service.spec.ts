@@ -8,6 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   buildContentFromRepo,
   resolveContentFKs,
+  checkUnresolvedFKs,
   diffContent,
   type RepoData,
   type ContentFKNames,
@@ -355,6 +356,85 @@ describe('resolveContentFKs', () => {
     const result = resolveContentFKs({}, fkMaps)
 
     expect(result).toEqual({})
+  })
+})
+
+// ============================================================================
+// CHECK UNRESOLVED FKS
+// ============================================================================
+
+describe('checkUnresolvedFKs', () => {
+  it('returns empty array when all FKs are resolved', () => {
+    const fkNames: ContentFKNames = {
+      vendor: 'MITRE',
+      standard: 'DISA STIG'
+    }
+    const resolvedFKs = {
+      vendor: 'org-mitre-123',
+      standard: 'std-stig-001'
+    }
+
+    const warnings = checkUnresolvedFKs(fkNames, resolvedFKs)
+
+    expect(warnings).toEqual([])
+  })
+
+  it('returns warnings for unresolved FKs', () => {
+    const fkNames: ContentFKNames = {
+      vendor: 'Unknown Vendor',
+      standard: 'Unknown Standard'
+    }
+    const resolvedFKs = {}
+
+    const warnings = checkUnresolvedFKs(fkNames, resolvedFKs)
+
+    expect(warnings).toHaveLength(2)
+    expect(warnings).toContain('Could not resolve vendor: "Unknown Vendor"')
+    expect(warnings).toContain('Could not resolve standard: "Unknown Standard"')
+  })
+
+  it('returns warnings only for unresolved FKs', () => {
+    const fkNames: ContentFKNames = {
+      vendor: 'MITRE',
+      standard: 'Unknown Standard',
+      technology: 'InSpec'
+    }
+    const resolvedFKs = {
+      vendor: 'org-mitre-123',
+      technology: 'tech-inspec-001'
+      // standard not resolved
+    }
+
+    const warnings = checkUnresolvedFKs(fkNames, resolvedFKs)
+
+    expect(warnings).toHaveLength(1)
+    expect(warnings).toContain('Could not resolve standard: "Unknown Standard"')
+  })
+
+  it('returns empty array for empty FK names', () => {
+    const warnings = checkUnresolvedFKs({}, {})
+
+    expect(warnings).toEqual([])
+  })
+
+  it('checks all FK fields', () => {
+    const fkNames: ContentFKNames = {
+      vendor: 'Missing Vendor',
+      standard: 'Missing Standard',
+      technology: 'Missing Tech',
+      target: 'Missing Target',
+      maintainer: 'Missing Maintainer'
+    }
+    const resolvedFKs = {}
+
+    const warnings = checkUnresolvedFKs(fkNames, resolvedFKs)
+
+    expect(warnings).toHaveLength(5)
+    expect(warnings).toContain('Could not resolve vendor: "Missing Vendor"')
+    expect(warnings).toContain('Could not resolve standard: "Missing Standard"')
+    expect(warnings).toContain('Could not resolve technology: "Missing Tech"')
+    expect(warnings).toContain('Could not resolve target: "Missing Target"')
+    expect(warnings).toContain('Could not resolve maintainer: "Missing Maintainer"')
   })
 })
 

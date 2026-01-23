@@ -11,6 +11,7 @@ import type { RepoInfo, InspecProfile } from '../lib/github.js'
 import {
   buildContentFromRepo,
   resolveContentFKs,
+  checkUnresolvedFKs,
   diffContent,
   type RepoData,
   type ContentFKNames,
@@ -166,21 +167,7 @@ export async function prepareContentAdd(
     const resolvedFKs = resolveContentFKs(input.fkNames, fkMaps)
 
     // Check for unresolved FKs and warn
-    if (input.fkNames.vendor && !resolvedFKs.vendor) {
-      warnings.push(`Could not resolve vendor: "${input.fkNames.vendor}"`)
-    }
-    if (input.fkNames.standard && !resolvedFKs.standard) {
-      warnings.push(`Could not resolve standard: "${input.fkNames.standard}"`)
-    }
-    if (input.fkNames.technology && !resolvedFKs.technology) {
-      warnings.push(`Could not resolve technology: "${input.fkNames.technology}"`)
-    }
-    if (input.fkNames.target && !resolvedFKs.target) {
-      warnings.push(`Could not resolve target: "${input.fkNames.target}"`)
-    }
-    if (input.fkNames.maintainer && !resolvedFKs.maintainer) {
-      warnings.push(`Could not resolve maintainer: "${input.fkNames.maintainer}"`)
-    }
+    warnings.push(...checkUnresolvedFKs(input.fkNames, resolvedFKs))
 
     // Merge resolved FKs
     content = {

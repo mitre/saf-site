@@ -123,37 +123,58 @@ export function buildContentFromRepo(repoData: RepoData): CreateContentInput {
 // ============================================================================
 
 /**
+ * FK field configuration for resolution
+ * Maps fkNames field to the corresponding fkMaps collection
+ */
+const FK_FIELD_CONFIG: Array<{ field: keyof ContentFKNames; mapKey: keyof FkMaps }> = [
+  { field: 'vendor', mapKey: 'organizations' },
+  { field: 'standard', mapKey: 'standards' },
+  { field: 'technology', mapKey: 'technologies' },
+  { field: 'target', mapKey: 'targets' },
+  { field: 'maintainer', mapKey: 'teams' }
+]
+
+/**
+ * Resolve a single FK name to its ID
+ */
+function resolveSingleFK(
+  name: string | undefined,
+  fkMap: Map<string, string>
+): string | undefined {
+  if (!name) return undefined
+  return fkMap.get(name.toLowerCase())
+}
+
+/**
  * Resolve human-readable FK names to Pocketbase IDs
  */
 export function resolveContentFKs(fkNames: ContentFKNames, fkMaps: FkMaps): ResolvedFKs {
   const result: ResolvedFKs = {}
 
-  if (fkNames.vendor) {
-    const id = fkMaps.organizations.get(fkNames.vendor.toLowerCase())
-    if (id) result.vendor = id
-  }
-
-  if (fkNames.standard) {
-    const id = fkMaps.standards.get(fkNames.standard.toLowerCase())
-    if (id) result.standard = id
-  }
-
-  if (fkNames.technology) {
-    const id = fkMaps.technologies.get(fkNames.technology.toLowerCase())
-    if (id) result.technology = id
-  }
-
-  if (fkNames.target) {
-    const id = fkMaps.targets.get(fkNames.target.toLowerCase())
-    if (id) result.target = id
-  }
-
-  if (fkNames.maintainer) {
-    const id = fkMaps.teams.get(fkNames.maintainer.toLowerCase())
-    if (id) result.maintainer = id
+  for (const { field, mapKey } of FK_FIELD_CONFIG) {
+    const id = resolveSingleFK(fkNames[field], fkMaps[mapKey])
+    if (id) result[field] = id
   }
 
   return result
+}
+
+/**
+ * Check for unresolved FKs and return warning messages
+ */
+export function checkUnresolvedFKs(
+  fkNames: ContentFKNames,
+  resolvedFKs: ResolvedFKs
+): string[] {
+  const warnings: string[] = []
+
+  for (const { field } of FK_FIELD_CONFIG) {
+    if (fkNames[field] && !resolvedFKs[field]) {
+      warnings.push(`Could not resolve ${field}: "${fkNames[field]}"`)
+    }
+  }
+
+  return warnings
 }
 
 // ============================================================================
