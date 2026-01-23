@@ -13,6 +13,9 @@ interface PBContent {
   status?: 'active' | 'beta' | 'deprecated' | 'draft'
   github?: string
   documentation_url?: string
+  reference_url?: string
+  readme_url?: string
+  readme_markdown?: string
   control_count?: number
   stig_id?: string
   benchmark_version?: string
@@ -20,7 +23,14 @@ interface PBContent {
   expand?: {
     target?: { id: string; name: string; slug: string; category?: string }
     standard?: { id: string; name: string; short_name?: string; slug: string; standard_type?: string }
-    technology?: { id: string; name: string; slug: string; logo?: string }
+    technology?: {
+      id: string
+      name: string
+      slug: string
+      logo?: string
+      quick_start_template?: string
+      prerequisites_template?: string
+    }
     vendor?: { id: string; name: string; slug: string; org_type?: string }
     maintainer?: { id: string; name: string; slug: string; organization?: string }
   }
@@ -61,6 +71,13 @@ export interface ContentItem {
   // Links
   github_url?: string
   documentation_url?: string
+  reference_url?: string
+  // README content
+  readme_url?: string
+  readme_markdown?: string
+  // Technology templates
+  quick_start_template?: string
+  prerequisites_template?: string
   // Domain-specific
   control_count?: number
   stig_id?: string
@@ -132,6 +149,13 @@ export default defineLoader({
         // Links
         github_url: record.github,
         documentation_url: record.documentation_url,
+        reference_url: record.reference_url,
+        // README content
+        readme_url: record.readme_url,
+        readme_markdown: record.readme_markdown,
+        // Technology templates
+        quick_start_template: record.expand?.technology?.quick_start_template,
+        prerequisites_template: record.expand?.technology?.prerequisites_template,
         // Domain-specific
         control_count: record.control_count,
         stig_id: record.stig_id,

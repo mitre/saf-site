@@ -32,6 +32,13 @@ export interface ContentItem {
   // Links
   github_url: string
   documentation_url?: string
+  reference_url?: string
+  // README content
+  readme_url?: string
+  readme_markdown?: string
+  // Technology templates
+  quick_start_template?: string
+  prerequisites_template?: string
   // Domain-specific (validation)
   control_count?: number
   stig_id?: string
@@ -55,6 +62,16 @@ export interface ContentDetailReturn {
   isValidation: ComputedRef<boolean>
   /** Whether this is a hardening profile */
   isHardening: ComputedRef<boolean>
+  /** Interpolated quick start template */
+  quickStart: ComputedRef<string>
+  /** Interpolated prerequisites template */
+  prerequisites: ComputedRef<string>
+  /** Whether quick start content is available */
+  hasQuickStart: ComputedRef<boolean>
+  /** Whether prerequisites content is available */
+  hasPrerequisites: ComputedRef<boolean>
+  /** Whether README content is available */
+  hasReadme: ComputedRef<boolean>
 }
 
 export interface ActionUrl {
@@ -87,6 +104,20 @@ function formatBenchmarkVersion(version: string, standardName: string): string {
 
   // CIS and others keep semver format
   return `v${version}`
+}
+
+/**
+ * Interpolate template variables with content values
+ * Supported variables: {github}, {slug}, {vendor_slug}, {name}
+ */
+function interpolateTemplate(template: string, content: ContentItem): string {
+  if (!template) return ''
+
+  return template
+    .replace(/\{github\}/g, content.github_url || '')
+    .replace(/\{slug\}/g, content.slug || '')
+    .replace(/\{vendor_slug\}/g, content.vendor_slug || '')
+    .replace(/\{name\}/g, content.name || '')
 }
 
 /**
@@ -143,6 +174,17 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       })
     }
 
+    // Show reference URL (STIG, CIS benchmark, etc.)
+    if (content.reference_url) {
+      urls.push({
+        label: content.standard_short_name
+          ? `${content.standard_short_name} Reference`
+          : 'Standard Reference',
+        url: content.reference_url,
+        primary: false
+      })
+    }
+
     // Future: Add content-type specific URLs for hardening profiles
     // - Ansible Galaxy: https://galaxy.ansible.com/...
     // - Chef Supermarket: https://supermarket.chef.io/...
@@ -182,6 +224,19 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     return cards
   })
 
+  // Template interpolation
+  const quickStart = computed(() => {
+    return interpolateTemplate(content.quick_start_template || '', content)
+  })
+
+  const prerequisites = computed(() => {
+    return content.prerequisites_template || ''
+  })
+
+  const hasQuickStart = computed(() => Boolean(content.quick_start_template))
+  const hasPrerequisites = computed(() => Boolean(content.prerequisites_template))
+  const hasReadme = computed(() => Boolean(content.readme_markdown))
+
   return {
     formattedBenchmarkVersion,
     formattedProfileVersion,
@@ -189,6 +244,11 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     actionUrls,
     featureCards,
     isValidation,
-    isHardening
+    isHardening,
+    quickStart,
+    prerequisites,
+    hasQuickStart,
+    hasPrerequisites,
+    hasReadme
   }
 }

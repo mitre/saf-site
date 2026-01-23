@@ -192,6 +192,32 @@ describe('useContentDetail', () => {
       const { actionUrls } = useContentDetail(content)
       expect(actionUrls.value).toHaveLength(0)
     })
+
+    it('adds reference URL with standard short name when available', () => {
+      const content = createContentItem({
+        github_url: 'https://github.com/test/repo',
+        reference_url: 'https://public.cyber.mil/stigs/',
+        standard_short_name: 'STIG'
+      })
+      const { actionUrls } = useContentDetail(content)
+
+      const refUrl = actionUrls.value.find(u => u.label.includes('Reference'))
+      expect(refUrl).toBeDefined()
+      expect(refUrl?.label).toBe('STIG Reference')
+      expect(refUrl?.url).toBe('https://public.cyber.mil/stigs/')
+    })
+
+    it('uses generic label when no standard short name', () => {
+      const content = createContentItem({
+        github_url: 'https://github.com/test/repo',
+        reference_url: 'https://example.com/standard',
+        standard_short_name: ''
+      })
+      const { actionUrls } = useContentDetail(content)
+
+      const refUrl = actionUrls.value.find(u => u.label.includes('Reference'))
+      expect(refUrl?.label).toBe('Standard Reference')
+    })
   })
 
   describe('featureCards', () => {
@@ -246,6 +272,105 @@ describe('useContentDetail', () => {
 
       expect(featureCards.value).toHaveLength(1)
       expect(featureCards.value[0].title).toBe('Target')
+    })
+  })
+
+  describe('quickStart', () => {
+    it('interpolates {github} variable', () => {
+      const content = createContentItem({
+        github_url: 'https://github.com/mitre/rhel8',
+        quick_start_template: 'git clone {github}'
+      })
+      const { quickStart } = useContentDetail(content)
+      expect(quickStart.value).toBe('git clone https://github.com/mitre/rhel8')
+    })
+
+    it('interpolates {slug} variable', () => {
+      const content = createContentItem({
+        slug: 'rhel8-stig',
+        quick_start_template: 'cd {slug}'
+      })
+      const { quickStart } = useContentDetail(content)
+      expect(quickStart.value).toBe('cd rhel8-stig')
+    })
+
+    it('interpolates {vendor_slug} variable', () => {
+      const content = createContentItem({
+        vendor_slug: 'mitre',
+        quick_start_template: 'ansible-galaxy install {vendor_slug}.role'
+      })
+      const { quickStart } = useContentDetail(content)
+      expect(quickStart.value).toBe('ansible-galaxy install mitre.role')
+    })
+
+    it('interpolates multiple variables', () => {
+      const content = createContentItem({
+        github_url: 'https://github.com/mitre/test',
+        slug: 'test-profile',
+        quick_start_template: 'git clone {github}\ncd {slug}'
+      })
+      const { quickStart } = useContentDetail(content)
+      expect(quickStart.value).toBe('git clone https://github.com/mitre/test\ncd test-profile')
+    })
+
+    it('returns empty string when no template', () => {
+      const content = createContentItem({ quick_start_template: '' })
+      const { quickStart } = useContentDetail(content)
+      expect(quickStart.value).toBe('')
+    })
+  })
+
+  describe('prerequisites', () => {
+    it('returns prerequisites template as-is', () => {
+      const content = createContentItem({
+        prerequisites_template: '- InSpec 5.x\n- SSH access'
+      })
+      const { prerequisites } = useContentDetail(content)
+      expect(prerequisites.value).toBe('- InSpec 5.x\n- SSH access')
+    })
+
+    it('returns empty string when no template', () => {
+      const content = createContentItem({ prerequisites_template: '' })
+      const { prerequisites } = useContentDetail(content)
+      expect(prerequisites.value).toBe('')
+    })
+  })
+
+  describe('content availability flags', () => {
+    it('hasQuickStart is true when template exists', () => {
+      const content = createContentItem({
+        quick_start_template: 'some content'
+      })
+      const { hasQuickStart } = useContentDetail(content)
+      expect(hasQuickStart.value).toBe(true)
+    })
+
+    it('hasQuickStart is false when template is empty', () => {
+      const content = createContentItem({ quick_start_template: '' })
+      const { hasQuickStart } = useContentDetail(content)
+      expect(hasQuickStart.value).toBe(false)
+    })
+
+    it('hasPrerequisites is true when template exists', () => {
+      const content = createContentItem({
+        prerequisites_template: '- Requirement 1'
+      })
+      const { hasPrerequisites } = useContentDetail(content)
+      expect(hasPrerequisites.value).toBe(true)
+    })
+
+    it('hasReadme is true when readme_markdown exists', () => {
+      const content = createContentItem({
+        readme_markdown: '# README content'
+      })
+      const { hasReadme } = useContentDetail(content)
+      expect(hasReadme.value).toBe(true)
+    })
+
+    it('hasReadme is false when readme_markdown is empty', () => {
+      const content = createContentItem({ readme_markdown: '' })
+      const { hasReadme } = useContentDetail(content)
+      expect(hasReadme.value).toBe(false)
     })
   })
 })

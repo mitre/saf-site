@@ -104,6 +104,24 @@
       </article>
     </div>
 
+    <!-- Quick Start Section -->
+    <section v-if="hasQuickStart" class="content-section">
+      <h2 class="section-title">Quick Start</h2>
+      <div class="markdown-content" v-html="quickStartHighlighted"></div>
+    </section>
+
+    <!-- Prerequisites Section -->
+    <section v-if="hasPrerequisites" class="content-section">
+      <h2 class="section-title">Prerequisites</h2>
+      <div class="markdown-content" v-html="prerequisitesHighlighted"></div>
+    </section>
+
+    <!-- Documentation Section (README) -->
+    <section v-if="hasReadme" class="content-section readme-section">
+      <h2 class="section-title">Documentation</h2>
+      <div class="markdown-content readme-content" v-html="readmeHighlighted"></div>
+    </section>
+
     <!-- Related Content Section -->
     <section v-if="relatedContent.length > 0" class="related-content">
       <h2 class="related-title">Related Content</h2>
@@ -136,10 +154,55 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { Marked } from 'marked'
+import { createHighlighter } from 'shiki'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import BrandIcon from './icons/BrandIcon.vue'
+
+// Store for highlighted HTML (populated async)
+const quickStartHighlighted = ref('')
+const prerequisitesHighlighted = ref('')
+const readmeHighlighted = ref('')
+
+// Create markdown renderer with shiki syntax highlighting
+async function createMarkedWithShiki() {
+  const highlighter = await createHighlighter({
+    themes: ['github-dark', 'github-light'],
+    langs: ['bash', 'shell', 'yaml', 'ruby', 'json', 'javascript', 'typescript', 'python', 'text']
+  })
+
+  const markedInstance = new Marked()
+
+  markedInstance.use({
+    renderer: {
+      code(token) {
+        const lang = token.lang || 'text'
+        const code = token.text
+        try {
+          // Use lang if supported, fallback to text
+          const supportedLang = highlighter.getLoadedLanguages().includes(lang) ? lang : 'text'
+          return highlighter.codeToHtml(code, {
+            lang: supportedLang,
+            theme: 'github-dark'
+          })
+        } catch {
+          return `<pre><code class="language-${lang}">${code}</code></pre>`
+        }
+      }
+    }
+  })
+
+  return markedInstance
+}
+
+// Render markdown with syntax highlighting
+async function renderMarkdownWithShiki(markdown: string): Promise<string> {
+  if (!markdown) return ''
+  const markedInstance = await createMarkedWithShiki()
+  return markedInstance.parse(markdown, { gfm: true, breaks: true }) as string
+}
 
 interface RelatedContentItem {
   id: string
@@ -161,8 +224,26 @@ const {
   benchmarkLabel,
   actionUrls,
   featureCards,
-  isValidation
+  isValidation,
+  quickStart,
+  prerequisites,
+  hasQuickStart,
+  hasPrerequisites,
+  hasReadme
 } = useContentDetail(props.content)
+
+// Render markdown with syntax highlighting on mount
+onMounted(async () => {
+  if (hasQuickStart.value) {
+    quickStartHighlighted.value = await renderMarkdownWithShiki(quickStart.value)
+  }
+  if (hasPrerequisites.value) {
+    prerequisitesHighlighted.value = await renderMarkdownWithShiki(prerequisites.value)
+  }
+  if (hasReadme.value) {
+    readmeHighlighted.value = await renderMarkdownWithShiki(props.content.readme_markdown || '')
+  }
+})
 
 // Map content_type to pillar
 const pillar = computed<PillarType>(() => {
@@ -322,8 +403,7 @@ const relatedContent = computed(() => props.relatedContent || [])
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--vp-c-divider);
+  margin-top: 2rem;
 }
 
 .feature-card {
@@ -393,6 +473,126 @@ const relatedContent = computed(() => props.relatedContent || [])
   .content-features {
     grid-template-columns: 1fr;
   }
+}
+
+/* Content Sections (Quick Start, Prerequisites, Documentation) */
+.content-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.section-title {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+/* Markdown content styling */
+.markdown-content {
+  color: var(--vp-c-text-1);
+  line-height: 1.7;
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3),
+.markdown-content :deep(h4) {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.markdown-content :deep(h1) { font-size: 1.75rem; }
+.markdown-content :deep(h2) { font-size: 1.4rem; }
+.markdown-content :deep(h3) { font-size: 1.2rem; }
+.markdown-content :deep(h4) { font-size: 1.1rem; }
+
+.markdown-content :deep(p) {
+  margin: 0.75rem 0;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content :deep(li) {
+  margin: 0.25rem 0;
+}
+
+.markdown-content :deep(pre) {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.markdown-content :deep(code) {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.875rem;
+}
+
+.markdown-content :deep(p code),
+.markdown-content :deep(li code) {
+  padding: 0.15rem 0.4rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.markdown-content :deep(a) {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.markdown-content :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.markdown-content :deep(blockquote) {
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 3px solid var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+}
+
+.markdown-content :deep(table) {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--vp-c-divider);
+  text-align: left;
+}
+
+.markdown-content :deep(th) {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+}
+
+.markdown-content :deep(hr) {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/* README section specific styling */
+.readme-section {
+  margin-top: 3rem;
+}
+
+.readme-content :deep(h1:first-child) {
+  display: none; /* Hide duplicate title from README */
 }
 
 /* Related Content Section */
