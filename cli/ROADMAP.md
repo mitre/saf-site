@@ -61,10 +61,10 @@ The database folder is the single source of truth for all schemas and types.
 - [x] `listContent()` - filtered list with expansion and sorting
 
 ### 2.3 Content Service
-- [ ] Write tests for `content-service.spec.ts`
-- [ ] `buildContentFromRepo()` - GitHub repo → content record
-- [ ] `resolveContentFKs()` - name → ID resolution
-- [ ] `diffContent()` - compare existing vs new
+- [x] Write tests for `content-service.spec.ts` - 26 tests
+- [x] `buildContentFromRepo()` - GitHub repo + inspec.yml + README → CreateContentInput
+- [x] `resolveContentFKs()` - human-readable names → Pocketbase IDs
+- [x] `diffContent()` - compare existing record vs updated input
 
 ---
 
@@ -121,11 +121,11 @@ Separate pure business logic from I/O.
 | 1 | `validation.spec.ts` | 35 | ✅ Passing |
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
 | 2 | `pocketbase.spec.ts` | 38+5 skipped | ✅ Passing |
-| 2 | `content-service.spec.ts` | TBD | Not started |
+| 2 | `content-service.spec.ts` | 26 | ✅ Passing |
 | 3 | `content.logic.spec.ts` | TBD | Not started |
 | 4 | `cli.spec.ts` | TBD | Not started |
 
-**Current Total:** 191 passing, 5 skipped
+**Current Total:** 217 passing, 5 skipped
 
 ---
 
@@ -158,6 +158,12 @@ Separate pure business logic from I/O.
   - Implemented `createContent()` with Zod validation + snake_case conversion
   - Implemented `updateContent()` with partial update + validation
   - All 191 tests passing
+- [x] Phase 2.3: Content Service (TDD)
+  - Wrote 26 failing tests for content service
+  - Implemented `buildContentFromRepo()` - builds CreateContentInput from GitHub data
+  - Implemented `resolveContentFKs()` - resolves human names to Pocketbase IDs
+  - Implemented `diffContent()` - compares existing vs updated content
+  - All 217 tests passing
 
 ---
 
