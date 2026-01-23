@@ -55,10 +55,10 @@ The database folder is the single source of truth for all schemas and types.
 - [x] `getPocketBase()` - authenticated client
 - [x] `checkConnection()` - connectivity check
 - [x] `loadFkMaps()` - FK lookup maps
-- [ ] `createContent()` - create with FK resolution
-- [ ] `updateContent()` - update with validation
-- [ ] `getContentBySlug()` - lookup by slug
-- [ ] `listContent()` - filtered list with expansion
+- [x] `createContent()` - create with validation + snake_case conversion
+- [x] `updateContent()` - update with validation + snake_case conversion
+- [x] `getContentBySlug()` - lookup by slug with optional FK expansion
+- [x] `listContent()` - filtered list with expansion and sorting
 
 ### 2.3 Content Service
 - [ ] Write tests for `content-service.spec.ts`
@@ -120,12 +120,12 @@ Separate pure business logic from I/O.
 | 1 | `conventions.spec.ts` | 32 | ✅ Passing |
 | 1 | `validation.spec.ts` | 35 | ✅ Passing |
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
-| 2 | `pocketbase.spec.ts` | 17+5 skipped | ✅ Passing |
+| 2 | `pocketbase.spec.ts` | 38+5 skipped | ✅ Passing |
 | 2 | `content-service.spec.ts` | TBD | Not started |
 | 3 | `content.logic.spec.ts` | TBD | Not started |
 | 4 | `cli.spec.ts` | TBD | Not started |
 
-**Current Total:** 170 passing, 5 skipped
+**Current Total:** 191 passing, 5 skipped
 
 ---
 
@@ -149,6 +149,15 @@ Separate pure business logic from I/O.
   - Added auditEntity() with slug suggestion generation
   - Refactored validation.ts to use schemas.ts as source of truth
   - All 170 tests passing
+
+### Session 048 (2026-01-23)
+- [x] Phase 2.2: Pocketbase CRUD operations (TDD)
+  - Wrote 21 failing tests for CRUD operations
+  - Implemented `getContentBySlug()` with optional FK expansion
+  - Implemented `listContent()` with filtering, sorting, expansion
+  - Implemented `createContent()` with Zod validation + snake_case conversion
+  - Implemented `updateContent()` with partial update + validation
+  - All 191 tests passing
 
 ---
 

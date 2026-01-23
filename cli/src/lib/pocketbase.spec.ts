@@ -203,3 +203,451 @@ describe('checkConnection (integration)', () => {
     // Integration test
   })
 })
+
+// ============================================================================
+// CRUD OPERATIONS (Phase 2.2)
+// ============================================================================
+
+import {
+  createContent,
+  updateContent,
+  getContentBySlug,
+  listContent,
+  type CreateContentInput,
+  type UpdateContentInput,
+  type ListContentOptions
+} from './pocketbase.js'
+
+describe('getContentBySlug', () => {
+  it('returns content record when slug exists', async () => {
+    // Mock implementation will return a record
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFirstListItem: vi.fn().mockResolvedValue({
+          id: 'content-123',
+          slug: 'rhel-9-stig',
+          name: 'RHEL 9 STIG',
+          content_type: 'validation'
+        })
+      })
+    }
+
+    const result = await getContentBySlug('rhel-9-stig', mockPb as any)
+    expect(result).not.toBeNull()
+    expect(result?.slug).toBe('rhel-9-stig')
+    expect(result?.name).toBe('RHEL 9 STIG')
+  })
+
+  it('returns null when slug does not exist', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFirstListItem: vi.fn().mockRejectedValue(new Error('Not found'))
+      })
+    }
+
+    const result = await getContentBySlug('nonexistent-slug', mockPb as any)
+    expect(result).toBeNull()
+  })
+
+  it('expands FK relations when requested', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFirstListItem: vi.fn().mockResolvedValue({
+          id: 'content-123',
+          slug: 'rhel-9-stig',
+          name: 'RHEL 9 STIG',
+          content_type: 'validation',
+          expand: {
+            target: { id: 'tgt-1', name: 'RHEL 9' },
+            standard: { id: 'std-1', name: 'DISA STIG' }
+          }
+        })
+      })
+    }
+
+    const result = await getContentBySlug('rhel-9-stig', mockPb as any, {
+      expand: ['target', 'standard']
+    })
+
+    expect(result?.expand?.target?.name).toBe('RHEL 9')
+    expect(result?.expand?.standard?.name).toBe('DISA STIG')
+  })
+})
+
+describe('listContent', () => {
+  it('returns all content when no filters provided', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: vi.fn().mockResolvedValue([
+          { id: '1', slug: 'rhel-9-stig', content_type: 'validation' },
+          { id: '2', slug: 'ansible-rhel-9', content_type: 'hardening' }
+        ])
+      })
+    }
+
+    const result = await listContent({}, mockPb as any)
+    expect(result).toHaveLength(2)
+  })
+
+  it('filters by content_type', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([
+      { id: '1', slug: 'rhel-9-stig', content_type: 'validation' }
+    ])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({ contentType: 'validation' }, mockPb as any)
+
+    expect(mockGetFullList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: expect.stringContaining('content_type = "validation"')
+      })
+    )
+  })
+
+  it('filters by status', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({ status: 'active' }, mockPb as any)
+
+    expect(mockGetFullList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: expect.stringContaining('status = "active"')
+      })
+    )
+  })
+
+  it('combines multiple filters with AND', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({ contentType: 'validation', status: 'active' }, mockPb as any)
+
+    const callArgs = mockGetFullList.mock.calls[0][0]
+    expect(callArgs.filter).toContain('content_type = "validation"')
+    expect(callArgs.filter).toContain('status = "active"')
+    expect(callArgs.filter).toContain('&&')
+  })
+
+  it('expands FK relations when requested', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({ expand: ['target', 'standard', 'vendor'] }, mockPb as any)
+
+    expect(mockGetFullList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expand: 'target,standard,vendor'
+      })
+    )
+  })
+
+  it('sorts by specified field', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({ sort: '-created' }, mockPb as any)
+
+    expect(mockGetFullList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: '-created'
+      })
+    )
+  })
+
+  it('defaults to sorting by name', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList
+      })
+    }
+
+    await listContent({}, mockPb as any)
+
+    expect(mockGetFullList).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: 'name'
+      })
+    )
+  })
+})
+
+describe('createContent', () => {
+  it('creates content with required fields', async () => {
+    const mockCreate = vi.fn().mockResolvedValue({
+      id: 'new-content-123',
+      slug: 'rhel-9-stig',
+      name: 'RHEL 9 STIG',
+      content_type: 'validation'
+    })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        create: mockCreate
+      })
+    }
+
+    const input: CreateContentInput = {
+      name: 'RHEL 9 STIG',
+      slug: 'rhel-9-stig',
+      contentType: 'validation'
+    }
+
+    const result = await createContent(input, mockPb as any)
+
+    expect(result.id).toBe('new-content-123')
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'RHEL 9 STIG',
+        slug: 'rhel-9-stig',
+        content_type: 'validation'
+      })
+    )
+  })
+
+  it('creates content with all optional fields', async () => {
+    const mockCreate = vi.fn().mockResolvedValue({
+      id: 'new-content-123',
+      slug: 'rhel-9-stig',
+      name: 'RHEL 9 STIG',
+      content_type: 'validation'
+    })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        create: mockCreate
+      })
+    }
+
+    const input: CreateContentInput = {
+      name: 'RHEL 9 STIG',
+      slug: 'rhel-9-stig',
+      contentType: 'validation',
+      description: 'InSpec profile for RHEL 9',
+      version: '1.0.0',
+      status: 'active',
+      github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
+      controlCount: 452,
+      target: 'tgt-rhel9-id',
+      standard: 'std-stig-id',
+      technology: 'tech-inspec-id',
+      vendor: 'org-mitre-id',
+      maintainer: 'team-saf-id'
+    }
+
+    await createContent(input, mockPb as any)
+
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'RHEL 9 STIG',
+        slug: 'rhel-9-stig',
+        content_type: 'validation',
+        description: 'InSpec profile for RHEL 9',
+        version: '1.0.0',
+        status: 'active',
+        github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
+        control_count: 452,
+        target: 'tgt-rhel9-id',
+        standard: 'std-stig-id',
+        technology: 'tech-inspec-id',
+        vendor: 'org-mitre-id',
+        maintainer: 'team-saf-id'
+      })
+    )
+  })
+
+  it('validates input before creating', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        create: vi.fn()
+      })
+    }
+
+    const invalidInput = {
+      name: '',  // Empty name - invalid
+      slug: 'valid-slug',
+      contentType: 'validation'
+    } as CreateContentInput
+
+    await expect(createContent(invalidInput, mockPb as any))
+      .rejects.toThrow()
+  })
+
+  it('rejects invalid slug format', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        create: vi.fn()
+      })
+    }
+
+    const invalidInput: CreateContentInput = {
+      name: 'Valid Name',
+      slug: 'INVALID--SLUG',  // Uppercase and consecutive hyphens
+      contentType: 'validation'
+    }
+
+    await expect(createContent(invalidInput, mockPb as any))
+      .rejects.toThrow()
+  })
+
+  it('rejects invalid contentType', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        create: vi.fn()
+      })
+    }
+
+    const invalidInput = {
+      name: 'Valid Name',
+      slug: 'valid-slug',
+      contentType: 'invalid-type'
+    } as CreateContentInput
+
+    await expect(createContent(invalidInput, mockPb as any))
+      .rejects.toThrow()
+  })
+})
+
+describe('updateContent', () => {
+  it('updates content by ID', async () => {
+    const mockUpdate = vi.fn().mockResolvedValue({
+      id: 'content-123',
+      slug: 'rhel-9-stig',
+      name: 'RHEL 9 STIG Updated',
+      content_type: 'validation'
+    })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: mockUpdate
+      })
+    }
+
+    const update: UpdateContentInput = {
+      name: 'RHEL 9 STIG Updated'
+    }
+
+    const result = await updateContent('content-123', update, mockPb as any)
+
+    expect(result.name).toBe('RHEL 9 STIG Updated')
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'content-123',
+      expect.objectContaining({
+        name: 'RHEL 9 STIG Updated'
+      })
+    )
+  })
+
+  it('updates multiple fields at once', async () => {
+    const mockUpdate = vi.fn().mockResolvedValue({
+      id: 'content-123',
+      name: 'Updated Name',
+      version: '2.0.0',
+      control_count: 500
+    })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: mockUpdate
+      })
+    }
+
+    const update: UpdateContentInput = {
+      name: 'Updated Name',
+      version: '2.0.0',
+      controlCount: 500
+    }
+
+    await updateContent('content-123', update, mockPb as any)
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'content-123',
+      expect.objectContaining({
+        name: 'Updated Name',
+        version: '2.0.0',
+        control_count: 500
+      })
+    )
+  })
+
+  it('validates slug format on update', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: vi.fn()
+      })
+    }
+
+    const update: UpdateContentInput = {
+      slug: 'INVALID--SLUG'
+    }
+
+    await expect(updateContent('content-123', update, mockPb as any))
+      .rejects.toThrow()
+  })
+
+  it('validates version format on update', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: vi.fn()
+      })
+    }
+
+    const update: UpdateContentInput = {
+      version: 'not-semver'
+    }
+
+    await expect(updateContent('content-123', update, mockPb as any))
+      .rejects.toThrow()
+  })
+
+  it('allows partial updates', async () => {
+    const mockUpdate = vi.fn().mockResolvedValue({
+      id: 'content-123',
+      control_count: 500
+    })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: mockUpdate
+      })
+    }
+
+    const update: UpdateContentInput = {
+      controlCount: 500
+    }
+
+    await updateContent('content-123', update, mockPb as any)
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'content-123',
+      { control_count: 500 }
+    )
+  })
+
+  it('throws error for non-existent ID', async () => {
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        update: vi.fn().mockRejectedValue(new Error('Record not found'))
+      })
+    }
+
+    await expect(updateContent('nonexistent-id', { name: 'Test' }, mockPb as any))
+      .rejects.toThrow('Record not found')
+  })
+})
