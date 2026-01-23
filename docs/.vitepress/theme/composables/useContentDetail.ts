@@ -26,9 +26,11 @@ export interface ContentItem {
   // Vendor
   vendor_name: string
   vendor_slug: string
+  vendor_logo?: string
   // Maintainer
   maintainer_name: string
   maintainer_slug: string
+  maintainer_logo?: string
   // Links
   github_url: string
   documentation_url?: string

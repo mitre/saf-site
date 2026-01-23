@@ -10,6 +10,12 @@ const props = defineProps<{
 // Local SVG files in /public/icons/
 const localSvgMap: Record<string, string> = {
   'inspec': '/icons/inspec.svg',
+  'mitre': '/icons/mitre.svg',
+  'the mitre corporation': '/icons/mitre.svg',
+  'mitre saf team': '/icons/saf-logo.svg',
+  'mitre saf': '/icons/saf-logo.svg',
+  'saf': '/icons/saf-logo.svg',
+  'heimdall': '/icons/heimdall.svg',
 }
 
 // Map names to Iconify icon names
@@ -51,10 +57,7 @@ const iconMap: Record<string, string> = {
   'microsoft': 'simple-icons:microsoft',
   'windows': 'simple-icons:windows',
 
-  // MITRE & Teams
-  'mitre': 'lucide:shield-check',
-  'the mitre corporation': 'lucide:shield-check',
-  'mitre saf team': 'lucide:users',
+  // Organizations (MITRE handled by localSvgMap)
   'disa': 'lucide:shield',
   'cis': 'lucide:shield',
 

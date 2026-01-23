@@ -7,102 +7,18 @@
       <span class="current">{{ content.name }}</span>
     </nav>
 
-    <!-- Header Section -->
-    <header class="content-header">
-      <div class="title-row">
-        <h1 class="content-title">{{ content.name }}</h1>
-        <PillarBadge :pillar="pillar" size="md" />
-      </div>
-
-      <span v-if="benchmarkLabel" class="benchmark-version">
-        {{ benchmarkLabel }}
-      </span>
-
-      <p class="content-description">{{ content.description }}</p>
-
-      <!-- Metadata Tags -->
-      <div class="content-tags">
-        <span v-if="content.status" :class="['tag', `tag-${content.status}`]">
-          {{ content.status }}
-        </span>
-        <span v-if="formattedProfileVersion" class="tag tag-version">
-          Profile {{ formattedProfileVersion }}
-        </span>
-        <span v-if="content.control_count" class="tag tag-controls">
-          {{ content.control_count }} controls
-        </span>
-      </div>
-    </header>
-
-    <!-- Action Buttons -->
-    <div class="content-actions" v-if="actionUrls.length">
-      <a
-        v-for="action in actionUrls"
-        :key="action.url"
-        :href="action.url"
-        target="_blank"
-        :class="['action-btn', action.primary ? 'brand' : 'alt']"
-      >
-        {{ action.label }}
-      </a>
-    </div>
-
-    <!-- Feature Cards -->
-    <div class="content-features">
-      <!-- Target -->
-      <article v-if="content.target_name" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon :name="content.target_name" :size="28" />
-        </div>
-        <h3 class="feature-title">Target</h3>
-        <p class="feature-detail">{{ content.target_name }}</p>
-      </article>
-
-      <!-- Standard -->
-      <article v-if="content.standard_name" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon :name="content.standard_name" :size="28" />
-        </div>
-        <h3 class="feature-title">Standard</h3>
-        <p class="feature-detail">{{ content.standard_name }}</p>
-      </article>
-
-      <!-- Technology -->
-      <article v-if="content.technology_name" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon :name="content.technology_name" :size="28" />
-        </div>
-        <h3 class="feature-title">Technology</h3>
-        <p class="feature-detail">{{ content.technology_name }}</p>
-      </article>
-
-      <!-- Vendor -->
-      <article v-if="content.vendor_name" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon :name="content.vendor_name" :size="28" />
-        </div>
-        <h3 class="feature-title">Vendor</h3>
-        <p class="feature-detail">{{ content.vendor_name }}</p>
-      </article>
-
-      <!-- Maintainer -->
-      <article v-if="content.maintainer_name" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon :name="content.maintainer_name" :size="28" />
-        </div>
-        <h3 class="feature-title">Maintainer</h3>
-        <p class="feature-detail">{{ content.maintainer_name }}</p>
-      </article>
-
-      <!-- STIG ID (validation-specific) -->
-      <article v-if="isValidation && content.stig_id" class="feature-card">
-        <div class="feature-icon">
-          <BrandIcon name="stig" :size="28" />
-        </div>
-        <h3 class="feature-title">STIG ID</h3>
-        <p class="feature-detail mono">{{ content.stig_id }}</p>
-      </article>
-    </div>
+    <!-- Hero Section (reusable component) -->
+    <ContentHero
+      :title="content.name"
+      :description="content.description"
+      :pillar="pillar"
+      :benchmark-label="benchmarkLabel"
+      :status="content.status"
+      :version="formattedProfileVersion"
+      :control-count="content.control_count"
+      :actions="heroActions"
+      :metadata="metadataItems"
+    />
 
     <!-- Quick Start Section -->
     <section v-if="hasQuickStart" class="content-section">
@@ -158,8 +74,11 @@ import { ref, computed, onMounted } from 'vue'
 import { Marked } from 'marked'
 import { createHighlighter } from 'shiki'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
+import ContentHero from './ContentHero.vue'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import BrandIcon from './icons/BrandIcon.vue'
+import type { ActionItem } from './ActionButtons.vue'
+import type { MetadataItem } from './MetadataStrip.vue'
 
 // Store for highlighted HTML (populated async)
 const quickStartHighlighted = ref('')
@@ -223,7 +142,6 @@ const {
   formattedProfileVersion,
   benchmarkLabel,
   actionUrls,
-  featureCards,
   isValidation,
   quickStart,
   prerequisites,
@@ -250,6 +168,62 @@ const pillar = computed<PillarType>(() => {
   return isValidation.value ? 'validate' : 'harden'
 })
 
+// Transform actionUrls for ActionButtons component
+const heroActions = computed<ActionItem[]>(() => {
+  return actionUrls.value.map(action => ({
+    label: action.label,
+    url: action.url,
+    primary: action.primary
+  }))
+})
+
+// Build metadata items for MetadataStrip
+// Icons are resolved by BrandIcon using the value - no logo URLs needed
+const metadataItems = computed<MetadataItem[]>(() => {
+  const items: MetadataItem[] = []
+
+  if (props.content.target_name) {
+    items.push({
+      label: 'Target',
+      value: props.content.target_name,
+      href: `/content/?target=${props.content.target_slug}`
+    })
+  }
+
+  if (props.content.standard_short_name || props.content.standard_name) {
+    items.push({
+      label: 'Standard',
+      value: props.content.standard_short_name || props.content.standard_name,
+      href: `/content/?standard=${props.content.standard_slug}`
+    })
+  }
+
+  if (props.content.technology_name) {
+    items.push({
+      label: 'Tech',
+      value: props.content.technology_name,
+      href: `/content/?technology=${props.content.technology_slug}`
+    })
+  }
+
+  if (props.content.vendor_name) {
+    items.push({
+      label: 'Vendor',
+      value: props.content.vendor_name,
+      href: `/content/?vendor=${props.content.vendor_slug}`
+    })
+  }
+
+  if (props.content.maintainer_name) {
+    items.push({
+      label: 'Maintainer',
+      value: props.content.maintainer_name
+    })
+  }
+
+  return items
+})
+
 // Related content with default empty array
 const relatedContent = computed(() => props.relatedContent || [])
 </script>
@@ -261,7 +235,7 @@ const relatedContent = computed(() => props.relatedContent || [])
 
 /* Breadcrumb */
 .breadcrumb {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   font-size: 0.875rem;
   color: var(--vp-c-text-2);
 }
@@ -282,197 +256,6 @@ const relatedContent = computed(() => props.relatedContent || [])
 
 .breadcrumb .current {
   color: var(--vp-c-text-1);
-}
-
-/* Header */
-.content-header {
-  margin-bottom: 1.5rem;
-}
-
-.title-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.content-title {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--vp-c-text-1);
-}
-
-.benchmark-version {
-  display: inline-block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-  padding: 0.25rem 0.75rem;
-  border-radius: 6px;
-  margin-bottom: 0.75rem;
-}
-
-.tag-version {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
-  font-family: var(--vp-font-family-mono);
-}
-
-.content-description {
-  margin: 0 0 1rem;
-  font-size: 1.125rem;
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
-}
-
-/* Tags */
-.content-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag {
-  padding: 0.25rem 0.75rem;
-  border-radius: 100px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.tag-active { background: #10b981; color: white; }
-.tag-beta { background: #f59e0b; color: white; }
-.tag-deprecated { background: #ef4444; color: white; }
-.tag-draft { background: #6b7280; color: white; }
-
-.tag-controls {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
-}
-
-/* Action Buttons */
-.content-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 2.5rem;
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 20px;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: 20px;
-  transition: all 0.25s;
-}
-
-.action-btn.brand {
-  background: var(--vp-c-brand-1);
-  color: white;
-  border: 1px solid var(--vp-c-brand-1);
-}
-
-.action-btn.brand:hover {
-  background: var(--vp-c-brand-2);
-  border-color: var(--vp-c-brand-2);
-}
-
-.action-btn.alt {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-1);
-  border: 1px solid var(--vp-c-divider);
-}
-
-.action-btn.alt:hover {
-  border-color: var(--vp-c-text-2);
-}
-
-/* Feature Cards */
-.content-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.feature-card {
-  padding: 1.5rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 12px;
-  border: 1px solid var(--vp-c-bg-soft);
-  transition: border-color 0.25s;
-}
-
-.feature-card:hover {
-  border-color: var(--vp-c-divider);
-}
-
-.feature-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: var(--vp-c-bg-elv);
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  color: var(--vp-c-text-1);
-}
-
-.feature-icon.emoji {
-  font-size: 24px;
-}
-
-.feature-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--vp-c-text-1);
-}
-
-.feature-detail {
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--vp-c-text-2);
-  line-height: 1.5;
-}
-
-.feature-detail.mono {
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.875rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .content-features {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .content-title {
-    font-size: 1.75rem;
-  }
-
-  .content-actions {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .content-features {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Content Sections (Quick Start, Prerequisites, Documentation) */

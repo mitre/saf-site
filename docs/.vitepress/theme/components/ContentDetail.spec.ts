@@ -36,7 +36,8 @@ describe('ContentDetail', () => {
       const content = createContentItem({ name: 'RHEL8 STIG' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.content-title').text()).toBe('RHEL8 STIG')
+      // Title is now in ContentHero child component
+      expect(wrapper.find('.hero-title').text()).toBe('RHEL8 STIG')
     })
 
     it('renders the description', () => {
@@ -45,7 +46,8 @@ describe('ContentDetail', () => {
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.content-description').text()).toBe(
+      // Description is now in ContentHero child component
+      expect(wrapper.find('.hero-description').text()).toBe(
         'InSpec validation profile for RHEL 8'
       )
     })
@@ -69,7 +71,8 @@ describe('ContentDetail', () => {
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.benchmark-version').text()).toBe('STIG V2R2')
+      // Benchmark is now in ContentHero child component
+      expect(wrapper.find('.hero-benchmark').text()).toBe('STIG V2R2')
     })
 
     it('displays CIS version in semver format', () => {
@@ -80,14 +83,14 @@ describe('ContentDetail', () => {
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.benchmark-version').text()).toBe('CIS v2.0.0')
+      expect(wrapper.find('.hero-benchmark').text()).toBe('CIS v2.0.0')
     })
 
     it('hides benchmark version when not provided', () => {
       const content = createContentItem({ benchmark_version: '' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.benchmark-version').exists()).toBe(false)
+      expect(wrapper.find('.hero-benchmark').exists()).toBe(false)
     })
   })
 
@@ -142,7 +145,8 @@ describe('ContentDetail', () => {
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      const primaryBtn = wrapper.find('.action-btn.brand')
+      // Action buttons now use ActionButtons component with .action-btn.primary
+      const primaryBtn = wrapper.find('.action-btn.primary')
       expect(primaryBtn.text()).toBe('View on GitHub')
       expect(primaryBtn.attributes('href')).toBe('https://github.com/mitre/rhel8-stig')
     })
@@ -153,8 +157,9 @@ describe('ContentDetail', () => {
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      const altBtns = wrapper.findAll('.action-btn.alt')
-      const readmeBtn = altBtns.find(btn => btn.text() === 'View README')
+      // Non-primary buttons don't have the .primary class
+      const allBtns = wrapper.findAll('.action-btn')
+      const readmeBtn = allBtns.find(btn => btn.text() === 'View README')
       expect(readmeBtn?.attributes('href')).toBe('https://github.com/mitre/rhel8-stig#readme')
     })
 
@@ -162,53 +167,51 @@ describe('ContentDetail', () => {
       const content = createContentItem({ github_url: '' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      expect(wrapper.find('.content-actions').exists()).toBe(false)
+      // ActionButtons component won't render anything
+      expect(wrapper.find('.action-buttons').exists()).toBe(false)
     })
   })
 
-  describe('feature cards', () => {
-    it('renders feature cards for available metadata', () => {
+  describe('metadata strip', () => {
+    it('renders metadata pills for available metadata', () => {
       const content = createContentItem({
         target_name: 'RHEL 8',
         standard_name: 'DISA STIG',
+        standard_short_name: 'STIG',
         technology_name: 'InSpec'
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      const cards = wrapper.findAll('.feature-card')
-      expect(cards.length).toBeGreaterThanOrEqual(3)
+      // Now uses MetadataStrip with .metadata-pill
+      const pills = wrapper.findAll('.metadata-pill')
+      expect(pills.length).toBeGreaterThanOrEqual(3)
 
-      const titles = cards.map(c => c.find('.feature-title').text())
-      expect(titles).toContain('Target')
-      expect(titles).toContain('Standard')
-      expect(titles).toContain('Technology')
+      const pillTexts = pills.map(p => p.text())
+      expect(pillTexts.some(t => t.includes('Target'))).toBe(true)
+      expect(pillTexts.some(t => t.includes('Standard'))).toBe(true)
+      expect(pillTexts.some(t => t.includes('Tech'))).toBe(true)
     })
 
-    it('shows STIG ID card for validation profiles', () => {
+    it('includes vendor metadata when provided', () => {
       const content = createContentItem({
-        content_type: 'validation',
-        stig_id: 'RHEL-08-010010'
+        vendor_name: 'MITRE'
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      const stigCard = wrapper.findAll('.feature-card').find(
-        c => c.find('.feature-title').text() === 'STIG ID'
-      )
-      expect(stigCard).toBeDefined()
-      expect(stigCard?.find('.feature-detail').text()).toBe('RHEL-08-010010')
+      const pills = wrapper.findAll('.metadata-pill')
+      const pillTexts = pills.map(p => p.text())
+      expect(pillTexts.some(t => t.includes('Vendor') && t.includes('MITRE'))).toBe(true)
     })
 
-    it('applies mono styling to STIG ID', () => {
+    it('includes maintainer metadata when provided', () => {
       const content = createContentItem({
-        content_type: 'validation',
-        stig_id: 'RHEL-08-010010'
+        maintainer_name: 'SAF Team'
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
-      const stigCard = wrapper.findAll('.feature-card').find(
-        c => c.find('.feature-title').text() === 'STIG ID'
-      )
-      expect(stigCard?.find('.feature-detail').classes()).toContain('mono')
+      const pills = wrapper.findAll('.metadata-pill')
+      const pillTexts = pills.map(p => p.text())
+      expect(pillTexts.some(t => t.includes('Maintainer') && t.includes('SAF Team'))).toBe(true)
     })
   })
 
