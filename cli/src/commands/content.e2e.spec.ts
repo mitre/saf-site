@@ -336,11 +336,12 @@ describe('Content CLI E2E - Live', () => {
 // ============================================================================
 
 describe('Content CLI E2E - Live Database Operations', () => {
-  // Use unique slug for test isolation
+  // Shared test state - set up once in beforeAll
   const testSlug = `test-cli-e2e-${Date.now()}`
-  let createdId: string | null = null
+  let testRecordId: string
 
-  it('creates a content record (non-dry-run)', async () => {
+  // Create test record once before all tests in this suite
+  beforeAll(async () => {
     const { stdout, exitCode } = await runCli([
       'content', 'add',
       'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
@@ -352,87 +353,101 @@ describe('Content CLI E2E - Live Database Operations', () => {
       '--yes', '--json'
     ])
 
-    expect(exitCode).toBe(0)
-    const parsed = JSON.parse(stdout)
-    expect(parsed.success).toBe(true)
-    expect(parsed.content).toBeDefined()
-    expect(parsed.content.slug).toBe(testSlug)
+    if (exitCode !== 0) {
+      throw new Error(`Failed to create test record: ${stdout}`)
+    }
 
-    // Store ID for subsequent tests
-    createdId = parsed.id || parsed.content?.id
+    const parsed = JSON.parse(stdout)
+    testRecordId = parsed.id || parsed.content?.id
+
+    if (!testRecordId) {
+      throw new Error('Failed to get test record ID from create response')
+    }
   }, 30000) // Extended timeout for GitHub fetch
 
-  it('verifies created record exists via list', async () => {
-    const { stdout, exitCode } = await runCli([
-      'content', 'list', '--json'
-    ])
+  // Note: No cleanup needed - test DB is restored fresh from diffable/ on each test run
 
-    expect(exitCode).toBe(0)
-    const records = JSON.parse(stdout)
-    const found = records.find((r: any) => r.slug === testSlug)
-    expect(found).toBeDefined()
-    expect(found.name).toBe('CLI E2E Test Profile')
+  describe('content add', () => {
+    it('creates record with correct slug', async () => {
+      // Verify via list (independent check)
+      const { stdout, exitCode } = await runCli([
+        'content', 'list', '--json'
+      ])
 
-    // Capture ID if not already set
-    if (!createdId && found) {
-      createdId = found.id
-    }
+      expect(exitCode).toBe(0)
+      const records = JSON.parse(stdout)
+      const found = records.find((r: any) => r.slug === testSlug)
+      expect(found).toBeDefined()
+      expect(found.name).toBe('CLI E2E Test Profile')
+    })
   })
 
-  it('shows the created record details', async () => {
-    if (!createdId) {
-      console.log('Skipping: no record ID from previous test')
-      return
-    }
+  describe('content show', () => {
+    it('displays record details correctly', async () => {
+      const { stdout, exitCode } = await runCli([
+        'content', 'show', testRecordId, '--json'
+      ])
 
-    const { stdout, exitCode } = await runCli([
-      'content', 'show', createdId, '--json'
-    ])
-
-    expect(exitCode).toBe(0)
-    const record = JSON.parse(stdout)
-    expect(record.id).toBe(createdId)
-    expect(record.slug).toBe(testSlug)
-    expect(record.content_type).toBe('validation')
+      expect(exitCode).toBe(0)
+      const record = JSON.parse(stdout)
+      expect(record.id).toBe(testRecordId)
+      expect(record.slug).toBe(testSlug)
+      expect(record.content_type).toBe('validation')
+    })
   })
 
-  it('updates the created record', async () => {
-    if (!createdId) {
-      console.log('Skipping: no record ID from previous test')
-      return
-    }
+  describe('content update', () => {
+    it('updates version field successfully', async () => {
+      const { stdout, exitCode } = await runCli([
+        'content', 'update', testRecordId,
+        '--set-version', '99.0.0-test',
+        '--yes', '--json'
+      ])
 
-    const { stdout, exitCode } = await runCli([
-      'content', 'update', createdId,
-      '--set-version', '99.0.0-test',
-      '--yes', '--json'
-    ])
+      expect(exitCode).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.success).toBe(true)
+      expect(parsed.hasChanges).toBe(true)
+    })
 
-    expect(exitCode).toBe(0)
-    const parsed = JSON.parse(stdout)
-    expect(parsed.success).toBe(true)
-    expect(parsed.hasChanges).toBe(true)
+    it('persists version change to database', async () => {
+      // First ensure version is set (in case tests run in different order)
+      await runCli([
+        'content', 'update', testRecordId,
+        '--set-version', '99.0.0-verify',
+        '--yes', '--json'
+      ])
+
+      // Verify via show
+      const { stdout, exitCode } = await runCli([
+        'content', 'show', testRecordId, '--json'
+      ])
+
+      expect(exitCode).toBe(0)
+      const record = JSON.parse(stdout)
+      expect(record.version).toBe('99.0.0-verify')
+    })
+
+    it('reports no changes when version unchanged', async () => {
+      // Set a known version
+      await runCli([
+        'content', 'update', testRecordId,
+        '--set-version', '1.0.0',
+        '--yes', '--json'
+      ])
+
+      // Try to set same version again
+      const { stdout, exitCode } = await runCli([
+        'content', 'update', testRecordId,
+        '--set-version', '1.0.0',
+        '--yes', '--json'
+      ])
+
+      expect(exitCode).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.hasChanges).toBe(false)
+    })
   })
-
-  it('verifies update was applied', async () => {
-    if (!createdId) {
-      console.log('Skipping: no record ID from previous test')
-      return
-    }
-
-    const { stdout, exitCode } = await runCli([
-      'content', 'show', createdId, '--json'
-    ])
-
-    expect(exitCode).toBe(0)
-    const record = JSON.parse(stdout)
-    expect(record.version).toBe('99.0.0-test')
-  })
-
-  // Note: We don't delete the test record because:
-  // 1. Test DB is restored fresh from diffable/ on each test run
-  // 2. No delete command exists yet
-  // 3. The record serves as evidence the tests ran
 })
 
 // ============================================================================
