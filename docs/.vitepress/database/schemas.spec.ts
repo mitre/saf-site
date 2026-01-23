@@ -22,6 +22,12 @@ import {
   teamInputSchema,
   tagInputSchema,
   contentInputSchema,
+  // Pocketbase record schemas (Phase 1.2)
+  pbRecordSchema,
+  pbOrganizationSchema,
+  pbTargetSchema,
+  pbContentSchema,
+  pbContentWithExpand,
   // Type exports
   type Organization,
   type Target,
@@ -32,6 +38,9 @@ import {
   type ContentRecord,
   type OrganizationInput,
   type TargetInput,
+  type PocketbaseRecord,
+  type PBContent,
+  type PBContentExpanded,
 } from './schemas.js'
 
 // ============================================================================
@@ -545,5 +554,273 @@ describe('Type inference', () => {
     // @ts-expect-error - id should not be allowed on input type
     input.id = 'should-error'
     expect(input.name).toBe('Test')
+  })
+})
+
+// ============================================================================
+// PHASE 1.2: POCKETBASE COMPATIBILITY
+// ============================================================================
+
+describe('Pocketbase Record Schema', () => {
+  it('validates Pocketbase metadata fields', () => {
+    const pbRecord = {
+      id: 'abc123',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_abc',
+      collectionName: 'organizations'
+    }
+    const result = pbRecordSchema.safeParse(pbRecord)
+    expect(result.success).toBe(true)
+  })
+
+  it('validates with optional expand field', () => {
+    const pbRecord = {
+      id: 'abc123',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_abc',
+      collectionName: 'organizations',
+      expand: {}
+    }
+    const result = pbRecordSchema.safeParse(pbRecord)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('pbOrganizationSchema', () => {
+  it('validates Pocketbase organization response', () => {
+    const pbOrg = {
+      id: 'org_mitre',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_orgs',
+      collectionName: 'organizations',
+      name: 'MITRE',
+      slug: 'mitre',
+      description: 'Not-for-profit',
+      website: 'https://mitre.org',
+      org_type: 'government'
+    }
+    const result = pbOrganizationSchema.safeParse(pbOrg)
+    expect(result.success).toBe(true)
+  })
+
+  it('handles Pocketbase snake_case field names', () => {
+    const pbOrg = {
+      id: 'org_test',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_orgs',
+      collectionName: 'organizations',
+      name: 'Test',
+      slug: 'test',
+      org_type: 'vendor'  // snake_case from Pocketbase
+    }
+    const result = pbOrganizationSchema.safeParse(pbOrg)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('pbTargetSchema', () => {
+  it('validates Pocketbase target with FK references', () => {
+    const pbTarget = {
+      id: 'target_rhel9',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_targets',
+      collectionName: 'targets',
+      name: 'Red Hat Enterprise Linux 9',
+      slug: 'rhel-9',
+      category: 'cat_os',  // FK as string ID
+      vendor: 'org_redhat'  // FK as string ID
+    }
+    const result = pbTargetSchema.safeParse(pbTarget)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('pbContentSchema', () => {
+  it('validates Pocketbase content response', () => {
+    const pbContent = {
+      id: 'content_rhel9_stig',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_content',
+      collectionName: 'content',
+      name: 'Red Hat Enterprise Linux 9 STIG',
+      slug: 'rhel-9-stig',
+      content_type: 'validation',
+      status: 'active',
+      target: 'target_rhel9',
+      standard: 'std_stig',
+      technology: 'tech_inspec',
+      vendor: 'org_mitre',
+      maintainer: 'team_saf',
+      github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
+      control_count: 452,
+      license: 'Apache-2.0'
+    }
+    const result = pbContentSchema.safeParse(pbContent)
+    expect(result.success).toBe(true)
+  })
+
+  it('handles all snake_case field names from Pocketbase', () => {
+    const pbContent = {
+      id: 'content_test',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_content',
+      collectionName: 'content',
+      name: 'Test Content',
+      slug: 'test-content',
+      content_type: 'hardening',
+      long_description: 'Long description here',
+      documentation_url: 'https://docs.example.com',
+      reference_url: 'https://ref.example.com',
+      readme_url: 'https://raw.github.com/readme.md',
+      readme_markdown: '# README',
+      control_count: 100,
+      stig_id: 'RHEL-09-010001',
+      benchmark_version: 'V1R1',
+      automation_level: 'full',
+      is_featured: true,
+      featured_order: 1,
+      release_date: '2024-01-01',
+      deprecated_at: null
+    }
+    const result = pbContentSchema.safeParse(pbContent)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('pbContentWithExpand', () => {
+  it('validates content with expanded FK relations', () => {
+    const pbContentExpanded = {
+      id: 'content_rhel9_stig',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_content',
+      collectionName: 'content',
+      name: 'Red Hat Enterprise Linux 9 STIG',
+      slug: 'rhel-9-stig',
+      content_type: 'validation',
+      target: 'target_rhel9',
+      standard: 'std_stig',
+      vendor: 'org_mitre',
+      expand: {
+        target: {
+          id: 'target_rhel9',
+          created: '2024-01-15 10:30:00.000Z',
+          updated: '2024-01-15 10:30:00.000Z',
+          collectionId: 'col_targets',
+          collectionName: 'targets',
+          name: 'Red Hat Enterprise Linux 9',
+          slug: 'rhel-9'
+        },
+        standard: {
+          id: 'std_stig',
+          created: '2024-01-15 10:30:00.000Z',
+          updated: '2024-01-15 10:30:00.000Z',
+          collectionId: 'col_standards',
+          collectionName: 'standards',
+          name: 'Security Technical Implementation Guide',
+          short_name: 'STIG',
+          slug: 'stig'
+        },
+        vendor: {
+          id: 'org_mitre',
+          created: '2024-01-15 10:30:00.000Z',
+          updated: '2024-01-15 10:30:00.000Z',
+          collectionId: 'col_orgs',
+          collectionName: 'organizations',
+          name: 'MITRE',
+          slug: 'mitre'
+        }
+      }
+    }
+    const result = pbContentWithExpand.safeParse(pbContentExpanded)
+    expect(result.success).toBe(true)
+  })
+
+  it('handles partial expand (not all FKs expanded)', () => {
+    const pbContentPartial = {
+      id: 'content_test',
+      created: '2024-01-15 10:30:00.000Z',
+      updated: '2024-01-15 10:30:00.000Z',
+      collectionId: 'col_content',
+      collectionName: 'content',
+      name: 'Test',
+      slug: 'test',
+      content_type: 'validation',
+      target: 'target_test',
+      expand: {
+        target: {
+          id: 'target_test',
+          created: '2024-01-15 10:30:00.000Z',
+          updated: '2024-01-15 10:30:00.000Z',
+          collectionId: 'col_targets',
+          collectionName: 'targets',
+          name: 'Test Target',
+          slug: 'test-target'
+        }
+        // standard and vendor not expanded
+      }
+    }
+    const result = pbContentWithExpand.safeParse(pbContentPartial)
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('Pocketbase type compatibility', () => {
+  it('PocketbaseRecord type has metadata fields', () => {
+    const record: PocketbaseRecord = {
+      id: 'test',
+      created: '2024-01-15',
+      updated: '2024-01-15',
+      collectionId: 'col',
+      collectionName: 'test'
+    }
+    expect(record.collectionName).toBe('test')
+  })
+
+  it('PBContent type combines content + metadata', () => {
+    const content: PBContent = {
+      id: 'content_test',
+      created: '2024-01-15',
+      updated: '2024-01-15',
+      collectionId: 'col',
+      collectionName: 'content',
+      name: 'Test',
+      slug: 'test',
+      content_type: 'validation'
+    }
+    expect(content.content_type).toBe('validation')
+    expect(content.collectionName).toBe('content')
+  })
+
+  it('PBContentExpanded includes expand object', () => {
+    const content: PBContentExpanded = {
+      id: 'content_test',
+      created: '2024-01-15',
+      updated: '2024-01-15',
+      collectionId: 'col',
+      collectionName: 'content',
+      name: 'Test',
+      slug: 'test',
+      content_type: 'validation',
+      expand: {
+        target: {
+          id: 'target_test',
+          created: '2024-01-15',
+          updated: '2024-01-15',
+          collectionId: 'col',
+          collectionName: 'targets',
+          name: 'Test Target',
+          slug: 'test'
+        }
+      }
+    }
+    expect(content.expand?.target?.name).toBe('Test Target')
   })
 })

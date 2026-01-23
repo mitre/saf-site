@@ -22,7 +22,11 @@ The database folder is the single source of truth for all schemas and types.
 ### 1.2 TypeScript Types
 - [x] Export inferred types: `type Target = z.infer<typeof targetSchema>`
 - [x] Export input types for create/update operations
-- [ ] Verify types work with Pocketbase responses
+- [x] Verify types work with Pocketbase responses
+  - Added `pbRecordSchema` for Pocketbase metadata (created, updated, collectionId, collectionName)
+  - Added `pb*Schema` for each entity with snake_case fields
+  - Added `pbContentWithExpand` for expanded FK relations
+  - 12 new tests for Pocketbase compatibility
 
 ### 1.3 Validation Functions
 - [x] `validateSlug()` - slug format validation
@@ -109,7 +113,7 @@ Separate pure business logic from I/O.
 
 | Phase | Test File | Tests | Status |
 |-------|-----------|-------|--------|
-| 1 | `schemas.spec.ts` | 37 | ✅ Passing |
+| 1 | `schemas.spec.ts` | 49 | ✅ Passing |
 | 1 | `conventions.spec.ts` | 32 | ✅ Passing |
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
 | 2 | `pocketbase.spec.ts` | 17+5 skipped | ✅ Passing |
@@ -117,7 +121,7 @@ Separate pure business logic from I/O.
 | 3 | `content.logic.spec.ts` | TBD | Not started |
 | 4 | `cli.spec.ts` | TBD | Not started |
 
-**Current Total:** 123 passing, 5 skipped
+**Current Total:** 135 passing, 5 skipped
 
 ---
 
@@ -130,7 +134,11 @@ Separate pure business logic from I/O.
   - Wrote 37 failing tests for schemas.spec.ts
   - Implemented Zod schemas for all entities
   - All 123 tests passing
-- [ ] Phase 1.2: Verify types with Pocketbase (in progress)
+- [x] Phase 1.2: Pocketbase type compatibility (TDD)
+  - Wrote 12 failing tests for Pocketbase schemas
+  - Implemented pb*Schema for all entities with snake_case
+  - Added pbContentWithExpand for FK expansion
+  - All 135 tests passing
 
 ---
 

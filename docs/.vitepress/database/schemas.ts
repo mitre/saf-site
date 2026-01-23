@@ -228,3 +228,161 @@ export type TagInput = z.infer<typeof tagInputSchema>
 
 export type ContentRecord = z.infer<typeof contentSchema>
 export type ContentInput = z.infer<typeof contentInputSchema>
+
+// ============================================================================
+// POCKETBASE RECORD SCHEMAS (Phase 1.2)
+// ============================================================================
+
+/**
+ * Base Pocketbase record metadata
+ * All Pocketbase records include these fields
+ */
+export const pbRecordSchema = z.object({
+  id: z.string(),
+  created: z.string(),  // ISO timestamp string from Pocketbase
+  updated: z.string(),  // ISO timestamp string from Pocketbase
+  collectionId: z.string(),
+  collectionName: z.string(),
+  expand: z.record(z.unknown()).optional()
+})
+
+/**
+ * Pocketbase organization record (snake_case fields)
+ */
+export const pbOrganizationSchema = pbRecordSchema.extend({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  website: z.string().nullable().optional(),
+  logo: z.string().nullable().optional(),
+  org_type: z.string().nullable().optional()  // snake_case from Pocketbase
+})
+
+/**
+ * Pocketbase target record (snake_case fields)
+ */
+export const pbTargetSchema = pbRecordSchema.extend({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  category: z.string().nullable().optional(),  // FK as string ID
+  vendor: z.string().nullable().optional(),    // FK as string ID
+  website: z.string().nullable().optional(),
+  logo: z.string().nullable().optional()
+})
+
+/**
+ * Pocketbase standard record (snake_case fields)
+ */
+export const pbStandardSchema = pbRecordSchema.extend({
+  name: z.string(),
+  short_name: z.string().nullable().optional(),  // snake_case
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  website: z.string().nullable().optional(),
+  logo: z.string().nullable().optional(),
+  organization: z.string().nullable().optional(),  // FK as string ID
+  standard_type: z.string().nullable().optional()  // snake_case
+})
+
+/**
+ * Pocketbase technology record (snake_case fields)
+ */
+export const pbTechnologySchema = pbRecordSchema.extend({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  website: z.string().nullable().optional(),
+  logo: z.string().nullable().optional(),
+  github: z.string().nullable().optional(),
+  organization: z.string().nullable().optional(),
+  documentation_url: z.string().nullable().optional(),  // snake_case
+  quick_start_template: z.string().nullable().optional(),
+  prerequisites_template: z.string().nullable().optional()
+})
+
+/**
+ * Pocketbase team record (snake_case fields)
+ */
+export const pbTeamSchema = pbRecordSchema.extend({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  organization: z.string().nullable().optional(),
+  website: z.string().nullable().optional(),
+  logo: z.string().nullable().optional()
+})
+
+/**
+ * Pocketbase content record (snake_case fields)
+ * This is the main content schema for validation profiles and hardening content
+ */
+export const pbContentSchema = pbRecordSchema.extend({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable().optional(),
+  long_description: z.string().nullable().optional(),  // snake_case
+  version: z.string().nullable().optional(),
+
+  // Classification
+  content_type: z.string(),  // snake_case: 'validation' | 'hardening'
+  status: z.string().nullable().optional(),
+
+  // Foreign Keys (as string IDs)
+  target: z.string().nullable().optional(),
+  standard: z.string().nullable().optional(),
+  technology: z.string().nullable().optional(),
+  vendor: z.string().nullable().optional(),
+  maintainer: z.string().nullable().optional(),
+
+  // Links
+  github: z.string().nullable().optional(),
+  documentation_url: z.string().nullable().optional(),  // snake_case
+  reference_url: z.string().nullable().optional(),
+  readme_url: z.string().nullable().optional(),
+  readme_markdown: z.string().nullable().optional(),
+
+  // Domain-specific (validation profiles)
+  control_count: z.number().nullable().optional(),  // snake_case
+  stig_id: z.string().nullable().optional(),
+  benchmark_version: z.string().nullable().optional(),
+
+  // Domain-specific (hardening)
+  automation_level: z.string().nullable().optional(),  // snake_case
+
+  // Featured/Curation
+  is_featured: z.boolean().nullable().optional(),  // snake_case
+  featured_order: z.number().nullable().optional(),
+
+  // Metadata
+  license: z.string().nullable().optional(),
+  release_date: z.string().nullable().optional(),  // ISO date string
+  deprecated_at: z.string().nullable().optional()
+})
+
+/**
+ * Content with expanded FK relations
+ * Used when fetching content with ?expand=target,standard,vendor,etc.
+ */
+export const pbContentWithExpand = pbContentSchema.extend({
+  expand: z.object({
+    target: pbTargetSchema.optional(),
+    standard: pbStandardSchema.optional(),
+    technology: pbTechnologySchema.optional(),
+    vendor: pbOrganizationSchema.optional(),
+    maintainer: pbTeamSchema.optional()
+  }).optional()
+})
+
+// ============================================================================
+// POCKETBASE TYPE EXPORTS
+// ============================================================================
+
+export type PocketbaseRecord = z.infer<typeof pbRecordSchema>
+export type PBOrganization = z.infer<typeof pbOrganizationSchema>
+export type PBTarget = z.infer<typeof pbTargetSchema>
+export type PBStandard = z.infer<typeof pbStandardSchema>
+export type PBTechnology = z.infer<typeof pbTechnologySchema>
+export type PBTeam = z.infer<typeof pbTeamSchema>
+export type PBContent = z.infer<typeof pbContentSchema>
+export type PBContentExpanded = z.infer<typeof pbContentWithExpand>
