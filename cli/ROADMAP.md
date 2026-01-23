@@ -75,9 +75,9 @@ The database folder is the single source of truth for all schemas and types.
 Separate pure business logic from I/O.
 
 ### 3.1 Content Command Logic
-- [ ] Write tests for `content.logic.spec.ts`
-- [ ] `prepareContentAdd()` - validate inputs, build record
-- [ ] `prepareContentUpdate()` - diff and validate changes
+- [x] Write tests for `content.logic.spec.ts` - 25 tests
+- [x] `prepareContentAdd()` - orchestrate GitHub fetch, FK resolution, validation
+- [x] `prepareContentUpdate()` - validate, diff, return only changed fields
 
 ### 3.2 Database Command Logic
 - [x] `db status` - connection check
@@ -122,10 +122,10 @@ Separate pure business logic from I/O.
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
 | 2 | `pocketbase.spec.ts` | 38+5 skipped | ✅ Passing |
 | 2 | `content-service.spec.ts` | 26 | ✅ Passing |
-| 3 | `content.logic.spec.ts` | TBD | Not started |
+| 3 | `content.logic.spec.ts` | 25 | ✅ Passing |
 | 4 | `cli.spec.ts` | TBD | Not started |
 
-**Current Total:** 217 passing, 5 skipped
+**Current Total:** 242 passing, 5 skipped
 
 ---
 
@@ -164,6 +164,11 @@ Separate pure business logic from I/O.
   - Implemented `resolveContentFKs()` - resolves human names to Pocketbase IDs
   - Implemented `diffContent()` - compares existing vs updated content
   - All 217 tests passing
+- [x] Phase 3.1: Content Command Logic (TDD)
+  - Wrote 25 failing tests for command logic
+  - Implemented `prepareContentAdd()` - orchestrates full add flow with dependency injection
+  - Implemented `prepareContentUpdate()` - validates and returns only changed fields
+  - All 242 tests passing
 
 ---
 
