@@ -2,10 +2,10 @@
  * Content Command E2E Tests
  *
  * Tests that spawn the actual CLI binary and verify stdout/stderr/exit codes.
- * These tests require Pocketbase to be running for full functionality.
+ * Uses the test Pocketbase instance (port 8091) managed by global setup.
  *
  * Tests are marked with:
- * - @live: Requires Pocketbase running (skipped by default in CI)
+ * - @live: Requires Pocketbase running (uses test instance on 8091)
  * - @offline: Tests that can run without Pocketbase (validation, parsing errors)
  */
 
@@ -21,24 +21,22 @@ const __dirname = dirname(__filename)
 const CLI_PATH = join(__dirname, '../../dist/index.js')
 const CLI_DEV_PATH = join(__dirname, '../index.ts')
 
-// Check if we're running in CI or if Pocketbase is available
-const isPocketbaseAvailable = async (): Promise<boolean> => {
-  try {
-    const response = await fetch('http://localhost:8090/api/health')
-    return response.ok
-  } catch {
-    return false
-  }
-}
+// Test Pocketbase configuration (managed by global setup)
+const TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
+const TEST_PB_EMAIL = process.env.PB_EMAIL || 'admin@localhost.com'
+const TEST_PB_PASSWORD = process.env.PB_PASSWORD || 'testpassword123'
 
-// Helper to run CLI command
+// Helper to run CLI command with test Pocketbase env vars
 async function runCli(args: string[], options: { expectError?: boolean } = {}) {
   try {
     const result = await execa('npx', ['tsx', CLI_DEV_PATH, ...args], {
       cwd: join(__dirname, '../..'),
       env: {
         ...process.env,
-        FORCE_COLOR: '0' // Disable colors for easier assertion
+        FORCE_COLOR: '0', // Disable colors for easier assertion
+        PB_URL: TEST_PB_URL,
+        PB_EMAIL: TEST_PB_EMAIL,
+        PB_PASSWORD: TEST_PB_PASSWORD
       }
     })
     return {
@@ -221,21 +219,15 @@ describe('Content CLI E2E - Offline', () => {
 })
 
 // ============================================================================
-// LIVE E2E TESTS (Require Pocketbase)
+// LIVE E2E TESTS (Require Pocketbase - provided by global setup)
 // ============================================================================
 
 describe('Content CLI E2E - Live', () => {
-  let pocketbaseAvailable = false
-
-  beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-    if (!pocketbaseAvailable) {
-      console.log('Pocketbase not available, skipping live E2E tests')
-    }
-  })
+  // Pocketbase is always available via global setup (port 8091)
+  // If global setup fails, all tests will fail anyway
 
   describe('content list', () => {
-    it.skipIf(!pocketbaseAvailable)('lists content with --json', async () => {
+    it('lists content with --json', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'list', '--json', '--limit', '5'
       ])
@@ -245,7 +237,7 @@ describe('Content CLI E2E - Live', () => {
       expect(Array.isArray(parsed)).toBe(true)
     })
 
-    it.skipIf(!pocketbaseAvailable)('lists content with --quiet (IDs only)', async () => {
+    it('lists content with --quiet (IDs only)', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'list', '--quiet', '--limit', '5'
       ])
@@ -259,7 +251,7 @@ describe('Content CLI E2E - Live', () => {
       }
     })
 
-    it.skipIf(!pocketbaseAvailable)('filters by content type', async () => {
+    it('filters by content type', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'list', '--type', 'validation', '--json', '--limit', '5'
       ])
@@ -271,7 +263,7 @@ describe('Content CLI E2E - Live', () => {
       }
     })
 
-    it.skipIf(!pocketbaseAvailable)('filters by status', async () => {
+    it('filters by status', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'list', '--status', 'active', '--json', '--limit', '5'
       ])
@@ -285,7 +277,7 @@ describe('Content CLI E2E - Live', () => {
   })
 
   describe('content add --dry-run', () => {
-    it.skipIf(!pocketbaseAvailable)('validates and prepares content without creating', async () => {
+    it('validates and prepares content without creating', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'add',
         'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
@@ -305,7 +297,7 @@ describe('Content CLI E2E - Live', () => {
       }
     })
 
-    it.skipIf(!pocketbaseAvailable)('shows warnings for unresolved FKs in dry-run', async () => {
+    it('shows warnings for unresolved FKs in dry-run', async () => {
       const { stdout, exitCode } = await runCli([
         'content', 'add',
         'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
@@ -322,7 +314,7 @@ describe('Content CLI E2E - Live', () => {
   })
 
   describe('content show', () => {
-    it.skipIf(!pocketbaseAvailable)('shows content details with --json', async () => {
+    it('shows content details with --json', async () => {
       // First get a content ID
       const listResult = await runCli(['content', 'list', '--quiet', '--limit', '1'])
 

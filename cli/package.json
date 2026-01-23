@@ -34,12 +34,14 @@
   },
   "devDependencies": {
     "@types/node": "^25.0.9",
+    "@types/wait-on": "^5.3.4",
     "@vitest/coverage-v8": "^4.0.17",
     "execa": "^9.6.1",
     "interactive-cli-tester": "^0.3.0",
     "tsup": "^8.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.17",
+    "wait-on": "^9.0.3"
   }
 }

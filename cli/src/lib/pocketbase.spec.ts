@@ -174,33 +174,54 @@ describe('FkMaps structure', () => {
   })
 })
 
-// Note: getPocketBase and loadFkMaps require integration testing
-// with a running Pocketbase instance and are tested in e2e tests
+// Integration tests using test Pocketbase instance (port 8091)
+// Global setup starts Pocketbase and sets PB_URL environment variable
+import { getPocketBase, loadFkMaps, checkConnection } from './pocketbase.js'
+
 describe('getPocketBase (integration)', () => {
-  it.skip('connects to Pocketbase with valid credentials', async () => {
-    // This test requires a running Pocketbase instance
-    // Run manually with: pnpm --filter @saf-site/cli test -- --run pocketbase.spec.ts
+  it('connects to Pocketbase with valid credentials', async () => {
+    const pb = await getPocketBase()
+    expect(pb).toBeDefined()
+    expect(pb.authStore.isValid).toBe(true)
   })
 
-  it.skip('throws error when Pocketbase is not running', async () => {
-    // This test verifies error handling when PB is unavailable
+  it('returns cached instance on subsequent calls', async () => {
+    const pb1 = await getPocketBase()
+    const pb2 = await getPocketBase()
+    // Should return the same cached instance
+    expect(pb1).toBe(pb2)
   })
 })
 
 describe('loadFkMaps (integration)', () => {
-  it.skip('loads all FK maps from database', async () => {
-    // This test requires a running Pocketbase instance
-    // Verifies that all collections are fetched and mapped correctly
+  it('loads all FK maps from database', async () => {
+    const maps = await loadFkMaps()
+
+    // Verify all maps are populated
+    expect(maps.organizations.size).toBeGreaterThan(0)
+    expect(maps.teams.size).toBeGreaterThan(0)
+    expect(maps.standards.size).toBeGreaterThan(0)
+    expect(maps.technologies.size).toBeGreaterThan(0)
+    expect(maps.targets.size).toBeGreaterThan(0)
+    expect(maps.categories.size).toBeGreaterThan(0)
+    expect(maps.capabilities.size).toBeGreaterThan(0)
+    expect(maps.tags.size).toBeGreaterThan(0)
+  })
+
+  it('maps are lowercase keyed', async () => {
+    const maps = await loadFkMaps()
+
+    // Check that all keys are lowercase (required for resolveFK)
+    for (const [key] of maps.organizations) {
+      expect(key).toBe(key.toLowerCase())
+    }
   })
 })
 
 describe('checkConnection (integration)', () => {
-  it.skip('returns true when Pocketbase is running', async () => {
-    // Integration test
-  })
-
-  it.skip('returns false when Pocketbase is not running', async () => {
-    // Integration test
+  it('returns true when Pocketbase is running', async () => {
+    const isAvailable = await checkConnection()
+    expect(isAvailable).toBe(true)
   })
 })
 

@@ -15,6 +15,13 @@ export default defineConfig({
       'src/**/*.spec.ts',
       '../docs/.vitepress/database/**/*.spec.ts'
     ],
+    // Global setup/teardown for test Pocketbase instance
+    // Based on official Pocketbase testing pattern:
+    // https://github.com/pocketbase/pocketbase/discussions/603
+    globalSetup: ['./test/global-setup.ts'],
+    // Run tests with single worker to avoid port conflicts
+    // but keep isolation to prevent state pollution
+    maxWorkers: 1,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

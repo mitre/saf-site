@@ -13,9 +13,7 @@
  * Note: These tests are slower (~1-5s each) but provide high confidence
  * that the TUI works correctly end-to-end.
  *
- * Requirements:
- * - Pocketbase must be running for full flow tests
- * - Tests marked @offline can run without Pocketbase
+ * Uses the test Pocketbase instance (port 8091) managed by global setup.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest'
@@ -32,26 +30,24 @@ const CLI_ENTRY = join(__dirname, '../index.ts')
 // Timeout for TUI tests (they're slower due to real process spawning)
 const TUI_TIMEOUT = 15000
 
-// Check if Pocketbase is available
-const isPocketbaseAvailable = async (): Promise<boolean> => {
-  try {
-    const response = await fetch('http://localhost:8090/api/health')
-    return response.ok
-  } catch {
-    return false
-  }
-}
+// Test Pocketbase configuration (managed by global setup)
+const TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
+const TEST_PB_EMAIL = process.env.PB_EMAIL || 'admin@localhost.com'
+const TEST_PB_PASSWORD = process.env.PB_PASSWORD || 'testpassword123'
 
 // Ctrl+C character (not in ANSI constants)
 const CTRL_C = '\x03'
 
-// Helper to create CLI test instance
+// Helper to create CLI test instance with test Pocketbase env vars
 function createCliTest(args: string[]): CLITest {
   return new CLITest('npx', ['tsx', CLI_ENTRY, ...args], {
     env: {
       ...process.env,
       FORCE_COLOR: '0', // Disable colors for cleaner output matching
-      NO_COLOR: '1'
+      NO_COLOR: '1',
+      PB_URL: TEST_PB_URL,
+      PB_EMAIL: TEST_PB_EMAIL,
+      PB_PASSWORD: TEST_PB_PASSWORD
     },
     failOnStderr: false // Allow stderr output (errors are expected in some tests)
   })
@@ -96,17 +92,10 @@ describe('Content TUI - Help', { timeout: TUI_TIMEOUT }, () => {
 // ============================================================================
 
 describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
-  let pocketbaseAvailable = false
-
-  beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-    if (!pocketbaseAvailable) {
-      console.log('Pocketbase not available, some TUI tests will be skipped')
-    }
-  })
+  // Pocketbase is always available via global setup (port 8091)
 
   describe('URL input validation', () => {
-    it.skipIf(!pocketbaseAvailable)('prompts for GitHub URL when not provided', async () => {
+    it('prompts for GitHub URL when not provided', async () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
@@ -122,7 +111,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       expect([0, 130]).toContain(exitCode)
     })
 
-    it.skipIf(!pocketbaseAvailable)('shows validation error for invalid URL', async () => {
+    it('shows validation error for invalid URL', async () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
@@ -143,7 +132,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
   })
 
   describe('full add flow', () => {
-    it.skipIf(!pocketbaseAvailable)('completes add flow with valid inputs', async () => {
+    it('completes add flow with valid inputs', async () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
@@ -211,7 +200,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
   })
 
   describe('cancellation handling', () => {
-    it.skipIf(!pocketbaseAvailable)('handles Ctrl+C gracefully at URL prompt', async () => {
+    it('handles Ctrl+C gracefully at URL prompt', async () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
@@ -224,7 +213,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       expect([0, 130]).toContain(exitCode)
     })
 
-    it.skipIf(!pocketbaseAvailable)('handles Escape key for cancellation', async () => {
+    it('handles Escape key for cancellation', async () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
@@ -249,13 +238,9 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
 // ============================================================================
 
 describe('Content TUI - List', { timeout: TUI_TIMEOUT }, () => {
-  let pocketbaseAvailable = false
+  // Pocketbase is always available via global setup (port 8091)
 
-  beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-  })
-
-  it.skipIf(!pocketbaseAvailable)('lists content in table format', async () => {
+  it('lists content in table format', async () => {
     const cli = createCliTest(['content', 'list'])
 
     await cli.run()
@@ -268,7 +253,7 @@ describe('Content TUI - List', { timeout: TUI_TIMEOUT }, () => {
     expect(output).toContain('Name')
   })
 
-  it.skipIf(!pocketbaseAvailable)('filters by type', async () => {
+  it('filters by type', async () => {
     const cli = createCliTest(['content', 'list', '--type', 'validation'])
 
     await cli.run()
@@ -285,26 +270,28 @@ describe('Content TUI - List', { timeout: TUI_TIMEOUT }, () => {
 // ============================================================================
 
 describe('Content TUI - Show', { timeout: TUI_TIMEOUT }, () => {
-  let pocketbaseAvailable = false
+  // Pocketbase is always available via global setup (port 8091)
   let testContentId: string | null = null
 
   beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-
-    if (pocketbaseAvailable) {
-      // Get a content ID for testing
-      const cli = createCliTest(['content', 'list', '--quiet', '--limit', '1'])
-      await cli.run()
-      await cli.waitForExit()
-      const output = cli.getOutput().trim()
-      if (output) {
-        testContentId = output.split('\n')[0]
-      }
+    // Get a content ID for testing
+    const cli = createCliTest(['content', 'list', '--quiet', '--limit', '1'])
+    await cli.run()
+    await cli.waitForExit()
+    const output = cli.getOutput().trim()
+    if (output) {
+      testContentId = output.split('\n')[0]
     }
   })
 
-  it.skipIf(!pocketbaseAvailable || !testContentId)('shows content details', async () => {
-    const cli = createCliTest(['content', 'show', testContentId!])
+  it('shows content details', async () => {
+    // Skip if no content in database
+    if (!testContentId) {
+      console.log('No content found in database, skipping test')
+      return
+    }
+
+    const cli = createCliTest(['content', 'show', testContentId])
 
     await cli.run()
     const exitCode = await cli.waitForExit()
@@ -332,11 +319,7 @@ describe('Content TUI - Show', { timeout: TUI_TIMEOUT }, () => {
 // ============================================================================
 
 describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
-  let pocketbaseAvailable = false
-
-  beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-  })
+  // Pocketbase is always available via global setup (port 8091)
 
   it('shows error for missing ID', async () => {
     const cli = createCliTest(['content', 'update'])
@@ -350,7 +333,7 @@ describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
     expect(output).toContain('error')
   })
 
-  it.skipIf(!pocketbaseAvailable)('shows no changes when nothing specified', async () => {
+  it('shows no changes when nothing specified', async () => {
     // First get a content ID
     const listCli = createCliTest(['content', 'list', '--quiet', '--limit', '1'])
     await listCli.run()
@@ -377,13 +360,9 @@ describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
 // ============================================================================
 
 describe('Content TUI - Keyboard Navigation', { timeout: TUI_TIMEOUT }, () => {
-  let pocketbaseAvailable = false
+  // Pocketbase is always available via global setup (port 8091)
 
-  beforeAll(async () => {
-    pocketbaseAvailable = await isPocketbaseAvailable()
-  })
-
-  it.skipIf(!pocketbaseAvailable)('navigates select options with arrow keys', async () => {
+  it('navigates select options with arrow keys', async () => {
     const cli = createCliTest(['content', 'add', 'https://github.com/mitre/test-repo'])
 
     await cli.run()
