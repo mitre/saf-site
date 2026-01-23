@@ -45,6 +45,7 @@ const TEST_DATA_DIR = join(POCKETBASE_DIR, 'test_pb_data')
 const TEST_DB_PATH = join(TEST_DATA_DIR, 'data.db')
 
 let pbProcess: ChildProcess | null = null
+let weStartedPocketbase = false  // Track if we started it (vs it was already running)
 
 /**
  * Restore test database from diffable/
@@ -78,8 +79,17 @@ export async function restoreTestDatabase(): Promise<void> {
  *
  * Uses the official pattern:
  * ./pocketbase serve --dir="./test_pb_data" --http="127.0.0.1:8091"
+ *
+ * If Pocketbase is already running on the test port, we reuse it.
  */
 export async function startTestPocketbase(): Promise<void> {
+  // Check if Pocketbase is already running (e.g., from a previous test run or manual start)
+  if (await isTestPocketbaseAvailable()) {
+    console.log(`[test-pb] Pocketbase already running at ${TEST_URL}, reusing existing instance`)
+    weStartedPocketbase = false
+    return
+  }
+
   if (!existsSync(POCKETBASE_BINARY)) {
     throw new Error(
       `Pocketbase binary not found at ${POCKETBASE_BINARY}.\n` +
@@ -91,6 +101,7 @@ export async function startTestPocketbase(): Promise<void> {
     await restoreTestDatabase()
   }
 
+  weStartedPocketbase = true
   console.log(`[test-pb] Starting Pocketbase on port ${TEST_PORT}...`)
   console.log(`[test-pb] Command: ${POCKETBASE_BINARY} serve --dir=${TEST_DATA_DIR} --http=127.0.0.1:${TEST_PORT}`)
 
@@ -152,8 +163,15 @@ export async function startTestPocketbase(): Promise<void> {
  *
  * Based on official pattern using AbortController.abort()
  * For our async case, we use process.kill()
+ *
+ * Only stops Pocketbase if we started it (not if it was already running)
  */
 export async function stopTestPocketbase(): Promise<void> {
+  if (!weStartedPocketbase) {
+    console.log('[test-pb] Pocketbase was already running, not stopping it')
+    return
+  }
+
   if (!pbProcess) {
     console.log('[test-pb] No Pocketbase process to stop')
     return

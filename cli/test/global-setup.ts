@@ -15,8 +15,10 @@
  * - PB_URL: Points to test instance (http://127.0.0.1:8091)
  * - PB_EMAIL: Test admin email
  * - PB_PASSWORD: Test admin password
+ * - GITHUB_TOKEN: For authenticated GitHub API access (5000 req/hr vs 60 unauthenticated)
  */
 
+import { execSync } from 'child_process'
 import {
   restoreTestDatabase,
   startTestPocketbase,
@@ -26,6 +28,37 @@ import {
   TEST_EMAIL,
   TEST_PASSWORD
 } from './setup/test-pocketbase.js'
+
+/**
+ * Get GitHub token for authenticated API access
+ *
+ * Best practice per GitHub docs: Use authentication to get 5000 requests/hour
+ * instead of 60 for unauthenticated requests.
+ *
+ * Priority:
+ * 1. GITHUB_TOKEN env var (CI environments, explicit config)
+ * 2. gh auth token (local development with gh CLI)
+ *
+ * @see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ */
+function getGitHubToken(): string | null {
+  // First check if GITHUB_TOKEN is already set
+  if (process.env.GITHUB_TOKEN) {
+    return process.env.GITHUB_TOKEN
+  }
+
+  // Try to get token from gh CLI (standard for local development)
+  try {
+    const token = execSync('gh auth token', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim()
+    if (token) {
+      return token
+    }
+  } catch {
+    // gh CLI not installed or not authenticated
+  }
+
+  return null
+}
 
 /**
  * Setup: Called once before all tests
@@ -40,6 +73,18 @@ export async function setup(): Promise<void> {
   process.env.PB_URL = TEST_URL
   process.env.PB_EMAIL = TEST_EMAIL
   process.env.PB_PASSWORD = TEST_PASSWORD
+
+  // Set GITHUB_TOKEN for authenticated API access (5000 req/hr vs 60)
+  // This prevents rate limit errors during tests that call GitHub API
+  const githubToken = getGitHubToken()
+  if (githubToken) {
+    process.env.GITHUB_TOKEN = githubToken
+    console.log('[global-setup] GitHub token configured (authenticated API access)')
+  } else {
+    console.warn('[global-setup] WARNING: No GitHub token found')
+    console.warn('  Tests requiring GitHub API may fail due to rate limits (60 req/hr)')
+    console.warn('  To fix: Run "gh auth login" or set GITHUB_TOKEN env var')
+  }
 
   try {
     // Restore fresh database from diffable/

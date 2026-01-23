@@ -287,14 +287,11 @@ describe('Content CLI E2E - Live', () => {
         '--yes', '--json', '--dry-run'
       ])
 
-      // Dry-run should succeed (exit 0) if validation passes
-      // May fail if GitHub rate limited or repo not accessible
-      if (exitCode === 0) {
-        const parsed = JSON.parse(stdout)
-        expect(parsed.success).toBe(true)
-        expect(parsed.content).toBeDefined()
-        expect(parsed.content.contentType).toBe('validation')
-      }
+      expect(exitCode).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.success).toBe(true)
+      expect(parsed.content).toBeDefined()
+      expect(parsed.content.contentType).toBe('validation')
     })
 
     it('shows warnings for unresolved FKs in dry-run', async () => {
@@ -306,10 +303,9 @@ describe('Content CLI E2E - Live', () => {
         '--yes', '--json', '--dry-run'
       ])
 
-      if (exitCode === 0) {
-        const parsed = JSON.parse(stdout)
-        expect(parsed.warnings.some((w: string) => w.includes('NonexistentOrg'))).toBe(true)
-      }
+      expect(exitCode).toBe(0)
+      const parsed = JSON.parse(stdout)
+      expect(parsed.warnings.some((w: string) => w.includes('NonexistentOrg'))).toBe(true)
     })
   })
 
