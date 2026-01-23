@@ -10,8 +10,8 @@ const props = defineProps<{
 // Local SVG files in /public/icons/
 const localSvgMap: Record<string, string> = {
   'inspec': '/icons/inspec.svg',
-  'mitre': '/icons/mitre.svg',
-  'the mitre corporation': '/icons/mitre.svg',
+  'mitre': '/icons/mitre-m.svg',
+  'the mitre corporation': '/icons/mitre-m.svg',
   'mitre saf team': '/icons/saf-logo.svg',
   'mitre saf': '/icons/saf-logo.svg',
   'saf': '/icons/saf-logo.svg',
@@ -19,7 +19,7 @@ const localSvgMap: Record<string, string> = {
 }
 
 // Wide logos that need height-only constraint (wordmarks)
-const wideLogos = new Set(['mitre', 'the mitre corporation'])
+const wideLogos = new Set<string>()
 
 // Map names to Iconify icon names
 // Simple Icons: https://icon-sets.iconify.design/simple-icons/

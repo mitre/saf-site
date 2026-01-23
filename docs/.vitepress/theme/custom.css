@@ -131,3 +131,8 @@
 .VPDoc .content-container {
   max-width: none !important;
 }
+
+/* MITRE logo - white in dark mode, blue (original) in light mode */
+.dark img[src*="/icons/mitre-m"] {
+  filter: brightness(0) invert(1);
+}
