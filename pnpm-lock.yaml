@@ -146,6 +146,9 @@ importers:
       execa:
         specifier: ^9.6.1
         version: 9.6.1
+      interactive-cli-tester:
+        specifier: ^0.3.0
+        version: 0.3.0
       tsup:
         specifier: ^8.5.0
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -1762,6 +1765,10 @@ packages:
 
   ini@1.3.8:
     resolution: {integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==}
+
+  interactive-cli-tester@0.3.0:
+    resolution: {integrity: sha512-izrrrXpDPV1CkWfJlv3pGFckTqj6Iju/3OctKRnTGkcWxL9PcY95ec1DG6B50jaAx44vWQusFiQR10C930uTWg==}
+    engines: {node: '>=18'}
 
   is-fullwidth-code-point@3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
@@ -4144,6 +4151,8 @@ snapshots:
   inherits@2.0.4: {}
 
   ini@1.3.8: {}
+
+  interactive-cli-tester@0.3.0: {}
 
   is-fullwidth-code-point@3.0.0: {}
 

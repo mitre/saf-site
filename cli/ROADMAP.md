@@ -127,8 +127,9 @@ Separate pure business logic from I/O.
 | 4 | `content.cli.spec.ts` | 29 | ✅ Passing |
 | 4 | `content.integration.spec.ts` | 14 | ✅ Passing |
 | 4 | `content.e2e.spec.ts` | 14+7 skipped | ✅ Passing |
+| 4 | `content.tui.spec.ts` | 5+10 skipped | ✅ Passing |
 
-**Current Total:** 299 passing, 12 skipped
+**Current Total:** 304 passing, 22 skipped
 
 ---
 
@@ -192,6 +193,12 @@ Separate pure business logic from I/O.
 - [x] Fixed bug: Non-interactive mode hung when required args missing
   - Root cause: CLI entered TUI mode even with --yes/--json/--quiet flags
   - Fix: Always use non-interactive mode if any non-interactive flag is set
+- [x] Phase 4.3: TUI Integration Tests (TDD)
+  - Research: Evaluated mock-stdin, node-pty, module mocking, interactive-cli-tester
+  - Chose interactive-cli-tester for true integration testing
+  - Wrote 15 TUI tests (5 offline, 10 require Pocketbase)
+  - Tests spawn actual CLI, simulate keyboard input with ANSI codes
+  - All 304 tests passing (22 skipped for Pocketbase/CI)
 
 ---
 
