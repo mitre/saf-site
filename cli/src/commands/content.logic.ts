@@ -17,7 +17,13 @@ import {
   type ContentDiff
 } from '../lib/content-service.js'
 import { validateSlug } from '@schema/validation.js'
-import { z } from 'zod'
+import {
+  slugSchema,
+  optionalSlugSchema,
+  semverSchema,
+  optionalSemverSchema,
+  statusSchema
+} from '../lib/validation-schemas.js'
 
 // ============================================================================
 // TYPES
@@ -74,34 +80,7 @@ export interface PrepareUpdateResult {
   errors: string[]
 }
 
-// ============================================================================
-// VALIDATION SCHEMAS
-// ============================================================================
-
-const slugSchema = z.string()
-  .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens')
-  .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
-  .meta({
-    id: 'slug',
-    title: 'Slug',
-    description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens, no consecutive hyphens.'
-  })
-
-const versionSchema = z.string()
-  .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/,
-    'Version must be semver format (x.y.z[-prerelease][+build])')
-  .meta({
-    id: 'semver',
-    title: 'Semantic Version',
-    description: 'Version in semver format: MAJOR.MINOR.PATCH[-prerelease][+build]. See https://semver.org/'
-  })
-
-const statusSchema = z.enum(['active', 'beta', 'deprecated', 'draft'])
-  .meta({
-    id: 'status',
-    title: 'Publication Status',
-    description: 'Lifecycle status: active (production-ready), beta (testing), deprecated (legacy), or draft (work-in-progress)'
-  })
+// Validation schemas imported from ../lib/validation-schemas.js
 
 // ============================================================================
 // PREPARE CONTENT ADD
@@ -233,7 +212,7 @@ export async function prepareContentAdd(
 
   // Validate version if provided
   if (content.version) {
-    const versionResult = versionSchema.safeParse(content.version)
+    const versionResult = semverSchema.safeParse(content.version)
     if (!versionResult.success) {
       errors.push(`Version validation failed: ${versionResult.error.issues[0].message}`)
     }
@@ -301,7 +280,7 @@ export function prepareContentUpdate(
   }
 
   if (updates.version) {
-    const versionResult = versionSchema.safeParse(updates.version)
+    const versionResult = semverSchema.safeParse(updates.version)
     if (!versionResult.success) {
       errors.push(`Version validation failed: ${versionResult.error.issues[0].message}`)
     }

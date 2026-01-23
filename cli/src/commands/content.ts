@@ -35,9 +35,16 @@ import {
   parseUpdateArgs,
   formatAddResult,
   formatUpdateResult,
-  formatListResult,
-  type OutputFormat
+  formatListResult
 } from './content.cli.js'
+import {
+  type OutputFormat,
+  getOutputFormat,
+  isNonInteractive,
+  exitWithErrors,
+  exitWithError,
+  outputErrors
+} from '../lib/cli-utils.js'
 
 export const contentCommand = new Command('content')
   .description('Manage content records (profiles, hardening guides)')
@@ -80,7 +87,7 @@ contentCommand
       const limited = records.slice(0, parseInt(options.limit))
 
       // Determine output format
-      const format: OutputFormat = options.json ? 'json' : options.quiet ? 'quiet' : 'text'
+      const format = getOutputFormat(options)
 
       console.log(formatListResult(limited, format))
 
@@ -88,8 +95,7 @@ contentCommand
         console.log(pc.dim(`\nShowing ${limited.length} of ${records.length} records`))
       }
     } catch (error) {
-      console.error(pc.red(error instanceof Error ? error.message : 'Failed to list content'))
-      process.exit(1)
+      exitWithError(error instanceof Error ? error.message : 'Failed to list content', format)
     }
   })
 
@@ -102,6 +108,8 @@ contentCommand
   .description('Show content record details')
   .option('--json', 'Output as JSON')
   .action(async (id, options) => {
+    const format = getOutputFormat(options)
+
     try {
       const pb = await getPocketBase()
 
@@ -109,7 +117,7 @@ contentCommand
         expand: 'target,standard,technology,vendor,maintainer'
       })
 
-      if (options.json) {
+      if (format === 'json') {
         console.log(JSON.stringify(record, null, 2))
         return
       }
@@ -141,8 +149,7 @@ contentCommand
         console.log(pc.dim('\n' + record.description))
       }
     } catch (error) {
-      console.error(pc.red(error instanceof Error ? error.message : 'Failed to show content'))
-      process.exit(1)
+      exitWithError(error instanceof Error ? error.message : 'Failed to show content', format)
     }
   })
 
@@ -173,9 +180,7 @@ contentCommand
   .action(async (urlArg, options) => {
     // Non-interactive mode: use if --yes, --json, or --quiet is passed
     // This ensures CLI fails fast with errors instead of hanging on TUI input
-    const isNonInteractive = options.yes || options.json || options.quiet
-
-    if (isNonInteractive) {
+    if (isNonInteractive(options)) {
       await addNonInteractive(urlArg || '', options)
     } else {
       await addInteractive(urlArg, options)
@@ -186,7 +191,7 @@ contentCommand
  * Non-interactive add command
  */
 async function addNonInteractive(url: string, options: Record<string, any>) {
-  const format: OutputFormat = options.json ? 'json' : options.quiet ? 'quiet' : 'text'
+  const format = getOutputFormat(options)
 
   // Parse arguments
   const args = parseAddArgs({
@@ -206,15 +211,7 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
   })
 
   if (args.errors.length > 0) {
-    if (format === 'json') {
-      console.log(JSON.stringify({ success: false, errors: args.errors }, null, 2))
-    } else if (format !== 'quiet') {
-      console.error(pc.red('Errors:'))
-      for (const error of args.errors) {
-        console.error(pc.red(`  ✗ ${error}`))
-      }
-    }
-    process.exit(1)
+    exitWithErrors(args.errors, format)
   }
 
   // Load FK maps for resolution
@@ -473,7 +470,7 @@ contentCommand
   .option('--quiet', 'Output only ID on success')
   .option('--dry-run', 'Show changes without applying')
   .action(async (id, options) => {
-    const format: OutputFormat = options.json ? 'json' : options.quiet ? 'quiet' : 'text'
+    const format = getOutputFormat(options)
 
 
     try {
@@ -512,15 +509,7 @@ contentCommand
       // Check for errors (but not "no updates" if we have sync-readme)
       const realErrors = args.errors.filter(e => e !== 'No updates specified')
       if (realErrors.length > 0) {
-        if (format === 'json') {
-          console.log(JSON.stringify({ success: false, errors: realErrors }, null, 2))
-        } else if (format !== 'quiet') {
-          console.error(pc.red('Errors:'))
-          for (const error of realErrors) {
-            console.error(pc.red(`  ✗ ${error}`))
-          }
-        }
-        process.exit(1)
+        exitWithErrors(realErrors, format)
       }
 
       // Prepare update
@@ -528,15 +517,7 @@ contentCommand
 
       // Handle validation errors from prepareContentUpdate
       if (!result.success) {
-        if (format === 'json') {
-          console.log(JSON.stringify({ success: false, errors: result.errors }, null, 2))
-        } else if (format !== 'quiet') {
-          console.error(pc.red('Validation errors:'))
-          for (const error of result.errors) {
-            console.error(pc.red(`  ✗ ${error}`))
-          }
-        }
-        process.exit(1)
+        exitWithErrors(result.errors, format)
       }
 
       // Handle dry-run
@@ -578,12 +559,7 @@ contentCommand
         console.log(pc.green(`✓ Updated: ${id}`))
       }
     } catch (error) {
-      if (format === 'json') {
-        console.log(JSON.stringify({ success: false, errors: [String(error)] }, null, 2))
-      } else {
-        console.error(pc.red(`Failed to update: ${error}`))
-      }
-      process.exit(1)
+      exitWithError(error instanceof Error ? error.message : String(error), format)
     }
   })
 

@@ -10,12 +10,20 @@ import type { UpdateContentInput } from '../lib/pocketbase.js'
 import type { ContentFKNames } from '../lib/content-service.js'
 import pc from 'picocolors'
 import Table from 'cli-table3'
+import {
+  type OutputFormat,
+  VALID_CONTENT_TYPES,
+  VALID_STATUSES,
+  VALID_AUTOMATION_LEVELS,
+  formatWarnings
+} from '../lib/cli-utils.js'
+
+// Re-export OutputFormat for consumers
+export type { OutputFormat }
 
 // ============================================================================
 // TYPES
 // ============================================================================
-
-export type OutputFormat = 'json' | 'text' | 'quiet'
 
 export interface AddCommandArgs extends PrepareAddInput {
   errors: string[]
@@ -53,14 +61,6 @@ interface RawUpdateArgs {
   controlCount?: string
   syncReadme?: boolean
 }
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const VALID_CONTENT_TYPES = ['validation', 'hardening'] as const
-const VALID_STATUSES = ['active', 'beta', 'deprecated', 'draft'] as const
-const VALID_AUTOMATION_LEVELS = ['full', 'partial', 'manual'] as const
 
 // ============================================================================
 // PARSE ADD ARGS
@@ -198,11 +198,7 @@ export function formatAddResult(result: PrepareAddResult, format: OutputFormat):
   }
 
   if (result.warnings.length > 0) {
-    lines.push('')
-    lines.push(pc.yellow('Warnings:'))
-    for (const warning of result.warnings) {
-      lines.push(pc.yellow(`  ⚠ ${warning}`))
-    }
+    lines.push(formatWarnings(result.warnings))
   }
 
   if (result.errors.length > 0) {
@@ -260,11 +256,7 @@ export function formatUpdateResult(
   }
 
   if (result.warnings.length > 0) {
-    lines.push('')
-    lines.push(pc.yellow('Warnings:'))
-    for (const warning of result.warnings) {
-      lines.push(pc.yellow(`  ⚠ ${warning}`))
-    }
+    lines.push(formatWarnings(result.warnings))
   }
 
   if (result.errors.length > 0) {
