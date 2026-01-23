@@ -83,6 +83,13 @@ export interface FkMaps {
 }
 
 /**
+ * Create a lowercase name → ID map from records
+ */
+function createLowerCaseIdMap(records: Array<{ name: string; id: string }>): Map<string, string> {
+  return new Map(records.map(r => [r.name.toLowerCase(), r.id]))
+}
+
+/**
  * Load all FK lookup maps from database
  */
 export async function loadFkMaps(): Promise<FkMaps> {
@@ -109,14 +116,14 @@ export async function loadFkMaps(): Promise<FkMaps> {
   ])
 
   return {
-    organizations: new Map(organizations.map(r => [r.name.toLowerCase(), r.id])),
-    teams: new Map(teams.map(r => [r.name.toLowerCase(), r.id])),
-    standards: new Map(standards.map(r => [r.name.toLowerCase(), r.id])),
-    technologies: new Map(technologies.map(r => [r.name.toLowerCase(), r.id])),
-    targets: new Map(targets.map(r => [r.name.toLowerCase(), r.id])),
-    categories: new Map(categories.map(r => [r.name.toLowerCase(), r.id])),
-    capabilities: new Map(capabilities.map(r => [r.name.toLowerCase(), r.id])),
-    tags: new Map(tags.map(r => [r.name.toLowerCase(), r.id]))
+    organizations: createLowerCaseIdMap(organizations),
+    teams: createLowerCaseIdMap(teams),
+    standards: createLowerCaseIdMap(standards),
+    technologies: createLowerCaseIdMap(technologies),
+    targets: createLowerCaseIdMap(targets),
+    categories: createLowerCaseIdMap(categories),
+    capabilities: createLowerCaseIdMap(capabilities),
+    tags: createLowerCaseIdMap(tags)
   }
 }
 

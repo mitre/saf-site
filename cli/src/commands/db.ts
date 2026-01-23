@@ -116,17 +116,16 @@ dbCommand
       }
 
       // Check FK references exist
-      if (record.target && !await recordExists(pb, 'targets', record.target)) {
-        issues.push(`Content ${record.id}: invalid target reference "${record.target}"`)
-      }
-      if (record.standard && !await recordExists(pb, 'standards', record.standard)) {
-        issues.push(`Content ${record.id}: invalid standard reference "${record.standard}"`)
-      }
-      if (record.technology && !await recordExists(pb, 'technologies', record.technology)) {
-        issues.push(`Content ${record.id}: invalid technology reference "${record.technology}"`)
-      }
-      if (record.vendor && !await recordExists(pb, 'organizations', record.vendor)) {
-        issues.push(`Content ${record.id}: invalid vendor reference "${record.vendor}"`)
+      const fkValidations = await Promise.all([
+        validateFK(pb, record.id, record.target, 'targets', 'target'),
+        validateFK(pb, record.id, record.standard, 'standards', 'standard'),
+        validateFK(pb, record.id, record.technology, 'technologies', 'technology'),
+        validateFK(pb, record.id, record.vendor, 'organizations', 'vendor')
+      ])
+
+      // Collect any validation errors
+      for (const error of fkValidations) {
+        if (error) issues.push(error)
       }
     }
     s.stop(`Validated ${content.length} content records`)
@@ -274,4 +273,21 @@ async function recordExists(
   } catch {
     return false
   }
+}
+
+/**
+ * Helper: Validate a FK reference and return an error message if invalid
+ */
+async function validateFK(
+  pb: Awaited<ReturnType<typeof getPocketBase>>,
+  recordId: string,
+  fkValue: string | undefined | null,
+  collection: string,
+  fieldName: string
+): Promise<string | null> {
+  if (!fkValue) return null
+  if (!await recordExists(pb, collection, fkValue)) {
+    return `Content ${recordId}: invalid ${fieldName} reference "${fkValue}"`
+  }
+  return null
 }
