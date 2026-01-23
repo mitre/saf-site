@@ -106,10 +106,10 @@ Separate pure business logic from I/O.
 - [ ] Progress spinners and feedback
 
 ### 4.3 Non-Interactive Mode
-- [ ] All params via flags
-- [ ] Clear error messages for missing required params
-- [ ] JSON output for scripting
-- [ ] Proper exit codes
+- [x] All params via flags
+- [x] Clear error messages for missing required params
+- [x] JSON output for scripting
+- [x] Proper exit codes
 
 ---
 
@@ -121,12 +121,14 @@ Separate pure business logic from I/O.
 | 1 | `conventions.spec.ts` | 32 | ✅ Passing |
 | 1 | `validation.spec.ts` | 35 | ✅ Passing |
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
-| 2 | `pocketbase.spec.ts` | 38+5 skipped | ✅ Passing |
+| 2 | `pocketbase.spec.ts` | 43+5 skipped | ✅ Passing |
 | 2 | `content-service.spec.ts` | 26 | ✅ Passing |
 | 3 | `content.logic.spec.ts` | 25 | ✅ Passing |
 | 4 | `content.cli.spec.ts` | 29 | ✅ Passing |
+| 4 | `content.integration.spec.ts` | 14 | ✅ Passing |
+| 4 | `content.e2e.spec.ts` | 14+7 skipped | ✅ Passing |
 
-**Current Total:** 271 passing, 5 skipped
+**Current Total:** 299 passing, 12 skipped
 
 ---
 
@@ -176,6 +178,20 @@ Separate pure business logic from I/O.
   - Implemented `formatAddResult()`, `formatUpdateResult()`, `formatListResult()`
   - Supports json/text/quiet output formats
   - All 271 tests passing
+
+### Session 048 Continued (2026-01-23)
+- [x] Phase 4.2.1: Functional/Integration Tests (TDD)
+  - Wrote 14 integration tests for CLI → Logic → Services wiring
+  - Tests verify FK resolution, error handling, output formatting integration
+  - All 285 tests passing
+- [x] Phase 4.2.2: E2E Tests (TDD)
+  - Wrote 21 E2E tests (14 offline, 7 live requiring Pocketbase)
+  - Tests spawn actual CLI binary via execa
+  - Verify stdout, stderr, exit codes
+  - All 299 tests passing (12 skipped for Pocketbase/CI)
+- [x] Fixed bug: Non-interactive mode hung when required args missing
+  - Root cause: CLI entered TUI mode even with --yes/--json/--quiet flags
+  - Fix: Always use non-interactive mode if any non-interactive flag is set
 
 ---
 

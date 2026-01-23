@@ -171,12 +171,12 @@ contentCommand
   .option('--quiet', 'Output only slug on success')
   .option('--dry-run', 'Validate without creating')
   .action(async (urlArg, options) => {
-    // Determine if we can run non-interactively
-    const hasRequiredArgs = urlArg && options.type
+    // Non-interactive mode: use if --yes, --json, or --quiet is passed
+    // This ensures CLI fails fast with errors instead of hanging on TUI input
     const isNonInteractive = options.yes || options.json || options.quiet
 
-    if (hasRequiredArgs && isNonInteractive) {
-      await addNonInteractive(urlArg, options)
+    if (isNonInteractive) {
+      await addNonInteractive(urlArg || '', options)
     } else {
       await addInteractive(urlArg, options)
     }
