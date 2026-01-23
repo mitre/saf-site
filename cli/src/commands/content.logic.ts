@@ -81,14 +81,27 @@ export interface PrepareUpdateResult {
 const slugSchema = z.string()
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens')
   .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
+  .meta({
+    id: 'slug',
+    title: 'Slug',
+    description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens, no consecutive hyphens.'
+  })
 
-// Full semver regex: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
-// Examples: 1.0.0, 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0+build, 1.0.0-beta+build
 const versionSchema = z.string()
   .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/,
     'Version must be semver format (x.y.z[-prerelease][+build])')
+  .meta({
+    id: 'semver',
+    title: 'Semantic Version',
+    description: 'Version in semver format: MAJOR.MINOR.PATCH[-prerelease][+build]. See https://semver.org/'
+  })
 
 const statusSchema = z.enum(['active', 'beta', 'deprecated', 'draft'])
+  .meta({
+    id: 'status',
+    title: 'Publication Status',
+    description: 'Lifecycle status: active (production-ready), beta (testing), deprecated (legacy), or draft (work-in-progress)'
+  })
 
 // ============================================================================
 // PREPARE CONTENT ADD

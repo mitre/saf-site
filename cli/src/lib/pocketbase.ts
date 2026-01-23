@@ -233,32 +233,87 @@ function toSnakeCase(input: CreateContentInput | UpdateContentInput): Record<str
  * Validation schema for create input
  */
 const createContentValidation = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Name is required').meta({
+    title: 'Name',
+    description: 'Display name of the content item'
+  }),
   slug: z.string()
     .min(1, 'Slug is required')
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens')
-    .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens'),
-  contentType: z.enum(['validation', 'hardening']),
-  description: z.string().optional(),
-  version: z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format').optional(),
-  status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional(),
-  github: z.string().url().optional(),
-  controlCount: z.number().int().positive().optional()
-}).passthrough()
+    .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
+    .meta({
+      title: 'Slug',
+      description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens.'
+    }),
+  contentType: z.enum(['validation', 'hardening']).meta({
+    title: 'Content Type',
+    description: 'Type of security content: validation (InSpec) or hardening (Ansible/Chef)'
+  }),
+  description: z.string().optional().meta({
+    title: 'Description',
+    description: 'Brief description shown in cards and search results'
+  }),
+  version: z.string()
+    .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format')
+    .optional()
+    .meta({
+      title: 'Version',
+      description: 'Semantic version: MAJOR.MINOR.PATCH[-prerelease][+build]'
+    }),
+  status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional().meta({
+    title: 'Status',
+    description: 'Publication lifecycle status'
+  }),
+  github: z.string().url().optional().meta({
+    title: 'GitHub URL',
+    description: 'GitHub repository URL'
+  }),
+  controlCount: z.number().int().positive().optional().meta({
+    title: 'Control Count',
+    description: 'Number of controls/rules in this profile'
+  })
+}).passthrough().meta({
+  id: 'create_content_input',
+  title: 'Create Content Input',
+  description: 'Validation schema for creating new content via CLI'
+})
 
 /**
  * Validation schema for update input
  */
 const updateContentValidation = z.object({
-  name: z.string().min(1).optional(),
+  name: z.string().min(1).optional().meta({
+    title: 'Name',
+    description: 'Display name of the content item'
+  }),
   slug: z.string()
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens')
     .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
-    .optional(),
-  contentType: z.enum(['validation', 'hardening']).optional(),
-  version: z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format').optional(),
-  status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional()
-}).passthrough()
+    .optional()
+    .meta({
+      title: 'Slug',
+      description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens.'
+    }),
+  contentType: z.enum(['validation', 'hardening']).optional().meta({
+    title: 'Content Type',
+    description: 'Type of security content: validation (InSpec) or hardening (Ansible/Chef)'
+  }),
+  version: z.string()
+    .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format')
+    .optional()
+    .meta({
+      title: 'Version',
+      description: 'Semantic version: MAJOR.MINOR.PATCH[-prerelease][+build]'
+    }),
+  status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional().meta({
+    title: 'Status',
+    description: 'Publication lifecycle status'
+  })
+}).passthrough().meta({
+  id: 'update_content_input',
+  title: 'Update Content Input',
+  description: 'Validation schema for updating content via CLI'
+})
 
 /**
  * Get content by slug
