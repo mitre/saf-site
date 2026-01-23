@@ -25,7 +25,7 @@
     "db:populate:refs": "tsx scripts/fetch-readmes.ts --refs-only",
     "pb:setup": "./scripts/setup-pb-cli.sh",
     "reload-data": "touch 'docs/validate/[slug].paths.ts'",
-    "cli": "pnpm --filter @saf-site/cli dev",
+    "cli": "./scripts/cli.sh",
     "cli:test": "pnpm --filter @saf-site/cli test:run",
     "cli:build": "pnpm --filter @saf-site/cli build"
   },

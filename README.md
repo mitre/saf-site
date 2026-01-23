@@ -150,6 +150,43 @@ npx tsx scripts/fetch-readmes.ts --refs-only  # Only update reference URLs
 npx tsx scripts/fetch-readmes.ts --limit 10   # Process first 10 records
 ```
 
+### SAF Site CLI
+
+Interactive CLI for managing content and database operations.
+
+| Command | Description |
+|---------|-------------|
+| `pnpm cli --help` | Show CLI help |
+| `pnpm cli content list` | List all content records |
+| `pnpm cli content add <url>` | Add content from GitHub repo |
+| `pnpm cli content show <id>` | Show content details |
+| `pnpm cli db status` | Check database connection |
+| `pnpm cli db validate` | Validate database integrity |
+| `pnpm cli db lookups` | Show FK lookup values |
+
+**Examples:**
+```bash
+# Add a new InSpec profile (interactive)
+pnpm cli content add https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline
+
+# Add with all options (non-interactive)
+pnpm cli content add https://github.com/mitre/some-repo \
+  --type validation \
+  --vendor MITRE \
+  --standard "DISA STIG" \
+  --technology InSpec \
+  --target "RHEL 9" \
+  --yes
+
+# List validation profiles
+pnpm cli content list --type validation
+
+# Validate database
+pnpm cli db validate
+```
+
+See [cli/README.md](cli/README.md) for full CLI documentation.
+
 ### pb-cli (Pocketbase CLI)
 
 Optional CLI for advanced database operations. Requires [pb-cli](https://github.com/skeeeon/pb-cli).
