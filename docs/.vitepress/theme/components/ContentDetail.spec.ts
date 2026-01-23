@@ -109,22 +109,22 @@ describe('ContentDetail', () => {
   })
 
   describe('breadcrumb navigation', () => {
-    it('links to /validate/ for validation profiles', () => {
+    it('links to /content/ for validation profiles', () => {
       const content = createContentItem({ content_type: 'validation' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       const breadcrumbLink = wrapper.find('.breadcrumb a')
-      expect(breadcrumbLink.attributes('href')).toBe('/validate/')
-      expect(breadcrumbLink.text()).toBe('Validate')
+      expect(breadcrumbLink.attributes('href')).toBe('/content/')
+      expect(breadcrumbLink.text()).toBe('Content Library')
     })
 
-    it('links to /harden/ for hardening profiles', () => {
+    it('links to /content/ for hardening profiles', () => {
       const content = createContentItem({ content_type: 'hardening' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       const breadcrumbLink = wrapper.find('.breadcrumb a')
-      expect(breadcrumbLink.attributes('href')).toBe('/harden/')
-      expect(breadcrumbLink.text()).toBe('Harden')
+      expect(breadcrumbLink.attributes('href')).toBe('/content/')
+      expect(breadcrumbLink.text()).toBe('Content Library')
     })
 
     it('shows content name as current breadcrumb', () => {
