@@ -133,28 +133,45 @@ pnpm dev
 | `pnpm db:export` | Export database to git-friendly format |
 | `pnpm db:export:diff` | Export and show git diff |
 
-### Database Backup (pb-cli)
+### Content Population
 
-Binary backups for disaster recovery. Requires [pb-cli](https://github.com/skeeeon/pb-cli).
+Fetch README content from GitHub and populate reference URLs:
 
 | Command | Description |
 |---------|-------------|
+| `pnpm db:populate` | Fetch README content from GitHub repos |
+| `pnpm db:populate:refs` | Populate reference URLs (STIG/CIS links) |
+
+**Script options:**
+```bash
+npx tsx scripts/fetch-readmes.ts --dry-run    # Preview changes
+npx tsx scripts/fetch-readmes.ts --force      # Re-fetch all records
+npx tsx scripts/fetch-readmes.ts --refs-only  # Only update reference URLs
+npx tsx scripts/fetch-readmes.ts --limit 10   # Process first 10 records
+```
+
+### pb-cli (Pocketbase CLI)
+
+Optional CLI for advanced database operations. Requires [pb-cli](https://github.com/skeeeon/pb-cli).
+
+| Command | Description |
+|---------|-------------|
+| `pnpm pb:setup` | Configure pb-cli for this project (recommended) |
 | `pnpm db:backup` | Create a binary backup |
 | `pnpm db:backup:list` | List available backups |
 | `pnpm db:backup:download <name>` | Download a backup file |
 | `pnpm db:backup:restore <name>` | Restore from a backup |
 
-**First-time pb-cli setup:**
+**First-time setup:**
 ```bash
 # Install pb-cli (Go required)
 go install github.com/skeeeon/pb-cli/cmd/pb@latest
 
-# Create context for this project
-pb context create local --url http://127.0.0.1:8090
-
-# Authenticate (Pocketbase must be running)
-pb auth pb --collection _superusers --email admin@localhost.com --password testpassword123
+# Configure for this project (auto-configures all 33 collections)
+pnpm pb:setup
 ```
+
+The setup script creates a `saf-site` context with all collections from the database. Run it anytime to sync pb-cli with the current schema.
 
 ### Testing
 
@@ -205,25 +222,28 @@ cd .pocketbase && ./pocketbase serve
 
 1. **Open Pocketbase Admin**: http://localhost:8090/_/
 2. **Login**: `admin@localhost.com` / `testpassword123`
-3. **Navigate to collection** (e.g., profiles, organizations)
+3. **Navigate to collection** (e.g., content, organizations, standards)
 4. **Edit or add records** - FK fields show searchable dropdowns
 5. **Refresh dev server**: `pnpm reload-data`
 6. **Export for git**: `pnpm db:export`
 7. **Commit**: `git add .pocketbase/pb_data/diffable/ && git commit`
 
-### Adding a New Validation Profile
+### Adding New Content (Validation Profile or Hardening Content)
 
-1. Open Pocketbase Admin → **profiles** collection
+1. Open Pocketbase Admin → **content** collection
 2. Click **New record**
 3. Fill required fields:
    - `name`: Display name (e.g., "RHEL 9 STIG")
    - `slug`: URL-friendly ID (e.g., "rhel-9-stig")
+   - `content_type`: Select "validation" or "hardening"
    - `description`: Brief description
-   - `github_url`: GitHub repository URL
-   - `organization`: Select from dropdown (MITRE, etc.)
-   - `standard`: Select from dropdown (DISA STIG, etc.)
-   - `technology`: Select from dropdown (RHEL, etc.)
+   - `github`: GitHub repository URL
+   - `vendor`: Select from dropdown (MITRE, etc.)
+   - `standard`: Select from dropdown (DISA STIG, CIS, etc.)
+   - `target`: Select from dropdown (RHEL 9, etc.)
+   - `technology`: Select from dropdown (InSpec, Ansible, etc.)
 4. Save → Export → Commit
+5. **Optional**: Run `pnpm db:populate` to fetch README from GitHub
 
 ### Running Tests Before Committing
 
@@ -290,23 +310,34 @@ cd .pocketbase && ./pocketbase serve
 docs/
 ├── .vitepress/
 │   ├── config.ts              # VitePress configuration
-│   ├── loaders/               # Build-time data loaders
+│   ├── database/
+│   │   └── schema.ts          # Drizzle schema (source of truth)
+│   ├── loaders/
+│   │   └── profiles.data.ts   # Build-time Pocketbase queries
 │   └── theme/
 │       ├── components/        # Vue components
+│       │   └── ui/            # shadcn-vue components
 │       ├── composables/       # Vue composables (logic)
-│       └── custom.css         # Theme customization
+│       └── custom.css         # Theme + Tailwind customization
 ├── index.md                   # Home page
-└── validate/                  # Validation profiles section
-    ├── index.md               # Browse page
-    ├── [slug].md              # Dynamic detail page template
-    └── [slug].paths.ts        # Dynamic route generator
+├── content/                   # Content library (validation + hardening)
+│   ├── index.md               # Browse page
+│   ├── [slug].md              # Dynamic detail page template
+│   └── [slug].paths.ts        # Dynamic route generator
+└── validate/                  # Legacy validation profiles route
+
+scripts/
+├── setup.sh                   # Idempotent project setup
+├── setup-pb-cli.sh            # Configure pb-cli for this project
+├── fetch-readmes.ts           # Populate content from GitHub
+└── export-db.sh               # Export database to diffable/
 
 .pocketbase/
-├── pocketbase                 # Pocketbase binary
+├── pocketbase                 # Pocketbase binary (macOS ARM64)
 ├── pb_data/
 │   ├── data.db                # SQLite database (gitignored)
-│   └── diffable/              # Git-friendly database export
-└── pb_migrations/             # Schema migrations
+│   └── diffable/              # Git-tracked NDJSON export
+└── pb_migrations/             # Auto-generated (gitignored)
 ```
 
 ## Content Management
@@ -322,6 +353,17 @@ cd .pocketbase && ./pocketbase serve
 - Admin UI: http://localhost:8090/_/
 - Default login: `admin@localhost.com` / `testpassword123`
 
+### Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `content` | Validation profiles and hardening content (82 records) |
+| `standards` | Compliance frameworks (STIG, CIS, etc.) |
+| `technologies` | InSpec, Ansible, Chef, Terraform, etc. |
+| `targets` | What gets secured (RHEL 8, MySQL, etc.) |
+| `organizations` | MITRE, DISA, CIS, vendors |
+| `tags` | Categorization tags |
+
 ### Editing Content
 
 1. Start Pocketbase
@@ -329,15 +371,27 @@ cd .pocketbase && ./pocketbase serve
 3. Edit collections (content, standards, technologies, etc.)
 4. Run `pnpm reload-data` to refresh dev server
 
+### Populating Content from GitHub
+
+Content records can auto-populate README content and reference URLs:
+
+```bash
+# Fetch README.md from GitHub for all content
+pnpm db:populate
+
+# Populate reference URLs (STIG/CIS links)
+pnpm db:populate:refs
+```
+
 ### Database Version Control
 
 The database is exported to git-friendly NDJSON format:
 
 ```bash
 # Export (after editing in Pocketbase)
-pnpm db:dump
+pnpm db:export
 
-# Import (after cloning/pulling)
+# Import (after cloning/pulling - handled by setup script)
 pnpm db:load
 ```
 
@@ -379,10 +433,12 @@ Test files are colocated with source:
 |-------|------------|
 | Static Site | VitePress 1.6 |
 | UI Framework | Vue 3.5 |
-| Components | Reka UI 2.7 |
-| Content Database | Pocketbase 0.23 |
+| Components | Reka UI (shadcn-vue) |
+| Styling | Tailwind CSS 4 |
+| Content Database | Pocketbase 0.26 |
+| Schema Definition | Drizzle ORM |
 | Testing | Vitest 4 |
-| Package Manager | pnpm |
+| Package Manager | pnpm 10 |
 
 ## Deployment
 
