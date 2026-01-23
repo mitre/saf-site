@@ -1,7 +1,7 @@
 /**
  * Fetch README content from GitHub and populate Pocketbase records
  *
- * Usage: npx tsx scripts/fetch-readmes.ts [--dry-run] [--limit N] [--force]
+ * Usage: npx tsx scripts/fetch-readmes.ts [--dry-run] [--limit N] [--force] [--refs-only]
  *
  * This script:
  * 1. Queries all content records with GitHub URLs
@@ -10,6 +10,7 @@
  * 4. Tries multiple README variants (README.md, README, README.rst)
  * 5. Tries multiple branches (main, master)
  * 6. Updates records with readme_url and readme_markdown
+ * 7. Populates reference_url based on standard type (STIG, CIS, SRG, etc.)
  */
 
 import PocketBase from 'pocketbase'
@@ -24,13 +25,27 @@ const README_VARIANTS = ['README.md', 'README', 'README.rst', 'README.markdown',
 // Branches to try
 const BRANCHES = ['main', 'master']
 
+// Reference URL patterns by standard type
+const REFERENCE_URLS: Record<string, string> = {
+  'STIG': 'https://public.cyber.mil/stigs/downloads/',
+  'SRG': 'https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=all-srgs',
+  'CIS': 'https://www.cisecurity.org/benchmark/{target}',
+  'PCI-DSS': 'https://www.pcisecuritystandards.org/document_library',
+}
+
 interface ContentRecord {
   id: string
   name: string
   slug: string
   github: string
+  standard?: string
+  reference_url?: string
   readme_url?: string
   readme_markdown?: string
+  expand?: {
+    standard?: { id: string; short_name: string }
+    target?: { id: string; slug: string }
+  }
 }
 
 interface ParsedGitHubUrl {
@@ -90,6 +105,35 @@ async function checkRepoExists(owner: string, repo: string): Promise<boolean> {
 }
 
 /**
+ * Derive reference URL based on standard type and target
+ */
+function deriveReferenceUrl(record: ContentRecord): string | null {
+  const standardShortName = record.expand?.standard?.short_name
+  if (!standardShortName) return null
+
+  const pattern = REFERENCE_URLS[standardShortName]
+  if (!pattern) return null
+
+  // For CIS, substitute the target slug
+  if (standardShortName === 'CIS' && pattern.includes('{target}')) {
+    const targetSlug = record.expand?.target?.slug
+    if (targetSlug) {
+      // Normalize target slug for CIS URL (e.g., "docker-ce" -> "docker")
+      const normalizedTarget = targetSlug
+        .replace(/-ce$/, '')           // docker-ce -> docker
+        .replace(/-ee$/, '')           // docker-ee -> docker
+        .replace(/-enterprise$/, '')   // remove enterprise suffix
+        .replace(/-community$/, '')    // remove community suffix
+        .split('-')[0]                 // take first part (e.g., "red-hat" -> "red")
+      return pattern.replace('{target}', normalizedTarget)
+    }
+    return null
+  }
+
+  return pattern
+}
+
+/**
  * Fetch README content, trying multiple branches and filenames
  */
 async function fetchReadme(githubUrl: string): Promise<{ url: string; content: string; error?: string } | null> {
@@ -133,13 +177,15 @@ async function main() {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
   const force = args.includes('--force')  // Re-fetch even if already populated
+  const refsOnly = args.includes('--refs-only')  // Only populate reference_url
   const limitIndex = args.indexOf('--limit')
   const limit = limitIndex !== -1 ? parseInt(args[limitIndex + 1], 10) : undefined
 
-  console.log(`🚀 README Fetch Script`)
+  console.log(`🚀 Content Population Script`)
   console.log(`   Pocketbase: ${POCKETBASE_URL}`)
   console.log(`   Dry run: ${dryRun}`)
   console.log(`   Force refresh: ${force}`)
+  console.log(`   Refs only: ${refsOnly}`)
   console.log(`   Limit: ${limit || 'none'}`)
   console.log('')
 
@@ -154,17 +200,23 @@ async function main() {
     process.exit(1)
   }
 
-  // Fetch content records with GitHub URLs
-  const filter = force ? 'github != ""' : 'github != "" && readme_markdown = ""'
+  // Build filter based on mode
+  let filter: string
+  if (refsOnly) {
+    filter = force ? 'standard != ""' : 'standard != "" && reference_url = ""'
+  } else {
+    filter = force ? 'github != ""' : 'github != "" && readme_markdown = ""'
+  }
+
   let records: ContentRecord[]
 
   try {
     records = await pb.collection('content').getFullList<ContentRecord>({
       filter,
-      fields: 'id,name,slug,github,readme_url,readme_markdown',
+      expand: 'standard,target',
       sort: 'name'
     })
-    console.log(`📋 Found ${records.length} records ${force ? 'total' : 'needing README fetch'}\n`)
+    console.log(`📋 Found ${records.length} records ${force ? 'total' : 'needing updates'}\n`)
   } catch (error) {
     console.error('❌ Failed to fetch records:', error)
     process.exit(1)
@@ -178,6 +230,7 @@ async function main() {
 
   // Track different failure types
   let updated = 0
+  let refsUpdated = 0
   let repoNotFound = 0
   let noReadme = 0
   let updateFailed = 0
@@ -187,7 +240,33 @@ async function main() {
   for (const record of records) {
     process.stdout.write(`📄 ${record.name.substring(0, 50).padEnd(50)} `)
 
-    // Skip if no GitHub URL
+    // Refs-only mode: just populate reference_url
+    if (refsOnly) {
+      const refUrl = deriveReferenceUrl(record)
+      if (!refUrl) {
+        console.log('⏭️  No reference URL pattern')
+        skipped++
+        continue
+      }
+
+      if (dryRun) {
+        console.log(`✅ Would set ref: ${refUrl}`)
+        refsUpdated++
+        continue
+      }
+
+      try {
+        await pb.collection('content').update(record.id, { reference_url: refUrl })
+        console.log(`✅ Set ref: ${refUrl}`)
+        refsUpdated++
+      } catch (error) {
+        console.log(`❌ Update failed: ${error}`)
+        updateFailed++
+      }
+      continue
+    }
+
+    // Full mode: fetch README and also set reference_url if missing
     if (!record.github) {
       console.log('⏭️  No GitHub URL')
       skipped++
@@ -210,19 +289,32 @@ async function main() {
       continue
     }
 
+    // Build update payload
+    const updateData: Record<string, string> = {
+      readme_url: result.url,
+      readme_markdown: result.content
+    }
+
+    // Also set reference_url if not already set
+    if (!record.reference_url) {
+      const refUrl = deriveReferenceUrl(record)
+      if (refUrl) {
+        updateData.reference_url = refUrl
+      }
+    }
+
     if (dryRun) {
-      console.log(`✅ Would update (${result.content.length} chars)`)
+      const refNote = updateData.reference_url ? ` + ref` : ''
+      console.log(`✅ Would update (${result.content.length} chars${refNote})`)
       updated++
       continue
     }
 
     // Update record
     try {
-      await pb.collection('content').update(record.id, {
-        readme_url: result.url,
-        readme_markdown: result.content
-      })
-      console.log(`✅ Updated (${result.content.length} chars)`)
+      await pb.collection('content').update(record.id, updateData)
+      const refNote = updateData.reference_url ? ` + ref` : ''
+      console.log(`✅ Updated (${result.content.length} chars${refNote})`)
       updated++
     } catch (error) {
       console.log(`❌ Update failed: ${error}`)
@@ -236,9 +328,13 @@ async function main() {
   console.log('')
   console.log('━'.repeat(60))
   console.log(`📊 Summary:`)
-  console.log(`   ✅ Updated:        ${updated}`)
-  console.log(`   🚫 Repo not found: ${repoNotFound}`)
-  console.log(`   ❌ No README:      ${noReadme}`)
+  if (refsOnly) {
+    console.log(`   ✅ Refs updated:   ${refsUpdated}`)
+  } else {
+    console.log(`   ✅ Updated:        ${updated}`)
+    console.log(`   🚫 Repo not found: ${repoNotFound}`)
+    console.log(`   ❌ No README:      ${noReadme}`)
+  }
   console.log(`   💥 Update failed:  ${updateFailed}`)
   console.log(`   ⏭️  Skipped:        ${skipped}`)
   console.log('')
