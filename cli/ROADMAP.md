@@ -92,12 +92,13 @@ Separate pure business logic from I/O.
 
 **Location:** `cli/src/`
 
-### 4.1 Mode Detection
-- [ ] Write tests for `cli.spec.ts`
-- [ ] `isInteractive()` - TTY detection
-- [ ] `--yes` / `-y` flag support
-- [ ] `--json` output format
-- [ ] `--quiet` minimal output
+### 4.1 CLI Argument Parsing & Output Formatting
+- [x] Write tests for `content.cli.spec.ts` - 29 tests
+- [x] `parseAddArgs()` - parse add command flags with validation
+- [x] `parseUpdateArgs()` - parse update command flags
+- [x] `formatAddResult()` - json/text/quiet output formats
+- [x] `formatUpdateResult()` - show diff in multiple formats
+- [x] `formatListResult()` - table/json/quiet formats
 
 ### 4.2 Interactive Prompts
 - [ ] Content add wizard (missing params → prompts)
@@ -123,9 +124,9 @@ Separate pure business logic from I/O.
 | 2 | `pocketbase.spec.ts` | 38+5 skipped | ✅ Passing |
 | 2 | `content-service.spec.ts` | 26 | ✅ Passing |
 | 3 | `content.logic.spec.ts` | 25 | ✅ Passing |
-| 4 | `cli.spec.ts` | TBD | Not started |
+| 4 | `content.cli.spec.ts` | 29 | ✅ Passing |
 
-**Current Total:** 242 passing, 5 skipped
+**Current Total:** 271 passing, 5 skipped
 
 ---
 
@@ -169,6 +170,12 @@ Separate pure business logic from I/O.
   - Implemented `prepareContentAdd()` - orchestrates full add flow with dependency injection
   - Implemented `prepareContentUpdate()` - validates and returns only changed fields
   - All 242 tests passing
+- [x] Phase 4.1: CLI Argument Parsing & Output Formatting (TDD)
+  - Wrote 29 failing tests for CLI layer
+  - Implemented `parseAddArgs()`, `parseUpdateArgs()` with validation
+  - Implemented `formatAddResult()`, `formatUpdateResult()`, `formatListResult()`
+  - Supports json/text/quiet output formats
+  - All 271 tests passing
 
 ---
 
