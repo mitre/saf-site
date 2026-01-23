@@ -29,6 +29,33 @@ export interface InspecProfile {
   depends?: Array<{ name: string; url?: string; branch?: string }>
 }
 
+// ============================================================================
+// INTERNAL HELPERS
+// ============================================================================
+
+/**
+ * Build headers for GitHub API requests
+ *
+ * Handles authentication via GITHUB_TOKEN env var and sets required headers.
+ */
+function getGitHubHeaders(acceptType = 'application/vnd.github.v3+json'): HeadersInit {
+  const token = process.env.GITHUB_TOKEN
+  const headers: HeadersInit = {
+    'Accept': acceptType,
+    'User-Agent': 'saf-site-cli'
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  return headers
+}
+
+// ============================================================================
+// URL PARSING
+// ============================================================================
+
 /**
  * Parse GitHub URL to extract owner/repo
  */
@@ -53,16 +80,7 @@ export function parseGitHubUrl(url: string): { owner: string; repo: string } | n
  * Fetch repository metadata from GitHub API
  */
 export async function fetchRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
-  const token = process.env.GITHUB_TOKEN
-  const headers: HeadersInit = {
-    'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'saf-site-cli'
-  }
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
+  const headers = getGitHubHeaders()
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers })
 
   if (!response.ok) {
@@ -92,15 +110,7 @@ export async function fetchRawFile(
   path: string,
   branch = 'main'
 ): Promise<string | null> {
-  const token = process.env.GITHUB_TOKEN
-  const headers: HeadersInit = {
-    'Accept': 'application/vnd.github.v3.raw',
-    'User-Agent': 'saf-site-cli'
-  }
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
+  const headers = getGitHubHeaders('application/vnd.github.v3.raw')
 
   // Try specified branch first, then master as fallback
   const branches = [branch, 'master']

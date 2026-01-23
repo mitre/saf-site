@@ -172,6 +172,26 @@ export function outputWarnings(warnings: string[], format: OutputFormat): void {
 }
 
 // ============================================================================
+// ERRORS TEXT OUTPUT (for inline formatting)
+// ============================================================================
+
+/**
+ * Format errors for text output (used inline in result formatters)
+ *
+ * Unlike formatErrors() which handles all formats, this is specifically
+ * for text-mode inline use in format result functions.
+ */
+export function formatErrorsText(errors: string[]): string {
+  if (errors.length === 0) return ''
+
+  const lines: string[] = [pc.red('Errors:')]
+  for (const error of errors) {
+    lines.push(pc.red(`  ✗ ${error}`))
+  }
+  return lines.join('\n')
+}
+
+// ============================================================================
 // VALIDATION HELPERS
 // ============================================================================
 

@@ -15,7 +15,8 @@ import {
   VALID_CONTENT_TYPES,
   VALID_STATUSES,
   VALID_AUTOMATION_LEVELS,
-  formatWarnings
+  formatWarnings,
+  formatErrorsText
 } from '../lib/cli-utils.js'
 
 // Re-export OutputFormat for consumers
@@ -202,10 +203,7 @@ export function formatAddResult(result: PrepareAddResult, format: OutputFormat):
   }
 
   if (result.errors.length > 0) {
-    lines.push(pc.red('Errors:'))
-    for (const error of result.errors) {
-      lines.push(pc.red(`  ✗ ${error}`))
-    }
+    lines.push(formatErrorsText(result.errors))
   }
 
   return lines.join('\n')
@@ -260,10 +258,7 @@ export function formatUpdateResult(
   }
 
   if (result.errors.length > 0) {
-    lines.push(pc.red('Errors:'))
-    for (const error of result.errors) {
-      lines.push(pc.red(`  ✗ ${error}`))
-    }
+    lines.push(formatErrorsText(result.errors))
   }
 
   return lines.join('\n')
