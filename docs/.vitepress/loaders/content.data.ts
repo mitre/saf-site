@@ -1,49 +1,6 @@
 import { defineLoader } from 'vitepress'
 import PocketBase from 'pocketbase'
-
-// Pocketbase content record types
-interface PBContent {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  long_description?: string
-  version?: string
-  content_type: 'validation' | 'hardening'
-  status?: 'active' | 'beta' | 'deprecated' | 'draft'
-  github?: string
-  documentation_url?: string
-  reference_url?: string
-  readme_url?: string
-  readme_markdown?: string
-  control_count?: number
-  stig_id?: string
-  benchmark_version?: string
-  is_featured?: boolean
-  expand?: {
-    target?: { id: string; name: string; slug: string; category?: string }
-    standard?: { id: string; name: string; short_name?: string; slug: string; standard_type?: string }
-    technology?: {
-      id: string
-      name: string
-      slug: string
-      logo?: string
-      quick_start_template?: string
-      prerequisites_template?: string
-    }
-    vendor?: { id: string; name: string; slug: string; logo?: string; org_type?: string }
-    maintainer?: {
-      id: string
-      name: string
-      slug: string
-      logo?: string
-      organization?: string
-      expand?: {
-        organization?: { id: string; name: string; logo?: string }
-      }
-    }
-  }
-}
+import type { PBContent } from '../theme/lib/pocketbase-types'
 
 // Flattened content item for VitePress consumption
 export interface ContentItem {

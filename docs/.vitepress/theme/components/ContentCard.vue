@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
+import { getStatusVariant } from '@/lib/utils'
 
 export interface ContentItem {
   id: string
@@ -31,16 +32,6 @@ const pillar = computed<PillarType>(() => {
 const contentUrl = computed(() => {
   return `/content/${props.content.slug}.html`
 })
-
-const statusVariant = (status?: string) => {
-  switch (status) {
-    case 'active': return 'success'
-    case 'beta': return 'warning'
-    case 'deprecated': return 'destructive'
-    case 'draft': return 'secondary'
-    default: return 'default'
-  }
-}
 </script>
 
 <template>
@@ -55,7 +46,7 @@ const statusVariant = (status?: string) => {
             <PillarBadge :pillar="pillar" size="sm" />
             <Badge
               v-if="content.status"
-              :variant="statusVariant(content.status)"
+              :variant="getStatusVariant(content.status)"
               class="uppercase text-[0.625rem] px-2 py-0.5"
             >
               {{ content.status }}

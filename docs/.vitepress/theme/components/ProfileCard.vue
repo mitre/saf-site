@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { getStatusVariant } from '@/lib/utils'
 
 interface Profile {
   id: string
@@ -18,16 +19,6 @@ interface Profile {
 defineProps<{
   profile: Profile
 }>()
-
-const statusVariant = (status?: string) => {
-  switch (status) {
-    case 'active': return 'success'
-    case 'beta': return 'warning'
-    case 'deprecated': return 'destructive'
-    case 'draft': return 'secondary'
-    default: return 'default'
-  }
-}
 </script>
 
 <template>
@@ -41,7 +32,7 @@ const statusVariant = (status?: string) => {
           <div class="flex flex-wrap gap-1 shrink-0">
             <Badge
               v-if="profile.status"
-              :variant="statusVariant(profile.status)"
+              :variant="getStatusVariant(profile.status)"
               class="uppercase text-[0.625rem] px-2 py-0.5"
             >
               {{ profile.status }}
