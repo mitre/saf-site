@@ -137,6 +137,8 @@ export const technologies = sqliteTable('technologies', {
   github: text('github'),
   organization: text('organization').references(() => organizations.id),  // Who makes it
   documentationUrl: text('documentation_url'),
+  quickStartTemplate: text('quick_start_template'),      // Auto-generated quick start section
+  prerequisitesTemplate: text('prerequisites_template'), // Basic prerequisites per technology
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
@@ -275,6 +277,9 @@ export const content = sqliteTable('content', {
   // Links
   github: text('github'),
   documentationUrl: text('documentation_url'),
+  referenceUrl: text('reference_url'),          // Link to official standard (cyber.mil, cisecurity.org)
+  readmeUrl: text('readme_url'),                // GitHub raw README URL for fetching/syncing
+  readmeMarkdown: text('readme_markdown'),      // Full/curated README content (long markdown)
 
   // Domain-specific (validation profiles)
   controlCount: integer('control_count'),       // Number of controls/checks
