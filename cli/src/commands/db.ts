@@ -9,7 +9,7 @@ import * as p from '@clack/prompts'
 import pc from 'picocolors'
 import { execSync } from 'child_process'
 import { getPocketBase, checkConnection, loadFkMaps } from '../lib/pocketbase.js'
-import { auditSlug, validateSlug } from '../lib/validation.js'
+import { auditSlug, validateSlug } from '@schema/validation.js'
 
 export const dbCommand = new Command('db')
   .description('Database management commands')

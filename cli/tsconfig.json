@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "paths": {
       "@schema": ["../docs/.vitepress/database/schema.ts"],
+      "@schema/*": ["../docs/.vitepress/database/*"],
       "@/*": ["./src/*"]
     },
     "baseUrl": "."
