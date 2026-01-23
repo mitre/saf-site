@@ -361,7 +361,7 @@ describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
       return
     }
 
-    const cli = createCliTest(['content', 'update', contentId, '--version', '1.0.0', '--yes'])
+    const cli = createCliTest(['content', 'update', contentId, '--set-version', '1.0.0', '--yes'])
 
     await cli.run()
     const exitCode = await cli.waitForExit()

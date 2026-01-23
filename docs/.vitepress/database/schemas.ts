@@ -36,9 +36,11 @@ const slugSchema = z.string()
 const urlSchema = z.string().url().optional()
 
 /**
- * Semver pattern (loose - allows 1.0.0, 0.1.0, etc.)
+ * Full semver pattern: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+ * Examples: 1.0.0, 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0+build, 1.0.0-beta+build
+ * See: https://semver.org/
  */
-const semverPattern = /^\d+\.\d+\.\d+$/
+const semverPattern = /^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/
 
 // ============================================================================
 // ENUMS
@@ -164,7 +166,7 @@ export const contentSchema = z.object({
   slug: slugSchema,
   description: z.string().optional(),
   longDescription: z.string().optional(),
-  version: z.string().regex(semverPattern, 'Version must be semver format (x.y.z)').optional(),
+  version: z.string().regex(semverPattern, 'Version must be semver format (x.y.z[-prerelease][+build])').optional(),
 
   // Classification
   contentType: contentTypeEnum,

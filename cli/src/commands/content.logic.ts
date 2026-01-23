@@ -82,8 +82,11 @@ const slugSchema = z.string()
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens')
   .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
 
+// Full semver regex: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+// Examples: 1.0.0, 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0+build, 1.0.0-beta+build
 const versionSchema = z.string()
-  .regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format (x.y.z)')
+  .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/,
+    'Version must be semver format (x.y.z[-prerelease][+build])')
 
 const statusSchema = z.enum(['active', 'beta', 'deprecated', 'draft'])
 

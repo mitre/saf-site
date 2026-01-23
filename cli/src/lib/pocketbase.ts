@@ -240,7 +240,7 @@ const createContentValidation = z.object({
     .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens'),
   contentType: z.enum(['validation', 'hardening']),
   description: z.string().optional(),
-  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format').optional(),
+  version: z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format').optional(),
   status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional(),
   github: z.string().url().optional(),
   controlCount: z.number().int().positive().optional()
@@ -256,7 +256,7 @@ const updateContentValidation = z.object({
     .refine((s) => !s.includes('--'), 'Slug cannot contain consecutive hyphens')
     .optional(),
   contentType: z.enum(['validation', 'hardening']).optional(),
-  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format').optional(),
+  version: z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/, 'Version must be semver format').optional(),
   status: z.enum(['active', 'beta', 'deprecated', 'draft']).optional()
 }).passthrough()
 

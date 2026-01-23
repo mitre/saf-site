@@ -223,16 +223,15 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
   // Prepare content
   const result = await prepareContentAdd(args, fkMaps, serviceDeps)
 
-  // Handle dry-run
+  // Handle dry-run: output preparation result only
   if (options.dryRun) {
     console.log(formatAddResult(result, format))
     process.exit(result.success ? 0 : 1)
   }
 
-  // Output result
-  console.log(formatAddResult(result, format))
-
+  // Check preparation success
   if (!result.success) {
+    console.log(formatAddResult(result, format))
     process.exit(1)
   }
 
@@ -241,17 +240,32 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
     const pb = await getPocketBase()
     const record = await createContent(result.content!, pb)
 
+    // Output combined result (preparation + creation)
     if (format === 'json') {
-      console.log(JSON.stringify({ success: true, id: record.id, slug: record.slug }, null, 2))
+      console.log(JSON.stringify({
+        success: true,
+        id: record.id,
+        content: result.content,
+        warnings: result.warnings,
+        errors: []
+      }, null, 2))
     } else if (format === 'quiet') {
       console.log(record.slug)
     } else {
+      // Text format: show preparation summary then success
+      console.log(formatAddResult(result, format))
       console.log(pc.green(`\n✓ Created: ${record.id}`))
     }
   } catch (error) {
     if (format === 'json') {
-      console.log(JSON.stringify({ success: false, errors: [String(error)] }, null, 2))
+      console.log(JSON.stringify({
+        success: false,
+        content: result.content,
+        warnings: result.warnings,
+        errors: [String(error)]
+      }, null, 2))
     } else {
+      console.log(formatAddResult(result, format))
       console.error(pc.red(`Failed to create: ${error}`))
     }
     process.exit(1)
@@ -450,7 +464,7 @@ contentCommand
   .description('Update a content record')
   .option('--name <name>', 'Update name')
   .option('--description <desc>', 'Update description')
-  .option('--version <version>', 'Update version')
+  .option('-v, --set-version <version>', 'Update version')
   .option('--status <status>', 'Update status (active|beta|deprecated|draft)')
   .option('--control-count <count>', 'Update control count')
   .option('--sync-readme', 'Sync README from GitHub')
@@ -460,6 +474,7 @@ contentCommand
   .option('--dry-run', 'Show changes without applying')
   .action(async (id, options) => {
     const format: OutputFormat = options.json ? 'json' : options.quiet ? 'quiet' : 'text'
+
 
     try {
       const pb = await getPocketBase()
@@ -472,11 +487,12 @@ contentCommand
         id,
         name: options.name,
         description: options.description,
-        version: options.version,
+        version: options.setVersion,
         status: options.status,
         controlCount: options.controlCount,
         syncReadme: options.syncReadme
       })
+
 
       // Handle sync-readme
       if (options.syncReadme && existing.github) {
@@ -509,6 +525,19 @@ contentCommand
 
       // Prepare update
       const result = prepareContentUpdate(existing, { updates: args.updates || {} })
+
+      // Handle validation errors from prepareContentUpdate
+      if (!result.success) {
+        if (format === 'json') {
+          console.log(JSON.stringify({ success: false, errors: result.errors }, null, 2))
+        } else if (format !== 'quiet') {
+          console.error(pc.red('Validation errors:'))
+          for (const error of result.errors) {
+            console.error(pc.red(`  ✗ ${error}`))
+          }
+        }
+        process.exit(1)
+      }
 
       // Handle dry-run
       if (options.dryRun) {

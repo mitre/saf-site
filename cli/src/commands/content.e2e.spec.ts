@@ -95,7 +95,7 @@ describe('Content CLI E2E - Offline', () => {
     it('shows help for content update command', async () => {
       const { stdout } = await runCli(['content', 'update', '--help'])
 
-      expect(stdout).toContain('--version')
+      expect(stdout).toContain('--set-version')
       expect(stdout).toContain('--status')
       expect(stdout).toContain('--sync-readme')
       expect(stdout).toContain('--dry-run')
@@ -329,6 +329,110 @@ describe('Content CLI E2E - Live', () => {
       }
     })
   })
+})
+
+// ============================================================================
+// LIVE DATABASE TESTS (Actually create/update/delete records)
+// ============================================================================
+
+describe('Content CLI E2E - Live Database Operations', () => {
+  // Use unique slug for test isolation
+  const testSlug = `test-cli-e2e-${Date.now()}`
+  let createdId: string | null = null
+
+  it('creates a content record (non-dry-run)', async () => {
+    const { stdout, exitCode } = await runCli([
+      'content', 'add',
+      'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
+      '--type', 'validation',
+      '--slug', testSlug,
+      '--name', 'CLI E2E Test Profile',
+      '--vendor', 'MITRE',
+      '--standard', 'DISA STIG',
+      '--yes', '--json'
+    ])
+
+    expect(exitCode).toBe(0)
+    const parsed = JSON.parse(stdout)
+    expect(parsed.success).toBe(true)
+    expect(parsed.content).toBeDefined()
+    expect(parsed.content.slug).toBe(testSlug)
+
+    // Store ID for subsequent tests
+    createdId = parsed.id || parsed.content?.id
+  }, 30000) // Extended timeout for GitHub fetch
+
+  it('verifies created record exists via list', async () => {
+    const { stdout, exitCode } = await runCli([
+      'content', 'list', '--json'
+    ])
+
+    expect(exitCode).toBe(0)
+    const records = JSON.parse(stdout)
+    const found = records.find((r: any) => r.slug === testSlug)
+    expect(found).toBeDefined()
+    expect(found.name).toBe('CLI E2E Test Profile')
+
+    // Capture ID if not already set
+    if (!createdId && found) {
+      createdId = found.id
+    }
+  })
+
+  it('shows the created record details', async () => {
+    if (!createdId) {
+      console.log('Skipping: no record ID from previous test')
+      return
+    }
+
+    const { stdout, exitCode } = await runCli([
+      'content', 'show', createdId, '--json'
+    ])
+
+    expect(exitCode).toBe(0)
+    const record = JSON.parse(stdout)
+    expect(record.id).toBe(createdId)
+    expect(record.slug).toBe(testSlug)
+    expect(record.content_type).toBe('validation')
+  })
+
+  it('updates the created record', async () => {
+    if (!createdId) {
+      console.log('Skipping: no record ID from previous test')
+      return
+    }
+
+    const { stdout, exitCode } = await runCli([
+      'content', 'update', createdId,
+      '--set-version', '99.0.0-test',
+      '--yes', '--json'
+    ])
+
+    expect(exitCode).toBe(0)
+    const parsed = JSON.parse(stdout)
+    expect(parsed.success).toBe(true)
+    expect(parsed.hasChanges).toBe(true)
+  })
+
+  it('verifies update was applied', async () => {
+    if (!createdId) {
+      console.log('Skipping: no record ID from previous test')
+      return
+    }
+
+    const { stdout, exitCode } = await runCli([
+      'content', 'show', createdId, '--json'
+    ])
+
+    expect(exitCode).toBe(0)
+    const record = JSON.parse(stdout)
+    expect(record.version).toBe('99.0.0-test')
+  })
+
+  // Note: We don't delete the test record because:
+  // 1. Test DB is restored fresh from diffable/ on each test run
+  // 2. No delete command exists yet
+  // 3. The record serves as evidence the tests ran
 })
 
 // ============================================================================
