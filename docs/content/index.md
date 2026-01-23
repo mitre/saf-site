@@ -5,18 +5,40 @@ aside: false
 ---
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { data } from '../.vitepress/loaders/content.data'
+import { inBrowser } from 'vitepress'
 
 const allItems = data.items
 
-// Filter state
-const selectedPillar = ref('all')
-const selectedTarget = ref('all')
-const selectedTech = ref('all')
-const selectedVendor = ref('all')
-const selectedStandard = ref('all')
-const searchQuery = ref('')
+// Read URL query params (only in browser)
+function getUrlParam(name) {
+  if (!inBrowser) return null
+  const params = new URLSearchParams(window.location.search)
+  return params.get(name)
+}
+
+// Filter state - initialize from URL params if present
+const selectedPillar = ref(getUrlParam('pillar') || 'all')
+const selectedTarget = ref(getUrlParam('target') || 'all')
+const selectedTech = ref(getUrlParam('technology') || 'all')
+const selectedVendor = ref(getUrlParam('vendor') || 'all')
+const selectedStandard = ref(getUrlParam('standard') || 'all')
+const searchQuery = ref(getUrlParam('search') || '')
+
+// Clear all filters and URL params
+function clearAllFilters() {
+  selectedPillar.value = 'all'
+  selectedTarget.value = 'all'
+  selectedTech.value = 'all'
+  selectedVendor.value = 'all'
+  selectedStandard.value = 'all'
+  searchQuery.value = ''
+  // Clear URL params
+  if (inBrowser) {
+    window.history.replaceState({}, '', window.location.pathname)
+  }
+}
 
 // Computed filtered items
 const filteredItems = computed(() => {
@@ -79,12 +101,19 @@ Security content for validation and hardening across platforms and compliance st
 
 <ContentFilters
   :items="allItems"
+  :initial-pillar="selectedPillar"
+  :initial-target="selectedTarget"
+  :initial-technology="selectedTech"
+  :initial-vendor="selectedVendor"
+  :initial-standard="selectedStandard"
+  :initial-search="searchQuery"
   @update:pillar="selectedPillar = $event"
   @update:target="selectedTarget = $event"
   @update:technology="selectedTech = $event"
   @update:vendor="selectedVendor = $event"
   @update:standard="selectedStandard = $event"
   @update:search="searchQuery = $event"
+  @clear="clearAllFilters"
 />
 
 <div v-if="filteredItems.length > 0" class="results-count">

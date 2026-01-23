@@ -181,7 +181,7 @@ const metadataItems = computed<MetadataItem[]>(() => {
     items.push({
       label: 'Target',
       value: props.content.target_name,
-      href: `/content/?target=${props.content.target_slug}`
+      href: `/content/?target=${encodeURIComponent(props.content.target_name)}`
     })
   }
 
@@ -190,13 +190,13 @@ const metadataItems = computed<MetadataItem[]>(() => {
     items.push({
       label: 'Standard',
       value: benchmarkLabel.value,
-      href: `/content/?standard=${props.content.standard_slug}`
+      href: `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
     })
   } else if (props.content.standard_short_name || props.content.standard_name) {
     items.push({
       label: 'Standard',
       value: props.content.standard_short_name || props.content.standard_name,
-      href: `/content/?standard=${props.content.standard_slug}`
+      href: `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
     })
   }
 
@@ -204,7 +204,7 @@ const metadataItems = computed<MetadataItem[]>(() => {
     items.push({
       label: 'Tech',
       value: props.content.technology_name,
-      href: `/content/?technology=${props.content.technology_slug}`
+      href: `/content/?technology=${encodeURIComponent(props.content.technology_name)}`
     })
   }
 
@@ -236,7 +236,7 @@ const metadataItems = computed<MetadataItem[]>(() => {
     items.push({
       label: 'Vendor',
       value: props.content.vendor_name,
-      href: `/content/?vendor=${props.content.vendor_slug}`
+      href: `/content/?vendor=${encodeURIComponent(props.content.vendor_name)}`
     })
   }
 

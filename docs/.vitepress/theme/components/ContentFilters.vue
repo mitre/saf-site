@@ -1,6 +1,7 @@
 <template>
   <div class="content-filters">
-    <div class="filter-group">
+    <!-- Row 1: Dropdown filters -->
+    <div class="filter-row filter-dropdowns">
       <!-- Pillar Filter (SAF capability) -->
       <div class="filter-item">
         <label class="filter-label">Pillar</label>
@@ -109,8 +110,10 @@
           </SelectContent>
         </Select>
       </div>
+    </div>
 
-      <!-- Search Input -->
+    <!-- Row 2: Search + Clear -->
+    <div class="filter-row filter-search-row">
       <div class="filter-item filter-search">
         <label class="filter-label">Search</label>
         <Input
@@ -120,6 +123,15 @@
           @input="$emit('update:search', searchQuery)"
         />
       </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        :disabled="!hasActiveFilters"
+        @click="clearFilters"
+        class="clear-button"
+      >
+        Clear filters
+      </Button>
     </div>
   </div>
 </template>
@@ -135,6 +147,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface ContentItem {
   id: string
@@ -148,6 +161,12 @@ interface ContentItem {
 
 const props = defineProps<{
   items: ContentItem[]
+  initialPillar?: string
+  initialTarget?: string
+  initialTechnology?: string
+  initialVendor?: string
+  initialStandard?: string
+  initialSearch?: string
 }>()
 
 const emit = defineEmits<{
@@ -157,14 +176,36 @@ const emit = defineEmits<{
   'update:vendor': [value: string]
   'update:standard': [value: string]
   'update:search': [value: string]
+  'clear': []
 }>()
 
-const selectedPillar = ref('all')
-const selectedTarget = ref('all')
-const selectedTech = ref('all')
-const selectedVendor = ref('all')
-const selectedStandard = ref('all')
-const searchQuery = ref('')
+const selectedPillar = ref(props.initialPillar || 'all')
+const selectedTarget = ref(props.initialTarget || 'all')
+const selectedTech = ref(props.initialTechnology || 'all')
+const selectedVendor = ref(props.initialVendor || 'all')
+const selectedStandard = ref(props.initialStandard || 'all')
+const searchQuery = ref(props.initialSearch || '')
+
+// Check if any filters are active
+const hasActiveFilters = computed(() => {
+  return selectedPillar.value !== 'all' ||
+    selectedTarget.value !== 'all' ||
+    selectedTech.value !== 'all' ||
+    selectedVendor.value !== 'all' ||
+    selectedStandard.value !== 'all' ||
+    searchQuery.value !== ''
+})
+
+// Clear all filters
+function clearFilters() {
+  selectedPillar.value = 'all'
+  selectedTarget.value = 'all'
+  selectedTech.value = 'all'
+  selectedVendor.value = 'all'
+  selectedStandard.value = 'all'
+  searchQuery.value = ''
+  emit('clear')
+}
 
 // Extract unique targets from items
 const targets = computed(() => {
@@ -243,12 +284,37 @@ watch(selectedStandard, (value) => {
   background: var(--vp-c-bg-soft);
   border-radius: 8px;
   border: 1px solid var(--vp-c-divider);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.filter-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.filter-row {
+  display: flex;
   gap: 1rem;
+}
+
+.filter-dropdowns {
+  flex-wrap: wrap;
+}
+
+.filter-dropdowns .filter-item {
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-search-row {
+  align-items: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.filter-search {
+  flex: 1;
+}
+
+.filter-search :deep(input) {
+  background: var(--vp-c-bg);
 }
 
 .filter-item {
@@ -257,23 +323,33 @@ watch(selectedStandard, (value) => {
   gap: 0.5rem;
 }
 
-.filter-search {
-  grid-column: span 2;
-}
-
 .filter-label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.clear-button {
   color: var(--vp-c-text-2);
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
-  .filter-group {
-    grid-template-columns: 1fr;
+  .filter-dropdowns {
+    flex-direction: column;
   }
 
-  .filter-search {
-    grid-column: span 1;
+  .filter-dropdowns .filter-item {
+    min-width: 100%;
+  }
+
+  .filter-search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clear-button {
+    align-self: flex-start;
   }
 }
 </style>
