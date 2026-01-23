@@ -103,6 +103,7 @@ export const teams = sqliteTable('teams', {
   description: text('description'),
   organization: text('organization').references(() => organizations.id),
   website: text('website'),
+  logo: text('logo'),                           // Team logo URL (often inherited from organization)
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })

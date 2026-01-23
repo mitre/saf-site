@@ -32,8 +32,17 @@ interface PBContent {
       quick_start_template?: string
       prerequisites_template?: string
     }
-    vendor?: { id: string; name: string; slug: string }
-    maintainer?: { id: string; name: string; slug: string; organization?: string }
+    vendor?: { id: string; name: string; slug: string; logo?: string }
+    maintainer?: {
+      id: string
+      name: string
+      slug: string
+      logo?: string
+      organization?: string
+      expand?: {
+        organization?: { id: string; name: string; logo?: string }
+      }
+    }
   }
 }
 
@@ -61,8 +70,9 @@ export default {
       )
 
       // Query ALL content with FK expansion (no filter - both validation and hardening)
+      // Include maintainer.organization to get org logo as fallback for teams without logos
       const records = await pb.collection('content').getFullList<PBContent>({
-        expand: 'target,standard,technology,vendor,maintainer',
+        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
         sort: 'name'
       })
 
@@ -112,9 +122,12 @@ export default {
               // Vendor
               vendor_name: record.expand?.vendor?.name || '',
               vendor_slug: record.expand?.vendor?.slug || '',
-              // Maintainer
+              vendor_logo: record.expand?.vendor?.logo || '',
+              // Maintainer (logo falls back to organization logo)
               maintainer_name: record.expand?.maintainer?.name || '',
               maintainer_slug: record.expand?.maintainer?.slug || '',
+              maintainer_logo: record.expand?.maintainer?.logo ||
+                record.expand?.maintainer?.expand?.organization?.logo || '',
               // Links
               github_url: record.github || '',
               documentation_url: record.documentation_url || '',
