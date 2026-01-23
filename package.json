@@ -21,6 +21,9 @@
     "db:backup:list": "pb backup list",
     "db:backup:download": "pb backup download",
     "db:backup:restore": "pb backup restore",
+    "db:populate": "tsx scripts/fetch-readmes.ts",
+    "db:populate:refs": "tsx scripts/fetch-readmes.ts --refs-only",
+    "pb:setup": "./scripts/setup-pb-cli.sh",
     "reload-data": "touch 'docs/validate/[slug].paths.ts'"
   },
   "keywords": [
