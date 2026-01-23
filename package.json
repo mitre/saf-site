@@ -57,7 +57,7 @@
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitepress": "^1.6.4",
+    "vitepress": "2.0.0-alpha.15",
     "vitest": "^4.0.17",
     "vue": "^3.5.26"
   },
@@ -65,7 +65,22 @@
     "overrides": {
       "esbuild": ">=0.25.0",
       "mdast-util-to-hast": ">=13.2.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "-",
+      "3",
+      "b",
+      "better-sqlite3",
+      "e",
+      "esbuild",
+      "i",
+      "l",
+      "q",
+      "r",
+      "s",
+      "t",
+      "vue-demi"
+    ]
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.14",
