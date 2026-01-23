@@ -262,7 +262,6 @@ const relatedContent = computed(() => props.relatedContent || [])
 .content-section {
   margin-top: 2.5rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--vp-c-divider);
 }
 
 .section-title {
@@ -382,7 +381,6 @@ const relatedContent = computed(() => props.relatedContent || [])
 .related-content {
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--vp-c-divider);
 }
 
 .related-title {

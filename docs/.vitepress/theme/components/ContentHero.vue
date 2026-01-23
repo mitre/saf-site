@@ -148,8 +148,7 @@ defineProps<{
 
 /* Metadata Strip */
 .hero-metadata {
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 1rem;
 }
 
 /* Responsive */
