@@ -22,6 +22,10 @@
   --vp-c-brand-2: #0066a8;
   --vp-c-brand-3: #0080cc;
 
+  /* SAF Pillar icons - Light mode */
+  --pillar-primary: #005B94;
+  --pillar-secondary: #CBD2DF;
+
   /* shadcn-vue variables - Light mode */
   --radius: 0.5rem;
   --background: oklch(1 0 0);
@@ -46,6 +50,10 @@
 }
 
 .dark {
+  /* SAF Pillar icons - Dark mode */
+  --pillar-primary: #4A9FD4;
+  --pillar-secondary: #9CA3AF;
+
   /* shadcn-vue variables - Dark mode */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

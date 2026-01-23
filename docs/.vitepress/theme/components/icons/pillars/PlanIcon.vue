@@ -1,0 +1,30 @@
+<script setup lang="ts">
+defineProps<{
+  size?: number | string
+}>()
+</script>
+
+<template>
+  <svg
+    :width="size || 528"
+    :height="size ? Number(size) * (522/528) : 522"
+    viewBox="0 0 528 522"
+    xmlns="http://www.w3.org/2000/svg"
+    class="pillar-icon pillar-icon-plan"
+  >
+    <title>Plan Icon</title>
+    <!-- Gray secondary element (outer circle) -->
+    <path d="M263.5 2C118.43 2 1 117.645 1 260.5 1 403.355 118.43 519 263.5 519 408.57 519 526 403.355 526 260.5 526 117.645 408.57 2 263.5 2ZM263.5 42.816C385.08 42.816 484.55 140.774 484.55 260.5 484.55 380.226 385.08 478.184 263.5 478.184 141.92 478.184 42.45 380.226 42.45 260.5 42.45 140.774 141.92 42.816 263.5 42.816" class="pillar-icon-secondary" fill-rule="evenodd"/>
+    <!-- Blue primary element (compass needle) -->
+    <path d="M156 367 307.87 305.742 370 156 218.13 218.619 156 367ZM263.69 247.206C271.97 247.206 277.5 252.652 277.5 260.82 277.5 268.987 271.97 274.432 263.69 274.432 255.41 274.432 249.88 268.987 249.88 260.82 249.88 252.652 255.41 247.206 263.69 247.206" class="pillar-icon-primary" fill-rule="evenodd"/>
+  </svg>
+</template>
+
+<style scoped>
+.pillar-icon-primary {
+  fill: var(--pillar-primary, #005B94);
+}
+.pillar-icon-secondary {
+  fill: var(--pillar-secondary, #D9D9D9);
+}
+</style>
