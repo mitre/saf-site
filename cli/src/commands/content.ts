@@ -73,7 +73,7 @@ contentCommand
         contentType: options.type,
         status: options.status,
         expand: ['target', 'standard', 'technology', 'vendor'],
-        sort: '-created'
+        sort: 'name'  // Sort alphabetically (content collection has no created/updated fields)
       }, pb)
 
       // Limit results
