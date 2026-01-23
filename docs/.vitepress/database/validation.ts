@@ -1,26 +1,58 @@
 /**
- * Content Validation
+ * Entity Validation (Phase 1.3)
  *
- * Enforces naming conventions at the data layer
+ * Validation functions that combine Zod schema validation with convention checks.
+ * Uses schemas from schemas.ts as the source of truth.
  */
 
-import { z } from 'zod'
-import { TARGET_ABBREVIATIONS, STANDARD_IDENTIFIERS, TECHNOLOGY_PREFIXES } from './conventions.js'
+import { z, ZodError } from 'zod'
+import {
+  organizationInputSchema,
+  targetInputSchema,
+  standardInputSchema,
+  technologyInputSchema,
+  teamInputSchema,
+  tagInputSchema,
+  contentInputSchema,
+  type OrganizationInput,
+  type TargetInput,
+  type StandardInput,
+  type TechnologyInput,
+  type TeamInput,
+  type TagInput,
+  type ContentInput
+} from './schemas.js'
+import {
+  TARGET_ABBREVIATIONS,
+  STANDARD_IDENTIFIERS,
+  TECHNOLOGY_PREFIXES,
+  generateContentSlug,
+  abbreviateTarget
+} from './conventions.js'
 
-// Build regex patterns from our canonical mappings
-const targetAbbreviations = Object.values(TARGET_ABBREVIATIONS)
-const standardIdentifiers = Object.values(STANDARD_IDENTIFIERS)
-const technologyPrefixes = Object.values(TECHNOLOGY_PREFIXES)
+// ============================================================================
+// TYPES
+// ============================================================================
 
-/**
- * Slug validation pattern
- *
- * Valid formats:
- * - {target}-{standard}           e.g., rhel-9-stig
- * - {target}-{version}-{standard} e.g., rhel-9-stig, ubuntu-2204-cis
- * - {tech}-{target}-{standard}    e.g., ansible-rhel-9-stig
- */
+export interface ValidationResult<T> {
+  valid: boolean
+  data?: T
+  errors?: ZodError
+  warnings: string[]
+}
+
+export interface AuditResult {
+  compliant: boolean
+  issues: string[]
+  suggestedSlug?: string
+}
+
+// ============================================================================
+// SLUG VALIDATION
+// ============================================================================
+
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
+const standardIdentifiers = Object.values(STANDARD_IDENTIFIERS)
 
 /**
  * Validate a slug follows conventions
@@ -89,72 +121,59 @@ export function validateSlug(slug: string): {
 }
 
 /**
- * Zod schema for content slugs
+ * Check slug for target abbreviation conventions (non-content entities)
  */
-export const slugSchema = z.string()
-  .min(3, 'Slug must be at least 3 characters')
-  .max(100, 'Slug must be at most 100 characters')
-  .regex(SLUG_PATTERN, 'Slug must be lowercase alphanumeric with hyphens')
-  .refine(
-    (slug) => !slug.includes('--'),
-    'Slug cannot contain consecutive hyphens'
-  )
-  .refine(
-    (slug) => !slug.startsWith('-') && !slug.endsWith('-'),
-    'Slug cannot start or end with hyphen'
-  )
-
-/**
- * Zod schema for content type
- */
-export const contentTypeSchema = z.enum(['validation', 'hardening'])
-
-/**
- * Zod schema for content status
- */
-export const statusSchema = z.enum(['active', 'beta', 'deprecated', 'draft'])
-
-/**
- * Full content validation schema
- */
-export const contentSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(200),
-  slug: slugSchema,
-  description: z.string().optional(),
-  content_type: contentTypeSchema,
-  status: statusSchema.default('active'),
-  version: z.string().optional(),
-
-  // FKs - validated as non-empty strings (actual FK validation done at DB level)
-  target: z.string().min(1).optional(),
-  standard: z.string().min(1).optional(),
-  technology: z.string().min(1).optional(),
-  vendor: z.string().min(1).optional(),
-  maintainer: z.string().min(1).optional(),
-
-  // URLs
-  github: z.string().url().optional().or(z.literal('')),
-  documentation_url: z.string().url().optional().or(z.literal('')),
-  reference_url: z.string().url().optional().or(z.literal('')),
-
-  // Metadata
-  control_count: z.number().int().positive().optional(),
-  license: z.string().optional(),
-})
-
-/**
- * Validate content data before insert/update
- */
-export function validateContent(data: unknown): {
-  valid: boolean
-  data?: z.infer<typeof contentSchema>
-  errors?: z.ZodError
-  warnings: string[]
-} {
+function checkTargetSlugConventions(slug: string, name: string): string[] {
   const warnings: string[] = []
+  const nameLower = name.toLowerCase()
 
-  // Parse with Zod
-  const result = contentSchema.safeParse(data)
+  // Check for common mismatches
+  if (nameLower.includes('red hat') && !slug.startsWith('rhel')) {
+    warnings.push('Use "rhel" instead of "red-hat" for Red Hat Enterprise Linux')
+  }
+
+  if (nameLower.includes('windows') && !slug.includes('win')) {
+    warnings.push('Consider using "win" instead of "windows" for Windows Server')
+  }
+
+  if (nameLower.includes('enterprise linux') && slug.includes('enterprise-linux')) {
+    warnings.push('Use "rhel" abbreviation instead of full "enterprise-linux"')
+  }
+
+  return warnings
+}
+
+// ============================================================================
+// GENERIC VALIDATION
+// ============================================================================
+
+type EntityType = 'organization' | 'target' | 'standard' | 'technology' | 'team' | 'tag' | 'content'
+
+const schemaMap = {
+  organization: organizationInputSchema,
+  target: targetInputSchema,
+  standard: standardInputSchema,
+  technology: technologyInputSchema,
+  team: teamInputSchema,
+  tag: tagInputSchema,
+  content: contentInputSchema
+} as const
+
+/**
+ * Generic entity validation
+ */
+export function validateEntity<T extends EntityType>(
+  entityType: T,
+  data: unknown
+): ValidationResult<z.infer<typeof schemaMap[T]>> {
+  const schema = schemaMap[entityType]
+
+  if (!schema) {
+    throw new Error(`Unknown entity type: ${entityType}`)
+  }
+
+  const warnings: string[] = []
+  const result = schema.safeParse(data)
 
   if (!result.success) {
     return {
@@ -164,21 +183,15 @@ export function validateContent(data: unknown): {
     }
   }
 
-  // Additional convention checks
-  const slugValidation = validateSlug(result.data.slug)
-  warnings.push(...slugValidation.warnings)
+  // Add convention warnings based on entity type
+  const typedData = result.data as { slug?: string; name?: string; contentType?: string }
 
-  if (!slugValidation.valid) {
-    return {
-      valid: false,
-      errors: new z.ZodError(
-        slugValidation.errors.map(msg => ({
-          code: 'custom',
-          path: ['slug'],
-          message: msg
-        }))
-      ),
-      warnings
+  if (typedData.slug && typedData.name) {
+    if (entityType === 'content') {
+      const slugValidation = validateSlug(typedData.slug)
+      warnings.push(...slugValidation.warnings)
+    } else if (entityType === 'target') {
+      warnings.push(...checkTargetSlugConventions(typedData.slug, typedData.name))
     }
   }
 
@@ -189,14 +202,67 @@ export function validateContent(data: unknown): {
   }
 }
 
+// ============================================================================
+// ENTITY-SPECIFIC VALIDATION
+// ============================================================================
+
 /**
- * Audit existing content records for convention compliance
+ * Validate organization input
  */
-export function auditSlug(slug: string, name: string): {
-  compliant: boolean
-  issues: string[]
-  suggestedSlug?: string
-} {
+export function validateOrganization(data: unknown): ValidationResult<OrganizationInput> {
+  return validateEntity('organization', data) as ValidationResult<OrganizationInput>
+}
+
+/**
+ * Validate target input
+ */
+export function validateTarget(data: unknown): ValidationResult<TargetInput> {
+  return validateEntity('target', data) as ValidationResult<TargetInput>
+}
+
+/**
+ * Validate standard input
+ */
+export function validateStandard(data: unknown): ValidationResult<StandardInput> {
+  return validateEntity('standard', data) as ValidationResult<StandardInput>
+}
+
+/**
+ * Validate technology input
+ */
+export function validateTechnology(data: unknown): ValidationResult<TechnologyInput> {
+  return validateEntity('technology', data) as ValidationResult<TechnologyInput>
+}
+
+/**
+ * Validate team input
+ */
+export function validateTeam(data: unknown): ValidationResult<TeamInput> {
+  return validateEntity('team', data) as ValidationResult<TeamInput>
+}
+
+/**
+ * Validate tag input
+ */
+export function validateTag(data: unknown): ValidationResult<TagInput> {
+  return validateEntity('tag', data) as ValidationResult<TagInput>
+}
+
+/**
+ * Validate content input
+ */
+export function validateContent(data: unknown): ValidationResult<ContentInput> {
+  return validateEntity('content', data) as ValidationResult<ContentInput>
+}
+
+// ============================================================================
+// AUDIT FUNCTIONS
+// ============================================================================
+
+/**
+ * Audit a slug for convention compliance
+ */
+export function auditSlug(slug: string, name: string): AuditResult {
   const issues: string[] = []
   const validation = validateSlug(slug)
 
@@ -204,7 +270,6 @@ export function auditSlug(slug: string, name: string): {
   issues.push(...validation.warnings)
 
   // Check if slug matches expected pattern based on name
-  // This is a basic heuristic - the CLI can suggest better slugs
   const nameLower = name.toLowerCase()
 
   // Check for common mismatches
@@ -219,6 +284,91 @@ export function auditSlug(slug: string, name: string): {
   return {
     compliant: issues.length === 0,
     issues,
-    suggestedSlug: issues.length > 0 ? undefined : slug // TODO: Generate suggestion
+    suggestedSlug: issues.length > 0 ? undefined : slug
   }
 }
+
+/**
+ * Audit an entity record for convention compliance
+ */
+export function auditEntity(
+  entityType: EntityType,
+  data: { name: string; slug: string; contentType?: string; [key: string]: unknown }
+): AuditResult {
+  const issues: string[] = []
+  let suggestedSlug: string | undefined
+
+  // First validate the data
+  const validation = validateEntity(entityType, data)
+
+  if (!validation.valid && validation.errors) {
+    // Convert Zod errors to issue strings
+    for (const error of validation.errors.errors) {
+      issues.push(`${error.path.join('.')}: ${error.message}`)
+    }
+  }
+
+  // Add convention warnings as issues
+  issues.push(...validation.warnings)
+
+  // Check slug conventions based on entity type
+  if (entityType === 'content' && data.contentType) {
+    const slugAudit = auditSlug(data.slug, data.name)
+
+    // Only add unique issues
+    for (const issue of slugAudit.issues) {
+      if (!issues.includes(issue)) {
+        issues.push(issue)
+      }
+    }
+
+    // Try to generate suggested slug for content
+    if (issues.length > 0) {
+      // Extract standard from name (e.g., "STIG", "CIS")
+      const nameParts = data.name.split(' ')
+      let standard = 'stig' // default
+
+      for (const part of nameParts) {
+        const partLower = part.toLowerCase()
+        if (standardIdentifiers.includes(partLower)) {
+          standard = partLower
+          break
+        }
+      }
+
+      // Try to generate correct slug
+      const targetAbbrev = abbreviateTarget(data.name.replace(/stig|cis|pci.?dss|nist|hipaa/gi, '').trim())
+
+      // Extract version from name
+      const versionMatch = data.name.match(/(\d+(?:\.\d+)?(?:\.\d+)?)/)
+      const version = versionMatch ? versionMatch[1].replace('.', '') : ''
+
+      if (targetAbbrev) {
+        suggestedSlug = version
+          ? `${targetAbbrev}-${version}-${standard}`
+          : `${targetAbbrev}-${standard}`
+      }
+    }
+  } else if (entityType === 'target') {
+    const targetWarnings = checkTargetSlugConventions(data.slug, data.name)
+    for (const warning of targetWarnings) {
+      if (!issues.includes(warning)) {
+        issues.push(warning)
+      }
+    }
+  }
+
+  return {
+    compliant: issues.length === 0,
+    issues,
+    suggestedSlug
+  }
+}
+
+// ============================================================================
+// LEGACY EXPORTS (for backward compatibility)
+// ============================================================================
+
+// Re-export schemas that were previously in this file
+export { contentInputSchema as contentSchema } from './schemas.js'
+export { z } from 'zod'

@@ -32,7 +32,10 @@ The database folder is the single source of truth for all schemas and types.
 - [x] `validateSlug()` - slug format validation
 - [x] `validateContent()` - full content validation
 - [x] `auditSlug()` - convention compliance check
-- [ ] Add `validateTarget()`, `validateStandard()`, etc.
+- [x] Add `validateEntity()` - generic validation pattern
+- [x] Add `validateOrganization()`, `validateTarget()`, `validateStandard()`, etc.
+- [x] Add `auditEntity()` - generic audit with slug suggestion
+- [x] Refactored validation.ts to use schemas.ts as source of truth
 
 ---
 
@@ -115,13 +118,14 @@ Separate pure business logic from I/O.
 |-------|-----------|-------|--------|
 | 1 | `schemas.spec.ts` | 49 | ✅ Passing |
 | 1 | `conventions.spec.ts` | 32 | ✅ Passing |
+| 1 | `validation.spec.ts` | 35 | ✅ Passing |
 | 2 | `github.spec.ts` | 37 | ✅ Passing |
 | 2 | `pocketbase.spec.ts` | 17+5 skipped | ✅ Passing |
 | 2 | `content-service.spec.ts` | TBD | Not started |
 | 3 | `content.logic.spec.ts` | TBD | Not started |
 | 4 | `cli.spec.ts` | TBD | Not started |
 
-**Current Total:** 135 passing, 5 skipped
+**Current Total:** 170 passing, 5 skipped
 
 ---
 
@@ -139,6 +143,12 @@ Separate pure business logic from I/O.
   - Implemented pb*Schema for all entities with snake_case
   - Added pbContentWithExpand for FK expansion
   - All 135 tests passing
+- [x] Phase 1.3: Entity validation functions (TDD)
+  - Wrote 35 failing tests for validation functions
+  - Implemented validateEntity(), validateOrganization(), etc.
+  - Added auditEntity() with slug suggestion generation
+  - Refactored validation.ts to use schemas.ts as source of truth
+  - All 170 tests passing
 
 ---
 
