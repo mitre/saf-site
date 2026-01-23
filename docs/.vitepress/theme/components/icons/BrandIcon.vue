@@ -18,6 +18,9 @@ const localSvgMap: Record<string, string> = {
   'heimdall': '/icons/heimdall.svg',
 }
 
+// Wide logos that need height-only constraint (wordmarks)
+const wideLogos = new Set(['mitre', 'the mitre corporation'])
+
 // Map names to Iconify icon names
 // Simple Icons: https://icon-sets.iconify.design/simple-icons/
 // Lucide: https://icon-sets.iconify.design/lucide/
@@ -97,11 +100,26 @@ const iconName = computed(() => {
 })
 
 const iconSize = computed(() => props.size || 24)
+
+// Check if this is a wide logo (wordmark) that needs height-only sizing
+const isWideLogo = computed(() => {
+  const key = props.name.toLowerCase()
+  return wideLogos.has(key)
+})
 </script>
 
 <template>
+  <!-- Wide logos (wordmarks) - height only, width auto -->
   <img
-    v-if="localSvg"
+    v-if="localSvg && isWideLogo"
+    :src="localSvg"
+    :height="iconSize"
+    class="brand-icon brand-icon-local brand-icon-wide"
+    :alt="name"
+  />
+  <!-- Square logos - fixed width and height -->
+  <img
+    v-else-if="localSvg"
     :src="localSvg"
     :width="iconSize"
     :height="iconSize"
@@ -123,6 +141,10 @@ const iconSize = computed(() => props.size || 24)
 <style scoped>
 .brand-icon {
   flex-shrink: 0;
+}
+
+.brand-icon-wide {
+  width: auto;
 }
 
 .brand-icon-fallback {

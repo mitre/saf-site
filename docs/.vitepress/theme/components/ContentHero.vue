@@ -6,26 +6,8 @@
       <PillarBadge v-if="pillar" :pillar="pillar" size="md" />
     </div>
 
-    <!-- Benchmark Version -->
-    <span v-if="benchmarkLabel" class="hero-benchmark">
-      {{ benchmarkLabel }}
-    </span>
-
     <!-- Description -->
     <p v-if="description" class="hero-description">{{ description }}</p>
-
-    <!-- Status Tags -->
-    <div class="hero-tags">
-      <span v-if="status" :class="['tag', `tag-${status}`]">
-        {{ status }}
-      </span>
-      <span v-if="version" class="tag tag-version">
-        Profile {{ version }}
-      </span>
-      <span v-if="controlCount" class="tag tag-controls">
-        {{ controlCount }} controls
-      </span>
-    </div>
 
     <!-- Action Buttons -->
     <ActionButtons
@@ -36,29 +18,49 @@
       class="hero-actions"
     />
 
-    <!-- Metadata Strip -->
-    <MetadataStrip
-      v-if="metadata.length"
-      :items="metadata"
-      :truncate-values="true"
-      class="hero-metadata"
-    />
+    <!-- Metadata Card -->
+    <div v-if="metadata.length" class="hero-metadata-card">
+        <div class="metadata-list">
+          <component
+            :is="item.href ? 'a' : 'div'"
+            v-for="item in metadata"
+            :key="item.label"
+            :href="item.href"
+            class="metadata-item"
+            :class="{ clickable: !!item.href }"
+          >
+            <span class="metadata-label">{{ item.label }}</span>
+            <span class="metadata-value">
+              <!-- Status indicator dot for Status field -->
+              <span
+                v-if="item.label === 'Status'"
+                :class="['status-dot', `status-${item.value.toLowerCase()}`]"
+              ></span>
+              <!-- Icon for non-status fields -->
+              <BrandIcon v-else :name="item.value" :size="28" />
+              <span class="metadata-text">{{ item.value }}</span>
+            </span>
+          </component>
+        </div>
+      </div>
   </header>
 </template>
 
 <script setup lang="ts">
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import ActionButtons, { type ActionItem } from './ActionButtons.vue'
-import MetadataStrip, { type MetadataItem } from './MetadataStrip.vue'
+import BrandIcon from './icons/BrandIcon.vue'
+
+export interface MetadataItem {
+  label: string
+  value: string
+  href?: string
+}
 
 defineProps<{
   title: string
   description?: string
   pillar?: PillarType
-  benchmarkLabel?: string
-  status?: string
-  version?: string
-  controlCount?: number
   actions: ActionItem[]
   metadata: MetadataItem[]
 }>()
@@ -85,60 +87,12 @@ defineProps<{
   color: var(--vp-c-text-1);
 }
 
-/* Benchmark Badge */
-.hero-benchmark {
-  display: inline-block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-  padding: 0.25rem 0.75rem;
-  border-radius: 6px;
-  margin-bottom: 0.75rem;
-}
-
 /* Description */
 .hero-description {
-  margin: 0 0 1rem;
+  margin: 0 0 1.25rem;
   font-size: 1.0625rem;
   color: var(--vp-c-text-2);
   line-height: 1.6;
-}
-
-/* Tags */
-.hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.tag {
-  padding: 0.25rem 0.75rem;
-  border-radius: 100px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.tag-active { background: #10b981; color: white; }
-.tag-beta { background: #f59e0b; color: white; }
-.tag-deprecated { background: #ef4444; color: white; }
-.tag-draft { background: #6b7280; color: white; }
-
-.tag-version {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
-  font-family: var(--vp-font-family-mono);
-}
-
-.tag-controls {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
-  border: 1px solid var(--vp-c-divider);
 }
 
 /* Actions */
@@ -146,10 +100,68 @@ defineProps<{
   margin-bottom: 1.5rem;
 }
 
-/* Metadata Strip */
-.hero-metadata {
-  padding-top: 1rem;
+/* Metadata Card */
+.hero-metadata-card {
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 1.25rem;
 }
+
+.metadata-list {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 1rem 3rem;
+}
+
+.metadata-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.metadata-item.clickable:hover {
+  background: var(--vp-c-bg-elv);
+}
+
+.metadata-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--vp-c-text-3);
+}
+
+.metadata-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metadata-text {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--vp-c-text-1);
+}
+
+/* Status indicator dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-active { background: #10b981; }
+.status-beta { background: #f59e0b; }
+.status-deprecated { background: #ef4444; }
+.status-draft { background: #6b7280; }
 
 /* Responsive */
 @media (max-width: 640px) {
@@ -160,6 +172,10 @@ defineProps<{
   .hero-title-row {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .metadata-list {
+    grid-template-columns: 1fr;
   }
 }
 </style>

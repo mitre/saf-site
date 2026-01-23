@@ -12,10 +12,6 @@
       :title="content.name"
       :description="content.description"
       :pillar="pillar"
-      :benchmark-label="benchmarkLabel"
-      :status="content.status"
-      :version="formattedProfileVersion"
-      :control-count="content.control_count"
       :actions="heroActions"
       :metadata="metadataItems"
     />
@@ -74,11 +70,10 @@ import { ref, computed, onMounted } from 'vue'
 import { Marked } from 'marked'
 import { createHighlighter } from 'shiki'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
-import ContentHero from './ContentHero.vue'
+import ContentHero, { type MetadataItem } from './ContentHero.vue'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import BrandIcon from './icons/BrandIcon.vue'
 import type { ActionItem } from './ActionButtons.vue'
-import type { MetadataItem } from './MetadataStrip.vue'
 
 // Store for highlighted HTML (populated async)
 const quickStartHighlighted = ref('')
@@ -177,8 +172,8 @@ const heroActions = computed<ActionItem[]>(() => {
   }))
 })
 
-// Build metadata items for MetadataStrip
-// Icons are resolved by BrandIcon using the value - no logo URLs needed
+// Build metadata items for sidebar
+// All profile info consolidated in one place
 const metadataItems = computed<MetadataItem[]>(() => {
   const items: MetadataItem[] = []
 
@@ -190,7 +185,14 @@ const metadataItems = computed<MetadataItem[]>(() => {
     })
   }
 
-  if (props.content.standard_short_name || props.content.standard_name) {
+  // Use full benchmark label (e.g., "STIG V1R0") instead of just standard name
+  if (benchmarkLabel.value) {
+    items.push({
+      label: 'Standard',
+      value: benchmarkLabel.value,
+      href: `/content/?standard=${props.content.standard_slug}`
+    })
+  } else if (props.content.standard_short_name || props.content.standard_name) {
     items.push({
       label: 'Standard',
       value: props.content.standard_short_name || props.content.standard_name,
@@ -203,6 +205,30 @@ const metadataItems = computed<MetadataItem[]>(() => {
       label: 'Tech',
       value: props.content.technology_name,
       href: `/content/?technology=${props.content.technology_slug}`
+    })
+  }
+
+  // Status with indicator
+  if (props.content.status) {
+    items.push({
+      label: 'Status',
+      value: props.content.status
+    })
+  }
+
+  // Profile version
+  if (formattedProfileVersion.value) {
+    items.push({
+      label: 'Profile',
+      value: formattedProfileVersion.value
+    })
+  }
+
+  // Control count
+  if (props.content.control_count) {
+    items.push({
+      label: 'Controls',
+      value: `${props.content.control_count}`
     })
   }
 
