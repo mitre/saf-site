@@ -55,3 +55,5 @@ Join our community to learn more and contribute:
 - [GitHub Discussions](https://github.com/mitre/saf/discussions)
 - [Issue Tracker](https://github.com/mitre/saf/issues)
 - Email: saf@mitre.org
+
+<!-- CI/CD Test: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Remove after verification. -->
