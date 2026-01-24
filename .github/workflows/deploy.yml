@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-    branches: [main]
+    # No branch filter - deploy previews for all branches after CI passes
 
   workflow_dispatch:
     inputs:
