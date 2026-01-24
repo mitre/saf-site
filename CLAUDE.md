@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Note:** This project's CLAUDE.md is version-controlled and should be committed with changes. Update it as architectural decisions are made.
+
 ## Context Restoration (Start Here After Compact/New Session)
 
 This project uses **beads** for task tracking and context preservation. After a `/compact` or starting a new session:
