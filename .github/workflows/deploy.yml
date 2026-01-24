@@ -6,7 +6,6 @@ on:
     types: [completed]
     branches: [main]
 
-  # Allow manual trigger for debugging
   workflow_dispatch:
     inputs:
       branch:
@@ -23,7 +22,6 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
 
-    # Only run if CI succeeded (or manual trigger)
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
@@ -48,20 +46,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Setup environment
-        run: pnpm dev:setup --force --yes
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Start Pocketbase
-        run: |
-          cd .pocketbase && ./pocketbase serve &
-          echo "Waiting for Pocketbase..."
-          for i in {1..30}; do
-            if curl -s http://localhost:8090/api/health > /dev/null 2>&1; then
-              echo "Pocketbase ready"
-              break
-            fi
-            sleep 1
-          done
+      - name: Setup Pocketbase
+        uses: ./.github/actions/setup-pocketbase
 
       - name: Build
         run: pnpm build
@@ -140,5 +129,4 @@ jobs:
           echo "## Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** ${{ steps.deploy.outputs.deployment-url }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Alias:** ${{ steps.deploy.outputs.pages-deployment-alias-url }}" >> $GITHUB_STEP_SUMMARY

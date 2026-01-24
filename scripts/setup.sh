@@ -339,6 +339,8 @@ restore_database() {
         exit 1
     fi
 
+    local db_size
+    db_size=$(stat -f%z "$DB_PATH" 2>/dev/null || stat -c%s "$DB_PATH" 2>/dev/null || echo "unknown")
     ok "Database restored ($db_size bytes)"
 }
 

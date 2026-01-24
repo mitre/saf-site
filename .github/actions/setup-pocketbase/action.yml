@@ -1,0 +1,130 @@
+name: 'Setup Pocketbase'
+description: 'Downloads Pocketbase binary, restores database, and optionally starts server. Assumes Node/pnpm/deps already installed.'
+
+inputs:
+  pocketbase-version:
+    description: 'Pocketbase version to download'
+    required: false
+    default: '0.36.0'
+  start-server:
+    description: 'Start Pocketbase server after setup'
+    required: false
+    default: 'true'
+  wait-timeout:
+    description: 'Timeout in seconds waiting for server'
+    required: false
+    default: '30'
+
+outputs:
+  pocketbase-url:
+    description: 'URL of the running Pocketbase server'
+    value: ${{ steps.start.outputs.url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect platform
+      id: platform
+      shell: bash
+      run: |
+        os=$(uname -s | tr '[:upper:]' '[:lower:]')
+        arch=$(uname -m)
+
+        case "$os" in
+          darwin) pb_os="darwin" ;;
+          linux)  pb_os="linux" ;;
+          *)      echo "Unsupported OS: $os"; exit 1 ;;
+        esac
+
+        case "$arch" in
+          x86_64|amd64)   pb_arch="amd64" ;;
+          arm64|aarch64)  pb_arch="arm64" ;;
+          *)              echo "Unsupported arch: $arch"; exit 1 ;;
+        esac
+
+        echo "os=$pb_os" >> $GITHUB_OUTPUT
+        echo "arch=$pb_arch" >> $GITHUB_OUTPUT
+        echo "platform=${pb_os}_${pb_arch}" >> $GITHUB_OUTPUT
+
+    - name: Download Pocketbase
+      shell: bash
+      run: |
+        PB_VERSION="${{ inputs.pocketbase-version }}"
+        PLATFORM="${{ steps.platform.outputs.platform }}"
+        PB_DIR=".pocketbase"
+        PB_BINARY="$PB_DIR/pocketbase"
+
+        mkdir -p "$PB_DIR"
+
+        # Skip if binary exists and works
+        if [ -f "$PB_BINARY" ] && "$PB_BINARY" --version &>/dev/null; then
+          echo "✅ Pocketbase already installed: $($PB_BINARY --version)"
+          exit 0
+        fi
+
+        echo "Downloading Pocketbase $PB_VERSION for $PLATFORM..."
+        URL="https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_${PLATFORM}.zip"
+
+        curl -fsSL "$URL" -o /tmp/pocketbase.zip
+        unzip -o -q /tmp/pocketbase.zip -d "$PB_DIR" pocketbase
+        chmod +x "$PB_BINARY"
+        rm /tmp/pocketbase.zip
+
+        echo "✅ Pocketbase $PB_VERSION installed"
+        "$PB_BINARY" --version
+
+    - name: Restore database from diffable
+      shell: bash
+      run: |
+        DB_PATH=".pocketbase/pb_data/data.db"
+        DIFFABLE_DIR=".pocketbase/pb_data/diffable"
+
+        if [ ! -d "$DIFFABLE_DIR" ]; then
+          echo "❌ diffable/ directory not found"
+          exit 1
+        fi
+
+        # Always restore fresh in CI
+        echo "Restoring database from diffable/..."
+        npx tsx scripts/db-diffable.ts load "$DB_PATH" "$DIFFABLE_DIR"
+
+        echo "✅ Database restored"
+
+    - name: Clear migrations
+      shell: bash
+      run: |
+        MIGRATIONS_DIR=".pocketbase/pb_migrations"
+
+        if [ -d "$MIGRATIONS_DIR" ]; then
+          migration_count=$(find "$MIGRATIONS_DIR" -name "*.js" 2>/dev/null | wc -l | tr -d ' ')
+          if [ "$migration_count" -gt 0 ]; then
+            echo "Clearing $migration_count migration files..."
+            rm -f "$MIGRATIONS_DIR"/*.js
+          fi
+        fi
+
+        echo "✅ Migrations cleared"
+
+    - name: Start Pocketbase server
+      id: start
+      if: inputs.start-server == 'true'
+      shell: bash
+      run: |
+        cd .pocketbase && ./pocketbase serve &
+
+        echo "Waiting for Pocketbase..."
+        timeout=${{ inputs.wait-timeout }}
+        elapsed=0
+
+        while [ $elapsed -lt $timeout ]; do
+          if curl -s http://localhost:8090/api/health > /dev/null 2>&1; then
+            echo "✅ Pocketbase ready (${elapsed}s)"
+            echo "url=http://localhost:8090" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          sleep 1
+          elapsed=$((elapsed + 1))
+        done
+
+        echo "❌ Pocketbase failed to start"
+        exit 1
