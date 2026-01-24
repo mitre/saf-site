@@ -60,14 +60,25 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup environment (deps, Pocketbase, database)
+        run: pnpm dev:setup --force --yes
 
       - name: CLI Typecheck
         run: pnpm --filter @saf-site/cli typecheck
 
       - name: CLI Lint
         run: pnpm --filter @saf-site/cli lint:check
+
+      - name: Start Pocketbase for tests
+        run: |
+          cd .pocketbase && ./pocketbase serve &
+          for i in {1..30}; do
+            if curl -s http://localhost:8090/api/health > /dev/null 2>&1; then
+              echo "Pocketbase ready"
+              break
+            fi
+            sleep 1
+          done
 
       - name: CLI Test
         run: pnpm --filter @saf-site/cli test:run
