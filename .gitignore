@@ -43,6 +43,8 @@ Thumbs.db
 .beads/.bdui
 .beads/recovery-context.md
 .playwright-mcp/
+RECOVERY-PROMPT*.md
+SESSION*.md
 
 # Test coverage
 coverage/

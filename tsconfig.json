@@ -18,7 +18,6 @@
   },
   "include": ["docs/.vitepress/**/*.ts", "docs/.vitepress/**/*.vue"],
   "exclude": [
-    "node_modules",
-    "docs/.vitepress/database/yaml-schemas.ts"
+    "node_modules"
   ]
 }

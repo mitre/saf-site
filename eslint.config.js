@@ -28,12 +28,6 @@ export default antfu({
     '*.min.js',
     'pnpm-lock.yaml',
     '**/*.md',
-    // Legacy/archived files - clean up in separate PR
-    'docs/.vitepress/database/schema-v1-archived.ts',
-    'scripts/import-from-v4.ts',
-    'scripts/import-yaml-data.ts',
-    'scripts/seed-database.ts',
-    'scripts/validate-against-design.ts',
     // CLI has minor test file issues - clean up separately
     'cli/**/*.spec.ts',
   ],
