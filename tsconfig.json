@@ -18,6 +18,7 @@
   },
   "include": ["docs/.vitepress/**/*.ts", "docs/.vitepress/**/*.vue"],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "docs/.vitepress/lib/research"
   ]
 }
