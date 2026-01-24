@@ -8,6 +8,22 @@ const sampleItems = [
   { name: 'AWS' }
 ]
 
+// Larger set for multi-row testing
+const manyItems = [
+  { name: 'SonarQube' },
+  { name: 'Burp Suite' },
+  { name: 'OWASP ZAP' },
+  { name: 'Nessus' },
+  { name: 'Qualys' },
+  { name: 'Snyk' },
+  { name: 'Veracode' },
+  { name: 'Checkmarx' },
+  { name: 'Fortify' },
+  { name: 'Prisma Cloud' },
+  { name: 'AWS Inspector' },
+  { name: 'Azure Defender' }
+]
+
 describe('LogoMarquee', () => {
   describe('rendering', () => {
     it('renders items repeated for seamless loop', () => {
@@ -146,6 +162,101 @@ describe('LogoMarquee', () => {
       const items = wrapper.findAll('.logo-marquee-item')
       expect(items[0].attributes('title')).toBe('GitHub')
       expect(items[1].attributes('title')).toBe('Oracle')
+    })
+  })
+
+  describe('multi-row', () => {
+    it('renders single row by default', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, repeat: 1 }
+      })
+
+      expect(wrapper.findAll('.logo-marquee')).toHaveLength(1)
+    })
+
+    it('splits items into multiple rows', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 3, repeat: 1 }
+      })
+
+      expect(wrapper.findAll('.logo-marquee')).toHaveLength(3)
+    })
+
+    it('distributes items evenly across rows', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 3, repeat: 1 }
+      })
+
+      // 12 items / 3 rows = 4 items per row
+      const rows = wrapper.findAll('.logo-marquee')
+      rows.forEach(row => {
+        expect(row.findAll('.logo-marquee-item')).toHaveLength(4)
+      })
+    })
+
+    it('handles uneven item distribution', () => {
+      // 12 items / 5 rows = ceil(2.4) = 3 items per row
+      // Row 1: 3, Row 2: 3, Row 3: 3, Row 4: 3, Row 5: 0 (empty, not rendered)
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 5, repeat: 1 }
+      })
+
+      // Should have 4 rows (last row would be empty so not rendered)
+      const rows = wrapper.findAll('.logo-marquee')
+      expect(rows.length).toBeLessThanOrEqual(5)
+      expect(rows.length).toBeGreaterThan(0)
+    })
+
+    it('applies multi-row class when rows > 1', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 2, repeat: 1 }
+      })
+
+      expect(wrapper.find('.logo-marquee--multi-row').exists()).toBe(true)
+    })
+
+    it('does not apply multi-row class when rows = 1', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 1, repeat: 1 }
+      })
+
+      expect(wrapper.find('.logo-marquee--multi-row').exists()).toBe(false)
+    })
+
+    it('alternates direction per row by default', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 3, repeat: 1 }
+      })
+
+      const rows = wrapper.findAll('.logo-marquee')
+      // Default: row 0 not reversed, row 1 reversed, row 2 not reversed
+      expect(rows[0].classes()).not.toContain('logo-marquee--reverse')
+      expect(rows[1].classes()).toContain('logo-marquee--reverse')
+      expect(rows[2].classes()).not.toContain('logo-marquee--reverse')
+    })
+
+    it('respects reverse prop with alternating rows', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 3, reverse: true, repeat: 1 }
+      })
+
+      const rows = wrapper.findAll('.logo-marquee')
+      // With reverse: row 0 reversed, row 1 not reversed, row 2 reversed
+      expect(rows[0].classes()).toContain('logo-marquee--reverse')
+      expect(rows[1].classes()).not.toContain('logo-marquee--reverse')
+      expect(rows[2].classes()).toContain('logo-marquee--reverse')
+    })
+
+    it('can disable alternating direction', () => {
+      const wrapper = mount(LogoMarquee, {
+        props: { items: manyItems, rows: 3, alternateDirection: false, repeat: 1 }
+      })
+
+      const rows = wrapper.findAll('.logo-marquee')
+      // All rows should have same direction (not reversed by default)
+      rows.forEach(row => {
+        expect(row.classes()).not.toContain('logo-marquee--reverse')
+      })
     })
   })
 })
