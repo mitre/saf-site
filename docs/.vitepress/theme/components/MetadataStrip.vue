@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import type { MetadataItem } from '@/lib/metadata'
+import { computed } from 'vue'
+import MetadataPill from './MetadataPill.vue'
+
+// Re-export for consumers
+export type { MetadataItem }
+
+const props = defineProps<{
+  items: MetadataItem[]
+  truncateValues?: boolean
+}>()
+
+// Filter out items with empty values
+const visibleItems = computed(() =>
+  props.items.filter(item => item.value && item.value.trim() !== ''),
+)
+</script>
+
 <template>
   <div class="metadata-strip">
     <MetadataPill
@@ -10,25 +29,6 @@
     />
   </div>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue'
-import MetadataPill from './MetadataPill.vue'
-import type { MetadataItem } from '@/lib/metadata'
-
-// Re-export for consumers
-export type { MetadataItem }
-
-const props = defineProps<{
-  items: MetadataItem[]
-  truncateValues?: boolean
-}>()
-
-// Filter out items with empty values
-const visibleItems = computed(() =>
-  props.items.filter(item => item.value && item.value.trim() !== '')
-)
-</script>
 
 <style scoped>
 .metadata-strip {

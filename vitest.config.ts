@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config'
+import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
-import { fileURLToPath } from 'url'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [vue()],
@@ -18,7 +18,7 @@ export default defineConfig({
       'docs/.vitepress/lib/**/*.spec.ts',
       'docs/.vitepress/lib/**/*.test.ts',
       'scripts/**/*.spec.ts',
-      'scripts/**/*.test.ts'
+      'scripts/**/*.test.ts',
     ],
 
     // Coverage configuration
@@ -28,13 +28,13 @@ export default defineConfig({
       include: [
         'docs/.vitepress/theme/composables/**/*.ts',
         'docs/.vitepress/theme/components/**/*.vue',
-        'docs/.vitepress/theme/utils/**/*.ts'
+        'docs/.vitepress/theme/utils/**/*.ts',
       ],
       exclude: [
         '**/*.spec.ts',
         '**/*.test.ts',
-        '**/index.ts'
-      ]
+        '**/index.ts',
+      ],
     },
 
     // Aliases matching VitePress paths
@@ -42,7 +42,7 @@ export default defineConfig({
       '@/': fileURLToPath(new URL('./docs/.vitepress/theme/', import.meta.url)),
       '@theme': fileURLToPath(new URL('./docs/.vitepress/theme', import.meta.url)),
       '@composables': fileURLToPath(new URL('./docs/.vitepress/theme/composables', import.meta.url)),
-      '@components': fileURLToPath(new URL('./docs/.vitepress/theme/components', import.meta.url))
-    }
-  }
+      '@components': fileURLToPath(new URL('./docs/.vitepress/theme/components', import.meta.url)),
+    },
+  },
 })

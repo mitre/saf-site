@@ -28,5 +28,5 @@ for (const c of ourCollections) {
   }
 }
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('✓ Verification complete')

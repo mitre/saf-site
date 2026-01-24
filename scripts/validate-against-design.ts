@@ -30,7 +30,7 @@ const EXPECTED_TARGET_TYPES = [
   'Cloud Service',
   'Cloud Platform',
   'Security Tool',
-  'DevOps Platform'
+  'DevOps Platform',
 ]
 
 const EXPECTED_OS_FAMILIES = [
@@ -38,7 +38,7 @@ const EXPECTED_OS_FAMILIES = [
   'Windows',
   'Cross-Platform',
   'Cloud-Native',
-  'N/A'
+  'N/A',
 ]
 
 const EXPECTED_CATEGORIES = [
@@ -49,11 +49,11 @@ const EXPECTED_CATEGORIES = [
   'Container Platforms',
   'Virtualization',
   'Cloud Infrastructure',
-  'Security & Identity'
+  'Security & Identity',
 ]
 
 // Issues tracker
-const issues: Array<{profile: string, issue: string, current: string, expected: string}> = []
+const issues: Array<{ profile: string, issue: string, current: string, expected: string }> = []
 
 // 1. Validate Target Types
 console.log('\n1. TARGET TYPE VALIDATION:')
@@ -61,11 +61,12 @@ const actualTargetTypes = new Set(all.map(p => p.target_type))
 const unexpectedTypes = Array.from(actualTargetTypes).filter(t => !EXPECTED_TARGET_TYPES.includes(t))
 if (unexpectedTypes.length > 0) {
   console.log('  ⚠️  Unexpected target types found:')
-  unexpectedTypes.forEach(t => {
+  unexpectedTypes.forEach((t) => {
     const count = all.filter(p => p.target_type === t).length
     console.log(`    - "${t}" (${count} profiles)`)
   })
-} else {
+}
+else {
   console.log('  ✓ All target types are valid')
 }
 
@@ -81,8 +82,8 @@ const examples = [
       target_subtype: 'Linux',
       os_family: 'Linux',
       category: 'Operating Systems',
-      vendor: 'Red Hat'
-    }
+      vendor: 'Red Hat',
+    },
   },
   {
     name: 'VMware ESXi 6.7 STIG',
@@ -92,8 +93,8 @@ const examples = [
       target_subtype: 'Hypervisor',
       os_family: 'N/A',
       category: 'Virtualization',
-      vendor: 'VMware'
-    }
+      vendor: 'VMware',
+    },
   },
   {
     name: 'Oracle MySQL 8.0 STIG',
@@ -103,8 +104,8 @@ const examples = [
       target_subtype: 'MySQL',
       os_family: 'Cross-Platform',
       category: 'Databases',
-      vendor: 'Oracle'
-    }
+      vendor: 'Oracle',
+    },
   },
   {
     name: 'AWS RDS MySQL 5.7 CIS',
@@ -114,8 +115,8 @@ const examples = [
       target_subtype: 'Database',
       os_family: 'Cloud-Native',
       category: 'Cloud Infrastructure',
-      vendor: 'AWS'
-    }
+      vendor: 'AWS',
+    },
   },
   {
     name: 'Docker CE CIS',
@@ -125,12 +126,12 @@ const examples = [
       target_subtype: 'Docker',
       os_family: 'Cross-Platform',
       category: 'Container Platforms',
-      vendor: 'Docker'
-    }
-  }
+      vendor: 'Docker',
+    },
+  },
 ]
 
-examples.forEach(example => {
+examples.forEach((example) => {
   const profile = all.find(p => p.name === example.searchName)
   if (!profile) {
     console.log(`  ⚠️  Profile not found: ${example.name}`)
@@ -148,7 +149,7 @@ examples.forEach(example => {
         profile: profile.name,
         issue: field,
         current: profile[field] || 'MISSING',
-        expected: expectedValue
+        expected: expectedValue,
       })
     }
   })
@@ -156,7 +157,8 @@ examples.forEach(example => {
   if (hasIssues) {
     console.log(`  ❌ ${profile.name}`)
     profileIssues.forEach(issue => console.log(`     ${issue}`))
-  } else {
+  }
+  else {
     console.log(`  ✓ ${profile.name}`)
   }
 })
@@ -174,16 +176,17 @@ if (jboss) {
       profile: jboss.name,
       issue: 'target_type',
       current: jboss.target_type,
-      expected: 'Application Server'
+      expected: 'Application Server',
     })
-  } else {
+  }
+  else {
     console.log(`  ✓ ${jboss.name}`)
   }
 }
 
 // vCenter profiles should have target_subtype = vCenter
 const vcenterProfiles = all.filter(p => p.name.includes('vCenter'))
-vcenterProfiles.forEach(p => {
+vcenterProfiles.forEach((p) => {
   if (p.target_subtype !== 'vCenter') {
     console.log(`  ❌ ${p.name}`)
     console.log(`     target_subtype: "${p.target_subtype}" (expected: "vCenter")`)
@@ -191,16 +194,17 @@ vcenterProfiles.forEach(p => {
       profile: p.name,
       issue: 'target_subtype',
       current: p.target_subtype,
-      expected: 'vCenter'
+      expected: 'vCenter',
     })
-  } else {
+  }
+  else {
     console.log(`  ✓ ${p.name}`)
   }
 })
 
 // AWS RDS should be Cloud Service not Cloud Database Service
 const awsRdsProfiles = all.filter(p => p.name.includes('AWS RDS'))
-awsRdsProfiles.forEach(p => {
+awsRdsProfiles.forEach((p) => {
   if (p.target_type === 'Cloud Database Service') {
     console.log(`  ❌ ${p.name}`)
     console.log(`     target_type: "${p.target_type}" (expected: "Cloud Service")`)
@@ -209,13 +213,13 @@ awsRdsProfiles.forEach(p => {
       profile: p.name,
       issue: 'target_type',
       current: p.target_type,
-      expected: 'Cloud Service'
+      expected: 'Cloud Service',
     })
   }
 })
 
 // 4. Summary
-console.log('\n' + '='.repeat(80))
+console.log(`\n${'='.repeat(80)}`)
 console.log('SUMMARY')
 console.log('='.repeat(80))
 console.log(`Total profiles: ${all.length}`)
@@ -225,7 +229,7 @@ console.log(`Total issues found: ${issues.length}`)
 if (issues.length > 0) {
   console.log('\nISSUES TO FIX:')
   const byProfile = new Map<string, typeof issues>()
-  issues.forEach(issue => {
+  issues.forEach((issue) => {
     if (!byProfile.has(issue.profile)) {
       byProfile.set(issue.profile, [])
     }
@@ -234,7 +238,7 @@ if (issues.length > 0) {
 
   Array.from(byProfile.entries()).forEach(([profile, profileIssues]) => {
     console.log(`\n  ${profile}:`)
-    profileIssues.forEach(issue => {
+    profileIssues.forEach((issue) => {
       console.log(`    ${issue.issue}: "${issue.current}" → "${issue.expected}"`)
     })
   })

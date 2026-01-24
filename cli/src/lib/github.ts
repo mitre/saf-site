@@ -25,8 +25,8 @@ export interface InspecProfile {
   license?: string
   summary?: string
   version?: string
-  supports?: Array<{ platform?: string; 'platform-name'?: string; release?: string }>
-  depends?: Array<{ name: string; url?: string; branch?: string }>
+  supports?: Array<{ 'platform'?: string, 'platform-name'?: string, 'release'?: string }>
+  depends?: Array<{ name: string, url?: string, branch?: string }>
 }
 
 // ============================================================================
@@ -42,11 +42,11 @@ function getGitHubHeaders(acceptType = 'application/vnd.github.v3+json'): Header
   const token = process.env.GITHUB_TOKEN
   const headers: HeadersInit = {
     'Accept': acceptType,
-    'User-Agent': 'saf-site-cli'
+    'User-Agent': 'saf-site-cli',
   }
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`
+    headers.Authorization = `Bearer ${token}`
   }
 
   return headers
@@ -59,11 +59,11 @@ function getGitHubHeaders(acceptType = 'application/vnd.github.v3+json'): Header
 /**
  * Parse GitHub URL to extract owner/repo
  */
-export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
+export function parseGitHubUrl(url: string): { owner: string, repo: string } | null {
   // Handle various GitHub URL formats
   const patterns = [
     /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/.*)?$/,
-    /^([^/]+)\/([^/]+)$/  // shorthand: owner/repo
+    /^([^/]+)\/([^/]+)$/, // shorthand: owner/repo
   ]
 
   for (const pattern of patterns) {
@@ -97,7 +97,7 @@ export async function fetchRepoInfo(owner: string, repo: string): Promise<RepoIn
     defaultBranch: data.default_branch,
     license: data.license?.spdx_id || null,
     topics: data.topics || [],
-    htmlUrl: data.html_url
+    htmlUrl: data.html_url,
   }
 }
 
@@ -108,7 +108,7 @@ export async function fetchRawFile(
   owner: string,
   repo: string,
   path: string,
-  branch = 'main'
+  branch = 'main',
 ): Promise<string | null> {
   const headers = getGitHubHeaders('application/vnd.github.v3.raw')
 
@@ -119,13 +119,14 @@ export async function fetchRawFile(
     try {
       const response = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${b}`,
-        { headers }
+        { headers },
       )
 
       if (response.ok) {
         return await response.text()
       }
-    } catch {
+    }
+    catch {
       // Try next branch
     }
   }
@@ -139,7 +140,7 @@ export async function fetchRawFile(
 export async function fetchInspecYml(
   owner: string,
   repo: string,
-  branch = 'main'
+  branch = 'main',
 ): Promise<InspecProfile | null> {
   const content = await fetchRawFile(owner, repo, 'inspec.yml', branch)
 
@@ -149,7 +150,8 @@ export async function fetchInspecYml(
 
   try {
     return parseYaml(content) as InspecProfile
-  } catch {
+  }
+  catch {
     return null
   }
 }
@@ -160,7 +162,7 @@ export async function fetchInspecYml(
 export async function fetchReadme(
   owner: string,
   repo: string,
-  branch = 'main'
+  branch = 'main',
 ): Promise<string | null> {
   // Try common README filenames
   const filenames = ['README.md', 'readme.md', 'Readme.md']
@@ -188,8 +190,8 @@ export async function fetchReadme(
 export function generateSlug(repoName: string): string {
   return repoName
     .toLowerCase()
-    .replace(/-baseline$/, '')    // Remove validation suffix
-    .replace(/-hardening$/, '')   // Remove hardening suffix
+    .replace(/-baseline$/, '') // Remove validation suffix
+    .replace(/-hardening$/, '') // Remove hardening suffix
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 }
@@ -202,13 +204,13 @@ export function extractControlCount(readme: string): number | null {
   const patterns = [
     /(\d+)\s+controls/i,
     /controls:\s*(\d+)/i,
-    /(\d+)\s+checks/i
+    /(\d+)\s+checks/i,
   ]
 
   for (const pattern of patterns) {
     const match = readme.match(pattern)
     if (match) {
-      return parseInt(match[1], 10)
+      return Number.parseInt(match[1], 10)
     }
   }
 

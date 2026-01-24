@@ -3,10 +3,10 @@
  * Import data from content/data YAML files into SQLite database
  */
 
-import { drizzle } from 'drizzle-orm/libsql'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { createClient } from '@libsql/client'
-import { readFileSync, readdirSync } from 'fs'
-import { join } from 'path'
+import { drizzle } from 'drizzle-orm/libsql'
 import * as YAML from 'yaml'
 import * as schema from '../docs/.vitepress/database/schema.js'
 
@@ -28,27 +28,30 @@ function getYAMLFiles(dir: string): string[] {
     return readdirSync(dir)
       .filter(f => f.endsWith('.yml') || f.endsWith('.yaml'))
       .map(f => join(dir, f))
-  } catch (e) {
+  }
+  catch (e) {
     return []
   }
 }
 
 // Helper to normalize timestamps in records
 function normalizeTimestamps(records: any[]): any[] {
-  return records.map(record => {
+  return records.map((record) => {
     const normalized = { ...record }
 
     // Handle lastUpdated string dates
     if (normalized.lastUpdated && typeof normalized.lastUpdated === 'string') {
       normalized.lastUpdated = new Date(normalized.lastUpdated)
-    } else if (!normalized.lastUpdated) {
+    }
+    else if (!normalized.lastUpdated) {
       normalized.lastUpdated = new Date()
     }
 
     // Handle createdAt (usually missing from YAML)
     if (normalized.createdAt && typeof normalized.createdAt === 'string') {
       normalized.createdAt = new Date(normalized.createdAt)
-    } else if (!normalized.createdAt) {
+    }
+    else if (!normalized.createdAt) {
       // Use lastUpdated if available, otherwise current date
       normalized.createdAt = normalized.lastUpdated || new Date()
     }
@@ -175,8 +178,8 @@ async function importData() {
     console.log('  2. View data in Drizzle Studio')
     console.log('  3. Run: pnpm db:dump')
     console.log('  4. Commit diffable/ directory\n')
-
-  } catch (error) {
+  }
+  catch (error) {
     console.error('❌ Import failed:', error)
     process.exit(1)
   }

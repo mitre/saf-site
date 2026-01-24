@@ -1,19 +1,19 @@
-import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
 import LogoGrid from './LogoGrid.vue'
 
 const sampleItems = [
   { name: 'GitHub', href: 'https://github.com' },
   { name: 'Oracle', description: 'Database partner' },
   { name: 'AWS', href: 'https://aws.amazon.com' },
-  { name: 'Custom', image: '/logos/custom.png' }
+  { name: 'Custom', image: '/logos/custom.png' },
 ]
 
-describe('LogoGrid', () => {
+describe('logoGrid', () => {
   describe('rendering', () => {
     it('renders all logo items', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.findAll('.logo-item')).toHaveLength(4)
@@ -21,7 +21,7 @@ describe('LogoGrid', () => {
 
     it('renders title when provided', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems, title: 'Our Partners' }
+        props: { items: sampleItems, title: 'Our Partners' },
       })
 
       expect(wrapper.find('.logo-grid-title').text()).toBe('Our Partners')
@@ -29,7 +29,7 @@ describe('LogoGrid', () => {
 
     it('does not render title when not provided', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.find('.logo-grid-title').exists()).toBe(false)
@@ -39,7 +39,7 @@ describe('LogoGrid', () => {
   describe('links', () => {
     it('renders anchor tags for items with href', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const links = wrapper.findAll('a.logo-item')
@@ -53,7 +53,7 @@ describe('LogoGrid', () => {
 
     it('renders div for items without href', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const divs = wrapper.findAll('div.logo-item')
@@ -64,7 +64,7 @@ describe('LogoGrid', () => {
   describe('images', () => {
     it('uses custom image when provided', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const img = wrapper.find('img.logo-image')
@@ -76,8 +76,8 @@ describe('LogoGrid', () => {
     it('uses BrandIcon for items without custom image', () => {
       const wrapper = mount(LogoGrid, {
         props: {
-          items: [{ name: 'GitHub' }]
-        }
+          items: [{ name: 'GitHub' }],
+        },
       })
 
       // BrandIcon should be rendered (not img.logo-image)
@@ -89,7 +89,7 @@ describe('LogoGrid', () => {
   describe('name labels', () => {
     it('shows name labels when showNames is true', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems, showNames: true }
+        props: { items: sampleItems, showNames: true },
       })
 
       const names = wrapper.findAll('.logo-name')
@@ -99,7 +99,7 @@ describe('LogoGrid', () => {
 
     it('hides name labels by default', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.find('.logo-name').exists()).toBe(false)
@@ -109,7 +109,7 @@ describe('LogoGrid', () => {
   describe('variants', () => {
     it('applies default variant class', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.find('.logo-grid--default').exists()).toBe(true)
@@ -117,7 +117,7 @@ describe('LogoGrid', () => {
 
     it('applies compact variant class', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems, variant: 'compact' }
+        props: { items: sampleItems, variant: 'compact' },
       })
 
       expect(wrapper.find('.logo-grid--compact').exists()).toBe(true)
@@ -125,7 +125,7 @@ describe('LogoGrid', () => {
 
     it('applies card variant class', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems, variant: 'card' }
+        props: { items: sampleItems, variant: 'card' },
       })
 
       expect(wrapper.find('.logo-grid--card').exists()).toBe(true)
@@ -135,7 +135,7 @@ describe('LogoGrid', () => {
   describe('sizing', () => {
     it('passes size prop to BrandIcon', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: [{ name: 'GitHub' }], size: 64 }
+        props: { items: [{ name: 'GitHub' }], size: 64 },
       })
 
       // Check that size is passed (via the rendered icon)
@@ -147,8 +147,8 @@ describe('LogoGrid', () => {
       const wrapper = mount(LogoGrid, {
         props: {
           items: [{ name: 'Custom', image: '/logo.png' }],
-          size: 64
-        }
+          size: 64,
+        },
       })
 
       const img = wrapper.find('img.logo-image')
@@ -160,7 +160,7 @@ describe('LogoGrid', () => {
   describe('columns', () => {
     it('uses auto-fit columns by default', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const grid = wrapper.find('.logo-grid-items')
@@ -169,7 +169,7 @@ describe('LogoGrid', () => {
 
     it('applies fixed columns when specified', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems, columns: 4 }
+        props: { items: sampleItems, columns: 4 },
       })
 
       const grid = wrapper.find('.logo-grid-items')
@@ -180,7 +180,7 @@ describe('LogoGrid', () => {
   describe('accessibility', () => {
     it('uses description as title attribute when provided', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const oracleItem = wrapper.findAll('.logo-item')[1]
@@ -189,7 +189,7 @@ describe('LogoGrid', () => {
 
     it('falls back to name for title attribute', () => {
       const wrapper = mount(LogoGrid, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       const githubItem = wrapper.findAll('.logo-item')[0]

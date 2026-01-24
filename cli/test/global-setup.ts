@@ -18,15 +18,15 @@
  * - GITHUB_TOKEN: For authenticated GitHub API access (5000 req/hr vs 60 unauthenticated)
  */
 
-import { execSync } from 'child_process'
+import { execSync } from 'node:child_process'
 import {
+  cleanupTestData,
   restoreTestDatabase,
   startTestPocketbase,
   stopTestPocketbase,
-  cleanupTestData,
-  TEST_URL,
   TEST_EMAIL,
-  TEST_PASSWORD
+  TEST_PASSWORD,
+  TEST_URL,
 } from './setup/test-pocketbase.js'
 
 /**
@@ -53,7 +53,8 @@ function getGitHubToken(): string | null {
     if (token) {
       return token
     }
-  } catch {
+  }
+  catch {
     // gh CLI not installed or not authenticated
   }
 
@@ -80,7 +81,8 @@ export async function setup(): Promise<void> {
   if (githubToken) {
     process.env.GITHUB_TOKEN = githubToken
     console.log('[global-setup] GitHub token configured (authenticated API access)')
-  } else {
+  }
+  else {
     console.warn('[global-setup] WARNING: No GitHub token found')
     console.warn('  Tests requiring GitHub API may fail due to rate limits (60 req/hr)')
     console.warn('  To fix: Run "gh auth login" or set GITHUB_TOKEN env var')
@@ -98,7 +100,8 @@ export async function setup(): Promise<void> {
     console.log(`  URL: ${TEST_URL}`)
     console.log(`  Email: ${TEST_EMAIL}`)
     console.log('========================================\n')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('\n[global-setup] FAILED to setup test environment')
     console.error(error)
 
@@ -126,7 +129,8 @@ export async function teardown(): Promise<void> {
     // cleanupTestData()
 
     console.log('[global-teardown] Test environment cleaned up\n')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('[global-teardown] Error during cleanup:', error)
   }
 }

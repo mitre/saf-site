@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import BrandIcon from './icons/BrandIcon.vue'
+
+const props = defineProps<{
+  label: string
+  value: string
+  href?: string
+  truncate?: number
+}>()
+
+const displayValue = computed(() => {
+  if (!props.truncate || props.value.length <= props.truncate) {
+    return props.value
+  }
+  return `${props.value.slice(0, props.truncate)}...`
+})
+</script>
+
 <template>
   <component
     :is="href ? 'a' : 'span'"
@@ -15,25 +34,6 @@
     </span>
   </component>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue'
-import BrandIcon from './icons/BrandIcon.vue'
-
-const props = defineProps<{
-  label: string
-  value: string
-  href?: string
-  truncate?: number
-}>()
-
-const displayValue = computed(() => {
-  if (!props.truncate || props.value.length <= props.truncate) {
-    return props.value
-  }
-  return props.value.slice(0, props.truncate) + '...'
-})
-</script>
 
 <style scoped>
 .metadata-pill {

@@ -2,26 +2,26 @@
  * Validation Schemas Tests
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  SLUG_PATTERN,
-  SEMVER_PATTERN,
-  slugSchema,
-  optionalSlugSchema,
-  semverSchema,
-  optionalSemverSchema,
+  automationLevelSchema,
+  contentTypeSchema,
+  controlCountSchema,
+  descriptionSchema,
+  githubUrlSchema,
   nameSchema,
   optionalNameSchema,
-  descriptionSchema,
-  contentTypeSchema,
+  optionalSemverSchema,
+  optionalSlugSchema,
+  SEMVER_PATTERN,
+  semverSchema,
+  SLUG_PATTERN,
+  slugSchema,
   statusSchema,
-  automationLevelSchema,
-  githubUrlSchema,
-  controlCountSchema
 } from './validation-schemas.js'
 
-describe('Validation Schemas', () => {
-  describe('SLUG_PATTERN', () => {
+describe('validation Schemas', () => {
+  describe('sLUG_PATTERN', () => {
     it('matches valid slugs', () => {
       expect(SLUG_PATTERN.test('valid-slug')).toBe(true)
       expect(SLUG_PATTERN.test('simple')).toBe(true)
@@ -39,7 +39,7 @@ describe('Validation Schemas', () => {
     })
   })
 
-  describe('SEMVER_PATTERN', () => {
+  describe('sEMVER_PATTERN', () => {
     it('matches valid semver versions', () => {
       expect(SEMVER_PATTERN.test('1.0.0')).toBe(true)
       expect(SEMVER_PATTERN.test('0.0.1')).toBe(true)

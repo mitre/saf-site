@@ -18,10 +18,11 @@
  * - Tests run on a separate port (8091) to avoid conflicts with development
  */
 
-import { spawn, ChildProcess } from 'child_process'
-import { existsSync, rmSync, mkdirSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import type { ChildProcess } from 'node:child_process'
+import { spawn } from 'node:child_process'
+import { existsSync, mkdirSync, rmSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import waitOn from 'wait-on'
 import { load as restoreDatabase } from '../../../scripts/db-diffable.js'
 
@@ -45,7 +46,7 @@ const TEST_DATA_DIR = join(POCKETBASE_DIR, 'test_pb_data')
 const TEST_DB_PATH = join(TEST_DATA_DIR, 'data.db')
 
 let pbProcess: ChildProcess | null = null
-let weStartedPocketbase = false  // Track if we started it (vs it was already running)
+let weStartedPocketbase = false // Track if we started it (vs it was already running)
 
 /**
  * Restore test database from diffable/
@@ -92,8 +93,8 @@ export async function startTestPocketbase(): Promise<void> {
 
   if (!existsSync(POCKETBASE_BINARY)) {
     throw new Error(
-      `Pocketbase binary not found at ${POCKETBASE_BINARY}.\n` +
-      'Run: pnpm dev:setup'
+      `Pocketbase binary not found at ${POCKETBASE_BINARY}.\n`
+      + 'Run: pnpm dev:setup',
     )
   }
 
@@ -109,10 +110,10 @@ export async function startTestPocketbase(): Promise<void> {
   pbProcess = spawn(POCKETBASE_BINARY, [
     'serve',
     `--dir=${TEST_DATA_DIR}`,
-    `--http=127.0.0.1:${TEST_PORT}`
+    `--http=127.0.0.1:${TEST_PORT}`,
   ], {
     stdio: ['ignore', 'pipe', 'pipe'],
-    detached: false
+    detached: false,
   })
 
   // Log output for debugging
@@ -148,10 +149,11 @@ export async function startTestPocketbase(): Promise<void> {
       resources: [`${TEST_URL}/api/health`],
       timeout: 30000,
       interval: 100,
-      validateStatus: (status: number) => status === 200
+      validateStatus: (status: number) => status === 200,
     })
     console.log(`[test-pb] Pocketbase ready at ${TEST_URL}`)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('[test-pb] Server failed to start:', error)
     await stopTestPocketbase()
     throw new Error(`Pocketbase failed to start at ${TEST_URL}`)
@@ -218,7 +220,8 @@ export async function isTestPocketbaseAvailable(): Promise<boolean> {
   try {
     const response = await fetch(`${TEST_URL}/api/health`)
     return response.ok
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -231,6 +234,6 @@ export function getTestConfig() {
     url: TEST_URL,
     email: TEST_EMAIL,
     password: TEST_PASSWORD,
-    port: TEST_PORT
+    port: TEST_PORT,
   }
 }

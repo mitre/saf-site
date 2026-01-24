@@ -21,7 +21,7 @@ export interface PlaceholderProps {
 }
 
 const props = withDefaults(defineProps<PlaceholderProps>(), {
-  rounded: 'lg'
+  rounded: 'lg',
 })
 
 // Generate unique ID for pattern to avoid conflicts
@@ -30,7 +30,7 @@ const patternId = computed(() => `placeholder-pattern-${Math.random().toString(3
 const style = computed(() => ({
   width: props.width,
   height: props.height,
-  aspectRatio: props.aspectRatio
+  aspectRatio: props.aspectRatio,
 }))
 </script>
 

@@ -9,13 +9,13 @@ import PocketBase from 'pocketbase'
  */
 export async function initPocketBase(): Promise<PocketBase> {
   const pb = new PocketBase(
-    process.env.POCKETBASE_URL || 'http://localhost:8090'
+    process.env.POCKETBASE_URL || 'http://localhost:8090',
   )
 
   // PocketBase 0.23+ uses _superusers collection for admin auth
   await pb.collection('_superusers').authWithPassword(
     process.env.POCKETBASE_ADMIN_EMAIL || 'admin@localhost.com',
-    process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
+    process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123',
   )
 
   return pb
@@ -29,11 +29,11 @@ export function extractFK(expand: Record<string, unknown> | undefined, fieldName
   name?: string
   slug?: string
 } {
-  const field = expand?.[fieldName] as { id?: string; name?: string; slug?: string } | undefined
+  const field = expand?.[fieldName] as { id?: string, name?: string, slug?: string } | undefined
   return {
     id: field?.id,
     name: field?.name,
-    slug: field?.slug
+    slug: field?.slug,
   }
 }
 
@@ -46,12 +46,12 @@ export function extractStandardFK(expand: Record<string, unknown> | undefined): 
   short_name?: string
   slug?: string
 } {
-  const field = expand?.standard as { id?: string; name?: string; short_name?: string; slug?: string } | undefined
+  const field = expand?.standard as { id?: string, name?: string, short_name?: string, slug?: string } | undefined
   return {
     id: field?.id,
     name: field?.name,
     short_name: field?.short_name,
-    slug: field?.slug
+    slug: field?.slug,
   }
 }
 
@@ -80,7 +80,7 @@ export function extractTechnologyFK(expand: Record<string, unknown> | undefined)
     slug: field?.slug,
     logo: field?.logo,
     quick_start_template: field?.quick_start_template,
-    prerequisites_template: field?.prerequisites_template
+    prerequisites_template: field?.prerequisites_template,
   }
 }
 
@@ -93,12 +93,12 @@ export function extractOrgFK(expand: Record<string, unknown> | undefined, fieldN
   slug?: string
   logo?: string
 } {
-  const field = expand?.[fieldName] as { id?: string; name?: string; slug?: string; logo?: string } | undefined
+  const field = expand?.[fieldName] as { id?: string, name?: string, slug?: string, logo?: string } | undefined
   return {
     id: field?.id,
     name: field?.name,
     slug: field?.slug,
-    logo: field?.logo
+    logo: field?.logo,
   }
 }
 
@@ -125,6 +125,6 @@ export function extractMaintainerFK(expand: Record<string, unknown> | undefined)
     id: maintainer?.id,
     name: maintainer?.name,
     slug: maintainer?.slug,
-    logo: maintainer?.logo || maintainer?.expand?.organization?.logo
+    logo: maintainer?.logo || maintainer?.expand?.organization?.logo,
   }
 }

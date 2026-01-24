@@ -5,7 +5,7 @@
  * These tests verify the command interface without requiring Pocketbase.
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { dbCommand } from './db.js'
 
 // ============================================================================

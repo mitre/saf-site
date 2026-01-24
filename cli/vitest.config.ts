@@ -1,19 +1,19 @@
+import path from 'node:path'
 import { defineConfig } from 'vitest/config'
-import path from 'path'
 
 export default defineConfig({
   resolve: {
     alias: {
       '@schema': path.resolve(__dirname, '../docs/.vitepress/database'),
-      '@': path.resolve(__dirname, './src')
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   test: {
     globals: true,
     environment: 'node',
     include: [
       'src/**/*.spec.ts',
-      '../docs/.vitepress/database/**/*.spec.ts'
+      '../docs/.vitepress/database/**/*.spec.ts',
     ],
     // Global setup/teardown for test Pocketbase instance
     // Based on official Pocketbase testing pattern:
@@ -27,9 +27,9 @@ export default defineConfig({
       reporter: ['text', 'html'],
       include: [
         'src/lib/**/*.ts',
-        '../docs/.vitepress/database/**/*.ts'
+        '../docs/.vitepress/database/**/*.ts',
       ],
-      exclude: ['**/*.spec.ts']
-    }
-  }
+      exclude: ['**/*.spec.ts'],
+    },
+  },
 })

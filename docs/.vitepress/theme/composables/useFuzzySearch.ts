@@ -1,5 +1,7 @@
-import { computed, type Ref, type ComputedRef } from 'vue'
-import Fuse, { type IFuseOptions } from 'fuse.js'
+import type { IFuseOptions } from 'fuse.js'
+import type { ComputedRef, Ref } from 'vue'
+import Fuse from 'fuse.js'
+import { computed } from 'vue'
 
 /**
  * Default Fuse.js options for content search
@@ -19,8 +21,8 @@ const DEFAULT_FUSE_OPTIONS: IFuseOptions<unknown> = {
     { name: 'target_name', weight: 1.5 },
     { name: 'standard_name', weight: 1 },
     { name: 'technology_name', weight: 1 },
-    { name: 'vendor_name', weight: 1 }
-  ]
+    { name: 'vendor_name', weight: 1 },
+  ],
 }
 
 /**
@@ -39,7 +41,7 @@ const DEFAULT_FUSE_OPTIONS: IFuseOptions<unknown> = {
 export function useFuzzySearch<T extends Record<string, unknown>>(
   items: Ref<T[]> | T[],
   query: Ref<string> | string,
-  options?: Partial<IFuseOptions<T>>
+  options?: Partial<IFuseOptions<T>>,
 ): ComputedRef<T[]> {
   return computed(() => {
     const itemsArray = 'value' in items ? items.value : items
@@ -53,7 +55,7 @@ export function useFuzzySearch<T extends Record<string, unknown>>(
     // Create Fuse instance with merged options
     const fuse = new Fuse(itemsArray, {
       ...DEFAULT_FUSE_OPTIONS,
-      ...options
+      ...options,
     } as IFuseOptions<T>)
 
     // Search and extract items from results
@@ -68,11 +70,11 @@ export function useFuzzySearch<T extends Record<string, unknown>>(
  */
 export function createFuzzyMatcher<T extends Record<string, unknown>>(
   items: T[],
-  options?: Partial<IFuseOptions<T>>
+  options?: Partial<IFuseOptions<T>>,
 ): (query: string) => Set<T> {
   const fuse = new Fuse(items, {
     ...DEFAULT_FUSE_OPTIONS,
-    ...options
+    ...options,
   } as IFuseOptions<T>)
 
   return (query: string): Set<T> => {

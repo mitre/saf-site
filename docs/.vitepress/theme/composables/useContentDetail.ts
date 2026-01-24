@@ -1,4 +1,5 @@
-import { computed, type ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 
 /**
  * Content item from Pocketbase (validation or hardening profile)
@@ -94,7 +95,8 @@ export interface FeatureCard {
  * CIS/Others: 2.0.0 → v2.0.0 (keep semver)
  */
 function formatBenchmarkVersion(version: string, standardName: string): string {
-  if (!version) return ''
+  if (!version)
+    return ''
 
   // STIG uses V{major}R{minor} format
   if (standardName?.toLowerCase().includes('stig')) {
@@ -113,7 +115,8 @@ function formatBenchmarkVersion(version: string, standardName: string): string {
  * Supported variables: {github}, {slug}, {vendor_slug}, {name}
  */
 function interpolateTemplate(template: string, content: ContentItem): string {
-  if (!template) return ''
+  if (!template)
+    return ''
 
   return template
     .replace(/\{github\}/g, content.github_url || '')
@@ -133,7 +136,7 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
   const formattedBenchmarkVersion = computed(() => {
     return formatBenchmarkVersion(
       content.benchmark_version || '',
-      content.standard_name || content.standard_short_name
+      content.standard_name || content.standard_short_name,
     )
   })
 
@@ -143,7 +146,8 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
 
   const benchmarkLabel = computed(() => {
     const version = formattedBenchmarkVersion.value
-    if (!version) return ''
+    if (!version)
+      return ''
     const standard = content.standard_short_name || 'Benchmark'
     return `${standard} ${version}`
   })
@@ -156,14 +160,14 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       urls.push({
         label: 'View on GitHub',
         url: content.github_url,
-        primary: true
+        primary: true,
       })
 
       // Always show README
       urls.push({
         label: 'View README',
         url: `${content.github_url}#readme`,
-        primary: false
+        primary: false,
       })
     }
 
@@ -172,7 +176,7 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       urls.push({
         label: 'Documentation',
         url: content.documentation_url,
-        primary: false
+        primary: false,
       })
     }
 
@@ -183,7 +187,7 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
           ? `${content.standard_short_name} Reference`
           : 'Standard Reference',
         url: content.reference_url,
-        primary: false
+        primary: false,
       })
     }
 
@@ -251,6 +255,6 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     prerequisites,
     hasQuickStart,
     hasPrerequisites,
-    hasReadme
+    hasReadme,
   }
 }

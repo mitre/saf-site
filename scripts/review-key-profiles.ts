@@ -13,11 +13,11 @@ const keyProfiles = [
   'Oracle MySQL 8.0 STIG',
   'Docker CE CIS',
   'AWS RDS MySQL 5.7 CIS',
-  'GCP CIS Benchmark'
+  'GCP CIS Benchmark',
 ]
 
 console.log('Key Profile Verification:\n')
-keyProfiles.forEach(name => {
+keyProfiles.forEach((name) => {
   const profile = profiles.find(p => p.name === name)
   if (profile) {
     console.log(`${profile.name}`)
@@ -27,7 +27,8 @@ keyProfiles.forEach(name => {
     console.log(`  category: ${profile.category}`)
     console.log(`  vendor: ${profile.vendor}`)
     console.log('')
-  } else {
+  }
+  else {
     console.log(`⚠️  Profile not found: ${name}\n`)
   }
 })

@@ -22,12 +22,12 @@ export interface SkeletonProps {
 const props = withDefaults(defineProps<SkeletonProps>(), {
   as: 'div',
   rounded: 'md',
-  static: false
+  static: false,
 })
 
 const style = {
   width: props.width,
-  height: props.height
+  height: props.height,
 }
 </script>
 
@@ -41,7 +41,7 @@ const style = {
     class="skeleton"
     :class="[
       `skeleton--rounded-${rounded}`,
-      { 'skeleton--static': static }
+      { 'skeleton--static': static },
     ]"
     :style="style"
   >

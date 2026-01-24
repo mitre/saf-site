@@ -5,42 +5,29 @@
  * These tests are written FIRST, then schemas implemented to pass them
  */
 
-import { describe, it, expect } from 'vitest'
+import type { ContentRecord, Organization, OrganizationInput, PBContent, PBContentExpanded, PocketbaseRecord, Target } from './schemas.js'
+import { describe, expect, it } from 'vitest'
 import {
-  organizationSchema,
-  targetSchema,
-  standardSchema,
-  technologySchema,
-  teamSchema,
-  tagSchema,
+  contentInputSchema,
+
   contentSchema,
+  // Type exports
+
   // Input schemas (for create/update)
   organizationInputSchema,
-  targetInputSchema,
-  standardInputSchema,
-  technologyInputSchema,
-  teamInputSchema,
-  tagInputSchema,
-  contentInputSchema,
-  // Pocketbase record schemas (Phase 1.2)
-  pbRecordSchema,
-  pbOrganizationSchema,
-  pbTargetSchema,
+  organizationSchema,
+
   pbContentSchema,
   pbContentWithExpand,
-  // Type exports
-  type Organization,
-  type Target,
-  type Standard,
-  type Technology,
-  type Team,
-  type Tag,
-  type ContentRecord,
-  type OrganizationInput,
-  type TargetInput,
-  type PocketbaseRecord,
-  type PBContent,
-  type PBContentExpanded,
+  pbOrganizationSchema,
+  // Pocketbase record schemas (Phase 1.2)
+  pbRecordSchema,
+  pbTargetSchema,
+  standardSchema,
+  tagSchema,
+  targetSchema,
+  teamSchema,
+  technologySchema,
 } from './schemas.js'
 
 // ============================================================================
@@ -56,7 +43,7 @@ describe('organizationSchema', () => {
       description: 'Not-for-profit organization',
       website: 'https://mitre.org',
       logo: 'https://example.com/logo.png',
-      orgType: 'government'
+      orgType: 'government',
     }
     const result = organizationSchema.safeParse(org)
     expect(result.success).toBe(true)
@@ -66,7 +53,7 @@ describe('organizationSchema', () => {
     const org = {
       id: 'org_test',
       name: 'Test Org',
-      slug: 'test-org'
+      slug: 'test-org',
     }
     const result = organizationSchema.safeParse(org)
     expect(result.success).toBe(true)
@@ -82,7 +69,7 @@ describe('organizationSchema', () => {
     const org = {
       id: 'org_test',
       name: 'Test',
-      slug: 'Invalid Slug!' // spaces and special chars
+      slug: 'Invalid Slug!', // spaces and special chars
     }
     const result = organizationSchema.safeParse(org)
     expect(result.success).toBe(false)
@@ -93,7 +80,7 @@ describe('organizationSchema', () => {
       id: 'org_test',
       name: 'Test',
       slug: 'test',
-      website: 'not-a-url'
+      website: 'not-a-url',
     }
     const result = organizationSchema.safeParse(org)
     expect(result.success).toBe(false)
@@ -113,7 +100,7 @@ describe('organizationInputSchema', () => {
   it('does not require id for input', () => {
     const input = {
       name: 'New Org',
-      slug: 'new-org'
+      slug: 'new-org',
     }
     const result = organizationInputSchema.safeParse(input)
     expect(result.success).toBe(true)
@@ -134,7 +121,7 @@ describe('targetSchema', () => {
       category: 'cat_os',
       vendor: 'org_redhat',
       website: 'https://redhat.com/rhel',
-      logo: 'https://example.com/rhel.png'
+      logo: 'https://example.com/rhel.png',
     }
     const result = targetSchema.safeParse(target)
     expect(result.success).toBe(true)
@@ -144,7 +131,7 @@ describe('targetSchema', () => {
     const target = {
       id: 'target_test',
       name: 'Test Target',
-      slug: 'test-target'
+      slug: 'test-target',
     }
     const result = targetSchema.safeParse(target)
     expect(result.success).toBe(true)
@@ -154,7 +141,7 @@ describe('targetSchema', () => {
     const target = {
       id: 'target_test',
       name: '',
-      slug: 'test'
+      slug: 'test',
     }
     const result = targetSchema.safeParse(target)
     expect(result.success).toBe(false)
@@ -164,7 +151,7 @@ describe('targetSchema', () => {
     const target = {
       id: 'target_test',
       name: 'Test',
-      slug: 'UPPERCASE-SLUG' // should be lowercase
+      slug: 'UPPERCASE-SLUG', // should be lowercase
     }
     const result = targetSchema.safeParse(target)
     expect(result.success).toBe(false)
@@ -186,7 +173,7 @@ describe('standardSchema', () => {
       website: 'https://public.cyber.mil/stigs/',
       logo: 'https://example.com/stig.png',
       organization: 'org_disa',
-      standardType: 'government'
+      standardType: 'government',
     }
     const result = standardSchema.safeParse(standard)
     expect(result.success).toBe(true)
@@ -196,7 +183,7 @@ describe('standardSchema', () => {
     const standard = {
       id: 'std_test',
       name: 'Test Standard',
-      slug: 'test-standard'
+      slug: 'test-standard',
     }
     const result = standardSchema.safeParse(standard)
     expect(result.success).toBe(true)
@@ -227,7 +214,7 @@ describe('technologySchema', () => {
       logo: 'https://example.com/inspec.png',
       github: 'https://github.com/inspec/inspec',
       organization: 'org_progress',
-      documentationUrl: 'https://docs.chef.io/inspec/'
+      documentationUrl: 'https://docs.chef.io/inspec/',
     }
     const result = technologySchema.safeParse(tech)
     expect(result.success).toBe(true)
@@ -237,7 +224,7 @@ describe('technologySchema', () => {
     const tech = {
       id: 'tech_test',
       name: 'Test Tech',
-      slug: 'test-tech'
+      slug: 'test-tech',
     }
     const result = technologySchema.safeParse(tech)
     expect(result.success).toBe(true)
@@ -248,7 +235,7 @@ describe('technologySchema', () => {
       id: 'tech_test',
       name: 'Test',
       slug: 'test',
-      github: 'not-a-url'
+      github: 'not-a-url',
     }
     const result = technologySchema.safeParse(tech)
     expect(result.success).toBe(false)
@@ -268,7 +255,7 @@ describe('teamSchema', () => {
       description: 'Security Automation Framework team',
       organization: 'org_mitre',
       website: 'https://saf.mitre.org',
-      logo: 'https://example.com/saf.png'
+      logo: 'https://example.com/saf.png',
     }
     const result = teamSchema.safeParse(team)
     expect(result.success).toBe(true)
@@ -278,7 +265,7 @@ describe('teamSchema', () => {
     const team = {
       id: 'team_test',
       name: 'Test Team',
-      slug: 'test-team'
+      slug: 'test-team',
     }
     const result = teamSchema.safeParse(team)
     expect(result.success).toBe(true)
@@ -298,7 +285,7 @@ describe('tagSchema', () => {
       displayName: 'Linux',
       description: 'Linux-related content',
       tagCategory: 'platform',
-      badgeColor: 'blue'
+      badgeColor: 'blue',
     }
     const result = tagSchema.safeParse(tag)
     expect(result.success).toBe(true)
@@ -308,7 +295,7 @@ describe('tagSchema', () => {
     const tag = {
       id: 'tag_test',
       name: 'test',
-      slug: 'test'
+      slug: 'test',
     }
     const result = tagSchema.safeParse(tag)
     expect(result.success).toBe(true)
@@ -345,7 +332,7 @@ describe('contentSchema', () => {
       maintainer: 'team_saf',
       github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
       controlCount: 452,
-      license: 'Apache-2.0'
+      license: 'Apache-2.0',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(true)
@@ -362,7 +349,7 @@ describe('contentSchema', () => {
       target: 'target_rhel9',
       standard: 'std_stig',
       technology: 'tech_ansible',
-      automationLevel: 'full'
+      automationLevel: 'full',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(true)
@@ -373,7 +360,7 @@ describe('contentSchema', () => {
       id: 'content_test',
       name: 'Test Content',
       slug: 'test-content',
-      contentType: 'validation'
+      contentType: 'validation',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(true)
@@ -384,7 +371,7 @@ describe('contentSchema', () => {
       id: 'content_test',
       name: 'Test',
       slug: 'test',
-      contentType: 'invalid'
+      contentType: 'invalid',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(false)
@@ -396,7 +383,7 @@ describe('contentSchema', () => {
       name: 'Test',
       slug: 'test',
       contentType: 'validation',
-      status: 'invalid'
+      status: 'invalid',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(false)
@@ -410,7 +397,7 @@ describe('contentSchema', () => {
         name: 'Test',
         slug: 'test',
         contentType: 'hardening',
-        automationLevel
+        automationLevel,
       }
       const result = contentSchema.safeParse(content)
       expect(result.success).toBe(true)
@@ -422,7 +409,7 @@ describe('contentSchema', () => {
       id: 'content_test',
       name: 'Test',
       slug: 'Invalid--Slug', // consecutive hyphens
-      contentType: 'validation'
+      contentType: 'validation',
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(false)
@@ -436,7 +423,7 @@ describe('contentSchema', () => {
         name: 'Test',
         slug: 'test',
         contentType: 'validation',
-        version
+        version,
       }
       const result = contentSchema.safeParse(content)
       expect(result.success).toBe(true)
@@ -449,7 +436,7 @@ describe('contentSchema', () => {
       name: 'Test',
       slug: 'test',
       contentType: 'validation',
-      controlCount: -1
+      controlCount: -1,
     }
     const result = contentSchema.safeParse(content)
     expect(result.success).toBe(false)
@@ -461,7 +448,7 @@ describe('contentInputSchema', () => {
     const input = {
       name: 'New Content',
       slug: 'new-content',
-      contentType: 'validation'
+      contentType: 'validation',
     }
     const result = contentInputSchema.safeParse(input)
     expect(result.success).toBe(true)
@@ -473,7 +460,7 @@ describe('contentInputSchema', () => {
       slug: 'new-content',
       contentType: 'validation',
       target: 'target_rhel9',
-      standard: 'std_stig'
+      standard: 'std_stig',
     }
     const result = contentInputSchema.safeParse(input)
     expect(result.success).toBe(true)
@@ -484,8 +471,8 @@ describe('contentInputSchema', () => {
 // TYPE INFERENCE TESTS
 // ============================================================================
 
-describe('Type inference', () => {
-  it('Organization type has expected shape', () => {
+describe('type inference', () => {
+  it('organization type has expected shape', () => {
     // This is a compile-time check - if types are wrong, TS will error
     const org: Organization = {
       id: 'org_test',
@@ -494,12 +481,12 @@ describe('Type inference', () => {
       description: undefined,
       website: undefined,
       logo: undefined,
-      orgType: undefined
+      orgType: undefined,
     }
     expect(org.id).toBe('org_test')
   })
 
-  it('Target type has expected shape', () => {
+  it('target type has expected shape', () => {
     const target: Target = {
       id: 'target_test',
       name: 'Test',
@@ -508,12 +495,12 @@ describe('Type inference', () => {
       category: undefined,
       vendor: undefined,
       website: undefined,
-      logo: undefined
+      logo: undefined,
     }
     expect(target.id).toBe('target_test')
   })
 
-  it('ContentRecord type has expected shape', () => {
+  it('contentRecord type has expected shape', () => {
     const content: ContentRecord = {
       id: 'content_test',
       name: 'Test',
@@ -541,15 +528,15 @@ describe('Type inference', () => {
       featuredOrder: undefined,
       license: undefined,
       releaseDate: undefined,
-      deprecatedAt: undefined
+      deprecatedAt: undefined,
     }
     expect(content.contentType).toBe('validation')
   })
 
-  it('Input types omit id', () => {
+  it('input types omit id', () => {
     const input: OrganizationInput = {
       name: 'Test',
-      slug: 'test'
+      slug: 'test',
     }
     // @ts-expect-error - id should not be allowed on input type
     input.id = 'should-error'
@@ -561,14 +548,14 @@ describe('Type inference', () => {
 // PHASE 1.2: POCKETBASE COMPATIBILITY
 // ============================================================================
 
-describe('Pocketbase Record Schema', () => {
+describe('pocketbase Record Schema', () => {
   it('validates Pocketbase metadata fields', () => {
     const pbRecord = {
       id: 'abc123',
       created: '2024-01-15 10:30:00.000Z',
       updated: '2024-01-15 10:30:00.000Z',
       collectionId: 'col_abc',
-      collectionName: 'organizations'
+      collectionName: 'organizations',
     }
     const result = pbRecordSchema.safeParse(pbRecord)
     expect(result.success).toBe(true)
@@ -581,7 +568,7 @@ describe('Pocketbase Record Schema', () => {
       updated: '2024-01-15 10:30:00.000Z',
       collectionId: 'col_abc',
       collectionName: 'organizations',
-      expand: {}
+      expand: {},
     }
     const result = pbRecordSchema.safeParse(pbRecord)
     expect(result.success).toBe(true)
@@ -600,7 +587,7 @@ describe('pbOrganizationSchema', () => {
       slug: 'mitre',
       description: 'Not-for-profit',
       website: 'https://mitre.org',
-      org_type: 'government'
+      org_type: 'government',
     }
     const result = pbOrganizationSchema.safeParse(pbOrg)
     expect(result.success).toBe(true)
@@ -615,7 +602,7 @@ describe('pbOrganizationSchema', () => {
       collectionName: 'organizations',
       name: 'Test',
       slug: 'test',
-      org_type: 'vendor'  // snake_case from Pocketbase
+      org_type: 'vendor', // snake_case from Pocketbase
     }
     const result = pbOrganizationSchema.safeParse(pbOrg)
     expect(result.success).toBe(true)
@@ -632,8 +619,8 @@ describe('pbTargetSchema', () => {
       collectionName: 'targets',
       name: 'Red Hat Enterprise Linux 9',
       slug: 'rhel-9',
-      category: 'cat_os',  // FK as string ID
-      vendor: 'org_redhat'  // FK as string ID
+      category: 'cat_os', // FK as string ID
+      vendor: 'org_redhat', // FK as string ID
     }
     const result = pbTargetSchema.safeParse(pbTarget)
     expect(result.success).toBe(true)
@@ -659,7 +646,7 @@ describe('pbContentSchema', () => {
       maintainer: 'team_saf',
       github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
       control_count: 452,
-      license: 'Apache-2.0'
+      license: 'Apache-2.0',
     }
     const result = pbContentSchema.safeParse(pbContent)
     expect(result.success).toBe(true)
@@ -687,7 +674,7 @@ describe('pbContentSchema', () => {
       is_featured: true,
       featured_order: 1,
       release_date: '2024-01-01',
-      deprecated_at: null
+      deprecated_at: null,
     }
     const result = pbContentSchema.safeParse(pbContent)
     expect(result.success).toBe(true)
@@ -716,7 +703,7 @@ describe('pbContentWithExpand', () => {
           collectionId: 'col_targets',
           collectionName: 'targets',
           name: 'Red Hat Enterprise Linux 9',
-          slug: 'rhel-9'
+          slug: 'rhel-9',
         },
         standard: {
           id: 'std_stig',
@@ -726,7 +713,7 @@ describe('pbContentWithExpand', () => {
           collectionName: 'standards',
           name: 'Security Technical Implementation Guide',
           short_name: 'STIG',
-          slug: 'stig'
+          slug: 'stig',
         },
         vendor: {
           id: 'org_mitre',
@@ -735,9 +722,9 @@ describe('pbContentWithExpand', () => {
           collectionId: 'col_orgs',
           collectionName: 'organizations',
           name: 'MITRE',
-          slug: 'mitre'
-        }
-      }
+          slug: 'mitre',
+        },
+      },
     }
     const result = pbContentWithExpand.safeParse(pbContentExpanded)
     expect(result.success).toBe(true)
@@ -762,29 +749,29 @@ describe('pbContentWithExpand', () => {
           collectionId: 'col_targets',
           collectionName: 'targets',
           name: 'Test Target',
-          slug: 'test-target'
-        }
+          slug: 'test-target',
+        },
         // standard and vendor not expanded
-      }
+      },
     }
     const result = pbContentWithExpand.safeParse(pbContentPartial)
     expect(result.success).toBe(true)
   })
 })
 
-describe('Pocketbase type compatibility', () => {
-  it('PocketbaseRecord type has metadata fields', () => {
+describe('pocketbase type compatibility', () => {
+  it('pocketbaseRecord type has metadata fields', () => {
     const record: PocketbaseRecord = {
       id: 'test',
       created: '2024-01-15',
       updated: '2024-01-15',
       collectionId: 'col',
-      collectionName: 'test'
+      collectionName: 'test',
     }
     expect(record.collectionName).toBe('test')
   })
 
-  it('PBContent type combines content + metadata', () => {
+  it('pBContent type combines content + metadata', () => {
     const content: PBContent = {
       id: 'content_test',
       created: '2024-01-15',
@@ -793,13 +780,13 @@ describe('Pocketbase type compatibility', () => {
       collectionName: 'content',
       name: 'Test',
       slug: 'test',
-      content_type: 'validation'
+      content_type: 'validation',
     }
     expect(content.content_type).toBe('validation')
     expect(content.collectionName).toBe('content')
   })
 
-  it('PBContentExpanded includes expand object', () => {
+  it('pBContentExpanded includes expand object', () => {
     const content: PBContentExpanded = {
       id: 'content_test',
       created: '2024-01-15',
@@ -817,9 +804,9 @@ describe('Pocketbase type compatibility', () => {
           collectionId: 'col',
           collectionName: 'targets',
           name: 'Test Target',
-          slug: 'test'
-        }
-      }
+          slug: 'test',
+        },
+      },
     }
     expect(content.expand?.target?.name).toBe('Test Target')
   })

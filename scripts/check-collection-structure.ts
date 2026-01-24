@@ -10,6 +10,7 @@ const testColl = collections.find(c => c.name === 'organizations')
 if (testColl) {
   console.log('\nRaw collection object for "organizations":')
   console.log(JSON.stringify(testColl, null, 2))
-} else {
+}
+else {
   console.log('organizations collection not found')
 }

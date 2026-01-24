@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
 import LogoMarquee from './LogoMarquee.vue'
 
 const sampleItems = [
   { name: 'GitHub', href: 'https://github.com' },
   { name: 'Oracle' },
-  { name: 'AWS' }
+  { name: 'AWS' },
 ]
 
 // Larger set for multi-row testing
@@ -21,14 +21,14 @@ const manyItems = [
   { name: 'Fortify' },
   { name: 'Prisma Cloud' },
   { name: 'AWS Inspector' },
-  { name: 'Azure Defender' }
+  { name: 'Azure Defender' },
 ]
 
-describe('LogoMarquee', () => {
+describe('logoMarquee', () => {
   describe('rendering', () => {
     it('renders items repeated for seamless loop', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, repeat: 2 }
+        props: { items: sampleItems, repeat: 2 },
       })
 
       // 3 items × 2 repeats = 6 logo items
@@ -37,7 +37,7 @@ describe('LogoMarquee', () => {
 
     it('respects custom repeat count', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, repeat: 3 }
+        props: { items: sampleItems, repeat: 3 },
       })
 
       // 3 items × 3 repeats = 9 logo items
@@ -48,7 +48,7 @@ describe('LogoMarquee', () => {
   describe('animation', () => {
     it('sets animation duration via CSS variable', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, duration: 20 }
+        props: { items: sampleItems, duration: 20 },
       })
 
       expect(wrapper.find('.logo-marquee').attributes('style')).toContain('--marquee-duration: 20s')
@@ -56,7 +56,7 @@ describe('LogoMarquee', () => {
 
     it('applies pause-on-hover class by default', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.find('.logo-marquee--pause-hover').exists()).toBe(true)
@@ -64,7 +64,7 @@ describe('LogoMarquee', () => {
 
     it('can disable pause-on-hover', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, pauseOnHover: false }
+        props: { items: sampleItems, pauseOnHover: false },
       })
 
       expect(wrapper.find('.logo-marquee--pause-hover').exists()).toBe(false)
@@ -72,7 +72,7 @@ describe('LogoMarquee', () => {
 
     it('applies reverse class when enabled', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, reverse: true }
+        props: { items: sampleItems, reverse: true },
       })
 
       expect(wrapper.find('.logo-marquee--reverse').exists()).toBe(true)
@@ -82,7 +82,7 @@ describe('LogoMarquee', () => {
   describe('overlay', () => {
     it('shows overlay by default', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems }
+        props: { items: sampleItems },
       })
 
       expect(wrapper.find('.logo-marquee--overlay').exists()).toBe(true)
@@ -90,7 +90,7 @@ describe('LogoMarquee', () => {
 
     it('can hide overlay', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, overlay: false }
+        props: { items: sampleItems, overlay: false },
       })
 
       expect(wrapper.find('.logo-marquee--overlay').exists()).toBe(false)
@@ -101,7 +101,7 @@ describe('LogoMarquee', () => {
       // mask-image fades content to transparent, working on ANY background color
       // This is a regression test - do NOT change back to gradient overlay approach
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, overlay: true }
+        props: { items: sampleItems, overlay: true },
       })
 
       // The overlay class should exist and use CSS mask-image (not pseudo-elements)
@@ -115,7 +115,7 @@ describe('LogoMarquee', () => {
   describe('links', () => {
     it('renders anchor tags for items with href', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, repeat: 1 }
+        props: { items: sampleItems, repeat: 1 },
       })
 
       const links = wrapper.findAll('a.logo-marquee-item')
@@ -126,7 +126,7 @@ describe('LogoMarquee', () => {
 
     it('renders span for items without href', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, repeat: 1 }
+        props: { items: sampleItems, repeat: 1 },
       })
 
       const spans = wrapper.findAll('span.logo-marquee-item')
@@ -137,7 +137,7 @@ describe('LogoMarquee', () => {
   describe('sizing', () => {
     it('uses default size of 40', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: [{ name: 'GitHub' }], repeat: 1 }
+        props: { items: [{ name: 'GitHub' }], repeat: 1 },
       })
 
       const brandIcon = wrapper.findComponent({ name: 'BrandIcon' })
@@ -146,7 +146,7 @@ describe('LogoMarquee', () => {
 
     it('passes custom size to BrandIcon', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: [{ name: 'GitHub' }], size: 64, repeat: 1 }
+        props: { items: [{ name: 'GitHub' }], size: 64, repeat: 1 },
       })
 
       const brandIcon = wrapper.findComponent({ name: 'BrandIcon' })
@@ -158,8 +158,8 @@ describe('LogoMarquee', () => {
         props: {
           items: [{ name: 'Custom', image: '/logo.png' }],
           size: 56,
-          repeat: 1
-        }
+          repeat: 1,
+        },
       })
 
       const img = wrapper.find('img.logo-image')
@@ -171,7 +171,7 @@ describe('LogoMarquee', () => {
   describe('accessibility', () => {
     it('sets title attribute for all items', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: sampleItems, repeat: 1 }
+        props: { items: sampleItems, repeat: 1 },
       })
 
       const items = wrapper.findAll('.logo-marquee-item')
@@ -183,7 +183,7 @@ describe('LogoMarquee', () => {
   describe('multi-row', () => {
     it('renders single row by default', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, repeat: 1 }
+        props: { items: manyItems, repeat: 1 },
       })
 
       expect(wrapper.findAll('.logo-marquee')).toHaveLength(1)
@@ -191,7 +191,7 @@ describe('LogoMarquee', () => {
 
     it('splits items into multiple rows', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 3, repeat: 1 }
+        props: { items: manyItems, rows: 3, repeat: 1 },
       })
 
       expect(wrapper.findAll('.logo-marquee')).toHaveLength(3)
@@ -199,12 +199,12 @@ describe('LogoMarquee', () => {
 
     it('distributes items evenly across rows', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 3, repeat: 1 }
+        props: { items: manyItems, rows: 3, repeat: 1 },
       })
 
       // 12 items / 3 rows = 4 items per row
       const rows = wrapper.findAll('.logo-marquee')
-      rows.forEach(row => {
+      rows.forEach((row) => {
         expect(row.findAll('.logo-marquee-item')).toHaveLength(4)
       })
     })
@@ -213,7 +213,7 @@ describe('LogoMarquee', () => {
       // 12 items / 5 rows = ceil(2.4) = 3 items per row
       // Row 1: 3, Row 2: 3, Row 3: 3, Row 4: 3, Row 5: 0 (empty, not rendered)
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 5, repeat: 1 }
+        props: { items: manyItems, rows: 5, repeat: 1 },
       })
 
       // Should have 4 rows (last row would be empty so not rendered)
@@ -224,7 +224,7 @@ describe('LogoMarquee', () => {
 
     it('applies multi-row class when rows > 1', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 2, repeat: 1 }
+        props: { items: manyItems, rows: 2, repeat: 1 },
       })
 
       expect(wrapper.find('.logo-marquee--multi-row').exists()).toBe(true)
@@ -232,7 +232,7 @@ describe('LogoMarquee', () => {
 
     it('does not apply multi-row class when rows = 1', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 1, repeat: 1 }
+        props: { items: manyItems, rows: 1, repeat: 1 },
       })
 
       expect(wrapper.find('.logo-marquee--multi-row').exists()).toBe(false)
@@ -240,7 +240,7 @@ describe('LogoMarquee', () => {
 
     it('alternates direction per row by default', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 3, repeat: 1 }
+        props: { items: manyItems, rows: 3, repeat: 1 },
       })
 
       const rows = wrapper.findAll('.logo-marquee')
@@ -252,7 +252,7 @@ describe('LogoMarquee', () => {
 
     it('respects reverse prop with alternating rows', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 3, reverse: true, repeat: 1 }
+        props: { items: manyItems, rows: 3, reverse: true, repeat: 1 },
       })
 
       const rows = wrapper.findAll('.logo-marquee')
@@ -264,12 +264,12 @@ describe('LogoMarquee', () => {
 
     it('can disable alternating direction', () => {
       const wrapper = mount(LogoMarquee, {
-        props: { items: manyItems, rows: 3, alternateDirection: false, repeat: 1 }
+        props: { items: manyItems, rows: 3, alternateDirection: false, repeat: 1 },
       })
 
       const rows = wrapper.findAll('.logo-marquee')
       // All rows should have same direction (not reversed by default)
-      rows.forEach(row => {
+      rows.forEach((row) => {
         expect(row.classes()).not.toContain('logo-marquee--reverse')
       })
     })

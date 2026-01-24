@@ -10,8 +10,8 @@ const orgColl = await pb.collections.create({
   name: 'test_organizations',
   type: 'base',
   fields: [
-    { name: 'name', type: 'text', required: true }
-  ]
+    { name: 'name', type: 'text', required: true },
+  ],
 })
 console.log(`✓ Created: ${orgColl.id}`)
 
@@ -27,18 +27,19 @@ try {
         name: 'organization',
         type: 'relation',
         required: false,
-        collectionId: orgColl.id,  // DIRECT
-        cascadeDelete: false,       // DIRECT
-        maxSelect: 1                // DIRECT
-      }
-    ]
+        collectionId: orgColl.id, // DIRECT
+        cascadeDelete: false, // DIRECT
+        maxSelect: 1, // DIRECT
+      },
+    ],
   })
   console.log('✓ SUCCESS with DIRECT properties')
   console.log(`  Collection ID: ${profileColl.id}`)
   const orgField = profileColl.fields?.find(f => f.name === 'organization')
   console.log(`  Relation field:`, orgField)
   await pb.collections.delete(profileColl.id)
-} catch (e: any) {
+}
+catch (e: any) {
   console.log('✗ FAILED:', e.message)
 }
 

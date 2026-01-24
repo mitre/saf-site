@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   buildFilterUrl,
-  createMetadataItem,
   buildMetadataItems,
-  type MetadataItem
+  createMetadataItem,
 } from './metadata'
 
 describe('metadata utilities', () => {
@@ -24,38 +23,38 @@ describe('metadata utilities', () => {
       expect(item).toEqual({
         label: 'Target',
         value: 'RHEL 8',
-        href: undefined
+        href: undefined,
       })
     })
 
     it('creates item with explicit href', () => {
       const item = createMetadataItem('GitHub', 'View Source', {
-        href: 'https://github.com/example/repo'
+        href: 'https://github.com/example/repo',
       })
 
       expect(item).toEqual({
         label: 'GitHub',
         value: 'View Source',
-        href: 'https://github.com/example/repo'
+        href: 'https://github.com/example/repo',
       })
     })
 
     it('auto-generates filter link with filterParam', () => {
       const item = createMetadataItem('Target', 'RHEL 8', {
-        filterParam: 'target'
+        filterParam: 'target',
       })
 
       expect(item).toEqual({
         label: 'Target',
         value: 'RHEL 8',
-        href: '/content/?target=RHEL%208'
+        href: '/content/?target=RHEL%208',
       })
     })
 
     it('prefers explicit href over filterParam', () => {
       const item = createMetadataItem('Target', 'RHEL 8', {
         filterParam: 'target',
-        href: '/custom/url'
+        href: '/custom/url',
       })
 
       expect(item?.href).toBe('/custom/url')
@@ -79,7 +78,7 @@ describe('metadata utilities', () => {
       expect(item).toEqual({
         label: 'Controls',
         value: '247',
-        href: undefined
+        href: undefined,
       })
     })
 
@@ -94,7 +93,7 @@ describe('metadata utilities', () => {
         createMetadataItem('A', 'Value A'),
         createMetadataItem('B', undefined),
         createMetadataItem('C', 'Value C'),
-        undefined
+        undefined,
       )
 
       expect(items).toHaveLength(2)
@@ -105,7 +104,7 @@ describe('metadata utilities', () => {
       const items = buildMetadataItems(
         createMetadataItem('A', undefined),
         createMetadataItem('B', null),
-        createMetadataItem('C', '')
+        createMetadataItem('C', ''),
       )
 
       expect(items).toEqual([])
@@ -115,7 +114,7 @@ describe('metadata utilities', () => {
       const items = buildMetadataItems(
         createMetadataItem('First', '1'),
         createMetadataItem('Second', '2'),
-        createMetadataItem('Third', '3')
+        createMetadataItem('Third', '3'),
       )
 
       expect(items.map(i => i.label)).toEqual(['First', 'Second', 'Third'])

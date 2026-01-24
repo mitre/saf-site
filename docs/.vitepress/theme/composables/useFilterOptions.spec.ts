@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { ref } from 'vue'
-import { useUniqueValues, useStandardOptions } from './useFilterOptions'
+import { useStandardOptions, useUniqueValues } from './useFilterOptions'
 
 describe('useFilterOptions', () => {
   describe('useUniqueValues', () => {
@@ -9,7 +9,7 @@ describe('useFilterOptions', () => {
         { id: '1', target_name: 'RHEL 8' },
         { id: '2', target_name: 'RHEL 9' },
         { id: '3', target_name: 'RHEL 8' }, // duplicate
-        { id: '4', target_name: 'Ubuntu 22.04' }
+        { id: '4', target_name: 'Ubuntu 22.04' },
       ])
 
       const targets = useUniqueValues(items, 'target_name')
@@ -21,7 +21,7 @@ describe('useFilterOptions', () => {
       const items = ref([
         { name: 'Zebra' },
         { name: 'Apple' },
-        { name: 'Mango' }
+        { name: 'Mango' },
       ])
 
       const names = useUniqueValues(items, 'name')
@@ -34,7 +34,7 @@ describe('useFilterOptions', () => {
         { target_name: 'RHEL 8' },
         { target_name: undefined },
         { target_name: '' },
-        { target_name: 'Ubuntu' }
+        { target_name: 'Ubuntu' },
       ])
 
       const targets = useUniqueValues(items, 'target_name')
@@ -46,7 +46,7 @@ describe('useFilterOptions', () => {
       const items = [
         { tech: 'InSpec' },
         { tech: 'Ansible' },
-        { tech: 'InSpec' }
+        { tech: 'InSpec' },
       ]
 
       const techs = useUniqueValues(items, 'tech')
@@ -77,26 +77,26 @@ describe('useFilterOptions', () => {
     it('extracts standards with full and short names', () => {
       const items = ref([
         { standard_name: 'DISA STIG', standard_short_name: 'STIG' },
-        { standard_name: 'CIS Benchmark', standard_short_name: 'CIS' }
+        { standard_name: 'CIS Benchmark', standard_short_name: 'CIS' },
       ])
 
       const standards = useStandardOptions(items)
 
       expect(standards.value).toEqual([
         { fullName: 'CIS Benchmark', shortName: 'CIS' },
-        { fullName: 'DISA STIG', shortName: 'STIG' }
+        { fullName: 'DISA STIG', shortName: 'STIG' },
       ])
     })
 
     it('uses full name as short name when short_name is missing', () => {
       const items = ref([
-        { standard_name: 'Custom Standard' }
+        { standard_name: 'Custom Standard' },
       ])
 
       const standards = useStandardOptions(items)
 
       expect(standards.value).toEqual([
-        { fullName: 'Custom Standard', shortName: 'Custom Standard' }
+        { fullName: 'Custom Standard', shortName: 'Custom Standard' },
       ])
     })
 
@@ -104,7 +104,7 @@ describe('useFilterOptions', () => {
       const items = ref([
         { standard_name: 'DISA STIG', standard_short_name: 'STIG' },
         { standard_name: 'DISA STIG', standard_short_name: 'STIG' },
-        { standard_name: 'CIS Benchmark', standard_short_name: 'CIS' }
+        { standard_name: 'CIS Benchmark', standard_short_name: 'CIS' },
       ])
 
       const standards = useStandardOptions(items)
@@ -116,7 +116,7 @@ describe('useFilterOptions', () => {
       const items = ref([
         { standard_name: 'NIST 800-53', standard_short_name: 'NIST' },
         { standard_name: 'CIS Benchmark', standard_short_name: 'CIS' },
-        { standard_name: 'DISA STIG', standard_short_name: 'STIG' }
+        { standard_name: 'DISA STIG', standard_short_name: 'STIG' },
       ])
 
       const standards = useStandardOptions(items)
@@ -128,7 +128,7 @@ describe('useFilterOptions', () => {
       const items = ref([
         { standard_name: 'STIG', standard_short_name: 'STIG' },
         { standard_name: undefined },
-        {}
+        {},
       ])
 
       const standards = useStandardOptions(items)

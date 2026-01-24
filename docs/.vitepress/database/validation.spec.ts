@@ -4,18 +4,19 @@
  * TDD tests for entity validation functions
  */
 
-import { describe, it, expect } from 'vitest'
+import type { AuditResult, ValidationResult } from './validation.js'
+import { describe, expect, it } from 'vitest'
 import {
-  validateSlug,
+  auditEntity,
+
+  auditSlug,
+  validateContent,
   validateEntity,
   validateOrganization,
-  validateTarget,
+  validateSlug,
   validateStandard,
-  validateContent,
-  auditSlug,
-  auditEntity,
-  type ValidationResult,
-  type AuditResult
+  validateTarget,
+
 } from './validation.js'
 
 // ============================================================================
@@ -59,7 +60,7 @@ describe('validateEntity', () => {
   it('validates organization input', () => {
     const result = validateEntity('organization', {
       name: 'MITRE',
-      slug: 'mitre'
+      slug: 'mitre',
     })
     expect(result.valid).toBe(true)
   })
@@ -67,7 +68,7 @@ describe('validateEntity', () => {
   it('validates target input', () => {
     const result = validateEntity('target', {
       name: 'Red Hat Enterprise Linux 9',
-      slug: 'rhel-9'
+      slug: 'rhel-9',
     })
     expect(result.valid).toBe(true)
   })
@@ -76,15 +77,15 @@ describe('validateEntity', () => {
     const result = validateEntity('content', {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     })
     expect(result.valid).toBe(true)
   })
 
   it('returns errors for invalid input', () => {
     const result = validateEntity('organization', {
-      name: '',  // required
-      slug: 'valid-slug'
+      name: '', // required
+      slug: 'valid-slug',
     })
     expect(result.valid).toBe(false)
     expect(result.errors).toBeDefined()
@@ -93,10 +94,10 @@ describe('validateEntity', () => {
   it('returns warnings for convention issues', () => {
     const result = validateEntity('content', {
       name: 'Red Hat 9 STIG',
-      slug: 'red-hat-9-stig',  // should use rhel
-      contentType: 'validation'
+      slug: 'red-hat-9-stig', // should use rhel
+      contentType: 'validation',
     })
-    expect(result.valid).toBe(true)  // valid but with warnings
+    expect(result.valid).toBe(true) // valid but with warnings
     expect(result.warnings.length).toBeGreaterThan(0)
   })
 
@@ -113,7 +114,7 @@ describe('validateOrganization', () => {
   it('validates minimal organization', () => {
     const result = validateOrganization({
       name: 'MITRE',
-      slug: 'mitre'
+      slug: 'mitre',
     })
     expect(result.valid).toBe(true)
     expect(result.data?.name).toBe('MITRE')
@@ -125,7 +126,7 @@ describe('validateOrganization', () => {
       slug: 'mitre',
       description: 'Not-for-profit organization',
       website: 'https://mitre.org',
-      orgType: 'government'
+      orgType: 'government',
     })
     expect(result.valid).toBe(true)
   })
@@ -134,7 +135,7 @@ describe('validateOrganization', () => {
     const result = validateOrganization({
       name: 'Test',
       slug: 'test',
-      website: 'not-a-url'
+      website: 'not-a-url',
     })
     expect(result.valid).toBe(false)
   })
@@ -143,7 +144,7 @@ describe('validateOrganization', () => {
     const result = validateOrganization({
       name: 'Test',
       slug: 'test',
-      orgType: 'invalid' as any
+      orgType: 'invalid' as any,
     })
     expect(result.valid).toBe(false)
   })
@@ -157,7 +158,7 @@ describe('validateTarget', () => {
   it('validates minimal target', () => {
     const result = validateTarget({
       name: 'Red Hat Enterprise Linux 9',
-      slug: 'rhel-9'
+      slug: 'rhel-9',
     })
     expect(result.valid).toBe(true)
   })
@@ -167,7 +168,7 @@ describe('validateTarget', () => {
       name: 'Red Hat Enterprise Linux 9',
       slug: 'rhel-9',
       category: 'cat_os',
-      vendor: 'org_redhat'
+      vendor: 'org_redhat',
     })
     expect(result.valid).toBe(true)
     expect(result.data?.category).toBe('cat_os')
@@ -176,9 +177,9 @@ describe('validateTarget', () => {
   it('warns about non-standard target abbreviations in slug', () => {
     const result = validateTarget({
       name: 'Red Hat Enterprise Linux 9',
-      slug: 'red-hat-enterprise-linux-9'  // should be rhel-9
+      slug: 'red-hat-enterprise-linux-9', // should be rhel-9
     })
-    expect(result.valid).toBe(true)  // valid but with warning
+    expect(result.valid).toBe(true) // valid but with warning
     expect(result.warnings.some(w => w.includes('rhel'))).toBe(true)
   })
 })
@@ -191,7 +192,7 @@ describe('validateStandard', () => {
   it('validates minimal standard', () => {
     const result = validateStandard({
       name: 'Security Technical Implementation Guide',
-      slug: 'stig'
+      slug: 'stig',
     })
     expect(result.valid).toBe(true)
   })
@@ -204,7 +205,7 @@ describe('validateStandard', () => {
       description: 'DISA security configuration standard',
       website: 'https://public.cyber.mil/stigs/',
       organization: 'org_disa',
-      standardType: 'government'
+      standardType: 'government',
     })
     expect(result.valid).toBe(true)
   })
@@ -213,7 +214,7 @@ describe('validateStandard', () => {
     const result = validateStandard({
       name: 'Test',
       slug: 'test',
-      standardType: 'invalid' as any
+      standardType: 'invalid' as any,
     })
     expect(result.valid).toBe(false)
   })
@@ -228,7 +229,7 @@ describe('validateContent', () => {
     const result = validateContent({
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     })
     expect(result.valid).toBe(true)
   })
@@ -245,7 +246,7 @@ describe('validateContent', () => {
       technology: 'tech_inspec',
       github: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
       controlCount: 452,
-      license: 'Apache-2.0'
+      license: 'Apache-2.0',
     })
     expect(result.valid).toBe(true)
   })
@@ -255,7 +256,7 @@ describe('validateContent', () => {
       name: 'Ansible RHEL 9 STIG',
       slug: 'ansible-rhel-9-stig',
       contentType: 'hardening',
-      automationLevel: 'full'
+      automationLevel: 'full',
     })
     expect(result.valid).toBe(true)
   })
@@ -264,7 +265,7 @@ describe('validateContent', () => {
     const result = validateContent({
       name: 'Test',
       slug: 'test',
-      contentType: 'invalid' as any
+      contentType: 'invalid' as any,
     })
     expect(result.valid).toBe(false)
   })
@@ -272,8 +273,8 @@ describe('validateContent', () => {
   it('warns about non-standard slug conventions', () => {
     const result = validateContent({
       name: 'Red Hat 9 STIG',
-      slug: 'red-hat-9-stig',  // should use rhel
-      contentType: 'validation'
+      slug: 'red-hat-9-stig', // should use rhel
+      contentType: 'validation',
     })
     expect(result.warnings.length).toBeGreaterThan(0)
   })
@@ -311,7 +312,7 @@ describe('auditEntity', () => {
     const result = auditEntity('content', {
       name: 'Red Hat Enterprise Linux 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     })
     expect(result.compliant).toBe(true)
   })
@@ -319,8 +320,8 @@ describe('auditEntity', () => {
   it('returns issues for non-compliant content', () => {
     const result = auditEntity('content', {
       name: 'Red Hat Enterprise Linux 9 STIG',
-      slug: 'red-hat-9-stig',  // wrong convention
-      contentType: 'validation'
+      slug: 'red-hat-9-stig', // wrong convention
+      contentType: 'validation',
     })
     expect(result.compliant).toBe(false)
     expect(result.issues.length).toBeGreaterThan(0)
@@ -329,7 +330,7 @@ describe('auditEntity', () => {
   it('audits target for convention compliance', () => {
     const result = auditEntity('target', {
       name: 'Red Hat Enterprise Linux 9',
-      slug: 'rhel-9'
+      slug: 'rhel-9',
     })
     expect(result.compliant).toBe(true)
   })
@@ -338,7 +339,7 @@ describe('auditEntity', () => {
     const result = auditEntity('content', {
       name: 'Red Hat Enterprise Linux 9 STIG',
       slug: 'red-hat-enterprise-linux-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     })
     expect(result.suggestedSlug).toBe('rhel-9-stig')
   })
@@ -348,21 +349,21 @@ describe('auditEntity', () => {
 // TYPE EXPORTS
 // ============================================================================
 
-describe('Type exports', () => {
-  it('ValidationResult has expected shape', () => {
+describe('type exports', () => {
+  it('validationResult has expected shape', () => {
     const result: ValidationResult<{ name: string }> = {
       valid: true,
       data: { name: 'Test' },
-      warnings: []
+      warnings: [],
     }
     expect(result.valid).toBe(true)
   })
 
-  it('AuditResult has expected shape', () => {
+  it('auditResult has expected shape', () => {
     const result: AuditResult = {
       compliant: true,
       issues: [],
-      suggestedSlug: 'test-slug'
+      suggestedSlug: 'test-slug',
     }
     expect(result.compliant).toBe(true)
   })

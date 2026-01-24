@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import ContentDetail from './ContentDetail.vue'
 import type { ContentItem } from '../composables/useContentDetail'
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+import ContentDetail from './ContentDetail.vue'
 
 // Factory for creating test content items
 function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
@@ -26,7 +26,7 @@ function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
     maintainer_slug: 'test-maintainer',
     github_url: 'https://github.com/test/repo',
     benchmark_version: '2.2.0',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -46,7 +46,7 @@ function getMetadataValue(wrapper: ReturnType<typeof mount>, label: string): str
   return item?.find('.metadata-text').text()
 }
 
-describe('ContentDetail', () => {
+describe('contentDetail', () => {
   describe('rendering', () => {
     it('renders the content name as title', () => {
       const content = createContentItem({ name: 'RHEL8 STIG' })
@@ -58,13 +58,13 @@ describe('ContentDetail', () => {
 
     it('renders the description', () => {
       const content = createContentItem({
-        description: 'InSpec validation profile for RHEL 8'
+        description: 'InSpec validation profile for RHEL 8',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       // Description is in ContentHero child component
       expect(wrapper.find('.hero-description').text()).toBe(
-        'InSpec validation profile for RHEL 8'
+        'InSpec validation profile for RHEL 8',
       )
     })
 
@@ -82,7 +82,7 @@ describe('ContentDetail', () => {
       const content = createContentItem({
         benchmark_version: '2.2.0',
         standard_name: 'DISA STIG',
-        standard_short_name: 'STIG'
+        standard_short_name: 'STIG',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -95,7 +95,7 @@ describe('ContentDetail', () => {
       const content = createContentItem({
         benchmark_version: '2.0.0',
         standard_name: 'CIS Benchmark',
-        standard_short_name: 'CIS'
+        standard_short_name: 'CIS',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -107,7 +107,7 @@ describe('ContentDetail', () => {
       const content = createContentItem({
         benchmark_version: '',
         standard_name: 'DISA STIG',
-        standard_short_name: 'STIG'
+        standard_short_name: 'STIG',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -165,7 +165,7 @@ describe('ContentDetail', () => {
   describe('action buttons', () => {
     it('renders GitHub link as primary action', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8-stig'
+        github_url: 'https://github.com/mitre/rhel8-stig',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -177,7 +177,7 @@ describe('ContentDetail', () => {
 
     it('renders README link as secondary action', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8-stig'
+        github_url: 'https://github.com/mitre/rhel8-stig',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -202,7 +202,7 @@ describe('ContentDetail', () => {
         target_name: 'RHEL 8',
         standard_name: 'DISA STIG',
         standard_short_name: 'STIG',
-        technology_name: 'InSpec'
+        technology_name: 'InSpec',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -217,7 +217,7 @@ describe('ContentDetail', () => {
 
     it('includes vendor metadata when provided', () => {
       const content = createContentItem({
-        vendor_name: 'MITRE'
+        vendor_name: 'MITRE',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -226,7 +226,7 @@ describe('ContentDetail', () => {
 
     it('includes maintainer metadata when provided', () => {
       const content = createContentItem({
-        maintainer_name: 'SAF Team'
+        maintainer_name: 'SAF Team',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 

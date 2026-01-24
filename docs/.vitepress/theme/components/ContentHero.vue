@@ -1,56 +1,10 @@
-<template>
-  <header class="content-hero">
-    <!-- Title Row -->
-    <div class="hero-title-row">
-      <h1 class="hero-title">{{ title }}</h1>
-      <PillarBadge v-if="pillar" :pillar="pillar" size="md" />
-    </div>
-
-    <!-- Description -->
-    <p v-if="description" class="hero-description">{{ description }}</p>
-
-    <!-- Action Buttons -->
-    <ActionButtons
-      v-if="actions.length"
-      :actions="actions"
-      size="md"
-      layout="inline"
-      class="hero-actions"
-    />
-
-    <!-- Metadata Card -->
-    <div v-if="metadata.length" class="hero-metadata-card">
-        <div class="metadata-list">
-          <component
-            :is="item.href ? 'a' : 'div'"
-            v-for="item in metadata"
-            :key="item.label"
-            :href="item.href"
-            class="metadata-item"
-            :class="{ clickable: !!item.href }"
-          >
-            <span class="metadata-label">{{ item.label }}</span>
-            <span class="metadata-value">
-              <!-- Status indicator dot for Status field -->
-              <span
-                v-if="item.label === 'Status'"
-                :class="['status-dot', `status-${item.value.toLowerCase()}`]"
-              ></span>
-              <!-- Icon for non-status fields -->
-              <BrandIcon v-else :name="item.value" :size="28" />
-              <span class="metadata-text">{{ item.value }}</span>
-            </span>
-          </component>
-        </div>
-      </div>
-  </header>
-</template>
-
 <script setup lang="ts">
-import PillarBadge, { type PillarType } from './PillarBadge.vue'
-import ActionButtons, { type ActionItem } from './ActionButtons.vue'
-import BrandIcon from './icons/BrandIcon.vue'
+import type { ActionItem } from './ActionButtons.vue'
+import type { PillarType } from './PillarBadge.vue'
 import type { MetadataItem } from '@/lib/metadata'
+import ActionButtons from './ActionButtons.vue'
+import BrandIcon from './icons/BrandIcon.vue'
+import PillarBadge from './PillarBadge.vue'
 
 // Re-export for consumers
 export type { MetadataItem }
@@ -63,6 +17,58 @@ defineProps<{
   metadata: MetadataItem[]
 }>()
 </script>
+
+<template>
+  <header class="content-hero">
+    <!-- Title Row -->
+    <div class="hero-title-row">
+      <h1 class="hero-title">
+        {{ title }}
+      </h1>
+      <PillarBadge v-if="pillar" :pillar="pillar" size="md" />
+    </div>
+
+    <!-- Description -->
+    <p v-if="description" class="hero-description">
+      {{ description }}
+    </p>
+
+    <!-- Action Buttons -->
+    <ActionButtons
+      v-if="actions.length"
+      :actions="actions"
+      size="md"
+      layout="inline"
+      class="hero-actions"
+    />
+
+    <!-- Metadata Card -->
+    <div v-if="metadata.length" class="hero-metadata-card">
+      <div class="metadata-list">
+        <component
+          :is="item.href ? 'a' : 'div'"
+          v-for="item in metadata"
+          :key="item.label"
+          :href="item.href"
+          class="metadata-item"
+          :class="{ clickable: !!item.href }"
+        >
+          <span class="metadata-label">{{ item.label }}</span>
+          <span class="metadata-value">
+            <!-- Status indicator dot for Status field -->
+            <span
+              v-if="item.label === 'Status'"
+              class="status-dot" :class="[`status-${item.value.toLowerCase()}`]"
+            />
+            <!-- Icon for non-status fields -->
+            <BrandIcon v-else :name="item.value" :size="28" />
+            <span class="metadata-text">{{ item.value }}</span>
+          </span>
+        </component>
+      </div>
+    </div>
+  </header>
+</template>
 
 <style scoped>
 .content-hero {

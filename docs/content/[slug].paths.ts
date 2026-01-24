@@ -1,11 +1,11 @@
 import type { PBContent } from '../.vitepress/theme/lib/pocketbase-types'
 import {
-  initPocketBase,
   extractFK,
+  extractMaintainerFK,
+  extractOrgFK,
   extractStandardFK,
   extractTechnologyFK,
-  extractOrgFK,
-  extractMaintainerFK
+  initPocketBase,
 } from '../.vitepress/lib/loader-utils'
 
 // Simplified related content item
@@ -27,12 +27,12 @@ export default {
       // Include maintainer.organization to get org logo as fallback for teams without logos
       const records = await pb.collection('content').getFullList<PBContent>({
         expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
-        sort: 'name'
+        sort: 'name',
       })
 
       console.log(`✓ Generating ${records.length} content detail pages`)
 
-      return records.map(record => {
+      return records.map((record) => {
         // Extract FK data using shared utilities
         const target = extractFK(record.expand, 'target')
         const standard = extractStandardFK(record.expand)
@@ -43,9 +43,9 @@ export default {
         // Find related content (same target, different content_type)
         const relatedContent: RelatedContent[] = records
           .filter(r =>
-            r.id !== record.id &&
-            r.target === record.target &&
-            r.target // Must have a target to be related
+            r.id !== record.id
+            && r.target === record.target
+            && r.target, // Must have a target to be related
           )
           .map(r => ({
             id: r.id,
@@ -53,7 +53,7 @@ export default {
             name: r.name,
             description: r.description || '',
             content_type: r.content_type,
-            technology_name: r.expand?.technology?.name || ''
+            technology_name: r.expand?.technology?.name || '',
           }))
 
         return {
@@ -103,16 +103,17 @@ export default {
               stig_id: record.stig_id || '',
               benchmark_version: record.benchmark_version || '',
               license: record.license || '',
-              release_date: record.release_date || ''
+              release_date: record.release_date || '',
             },
             // Related content for cross-linking
-            relatedContent
-          }
+            relatedContent,
+          },
         }
       })
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to generate content paths:', error)
       return []
     }
-  }
+  },
 }

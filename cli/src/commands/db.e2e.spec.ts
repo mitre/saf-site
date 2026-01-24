@@ -5,10 +5,11 @@
  * Uses the test Pocketbase instance (port 8091) managed by global setup.
  */
 
-import { describe, it, expect } from 'vitest'
-import { execa, type ExecaError } from 'execa'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import type { ExecaError } from 'execa'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { execa } from 'execa'
+import { describe, expect, it } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -31,21 +32,22 @@ async function runCli(args: string[], options: { expectError?: boolean } = {}) {
         FORCE_COLOR: '0', // Disable colors for easier assertion
         PB_URL: TEST_PB_URL,
         PB_EMAIL: TEST_PB_EMAIL,
-        PB_PASSWORD: TEST_PB_PASSWORD
-      }
+        PB_PASSWORD: TEST_PB_PASSWORD,
+      },
     })
     return {
       stdout: result.stdout,
       stderr: result.stderr,
-      exitCode: result.exitCode
+      exitCode: result.exitCode,
     }
-  } catch (error) {
+  }
+  catch (error) {
     const execaError = error as ExecaError
     if (options.expectError) {
       return {
         stdout: execaError.stdout || '',
         stderr: execaError.stderr || '',
-        exitCode: execaError.exitCode || 1
+        exitCode: execaError.exitCode || 1,
       }
     }
     throw error

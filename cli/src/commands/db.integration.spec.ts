@@ -5,9 +5,9 @@
  * Uses the test Pocketbase managed by global setup (port 8091).
  */
 
-import { describe, it, expect, beforeAll } from 'vitest'
-import { getPocketBase, checkConnection, loadFkMaps } from '../lib/pocketbase.js'
 import { auditSlug } from '@schema/validation.js'
+import { describe, expect, it } from 'vitest'
+import { checkConnection, getPocketBase, loadFkMaps } from '../lib/pocketbase.js'
 
 // Test Pocketbase configuration (managed by global setup)
 const TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
@@ -51,7 +51,7 @@ describe('db status - collection stats', () => {
       'targets',
       'teams',
       'tags',
-      'tools'
+      'tools',
     ]
 
     for (const collection of collections) {
@@ -81,7 +81,7 @@ describe('db lookups - FK maps', () => {
 
     // Should have MITRE
     const hasKey = Array.from(maps.organizations.keys()).some(
-      k => k.toLowerCase().includes('mitre')
+      k => k.toLowerCase().includes('mitre'),
     )
     expect(hasKey).toBe(true)
   })
@@ -145,7 +145,7 @@ describe('db validate - content records', () => {
 
     // Get a sample of content with FKs
     const content = await pb.collection('content').getList(1, 10, {
-      filter: 'target != "" || standard != ""'
+      filter: 'target != "" || standard != ""',
     })
 
     for (const record of content.items) {

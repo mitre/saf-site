@@ -1,11 +1,11 @@
 import DefaultTheme from 'vitepress/theme'
-import './custom.css'
-
 // Content library components
 import ContentCard from './components/ContentCard.vue'
-import ContentFilters from './components/ContentFilters.vue'
+
 import ContentDetail from './components/ContentDetail.vue'
-import PillarBadge from './components/PillarBadge.vue'
+import ContentFilters from './components/ContentFilters.vue'
+import FeatureItem from './components/FeatureItem.vue'
+import FeatureList from './components/FeatureList.vue'
 
 // Logo display components
 import LogoGrid from './components/LogoGrid.vue'
@@ -13,10 +13,10 @@ import LogoMarquee from './components/LogoMarquee.vue'
 
 // Page layout components
 import PageSection from './components/PageSection.vue'
-import FeatureItem from './components/FeatureItem.vue'
-import FeatureList from './components/FeatureList.vue'
-import Skeleton from './components/Skeleton.vue'
+import PillarBadge from './components/PillarBadge.vue'
 import Placeholder from './components/Placeholder.vue'
+import Skeleton from './components/Skeleton.vue'
+import './custom.css'
 
 export default {
   extends: DefaultTheme,
@@ -37,5 +37,5 @@ export default {
     app.component('FeatureList', FeatureList)
     app.component('Skeleton', Skeleton)
     app.component('Placeholder', Placeholder)
-  }
+  },
 }

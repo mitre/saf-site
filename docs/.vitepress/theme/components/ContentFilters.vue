@@ -1,3 +1,96 @@
+<script setup lang="ts">
+import type { FilterOption } from './FilterSelect.vue'
+import { computed, ref, toRef, watch } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useStandardOptions, useUniqueValues } from '@/composables/useFilterOptions'
+import FilterSelect from './FilterSelect.vue'
+
+interface ContentItem {
+  id: string
+  content_type: 'validation' | 'hardening'
+  target_name?: string
+  technology_name?: string
+  vendor_name?: string
+  standard_name?: string
+  standard_short_name?: string
+}
+
+const props = defineProps<{
+  items: ContentItem[]
+  initialPillar?: string
+  initialTarget?: string
+  initialTechnology?: string
+  initialVendor?: string
+  initialStandard?: string
+  initialSearch?: string
+}>()
+
+const emit = defineEmits<{
+  'update:pillar': [value: string]
+  'update:target': [value: string]
+  'update:technology': [value: string]
+  'update:vendor': [value: string]
+  'update:standard': [value: string]
+  'update:search': [value: string]
+  'clear': []
+}>()
+
+// Filter state
+const selectedPillar = ref(props.initialPillar || 'all')
+const selectedTarget = ref(props.initialTarget || 'all')
+const selectedTech = ref(props.initialTechnology || 'all')
+const selectedVendor = ref(props.initialVendor || 'all')
+const selectedStandard = ref(props.initialStandard || 'all')
+const searchQuery = ref(props.initialSearch || '')
+
+// Static pillar options
+const pillarOptions: FilterOption[] = [
+  { value: 'validate', label: 'Validate' },
+  { value: 'harden', label: 'Harden' },
+]
+
+// Dynamic filter options using composable
+const itemsRef = toRef(props, 'items')
+const targets = useUniqueValues(itemsRef, 'target_name')
+const technologies = useUniqueValues(itemsRef, 'technology_name')
+const vendors = useUniqueValues(itemsRef, 'vendor_name')
+const standards = useStandardOptions(itemsRef)
+
+// Transform standards to FilterOption format
+const standardOptions = computed<FilterOption[]>(() =>
+  standards.value.map(s => ({ value: s.fullName, label: s.shortName })),
+)
+
+// Check if any filters are active
+const hasActiveFilters = computed(() => {
+  return selectedPillar.value !== 'all'
+    || selectedTarget.value !== 'all'
+    || selectedTech.value !== 'all'
+    || selectedVendor.value !== 'all'
+    || selectedStandard.value !== 'all'
+    || searchQuery.value !== ''
+})
+
+// Clear all filters
+function clearFilters() {
+  selectedPillar.value = 'all'
+  selectedTarget.value = 'all'
+  selectedTech.value = 'all'
+  selectedVendor.value = 'all'
+  selectedStandard.value = 'all'
+  searchQuery.value = ''
+  emit('clear')
+}
+
+// Emit changes
+watch(selectedPillar, value => emit('update:pillar', value))
+watch(selectedTarget, value => emit('update:target', value))
+watch(selectedTech, value => emit('update:technology', value))
+watch(selectedVendor, value => emit('update:vendor', value))
+watch(selectedStandard, value => emit('update:standard', value))
+</script>
+
 <template>
   <div class="content-filters">
     <!-- Row 1: Dropdown filters -->
@@ -63,106 +156,14 @@
         variant="ghost"
         size="sm"
         :disabled="!hasActiveFilters"
-        @click="clearFilters"
         class="clear-button"
+        @click="clearFilters"
       >
         Clear filters
       </Button>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, watch, toRef } from 'vue'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import FilterSelect, { type FilterOption } from './FilterSelect.vue'
-import { useUniqueValues, useStandardOptions } from '@/composables/useFilterOptions'
-
-interface ContentItem {
-  id: string
-  content_type: 'validation' | 'hardening'
-  target_name?: string
-  technology_name?: string
-  vendor_name?: string
-  standard_name?: string
-  standard_short_name?: string
-}
-
-const props = defineProps<{
-  items: ContentItem[]
-  initialPillar?: string
-  initialTarget?: string
-  initialTechnology?: string
-  initialVendor?: string
-  initialStandard?: string
-  initialSearch?: string
-}>()
-
-const emit = defineEmits<{
-  'update:pillar': [value: string]
-  'update:target': [value: string]
-  'update:technology': [value: string]
-  'update:vendor': [value: string]
-  'update:standard': [value: string]
-  'update:search': [value: string]
-  'clear': []
-}>()
-
-// Filter state
-const selectedPillar = ref(props.initialPillar || 'all')
-const selectedTarget = ref(props.initialTarget || 'all')
-const selectedTech = ref(props.initialTechnology || 'all')
-const selectedVendor = ref(props.initialVendor || 'all')
-const selectedStandard = ref(props.initialStandard || 'all')
-const searchQuery = ref(props.initialSearch || '')
-
-// Static pillar options
-const pillarOptions: FilterOption[] = [
-  { value: 'validate', label: 'Validate' },
-  { value: 'harden', label: 'Harden' }
-]
-
-// Dynamic filter options using composable
-const itemsRef = toRef(props, 'items')
-const targets = useUniqueValues(itemsRef, 'target_name')
-const technologies = useUniqueValues(itemsRef, 'technology_name')
-const vendors = useUniqueValues(itemsRef, 'vendor_name')
-const standards = useStandardOptions(itemsRef)
-
-// Transform standards to FilterOption format
-const standardOptions = computed<FilterOption[]>(() =>
-  standards.value.map(s => ({ value: s.fullName, label: s.shortName }))
-)
-
-// Check if any filters are active
-const hasActiveFilters = computed(() => {
-  return selectedPillar.value !== 'all' ||
-    selectedTarget.value !== 'all' ||
-    selectedTech.value !== 'all' ||
-    selectedVendor.value !== 'all' ||
-    selectedStandard.value !== 'all' ||
-    searchQuery.value !== ''
-})
-
-// Clear all filters
-function clearFilters() {
-  selectedPillar.value = 'all'
-  selectedTarget.value = 'all'
-  selectedTech.value = 'all'
-  selectedVendor.value = 'all'
-  selectedStandard.value = 'all'
-  searchQuery.value = ''
-  emit('clear')
-}
-
-// Emit changes
-watch(selectedPillar, (value) => emit('update:pillar', value))
-watch(selectedTarget, (value) => emit('update:target', value))
-watch(selectedTech, (value) => emit('update:technology', value))
-watch(selectedVendor, (value) => emit('update:vendor', value))
-watch(selectedStandard, (value) => emit('update:standard', value))
-</script>
 
 <style scoped>
 .content-filters {

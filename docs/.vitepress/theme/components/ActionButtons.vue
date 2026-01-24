@@ -1,20 +1,3 @@
-<template>
-  <div v-if="actions.length" class="action-buttons" :class="[size, layout]">
-    <a
-      v-for="action in actions"
-      :key="action.url"
-      :href="action.url"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="action-btn"
-      :class="{ primary: action.primary }"
-    >
-      <component v-if="action.icon" :is="action.icon" :size="16" class="btn-icon" />
-      <span>{{ action.label }}</span>
-    </a>
-  </div>
-</template>
-
 <script setup lang="ts">
 import type { Component } from 'vue'
 
@@ -31,6 +14,23 @@ defineProps<{
   layout?: 'inline' | 'stack'
 }>()
 </script>
+
+<template>
+  <div v-if="actions.length" class="action-buttons" :class="[size, layout]">
+    <a
+      v-for="action in actions"
+      :key="action.url"
+      :href="action.url"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="action-btn"
+      :class="{ primary: action.primary }"
+    >
+      <component :is="action.icon" v-if="action.icon" :size="16" class="btn-icon" />
+      <span>{{ action.label }}</span>
+    </a>
+  </div>
+</template>
 
 <style scoped>
 .action-buttons {

@@ -9,7 +9,8 @@ async function listCollections() {
     const collections = await pb.collections.getFullList()
     console.log(`Found ${collections.length} collections:\n`)
     collections.forEach(c => console.log(`  - ${c.name} (${c.id})`))
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error:', error)
   }
 }

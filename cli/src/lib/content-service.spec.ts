@@ -4,18 +4,18 @@
  * TDD tests for building content records from GitHub data
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { ContentFKNames, RepoData } from './content-service.js'
+import type { InspecProfile, RepoInfo } from './github.js'
+import type { FkMaps } from './pocketbase.js'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   buildContentFromRepo,
-  resolveContentFKs,
   checkUnresolvedFKs,
+
   diffContent,
-  type RepoData,
-  type ContentFKNames,
-  type ContentDiff
+
+  resolveContentFKs,
 } from './content-service.js'
-import type { FkMaps } from './pocketbase.js'
-import type { RepoInfo, InspecProfile } from './github.js'
 
 // ============================================================================
 // TEST DATA
@@ -31,7 +31,7 @@ function createMockRepoInfo(overrides: Partial<RepoInfo> = {}): RepoInfo {
     license: 'Apache-2.0',
     topics: ['inspec', 'stig', 'rhel', 'security'],
     htmlUrl: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -43,8 +43,8 @@ function createMockInspecProfile(overrides: Partial<InspecProfile> = {}): Inspec
     license: 'Apache-2.0',
     summary: 'InSpec validation profile for RHEL 9 STIG',
     version: '1.2.0',
-    supports: [{ 'platform-name': 'redhat', release: '9' }],
-    ...overrides
+    supports: [{ 'platform-name': 'redhat', 'release': '9' }],
+    ...overrides,
   }
 }
 
@@ -54,42 +54,42 @@ function createMockFkMaps(): FkMaps {
       ['mitre', 'org-mitre-123'],
       ['the mitre corporation', 'org-mitre-123'],
       ['disa', 'org-disa-456'],
-      ['cis', 'org-cis-789']
+      ['cis', 'org-cis-789'],
     ]),
     teams: new Map([
       ['saf team', 'team-saf-001'],
-      ['mitre saf team', 'team-saf-001']
+      ['mitre saf team', 'team-saf-001'],
     ]),
     standards: new Map([
       ['disa stig', 'std-stig-001'],
       ['stig', 'std-stig-001'],
       ['cis benchmark', 'std-cis-002'],
-      ['cis', 'std-cis-002']
+      ['cis', 'std-cis-002'],
     ]),
     technologies: new Map([
       ['inspec', 'tech-inspec-001'],
       ['chef inspec', 'tech-inspec-001'],
-      ['ansible', 'tech-ansible-002']
+      ['ansible', 'tech-ansible-002'],
     ]),
     targets: new Map([
       ['red hat enterprise linux 9', 'tgt-rhel9-001'],
       ['rhel 9', 'tgt-rhel9-001'],
       ['red hat enterprise linux 8', 'tgt-rhel8-002'],
       ['rhel 8', 'tgt-rhel8-002'],
-      ['ubuntu 22.04', 'tgt-ubuntu22-003']
+      ['ubuntu 22.04', 'tgt-ubuntu22-003'],
     ]),
     categories: new Map([
       ['operating system', 'cat-os-001'],
-      ['database', 'cat-db-002']
+      ['database', 'cat-db-002'],
     ]),
     capabilities: new Map([
       ['validate', 'cap-validate-001'],
-      ['harden', 'cap-harden-002']
+      ['harden', 'cap-harden-002'],
     ]),
     tags: new Map([
       ['linux', 'tag-linux-001'],
-      ['rhel', 'tag-rhel-002']
-    ])
+      ['rhel', 'tag-rhel-002'],
+    ]),
   }
 }
 
@@ -104,7 +104,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme: '# RHEL 9 STIG\n\nThis profile has 452 controls.',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -121,7 +121,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile({ title: 'Custom Profile Title' }),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -133,7 +133,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo({ description: 'Repo Description Here' }),
         inspecProfile: createMockInspecProfile({ title: undefined }),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -146,7 +146,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme: 'This profile validates 452 controls for RHEL 9.',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -158,9 +158,9 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile({
-          summary: 'InSpec profile for validating RHEL 9 STIG compliance'
+          summary: 'InSpec profile for validating RHEL 9 STIG compliance',
         }),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -174,7 +174,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme,
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -186,7 +186,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo({ repo: 'aws-rds-oracle-mysql-ee-5.7-cis-baseline' }),
         inspecProfile: createMockInspecProfile(),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -199,7 +199,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -215,9 +215,9 @@ describe('buildContentFromRepo', () => {
           repo: 'ansible-rhel-9-stig-hardening',
           fullName: 'mitre/ansible-rhel-9-stig-hardening',
           htmlUrl: 'https://github.com/mitre/ansible-rhel-9-stig-hardening',
-          description: 'Ansible playbook for RHEL 9 STIG hardening'
+          description: 'Ansible playbook for RHEL 9 STIG hardening',
         }),
-        contentType: 'hardening'
+        contentType: 'hardening',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -230,7 +230,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         contentType: 'hardening',
-        automationLevel: 'full'
+        automationLevel: 'full',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -244,9 +244,9 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo({
           description: null,
-          license: null
+          license: null,
         }),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -259,7 +259,7 @@ describe('buildContentFromRepo', () => {
     it('handles missing inspec profile', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = buildContentFromRepo(repoData)
@@ -287,7 +287,7 @@ describe('resolveContentFKs', () => {
       standard: 'DISA STIG',
       technology: 'InSpec',
       target: 'Red Hat Enterprise Linux 9',
-      maintainer: 'SAF Team'
+      maintainer: 'SAF Team',
     }
 
     const result = resolveContentFKs(fkNames, fkMaps)
@@ -302,7 +302,7 @@ describe('resolveContentFKs', () => {
   it('returns undefined for unresolved names', () => {
     const fkNames: ContentFKNames = {
       vendor: 'Unknown Vendor',
-      standard: 'Unknown Standard'
+      standard: 'Unknown Standard',
     }
 
     const result = resolveContentFKs(fkNames, fkMaps)
@@ -313,7 +313,7 @@ describe('resolveContentFKs', () => {
 
   it('handles partial FK names', () => {
     const fkNames: ContentFKNames = {
-      vendor: 'MITRE'
+      vendor: 'MITRE',
       // No other FKs specified
     }
 
@@ -330,7 +330,7 @@ describe('resolveContentFKs', () => {
     const fkNames: ContentFKNames = {
       vendor: 'mitre',
       standard: 'STIG',
-      technology: 'INSPEC'
+      technology: 'INSPEC',
     }
 
     const result = resolveContentFKs(fkNames, fkMaps)
@@ -343,7 +343,7 @@ describe('resolveContentFKs', () => {
   it('handles alternate names/aliases', () => {
     const fkNames: ContentFKNames = {
       vendor: 'The MITRE Corporation',
-      technology: 'Chef InSpec'
+      technology: 'Chef InSpec',
     }
 
     const result = resolveContentFKs(fkNames, fkMaps)
@@ -367,11 +367,11 @@ describe('checkUnresolvedFKs', () => {
   it('returns empty array when all FKs are resolved', () => {
     const fkNames: ContentFKNames = {
       vendor: 'MITRE',
-      standard: 'DISA STIG'
+      standard: 'DISA STIG',
     }
     const resolvedFKs = {
       vendor: 'org-mitre-123',
-      standard: 'std-stig-001'
+      standard: 'std-stig-001',
     }
 
     const warnings = checkUnresolvedFKs(fkNames, resolvedFKs)
@@ -382,7 +382,7 @@ describe('checkUnresolvedFKs', () => {
   it('returns warnings for unresolved FKs', () => {
     const fkNames: ContentFKNames = {
       vendor: 'Unknown Vendor',
-      standard: 'Unknown Standard'
+      standard: 'Unknown Standard',
     }
     const resolvedFKs = {}
 
@@ -397,11 +397,11 @@ describe('checkUnresolvedFKs', () => {
     const fkNames: ContentFKNames = {
       vendor: 'MITRE',
       standard: 'Unknown Standard',
-      technology: 'InSpec'
+      technology: 'InSpec',
     }
     const resolvedFKs = {
       vendor: 'org-mitre-123',
-      technology: 'tech-inspec-001'
+      technology: 'tech-inspec-001',
       // standard not resolved
     }
 
@@ -423,7 +423,7 @@ describe('checkUnresolvedFKs', () => {
       standard: 'Missing Standard',
       technology: 'Missing Tech',
       target: 'Missing Target',
-      maintainer: 'Missing Maintainer'
+      maintainer: 'Missing Maintainer',
     }
     const resolvedFKs = {}
 
@@ -450,7 +450,7 @@ describe('diffContent', () => {
       slug: 'rhel-9-stig',
       content_type: 'validation',
       version: '1.0.0',
-      control_count: 452
+      control_count: 452,
     }
 
     const updated = {
@@ -458,7 +458,7 @@ describe('diffContent', () => {
       slug: 'rhel-9-stig',
       contentType: 'validation',
       version: '1.0.0',
-      controlCount: 452
+      controlCount: 452,
     }
 
     const diff = diffContent(existing, updated)
@@ -472,13 +472,13 @@ describe('diffContent', () => {
       id: 'content-123',
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      content_type: 'validation'
+      content_type: 'validation',
     }
 
     const updated = {
       name: 'Red Hat Enterprise Linux 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     }
 
     const diff = diffContent(existing, updated)
@@ -486,7 +486,7 @@ describe('diffContent', () => {
     expect(diff.hasChanges).toBe(true)
     expect(diff.changes.name).toEqual({
       old: 'RHEL 9 STIG',
-      new: 'Red Hat Enterprise Linux 9 STIG'
+      new: 'Red Hat Enterprise Linux 9 STIG',
     })
   })
 
@@ -496,14 +496,14 @@ describe('diffContent', () => {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       content_type: 'validation',
-      version: '1.0.0'
+      version: '1.0.0',
     }
 
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       contentType: 'validation',
-      version: '1.1.0'
+      version: '1.1.0',
     }
 
     const diff = diffContent(existing, updated)
@@ -511,7 +511,7 @@ describe('diffContent', () => {
     expect(diff.hasChanges).toBe(true)
     expect(diff.changes.version).toEqual({
       old: '1.0.0',
-      new: '1.1.0'
+      new: '1.1.0',
     })
   })
 
@@ -521,14 +521,14 @@ describe('diffContent', () => {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       content_type: 'validation',
-      control_count: 400
+      control_count: 400,
     }
 
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       contentType: 'validation',
-      controlCount: 452
+      controlCount: 452,
     }
 
     const diff = diffContent(existing, updated)
@@ -536,7 +536,7 @@ describe('diffContent', () => {
     expect(diff.hasChanges).toBe(true)
     expect(diff.changes.controlCount).toEqual({
       old: 400,
-      new: 452
+      new: 452,
     })
   })
 
@@ -548,7 +548,7 @@ describe('diffContent', () => {
       content_type: 'validation',
       version: '1.0.0',
       control_count: 400,
-      status: 'draft'
+      status: 'draft',
     }
 
     const updated = {
@@ -557,7 +557,7 @@ describe('diffContent', () => {
       contentType: 'validation',
       version: '1.1.0',
       controlCount: 452,
-      status: 'active'
+      status: 'active',
     }
 
     const diff = diffContent(existing, updated)
@@ -576,13 +576,13 @@ describe('diffContent', () => {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       content_type: 'validation',
-      version: '1.0.0'
+      version: '1.0.0',
     }
 
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
       // version not specified - should not show as a change
     }
 
@@ -597,7 +597,7 @@ describe('diffContent', () => {
       id: 'content-123',
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      content_type: 'validation'
+      content_type: 'validation',
       // No license
     }
 
@@ -605,7 +605,7 @@ describe('diffContent', () => {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       contentType: 'validation',
-      license: 'Apache-2.0'
+      license: 'Apache-2.0',
     }
 
     const diff = diffContent(existing, updated)
@@ -613,7 +613,7 @@ describe('diffContent', () => {
     expect(diff.hasChanges).toBe(true)
     expect(diff.changes.license).toEqual({
       old: undefined,
-      new: 'Apache-2.0'
+      new: 'Apache-2.0',
     })
   })
 
@@ -623,14 +623,14 @@ describe('diffContent', () => {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       content_type: 'validation',
-      vendor: 'org-old-vendor'
+      vendor: 'org-old-vendor',
     }
 
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
       contentType: 'validation',
-      vendor: 'org-mitre-123'
+      vendor: 'org-mitre-123',
     }
 
     const diff = diffContent(existing, updated)
@@ -638,7 +638,7 @@ describe('diffContent', () => {
     expect(diff.hasChanges).toBe(true)
     expect(diff.changes.vendor).toEqual({
       old: 'org-old-vendor',
-      new: 'org-mitre-123'
+      new: 'org-mitre-123',
     })
   })
 })

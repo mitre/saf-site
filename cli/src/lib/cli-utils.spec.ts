@@ -2,22 +2,22 @@
  * CLI Utilities Tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  getOutputFormat,
-  isNonInteractive,
   formatErrors,
   formatSuccess,
   formatWarnings,
-  validateContentType,
-  validateStatus,
-  validateAutomationLevel,
+  getOutputFormat,
+  isNonInteractive,
+  VALID_AUTOMATION_LEVELS,
   VALID_CONTENT_TYPES,
   VALID_STATUSES,
-  VALID_AUTOMATION_LEVELS
+  validateAutomationLevel,
+  validateContentType,
+  validateStatus,
 } from './cli-utils.js'
 
-describe('CLI Utilities', () => {
+describe('cLI Utilities', () => {
   describe('getOutputFormat', () => {
     it('returns json when json option is true', () => {
       expect(getOutputFormat({ json: true })).toBe('json')

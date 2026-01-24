@@ -4,10 +4,10 @@
  * Phase 2 of Pocketbase content management implementation
  */
 
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import PocketBase from 'pocketbase'
-import { readFileSync, readdirSync } from 'fs'
 import { parse } from 'yaml'
-import { join } from 'path'
 
 const pb = new PocketBase('http://127.0.0.1:8090')
 
@@ -24,12 +24,12 @@ const idMap: Record<string, Record<string, string>> = {
   capabilities: {},
   teams: {},
   profiles: {},
-  hardening_profiles: {}
+  hardening_profiles: {},
 }
 
-console.log('='*60)
+console.log('=' * 60)
 console.log('PHASE 1: Import base data (no FKs)')
-console.log('='*60 + '\n')
+console.log(`${'=' * 60}\n`)
 
 // 1. Import Tags
 console.log('Importing tags...')
@@ -40,11 +40,12 @@ for (const tag of tagsYaml.tags) {
       tag_id: tag.id,
       description: tag.description || '',
       category: tag.category || '',
-      status: tag.status || 'active'
+      status: tag.status || 'active',
     })
     idMap.tags[tag.id] = record.id
     console.log(`  ✓ ${tag.id}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${tag.id}: ${e.message}`)
   }
 }
@@ -60,11 +61,12 @@ for (const org of orgsYaml.organizations) {
       description: org.description || '',
       website: org.website || '',
       logo: org.logo || '',
-      status: org.status || 'active'
+      status: org.status || 'active',
     })
     idMap.organizations[org.id] = record.id
     console.log(`  ✓ ${org.id}: ${org.name}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${org.id}: ${e.message}`)
   }
 }
@@ -82,11 +84,12 @@ for (const tech of techYaml.technologies) {
       logo: tech.logo || '',
       category: tech.category || '',
       type: tech.type || '',
-      status: tech.status || 'active'
+      status: tech.status || 'active',
     })
     idMap.technologies[tech.id] = record.id
     console.log(`  ✓ ${tech.id}: ${tech.name}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${tech.id}: ${e.message}`)
   }
 }
@@ -108,11 +111,12 @@ for (const file of standardFiles.filter(f => f.endsWith('.yml'))) {
         vendor: std.vendor || '',
         version: std.version || '',
         logo: std.logo || '',
-        status: std.status || 'active'
+        status: std.status || 'active',
       })
       idMap.standards[std.id] = record.id
       console.log(`  ✓ ${std.id}: ${std.name}`)
-    } catch (e: any) {
+    }
+    catch (e: any) {
       console.log(`  ✗ ${std.id}: ${e.message}`)
     }
   }
@@ -128,18 +132,19 @@ for (const cap of capabilitiesYaml.capabilities) {
       name: cap.name,
       description: cap.description || '',
       category: cap.category || '',
-      status: cap.status || 'active'
+      status: cap.status || 'active',
     })
     idMap.capabilities[cap.id] = record.id
     console.log(`  ✓ ${cap.id}: ${cap.name}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${cap.id}: ${e.message}`)
   }
 }
 
-console.log('\n' + '='*60)
+console.log(`\n` + `${'=' * 60}`)
 console.log('PHASE 2: Import data with FKs')
-console.log('='*60 + '\n')
+console.log(`${'=' * 60}\n`)
 
 // 6. Import Teams (FK: organization)
 console.log('Importing teams...')
@@ -151,11 +156,12 @@ for (const team of teamsYaml.teams) {
       name: team.name,
       description: team.description || '',
       organization: idMap.organizations[team.organization] || null,
-      status: team.status || 'active'
+      status: team.status || 'active',
     })
     idMap.teams[team.id] = record.id
     console.log(`  ✓ ${team.id}: ${team.name}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${team.id}: ${e.message}`)
   }
 }
@@ -185,14 +191,15 @@ for (const file of profileFiles.filter(f => f.endsWith('.yml') && f !== 'stig.ym
         short_description: profile.shortDescription || '',
         requirements: profile.requirements || '',
         category: profile.category || '',
-        status: profile.status || 'active'
+        status: profile.status || 'active',
       })
       idMap.profiles[profile.id] = record.id
       profileCount++
       if (profileCount % 10 === 0) {
         console.log(`  → Imported ${profileCount} profiles...`)
       }
-    } catch (e: any) {
+    }
+    catch (e: any) {
       console.log(`  ✗ ${profile.id}: ${e.message}`)
     }
   }
@@ -225,11 +232,12 @@ for (const file of hardeningFiles.filter(f => f.endsWith('.yml'))) {
         requirements: profile.requirements || '',
         category: profile.category || '',
         difficulty: profile.difficulty || '',
-        status: profile.status || 'active'
+        status: profile.status || 'active',
       })
       idMap.hardening_profiles[profile.id] = record.id
       hardeningCount++
-    } catch (e: any) {
+    }
+    catch (e: any) {
       console.log(`  ✗ ${profile.id}: ${e.message}`)
     }
   }
@@ -252,17 +260,18 @@ for (const tool of toolsYaml.tools) {
       organization: idMap.organizations[tool.organization] || null,
       github: tool.github || '',
       category: tool.category || '',
-      status: tool.status || 'active'
+      status: tool.status || 'active',
     })
     console.log(`  ✓ ${tool.id}: ${tool.name}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.log(`  ✗ ${tool.id}: ${e.message}`)
   }
 }
 
-console.log('\n' + '='*60)
+console.log(`\n` + `${'=' * 60}`)
 console.log('PHASE 3: Import junction table data')
-console.log('='*60 + '\n')
+console.log(`${'=' * 60}\n`)
 
 // 10. Import profile-tag relationships
 console.log('Importing profile-tag relationships...')
@@ -276,10 +285,11 @@ for (const file of profileFiles.filter(f => f.endsWith('.yml') && f !== 'stig.ym
           try {
             await pb.collection('profiles_tags').create({
               profile_id: idMap.profiles[profile.id],
-              tag_id: idMap.tags[tagId]
+              tag_id: idMap.tags[tagId],
             })
             tagRelCount++
-          } catch (e: any) {
+          }
+          catch (e: any) {
             // Ignore duplicate errors
           }
         }
@@ -301,10 +311,11 @@ for (const file of hardeningFiles.filter(f => f.endsWith('.yml'))) {
           try {
             await pb.collection('hardening_profiles_tags').create({
               hardening_profile_id: idMap.hardening_profiles[profile.id],
-              tag_id: idMap.tags[tagId]
+              tag_id: idMap.tags[tagId],
             })
             hardeningTagCount++
-          } catch (e: any) {
+          }
+          catch (e: any) {
             // Ignore duplicate errors
           }
         }
@@ -326,10 +337,11 @@ for (const file of profileFiles.filter(f => f.endsWith('.yml') && f !== 'stig.ym
           try {
             await pb.collection('validation_to_hardening').create({
               validation_profile_id: idMap.profiles[profile.id],
-              hardening_profile_id: idMap.hardening_profiles[hardeningId]
+              hardening_profile_id: idMap.hardening_profiles[hardeningId],
             })
             valHardCount++
-          } catch (e: any) {
+          }
+          catch (e: any) {
             // Ignore duplicate errors
           }
         }
@@ -339,9 +351,9 @@ for (const file of profileFiles.filter(f => f.endsWith('.yml') && f !== 'stig.ym
 }
 console.log(`  ✓ Created ${valHardCount} validation-to-hardening relationships`)
 
-console.log('\n' + '='*60)
+console.log(`\n` + `${'=' * 60}`)
 console.log('✅ IMPORT COMPLETE!')
-console.log('='*60)
+console.log('=' * 60)
 console.log('\nSummary:')
 console.log(`  Tags: ${Object.keys(idMap.tags).length}`)
 console.log(`  Organizations: ${Object.keys(idMap.organizations).length}`)
@@ -355,4 +367,4 @@ console.log(`  Tools: ${Object.keys(idMap.technologies).length}`)
 console.log(`  Profile-Tag Links: ${tagRelCount}`)
 console.log(`  Hardening-Tag Links: ${hardeningTagCount}`)
 console.log(`  Validation-Hardening Links: ${valHardCount}`)
-console.log('='*60 + '\n')
+console.log(`${'=' * 60}\n`)

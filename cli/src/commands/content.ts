@@ -5,46 +5,44 @@
  * Supports both non-interactive (CI/scripting) and interactive (TUI) modes.
  */
 
-import { Command } from 'commander'
+import type { FkMaps } from '../lib/pocketbase.js'
+import type { ServiceDeps } from './content.logic.js'
 import * as p from '@clack/prompts'
+import { Command } from 'commander'
 import pc from 'picocolors'
 import {
-  getPocketBase,
-  loadFkMaps,
-  createContent,
-  updateContent,
-  listContent,
-  getContentBySlug,
-  type FkMaps
-} from '../lib/pocketbase.js'
+  exitWithError,
+  exitWithErrors,
+  getOutputFormat,
+  isNonInteractive,
+} from '../lib/cli-utils.js'
 import {
-  parseGitHubUrl,
-  fetchRepoInfo,
+  extractControlCount,
   fetchInspecYml,
   fetchReadme,
+  fetchRepoInfo,
   generateSlug,
-  extractControlCount
+  parseGitHubUrl,
 } from '../lib/github.js'
+import {
+  createContent,
+  getPocketBase,
+  listContent,
+  loadFkMaps,
+  updateContent,
+} from '../lib/pocketbase.js'
+import {
+  formatAddResult,
+  formatListResult,
+  formatUpdateResult,
+  parseAddArgs,
+  parseUpdateArgs,
+} from './content.cli.js'
 import {
   prepareContentAdd,
   prepareContentUpdate,
-  type ServiceDeps
+
 } from './content.logic.js'
-import {
-  parseAddArgs,
-  parseUpdateArgs,
-  formatAddResult,
-  formatUpdateResult,
-  formatListResult
-} from './content.cli.js'
-import {
-  type OutputFormat,
-  getOutputFormat,
-  isNonInteractive,
-  exitWithErrors,
-  exitWithError,
-  outputErrors
-} from '../lib/cli-utils.js'
 
 export const contentCommand = new Command('content')
   .description('Manage content records (profiles, hardening guides)')
@@ -57,7 +55,7 @@ const serviceDeps: ServiceDeps = {
   parseGitHubUrl,
   fetchRepoInfo,
   fetchInspecYml,
-  fetchReadme
+  fetchReadme,
 }
 
 // ============================================================================
@@ -80,11 +78,11 @@ contentCommand
         contentType: options.type,
         status: options.status,
         expand: ['target', 'standard', 'technology', 'vendor'],
-        sort: 'name'  // Sort alphabetically (content collection has no created/updated fields)
+        sort: 'name', // Sort alphabetically (content collection has no created/updated fields)
       }, pb)
 
       // Limit results
-      const limited = records.slice(0, parseInt(options.limit))
+      const limited = records.slice(0, Number.parseInt(options.limit))
 
       // Determine output format
       const format = getOutputFormat(options)
@@ -94,7 +92,8 @@ contentCommand
       if (format === 'text') {
         console.log(pc.dim(`\nShowing ${limited.length} of ${records.length} records`))
       }
-    } catch (error) {
+    }
+    catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to list content', format)
     }
   })
@@ -114,7 +113,7 @@ contentCommand
       const pb = await getPocketBase()
 
       const record = await pb.collection('content').getOne(id, {
-        expand: 'target,standard,technology,vendor,maintainer'
+        expand: 'target,standard,technology,vendor,maintainer',
       })
 
       if (format === 'json') {
@@ -122,7 +121,7 @@ contentCommand
         return
       }
 
-      console.log(pc.bold('\n' + record.name))
+      console.log(pc.bold(`\n${record.name}`))
       console.log(pc.dim('─'.repeat(60)))
 
       const details = [
@@ -138,7 +137,7 @@ contentCommand
         ['Maintainer', record.expand?.maintainer?.name || '-'],
         ['Controls', record.control_count || '-'],
         ['GitHub', record.github || '-'],
-        ['License', record.license || '-']
+        ['License', record.license || '-'],
       ]
 
       for (const [key, value] of details) {
@@ -146,9 +145,10 @@ contentCommand
       }
 
       if (record.description) {
-        console.log(pc.dim('\n' + record.description))
+        console.log(pc.dim(`\n${record.description}`))
       }
-    } catch (error) {
+    }
+    catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to show content', format)
     }
   })
@@ -182,7 +182,8 @@ contentCommand
     // This ensures CLI fails fast with errors instead of hanging on TUI input
     if (isNonInteractive(options)) {
       await addNonInteractive(urlArg || '', options)
-    } else {
+    }
+    else {
       await addInteractive(urlArg, options)
     }
   })
@@ -207,7 +208,7 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
     version: options.version,
     status: options.status,
     controlCount: options.controlCount,
-    automationLevel: options.automationLevel
+    automationLevel: options.automationLevel,
   })
 
   if (args.errors.length > 0) {
@@ -244,24 +245,28 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
         id: record.id,
         content: result.content,
         warnings: result.warnings,
-        errors: []
+        errors: [],
       }, null, 2))
-    } else if (format === 'quiet') {
+    }
+    else if (format === 'quiet') {
       console.log(record.slug)
-    } else {
+    }
+    else {
       // Text format: show preparation summary then success
       console.log(formatAddResult(result, format))
       console.log(pc.green(`\n✓ Created: ${record.id}`))
     }
-  } catch (error) {
+  }
+  catch (error) {
     if (format === 'json') {
       console.log(JSON.stringify({
         success: false,
         content: result.content,
         warnings: result.warnings,
-        errors: [String(error)]
+        errors: [String(error)],
       }, null, 2))
-    } else {
+    }
+    else {
       console.log(formatAddResult(result, format))
       console.error(pc.red(`Failed to create: ${error}`))
     }
@@ -282,9 +287,11 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
       message: 'Enter GitHub repository URL:',
       placeholder: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
       validate: (value) => {
-        if (!value) return 'URL is required'
-        if (!parseGitHubUrl(value)) return 'Invalid GitHub URL'
-      }
+        if (!value)
+          return 'URL is required'
+        if (!parseGitHubUrl(value))
+          return 'Invalid GitHub URL'
+      },
     })
 
     if (p.isCancel(result)) {
@@ -313,7 +320,8 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
     inspecProfile = await fetchInspecYml(parsed.owner, parsed.repo, repoInfo.defaultBranch)
     readme = await fetchReadme(parsed.owner, parsed.repo, repoInfo.defaultBranch)
     s.stop('Repository metadata fetched')
-  } catch (error) {
+  }
+  catch (error) {
     s.stop('Failed to fetch repository')
     p.cancel(error instanceof Error ? error.message : 'Unknown error')
     process.exit(1)
@@ -331,9 +339,9 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
       `${pc.bold('Description:')} ${repoInfo.description || 'N/A'}`,
       `${pc.bold('License:')} ${repoInfo.license || 'N/A'}`,
       inspecProfile ? `${pc.bold('InSpec Version:')} ${inspecProfile.version || 'N/A'}` : '',
-      inspecProfile ? `${pc.bold('Profile Name:')} ${inspecProfile.name}` : ''
+      inspecProfile ? `${pc.bold('Profile Name:')} ${inspecProfile.name}` : '',
     ].filter(Boolean).join('\n'),
-    'Fetched Info'
+    'Fetched Info',
   )
 
   // Determine content type
@@ -341,9 +349,9 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
     message: 'Content type:',
     options: [
       { value: 'validation', label: 'Validation (InSpec profile)' },
-      { value: 'hardening', label: 'Hardening (Ansible, Chef, etc.)' }
+      { value: 'hardening', label: 'Hardening (Ansible, Chef, etc.)' },
     ],
-    initialValue: 'validation'
+    initialValue: 'validation',
   })
 
   if (p.isCancel(contentType)) {
@@ -360,59 +368,68 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
   const name = await p.text({
     message: 'Name:',
     initialValue: defaultName,
-    validate: (v) => !v ? 'Name is required' : undefined
+    validate: v => !v ? 'Name is required' : undefined,
   })
-  if (p.isCancel(name)) process.exit(0)
+  if (p.isCancel(name))
+    process.exit(0)
 
   const slug = await p.text({
     message: 'Slug (URL-friendly):',
     initialValue: defaultSlug,
-    validate: (v) => !v ? 'Slug is required' : undefined
+    validate: v => !v ? 'Slug is required' : undefined,
   })
-  if (p.isCancel(slug)) process.exit(0)
+  if (p.isCancel(slug))
+    process.exit(0)
 
   const description = await p.text({
     message: 'Description:',
-    initialValue: repoInfo.description || inspecProfile?.summary || ''
+    initialValue: repoInfo.description || inspecProfile?.summary || '',
   })
-  if (p.isCancel(description)) process.exit(0)
+  if (p.isCancel(description))
+    process.exit(0)
 
   const version = await p.text({
     message: 'Version:',
     initialValue: defaultVersion || '',
-    placeholder: 'e.g., 2.4.0'
+    placeholder: 'e.g., 2.4.0',
   })
-  if (p.isCancel(version)) process.exit(0)
+  if (p.isCancel(version))
+    process.exit(0)
 
   // Target selection
   const target = await selectOrCreate(fkMaps, 'targets', 'Target platform')
-  if (target === null) process.exit(0)
+  if (target === null)
+    process.exit(0)
 
   // Standard selection
   const standard = await selectOrCreate(fkMaps, 'standards', 'Compliance standard')
-  if (standard === null) process.exit(0)
+  if (standard === null)
+    process.exit(0)
 
   // Technology selection
   const technology = await selectOrCreate(fkMaps, 'technologies', 'Technology')
-  if (technology === null) process.exit(0)
+  if (technology === null)
+    process.exit(0)
 
   // Vendor selection
   const vendor = await selectOrCreate(fkMaps, 'organizations', 'Vendor/Organization')
-  if (vendor === null) process.exit(0)
+  if (vendor === null)
+    process.exit(0)
 
   // Control count
   let controlCount = readme ? extractControlCount(readme) : null
   const controlCountInput = await p.text({
     message: 'Control count:',
     initialValue: controlCount?.toString() || '',
-    placeholder: 'Number of controls/checks'
+    placeholder: 'Number of controls/checks',
   })
-  if (p.isCancel(controlCountInput)) process.exit(0)
-  controlCount = controlCountInput ? parseInt(controlCountInput, 10) : null
+  if (p.isCancel(controlCountInput))
+    process.exit(0)
+  controlCount = controlCountInput ? Number.parseInt(controlCountInput, 10) : null
 
   // Confirm and create
   const shouldCreate = await p.confirm({
-    message: 'Create this content record?'
+    message: 'Create this content record?',
   })
 
   if (p.isCancel(shouldCreate) || !shouldCreate) {
@@ -440,12 +457,13 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
       github: repoInfo.htmlUrl,
       readme_url: `https://raw.githubusercontent.com/${parsed.owner}/${parsed.repo}/${repoInfo.defaultBranch}/README.md`,
       readme_markdown: readme,
-      license: repoInfo.license || inspecProfile?.license
+      license: repoInfo.license || inspecProfile?.license,
     })
 
     s.stop('Content record created')
     p.outro(pc.green(`Created: ${record.id}`))
-  } catch (error) {
+  }
+  catch (error) {
     s.stop('Failed to create record')
     console.error(pc.red(error instanceof Error ? error.message : 'Unknown error'))
     process.exit(1)
@@ -472,7 +490,6 @@ contentCommand
   .action(async (id, options) => {
     const format = getOutputFormat(options)
 
-
     try {
       const pb = await getPocketBase()
 
@@ -487,9 +504,8 @@ contentCommand
         version: options.setVersion,
         status: options.status,
         controlCount: options.controlCount,
-        syncReadme: options.syncReadme
+        syncReadme: options.syncReadme,
       })
-
 
       // Handle sync-readme
       if (options.syncReadme && existing.github) {
@@ -497,7 +513,8 @@ contentCommand
         if (parsed) {
           const readme = await fetchReadme(parsed.owner, parsed.repo)
           if (readme) {
-            if (!args.updates) args.updates = {}
+            if (!args.updates)
+              args.updates = {}
             args.updates.readmeMarkdown = readme
             if (format === 'text') {
               console.log(pc.dim('README synced from GitHub'))
@@ -530,7 +547,8 @@ contentCommand
       if (!result.hasChanges && !options.syncReadme) {
         if (format === 'json') {
           console.log(JSON.stringify({ success: true, id, hasChanges: false }, null, 2))
-        } else if (format !== 'quiet') {
+        }
+        else if (format !== 'quiet') {
           console.log(pc.yellow('No changes to apply'))
         }
         process.exit(0)
@@ -540,7 +558,7 @@ contentCommand
       if (!options.yes && format === 'text' && result.hasChanges) {
         console.log(formatUpdateResult(result, id, format))
         const confirm = await p.confirm({
-          message: 'Apply these changes?'
+          message: 'Apply these changes?',
         })
         if (p.isCancel(confirm) || !confirm) {
           p.cancel('Operation cancelled')
@@ -553,12 +571,15 @@ contentCommand
 
       if (format === 'json') {
         console.log(JSON.stringify({ success: true, id: updated.id, hasChanges: true }, null, 2))
-      } else if (format === 'quiet') {
+      }
+      else if (format === 'quiet') {
         console.log(id)
-      } else {
+      }
+      else {
         console.log(pc.green(`✓ Updated: ${id}`))
       }
-    } catch (error) {
+    }
+    catch (error) {
       exitWithError(error instanceof Error ? error.message : String(error), format)
     }
   })
@@ -570,12 +591,12 @@ contentCommand
 async function selectOrCreate(
   fkMaps: FkMaps,
   collection: keyof FkMaps,
-  label: string
+  label: string,
 ): Promise<string | null> {
   const map = fkMaps[collection]
   const options = Array.from(map.entries()).map(([name, id]) => ({
     value: id,
-    label: name
+    label: name,
   }))
 
   options.sort((a, b) => a.label.localeCompare(b.label))
@@ -584,18 +605,21 @@ async function selectOrCreate(
 
   const selected = await p.select({
     message: `${label}:`,
-    options
+    options,
   })
 
-  if (p.isCancel(selected)) return null
-  if (selected === '__skip__') return ''
+  if (p.isCancel(selected))
+    return null
+  if (selected === '__skip__')
+    return ''
   if (selected === '__new__') {
     const newName = await p.text({
       message: `Enter new ${label.toLowerCase()} name:`,
-      validate: (v) => !v ? 'Name is required' : undefined
+      validate: v => !v ? 'Name is required' : undefined,
     })
 
-    if (p.isCancel(newName)) return null
+    if (p.isCancel(newName))
+      return null
 
     console.log(pc.yellow(`Note: Create "${newName}" in Pocketbase Admin UI, then re-run this command`))
     return null

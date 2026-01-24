@@ -14,7 +14,7 @@ console.log('='.repeat(80))
 // Group by category
 const byCategory = new Map<string, any[]>()
 
-;[...profiles, ...hardening].forEach(p => {
+;[...profiles, ...hardening].forEach((p) => {
   const category = p.category || 'UNCATEGORIZED'
   if (!byCategory.has(category)) {
     byCategory.set(category, [])
@@ -25,13 +25,13 @@ const byCategory = new Map<string, any[]>()
 // Sort categories
 const sortedCategories = Array.from(byCategory.keys()).sort()
 
-sortedCategories.forEach(category => {
+sortedCategories.forEach((category) => {
   const items = byCategory.get(category)!
   console.log(`\n${'='.repeat(80)}`)
   console.log(`CATEGORY: ${category} (${items.length} profiles)`)
   console.log('='.repeat(80))
 
-  items.forEach(p => {
+  items.forEach((p) => {
     console.log(`\n${p.name}`)
     console.log(`  Target Type:    ${p.target_type || 'MISSING'}`)
     console.log(`  Target Subtype: ${p.target_subtype || 'MISSING'}`)

@@ -1,12 +1,12 @@
-import { defineLoader } from 'vitepress'
 import type { PBContent } from '../theme/lib/pocketbase-types'
+import { defineLoader } from 'vitepress'
 import {
-  initPocketBase,
   extractFK,
+  extractMaintainerFK,
+  extractOrgFK,
   extractStandardFK,
   extractTechnologyFK,
-  extractOrgFK,
-  extractMaintainerFK
+  initPocketBase,
 } from '../lib/loader-utils'
 
 // Flattened content item for VitePress consumption
@@ -79,11 +79,11 @@ export default defineLoader({
       // Include maintainer.organization to get org logo as fallback for teams without logos
       const records = await pb.collection('content').getFullList<PBContent>({
         expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
-        sort: 'name'
+        sort: 'name',
       })
 
       // Transform Pocketbase records to flattened ContentItem format
-      const items: ContentItem[] = records.map(record => {
+      const items: ContentItem[] = records.map((record) => {
         const target = extractFK(record.expand, 'target')
         const standard = extractStandardFK(record.expand)
         const technology = extractTechnologyFK(record.expand)
@@ -137,7 +137,7 @@ export default defineLoader({
           control_count: record.control_count,
           stig_id: record.stig_id,
           benchmark_version: record.benchmark_version,
-          is_featured: record.is_featured
+          is_featured: record.is_featured,
         }
       })
 
@@ -147,12 +147,13 @@ export default defineLoader({
 
       console.log(`✓ Loaded ${items.length} content items (${validation.length} validation, ${hardening.length} hardening)`)
       return { items, validation, hardening }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to load content from Pocketbase:', error)
       console.error('Make sure Pocketbase is running: cd .pocketbase && ./pocketbase serve')
 
       // Return empty arrays instead of crashing build
       return { items: [], validation: [], hardening: [] }
     }
-  }
+  },
 })

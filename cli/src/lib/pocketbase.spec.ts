@@ -4,8 +4,18 @@
  * TDD tests for Pocketbase client and FK resolution functions
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { resolveFK, type FkMaps } from './pocketbase.js'
+import type { CreateContentInput, FkMaps, UpdateContentInput } from './pocketbase.js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { createContent, getContentBySlug, listContent, resolveFK, updateContent } from './pocketbase.js'
+
+// ============================================================================
+// CRUD OPERATIONS (Phase 2.2)
+// ============================================================================
+
+// Integration tests using test Pocketbase instance (port 8091)
+// Global setup starts Pocketbase and sets PB_URL environment variable
+import { checkConnection, getPocketBase, loadFkMaps } from './pocketbase.js'
 
 // Mock FkMaps for testing
 function createMockFkMaps(): FkMaps {
@@ -14,46 +24,46 @@ function createMockFkMaps(): FkMaps {
       ['mitre', 'org-mitre-123'],
       ['the mitre corporation', 'org-mitre-123'],
       ['disa', 'org-disa-456'],
-      ['aws', 'org-aws-789']
+      ['aws', 'org-aws-789'],
     ]),
     teams: new Map([
       ['saf team', 'team-saf-001'],
-      ['mitre saf team', 'team-saf-001']
+      ['mitre saf team', 'team-saf-001'],
     ]),
     standards: new Map([
       ['disa stig', 'std-stig-001'],
       ['cis benchmark', 'std-cis-002'],
-      ['pci-dss', 'std-pci-003']
+      ['pci-dss', 'std-pci-003'],
     ]),
     technologies: new Map([
       ['inspec', 'tech-inspec-001'],
       ['ansible', 'tech-ansible-002'],
       ['chef', 'tech-chef-003'],
-      ['terraform', 'tech-terraform-004']
+      ['terraform', 'tech-terraform-004'],
     ]),
     targets: new Map([
       ['red hat enterprise linux 8', 'tgt-rhel8-001'],
       ['red hat enterprise linux 9', 'tgt-rhel9-002'],
       ['ubuntu 20.04', 'tgt-ubuntu20-003'],
-      ['mysql 8.0', 'tgt-mysql8-004']
+      ['mysql 8.0', 'tgt-mysql8-004'],
     ]),
     categories: new Map([
       ['operating system', 'cat-os-001'],
       ['database', 'cat-db-002'],
-      ['container', 'cat-container-003']
+      ['container', 'cat-container-003'],
     ]),
     capabilities: new Map([
       ['validate', 'cap-validate-001'],
       ['harden', 'cap-harden-002'],
       ['normalize', 'cap-normalize-003'],
       ['plan', 'cap-plan-004'],
-      ['visualize', 'cap-visualize-005']
+      ['visualize', 'cap-visualize-005'],
     ]),
     tags: new Map([
       ['linux', 'tag-linux-001'],
       ['windows', 'tag-windows-002'],
-      ['cloud', 'tag-cloud-003']
-    ])
+      ['cloud', 'tag-cloud-003'],
+    ]),
   }
 }
 
@@ -151,7 +161,7 @@ describe('resolveFK', () => {
   })
 })
 
-describe('FkMaps structure', () => {
+describe('fkMaps structure', () => {
   it('has all required collections', () => {
     const fkMaps = createMockFkMaps()
 
@@ -173,10 +183,6 @@ describe('FkMaps structure', () => {
     }
   })
 })
-
-// Integration tests using test Pocketbase instance (port 8091)
-// Global setup starts Pocketbase and sets PB_URL environment variable
-import { getPocketBase, loadFkMaps, checkConnection } from './pocketbase.js'
 
 describe('getPocketBase (integration)', () => {
   it('connects to Pocketbase with valid credentials', async () => {
@@ -225,20 +231,6 @@ describe('checkConnection (integration)', () => {
   })
 })
 
-// ============================================================================
-// CRUD OPERATIONS (Phase 2.2)
-// ============================================================================
-
-import {
-  createContent,
-  updateContent,
-  getContentBySlug,
-  listContent,
-  type CreateContentInput,
-  type UpdateContentInput,
-  type ListContentOptions
-} from './pocketbase.js'
-
 describe('getContentBySlug', () => {
   it('returns content record when slug exists', async () => {
     // Mock implementation will return a record
@@ -248,9 +240,9 @@ describe('getContentBySlug', () => {
           id: 'content-123',
           slug: 'rhel-9-stig',
           name: 'RHEL 9 STIG',
-          content_type: 'validation'
-        })
-      })
+          content_type: 'validation',
+        }),
+      }),
     }
 
     const result = await getContentBySlug('rhel-9-stig', mockPb as any)
@@ -262,8 +254,8 @@ describe('getContentBySlug', () => {
   it('returns null when slug does not exist', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFirstListItem: vi.fn().mockRejectedValue(new Error('Not found'))
-      })
+        getFirstListItem: vi.fn().mockRejectedValue(new Error('Not found')),
+      }),
     }
 
     const result = await getContentBySlug('nonexistent-slug', mockPb as any)
@@ -280,14 +272,14 @@ describe('getContentBySlug', () => {
           content_type: 'validation',
           expand: {
             target: { id: 'tgt-1', name: 'RHEL 9' },
-            standard: { id: 'std-1', name: 'DISA STIG' }
-          }
-        })
-      })
+            standard: { id: 'std-1', name: 'DISA STIG' },
+          },
+        }),
+      }),
     }
 
     const result = await getContentBySlug('rhel-9-stig', mockPb as any, {
-      expand: ['target', 'standard']
+      expand: ['target', 'standard'],
     })
 
     expect(result?.expand?.target?.name).toBe('RHEL 9')
@@ -301,9 +293,9 @@ describe('listContent', () => {
       collection: vi.fn().mockReturnValue({
         getFullList: vi.fn().mockResolvedValue([
           { id: '1', slug: 'rhel-9-stig', content_type: 'validation' },
-          { id: '2', slug: 'ansible-rhel-9', content_type: 'hardening' }
-        ])
-      })
+          { id: '2', slug: 'ansible-rhel-9', content_type: 'hardening' },
+        ]),
+      }),
     }
 
     const result = await listContent({}, mockPb as any)
@@ -312,20 +304,20 @@ describe('listContent', () => {
 
   it('filters by content_type', async () => {
     const mockGetFullList = vi.fn().mockResolvedValue([
-      { id: '1', slug: 'rhel-9-stig', content_type: 'validation' }
+      { id: '1', slug: 'rhel-9-stig', content_type: 'validation' },
     ])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({ contentType: 'validation' }, mockPb as any)
 
     expect(mockGetFullList).toHaveBeenCalledWith(
       expect.objectContaining({
-        filter: expect.stringContaining('content_type = "validation"')
-      })
+        filter: expect.stringContaining('content_type = "validation"'),
+      }),
     )
   })
 
@@ -333,16 +325,16 @@ describe('listContent', () => {
     const mockGetFullList = vi.fn().mockResolvedValue([])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({ status: 'active' }, mockPb as any)
 
     expect(mockGetFullList).toHaveBeenCalledWith(
       expect.objectContaining({
-        filter: expect.stringContaining('status = "active"')
-      })
+        filter: expect.stringContaining('status = "active"'),
+      }),
     )
   })
 
@@ -350,8 +342,8 @@ describe('listContent', () => {
     const mockGetFullList = vi.fn().mockResolvedValue([])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({ contentType: 'validation', status: 'active' }, mockPb as any)
@@ -366,16 +358,16 @@ describe('listContent', () => {
     const mockGetFullList = vi.fn().mockResolvedValue([])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({ expand: ['target', 'standard', 'vendor'] }, mockPb as any)
 
     expect(mockGetFullList).toHaveBeenCalledWith(
       expect.objectContaining({
-        expand: 'target,standard,vendor'
-      })
+        expand: 'target,standard,vendor',
+      }),
     )
   })
 
@@ -383,16 +375,16 @@ describe('listContent', () => {
     const mockGetFullList = vi.fn().mockResolvedValue([])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({ sort: '-created' }, mockPb as any)
 
     expect(mockGetFullList).toHaveBeenCalledWith(
       expect.objectContaining({
-        sort: '-created'
-      })
+        sort: '-created',
+      }),
     )
   })
 
@@ -400,16 +392,16 @@ describe('listContent', () => {
     const mockGetFullList = vi.fn().mockResolvedValue([])
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        getFullList: mockGetFullList
-      })
+        getFullList: mockGetFullList,
+      }),
     }
 
     await listContent({}, mockPb as any)
 
     expect(mockGetFullList).toHaveBeenCalledWith(
       expect.objectContaining({
-        sort: 'name'
-      })
+        sort: 'name',
+      }),
     )
   })
 })
@@ -420,18 +412,18 @@ describe('createContent', () => {
       id: 'new-content-123',
       slug: 'rhel-9-stig',
       name: 'RHEL 9 STIG',
-      content_type: 'validation'
+      content_type: 'validation',
     })
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        create: mockCreate
-      })
+        create: mockCreate,
+      }),
     }
 
     const input: CreateContentInput = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     }
 
     const result = await createContent(input, mockPb as any)
@@ -441,8 +433,8 @@ describe('createContent', () => {
       expect.objectContaining({
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
-        content_type: 'validation'
-      })
+        content_type: 'validation',
+      }),
     )
   })
 
@@ -451,12 +443,12 @@ describe('createContent', () => {
       id: 'new-content-123',
       slug: 'rhel-9-stig',
       name: 'RHEL 9 STIG',
-      content_type: 'validation'
+      content_type: 'validation',
     })
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        create: mockCreate
-      })
+        create: mockCreate,
+      }),
     }
 
     const input: CreateContentInput = {
@@ -472,7 +464,7 @@ describe('createContent', () => {
       standard: 'std-stig-id',
       technology: 'tech-inspec-id',
       vendor: 'org-mitre-id',
-      maintainer: 'team-saf-id'
+      maintainer: 'team-saf-id',
     }
 
     await createContent(input, mockPb as any)
@@ -491,60 +483,63 @@ describe('createContent', () => {
         standard: 'std-stig-id',
         technology: 'tech-inspec-id',
         vendor: 'org-mitre-id',
-        maintainer: 'team-saf-id'
-      })
+        maintainer: 'team-saf-id',
+      }),
     )
   })
 
   it('validates input before creating', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        create: vi.fn()
-      })
+        create: vi.fn(),
+      }),
     }
 
     const invalidInput = {
-      name: '',  // Empty name - invalid
+      name: '', // Empty name - invalid
       slug: 'valid-slug',
-      contentType: 'validation'
+      contentType: 'validation',
     } as CreateContentInput
 
     await expect(createContent(invalidInput, mockPb as any))
-      .rejects.toThrow()
+      .rejects
+      .toThrow()
   })
 
   it('rejects invalid slug format', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        create: vi.fn()
-      })
+        create: vi.fn(),
+      }),
     }
 
     const invalidInput: CreateContentInput = {
       name: 'Valid Name',
-      slug: 'INVALID--SLUG',  // Uppercase and consecutive hyphens
-      contentType: 'validation'
+      slug: 'INVALID--SLUG', // Uppercase and consecutive hyphens
+      contentType: 'validation',
     }
 
     await expect(createContent(invalidInput, mockPb as any))
-      .rejects.toThrow()
+      .rejects
+      .toThrow()
   })
 
   it('rejects invalid contentType', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        create: vi.fn()
-      })
+        create: vi.fn(),
+      }),
     }
 
     const invalidInput = {
       name: 'Valid Name',
       slug: 'valid-slug',
-      contentType: 'invalid-type'
+      contentType: 'invalid-type',
     } as CreateContentInput
 
     await expect(createContent(invalidInput, mockPb as any))
-      .rejects.toThrow()
+      .rejects
+      .toThrow()
   })
 })
 
@@ -554,16 +549,16 @@ describe('updateContent', () => {
       id: 'content-123',
       slug: 'rhel-9-stig',
       name: 'RHEL 9 STIG Updated',
-      content_type: 'validation'
+      content_type: 'validation',
     })
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: mockUpdate
-      })
+        update: mockUpdate,
+      }),
     }
 
     const update: UpdateContentInput = {
-      name: 'RHEL 9 STIG Updated'
+      name: 'RHEL 9 STIG Updated',
     }
 
     const result = await updateContent('content-123', update, mockPb as any)
@@ -572,8 +567,8 @@ describe('updateContent', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       'content-123',
       expect.objectContaining({
-        name: 'RHEL 9 STIG Updated'
-      })
+        name: 'RHEL 9 STIG Updated',
+      }),
     )
   })
 
@@ -582,18 +577,18 @@ describe('updateContent', () => {
       id: 'content-123',
       name: 'Updated Name',
       version: '2.0.0',
-      control_count: 500
+      control_count: 500,
     })
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: mockUpdate
-      })
+        update: mockUpdate,
+      }),
     }
 
     const update: UpdateContentInput = {
       name: 'Updated Name',
       version: '2.0.0',
-      controlCount: 500
+      controlCount: 500,
     }
 
     await updateContent('content-123', update, mockPb as any)
@@ -603,72 +598,75 @@ describe('updateContent', () => {
       expect.objectContaining({
         name: 'Updated Name',
         version: '2.0.0',
-        control_count: 500
-      })
+        control_count: 500,
+      }),
     )
   })
 
   it('validates slug format on update', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: vi.fn()
-      })
+        update: vi.fn(),
+      }),
     }
 
     const update: UpdateContentInput = {
-      slug: 'INVALID--SLUG'
+      slug: 'INVALID--SLUG',
     }
 
     await expect(updateContent('content-123', update, mockPb as any))
-      .rejects.toThrow()
+      .rejects
+      .toThrow()
   })
 
   it('validates version format on update', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: vi.fn()
-      })
+        update: vi.fn(),
+      }),
     }
 
     const update: UpdateContentInput = {
-      version: 'not-semver'
+      version: 'not-semver',
     }
 
     await expect(updateContent('content-123', update, mockPb as any))
-      .rejects.toThrow()
+      .rejects
+      .toThrow()
   })
 
   it('allows partial updates', async () => {
     const mockUpdate = vi.fn().mockResolvedValue({
       id: 'content-123',
-      control_count: 500
+      control_count: 500,
     })
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: mockUpdate
-      })
+        update: mockUpdate,
+      }),
     }
 
     const update: UpdateContentInput = {
-      controlCount: 500
+      controlCount: 500,
     }
 
     await updateContent('content-123', update, mockPb as any)
 
     expect(mockUpdate).toHaveBeenCalledWith(
       'content-123',
-      { control_count: 500 }
+      { control_count: 500 },
     )
   })
 
   it('throws error for non-existent ID', async () => {
     const mockPb = {
       collection: vi.fn().mockReturnValue({
-        update: vi.fn().mockRejectedValue(new Error('Record not found'))
-      })
+        update: vi.fn().mockRejectedValue(new Error('Record not found')),
+      }),
     }
 
     await expect(updateContent('nonexistent-id', { name: 'Test' }, mockPb as any))
-      .rejects.toThrow('Record not found')
+      .rejects
+      .toThrow('Record not found')
   })
 })

@@ -106,12 +106,12 @@ export const STANDARD_IDENTIFIERS: Record<string, string> = {
  * Technology prefixes for hardening content
  */
 export const TECHNOLOGY_PREFIXES: Record<string, string> = {
-  'ansible': 'ansible',
-  'chef': 'chef',
-  'puppet': 'puppet',
-  'terraform': 'terraform',
-  'powershell': 'powershell',
-  'bash': 'bash',
+  ansible: 'ansible',
+  chef: 'chef',
+  puppet: 'puppet',
+  terraform: 'terraform',
+  powershell: 'powershell',
+  bash: 'bash',
 }
 
 /**
@@ -212,7 +212,8 @@ export function extractVersion(name: string): string | null {
   // Match version patterns: 9, 9.0, 22.04, 2019, etc.
   const versionMatch = name.match(/(\d+(?:\.\d+)?(?:\.\d+)?)/)
 
-  if (!versionMatch) return null
+  if (!versionMatch)
+    return null
 
   const version = versionMatch[1]
 
@@ -239,7 +240,7 @@ export function extractVersion(name: string): string | null {
 export function generateContentSlug(
   targetName: string,
   standardName: string,
-  technology?: string
+  technology?: string,
 ): string {
   const targetAbbrev = abbreviateTarget(targetName)
   const version = extractVersion(targetName)
@@ -287,7 +288,7 @@ export function parseRepoName(repoName: string): {
 
   // Check for hardening pattern: {tech}-{target}-{standard}-hardening
   const hardeningMatch = normalized.match(
-    /^(ansible|chef|puppet|terraform|powershell)-(.+)-(stig|cis|pci-dss|nist|hipaa)-hardening$/
+    /^(ansible|chef|puppet|terraform|powershell)-(.+)-(stig|cis|pci-dss|nist|hipaa)-hardening$/,
   )
 
   if (hardeningMatch) {
@@ -295,20 +296,20 @@ export function parseRepoName(repoName: string): {
       technology: hardeningMatch[1],
       target: hardeningMatch[2],
       standard: hardeningMatch[3],
-      type: 'hardening'
+      type: 'hardening',
     }
   }
 
   // Check for baseline pattern: {target}-{standard}-baseline
   const baselineMatch = normalized.match(
-    /^(.+)-(stig|cis|pci-dss|nist|hipaa)-baseline$/
+    /^(.+)-(stig|cis|pci-dss|nist|hipaa)-baseline$/,
   )
 
   if (baselineMatch) {
     return {
       target: baselineMatch[1],
       standard: baselineMatch[2],
-      type: 'baseline'
+      type: 'baseline',
     }
   }
 
@@ -331,7 +332,8 @@ export function slugify(text: string): string {
 export function suggestSlugFromRepo(repoName: string): string | null {
   const parsed = parseRepoName(repoName)
 
-  if (!parsed) return null
+  if (!parsed)
+    return null
 
   // Convert target from repo format to display format for abbreviation lookup
   const targetDisplay = parsed.target
@@ -341,6 +343,6 @@ export function suggestSlugFromRepo(repoName: string): string | null {
   return generateContentSlug(
     targetDisplay,
     parsed.standard,
-    parsed.technology
+    parsed.technology,
   )
 }

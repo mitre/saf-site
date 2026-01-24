@@ -1,14 +1,14 @@
 import { z } from 'zod'
 import {
-  insertProfileSchema,
+  insertCapabilitySchema,
   insertHardeningProfileSchema,
-  insertStandardSchema,
   insertOrganizationSchema,
-  insertTeamSchema,
-  insertToolSchema,
-  insertTechnologySchema,
+  insertProfileSchema,
+  insertStandardSchema,
   insertTagSchema,
-  insertCapabilitySchema
+  insertTeamSchema,
+  insertTechnologySchema,
+  insertToolSchema,
 } from './schema'
 
 /**
@@ -29,9 +29,9 @@ export const ProfilesFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
     standard: z.string().optional(),
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  profiles: z.array(insertProfileSchema)
+  profiles: z.array(insertProfileSchema),
 })
 
 export type ProfilesFile = z.infer<typeof ProfilesFileSchema>
@@ -47,9 +47,9 @@ export const HardeningFileSchema = z.object({
     lastUpdated: z.string().optional(),
     team: z.string().optional(),
     organization: z.string().optional(),
-    logo: z.string().optional()
+    logo: z.string().optional(),
   }).optional(),
-  profiles: z.array(insertHardeningProfileSchema)
+  profiles: z.array(insertHardeningProfileSchema),
 })
 
 export type HardeningFile = z.infer<typeof HardeningFileSchema>
@@ -59,9 +59,9 @@ export type HardeningFile = z.infer<typeof HardeningFileSchema>
 export const StandardsFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  standards: z.array(insertStandardSchema)
+  standards: z.array(insertStandardSchema),
 })
 
 export type StandardsFile = z.infer<typeof StandardsFileSchema>
@@ -71,9 +71,9 @@ export type StandardsFile = z.infer<typeof StandardsFileSchema>
 export const OrganizationsFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  organizations: z.array(insertOrganizationSchema)
+  organizations: z.array(insertOrganizationSchema),
 })
 
 export type OrganizationsFile = z.infer<typeof OrganizationsFileSchema>
@@ -83,9 +83,9 @@ export type OrganizationsFile = z.infer<typeof OrganizationsFileSchema>
 export const TeamsFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  teams: z.array(insertTeamSchema)
+  teams: z.array(insertTeamSchema),
 })
 
 export type TeamsFile = z.infer<typeof TeamsFileSchema>
@@ -95,9 +95,9 @@ export type TeamsFile = z.infer<typeof TeamsFileSchema>
 export const ToolsFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  tools: z.array(insertToolSchema)
+  tools: z.array(insertToolSchema),
 })
 
 export type ToolsFile = z.infer<typeof ToolsFileSchema>
@@ -107,9 +107,9 @@ export type ToolsFile = z.infer<typeof ToolsFileSchema>
 export const TechnologiesFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  technologies: z.array(insertTechnologySchema)
+  technologies: z.array(insertTechnologySchema),
 })
 
 export type TechnologiesFile = z.infer<typeof TechnologiesFileSchema>
@@ -119,9 +119,9 @@ export type TechnologiesFile = z.infer<typeof TechnologiesFileSchema>
 export const TagsFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  tags: z.array(insertTagSchema)
+  tags: z.array(insertTagSchema),
 })
 
 export type TagsFile = z.infer<typeof TagsFileSchema>
@@ -131,9 +131,9 @@ export type TagsFile = z.infer<typeof TagsFileSchema>
 export const CapabilitiesFileSchema = z.object({
   _id: z.string(),
   _metadata: z.object({
-    description: z.string().optional()
+    description: z.string().optional(),
   }).optional(),
-  capabilities: z.array(insertCapabilitySchema)
+  capabilities: z.array(insertCapabilitySchema),
 })
 
 export type CapabilitiesFile = z.infer<typeof CapabilitiesFileSchema>

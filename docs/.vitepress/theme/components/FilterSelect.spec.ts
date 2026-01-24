@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
 import FilterSelect from './FilterSelect.vue'
 
-describe('FilterSelect', () => {
+describe('filterSelect', () => {
   const defaultProps = {
     modelValue: 'all',
     options: ['Option 1', 'Option 2', 'Option 3'],
     label: 'Test Label',
     placeholder: 'All Options',
-    ariaLabel: 'Test filter'
+    ariaLabel: 'Test filter',
   }
 
   it('renders label correctly', () => {
@@ -30,9 +30,9 @@ describe('FilterSelect', () => {
         ...defaultProps,
         options: [
           { value: 'opt1', label: 'Option One' },
-          { value: 'opt2', label: 'Option Two' }
-        ]
-      }
+          { value: 'opt2', label: 'Option Two' },
+        ],
+      },
     })
 
     expect(wrapper.find('.filter-label').text()).toBe('Test Label')
@@ -42,8 +42,8 @@ describe('FilterSelect', () => {
     const wrapper = mount(FilterSelect, {
       props: {
         ...defaultProps,
-        ariaLabel: 'Filter by technology'
-      }
+        ariaLabel: 'Filter by technology',
+      },
     })
 
     expect(wrapper.find('[aria-label="Filter by technology"]').exists()).toBe(true)

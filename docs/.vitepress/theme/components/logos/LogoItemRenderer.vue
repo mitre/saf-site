@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { LogoItem } from './types'
 /**
  * Shared logo item renderer
  * Handles: custom image vs BrandIcon, link wrapping, accessibility
  */
 import BrandIcon from '../icons/BrandIcon.vue'
-import type { LogoItem } from './types'
 
 const props = defineProps<{
   item: LogoItem
@@ -31,7 +31,7 @@ const props = defineProps<{
       :width="size"
       :height="size"
       class="logo-image"
-    />
+    >
     <BrandIcon
       v-else
       :name="item.name"

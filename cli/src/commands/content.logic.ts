@@ -5,25 +5,22 @@
  * No I/O - all side effects are passed as dependencies.
  */
 
-import type { FkMaps } from '../lib/pocketbase.js'
-import type { CreateContentInput, UpdateContentInput } from '../lib/pocketbase.js'
-import type { RepoInfo, InspecProfile } from '../lib/github.js'
-import {
-  buildContentFromRepo,
-  resolveContentFKs,
-  checkUnresolvedFKs,
-  diffContent,
-  type RepoData,
-  type ContentFKNames,
-  type ContentDiff
-} from '../lib/content-service.js'
+import type { ContentDiff, ContentFKNames, RepoData } from '../lib/content-service.js'
+import type { InspecProfile, RepoInfo } from '../lib/github.js'
+import type { CreateContentInput, FkMaps, UpdateContentInput } from '../lib/pocketbase.js'
 import { validateSlug } from '@schema/validation.js'
 import {
-  slugSchema,
-  optionalSlugSchema,
+  buildContentFromRepo,
+  checkUnresolvedFKs,
+
+  diffContent,
+
+  resolveContentFKs,
+} from '../lib/content-service.js'
+import {
   semverSchema,
-  optionalSemverSchema,
-  statusSchema
+  slugSchema,
+  statusSchema,
 } from '../lib/validation-schemas.js'
 
 // ============================================================================
@@ -34,7 +31,7 @@ import {
  * Service dependencies (for testing/mocking)
  */
 export interface ServiceDeps {
-  parseGitHubUrl: (url: string) => { owner: string; repo: string } | null
+  parseGitHubUrl: (url: string) => { owner: string, repo: string } | null
   fetchRepoInfo: (owner: string, repo: string) => Promise<RepoInfo>
   fetchInspecYml: (owner: string, repo: string, branch?: string) => Promise<InspecProfile | null>
   fetchReadme: (owner: string, repo: string, branch?: string) => Promise<string | null>
@@ -103,7 +100,7 @@ export interface PrepareUpdateResult {
 export async function prepareContentAdd(
   input: PrepareAddInput,
   fkMaps: FkMaps,
-  deps: ServiceDeps
+  deps: ServiceDeps,
 ): Promise<PrepareAddResult> {
   const warnings: string[] = []
   const errors: string[] = []
@@ -114,7 +111,7 @@ export async function prepareContentAdd(
     return {
       success: false,
       warnings: [],
-      errors: ['Invalid GitHub URL']
+      errors: ['Invalid GitHub URL'],
     }
   }
 
@@ -125,11 +122,12 @@ export async function prepareContentAdd(
 
   try {
     repoInfo = await deps.fetchRepoInfo(parsed.owner, parsed.repo)
-  } catch (error) {
+  }
+  catch (error) {
     return {
       success: false,
       warnings: [],
-      errors: [`Failed to fetch repository: ${error instanceof Error ? error.message : 'Unknown error'}`]
+      errors: [`Failed to fetch repository: ${error instanceof Error ? error.message : 'Unknown error'}`],
     }
   }
 
@@ -138,7 +136,8 @@ export async function prepareContentAdd(
     if (!inspecProfile) {
       warnings.push('No inspec.yml found - using defaults')
     }
-  } catch {
+  }
+  catch {
     warnings.push('Failed to fetch inspec.yml - using defaults')
   }
 
@@ -147,7 +146,8 @@ export async function prepareContentAdd(
     if (!readme) {
       warnings.push('No README found')
     }
-  } catch {
+  }
+  catch {
     warnings.push('Failed to fetch README')
   }
 
@@ -157,7 +157,7 @@ export async function prepareContentAdd(
     inspecProfile: inspecProfile || undefined,
     readme: readme || undefined,
     contentType: input.contentType,
-    automationLevel: input.overrides?.automationLevel
+    automationLevel: input.overrides?.automationLevel,
   }
 
   let content = buildContentFromRepo(repoData)
@@ -172,7 +172,7 @@ export async function prepareContentAdd(
     // Merge resolved FKs
     content = {
       ...content,
-      ...resolvedFKs
+      ...resolvedFKs,
     }
   }
 
@@ -180,7 +180,7 @@ export async function prepareContentAdd(
   if (input.overrides) {
     content = {
       ...content,
-      ...input.overrides
+      ...input.overrides,
     }
   }
 
@@ -190,7 +190,8 @@ export async function prepareContentAdd(
     const slugResult = slugSchema.safeParse(content.slug)
     if (!slugResult.success) {
       errors.push(`Slug validation failed: ${slugResult.error.issues[0].message}`)
-    } else {
+    }
+    else {
       // Check slug conventions
       const slugValidation = validateSlug(content.slug)
       warnings.push(...slugValidation.warnings)
@@ -220,7 +221,7 @@ export async function prepareContentAdd(
       repoInfo,
       inspecProfile,
       warnings,
-      errors
+      errors,
     }
   }
 
@@ -230,7 +231,7 @@ export async function prepareContentAdd(
     repoInfo,
     inspecProfile,
     warnings,
-    errors: []
+    errors: [],
   }
 }
 
@@ -248,7 +249,7 @@ export async function prepareContentAdd(
  */
 export function prepareContentUpdate(
   existing: Record<string, unknown>,
-  input: PrepareUpdateInput
+  input: PrepareUpdateInput,
 ): PrepareUpdateResult {
   const warnings: string[] = []
   const errors: string[] = []
@@ -259,7 +260,8 @@ export function prepareContentUpdate(
     const slugResult = slugSchema.safeParse(updates.slug)
     if (!slugResult.success) {
       errors.push(`Slug validation failed: ${slugResult.error.issues[0].message}`)
-    } else {
+    }
+    else {
       // Check slug conventions
       const slugValidation = validateSlug(updates.slug)
       warnings.push(...slugValidation.warnings)
@@ -286,7 +288,7 @@ export function prepareContentUpdate(
       success: false,
       hasChanges: false,
       warnings,
-      errors
+      errors,
     }
   }
 
@@ -306,6 +308,6 @@ export function prepareContentUpdate(
     updates: diff.hasChanges ? changedUpdates : undefined,
     diff,
     warnings,
-    errors: []
+    errors: [],
   }
 }

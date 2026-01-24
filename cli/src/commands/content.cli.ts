@@ -5,18 +5,19 @@
  * Separates CLI concerns from business logic.
  */
 
-import type { PrepareAddInput, PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
-import type { UpdateContentInput } from '../lib/pocketbase.js'
+import type { OutputFormat } from '../lib/cli-utils.js'
 import type { ContentFKNames } from '../lib/content-service.js'
-import pc from 'picocolors'
+import type { UpdateContentInput } from '../lib/pocketbase.js'
+import type { PrepareAddInput, PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
 import Table from 'cli-table3'
+import pc from 'picocolors'
 import {
-  type OutputFormat,
+  formatErrorsText,
+  formatWarnings,
+
+  VALID_AUTOMATION_LEVELS,
   VALID_CONTENT_TYPES,
   VALID_STATUSES,
-  VALID_AUTOMATION_LEVELS,
-  formatWarnings,
-  formatErrorsText
 } from '../lib/cli-utils.js'
 
 // Re-export OutputFormat for consumers
@@ -80,7 +81,8 @@ export function parseAddArgs(raw: RawAddArgs): AddCommandArgs {
 
   if (!raw.type) {
     errors.push('Content type is required (--type validation|hardening)')
-  } else if (!VALID_CONTENT_TYPES.includes(raw.type as any)) {
+  }
+  else if (!VALID_CONTENT_TYPES.includes(raw.type as any)) {
     errors.push('Content type must be "validation" or "hardening"')
   }
 
@@ -95,27 +97,38 @@ export function parseAddArgs(raw: RawAddArgs): AddCommandArgs {
 
   // Build FK names
   const fkNames: ContentFKNames = {}
-  if (raw.vendor) fkNames.vendor = raw.vendor
-  if (raw.standard) fkNames.standard = raw.standard
-  if (raw.technology) fkNames.technology = raw.technology
-  if (raw.target) fkNames.target = raw.target
-  if (raw.maintainer) fkNames.maintainer = raw.maintainer
+  if (raw.vendor)
+    fkNames.vendor = raw.vendor
+  if (raw.standard)
+    fkNames.standard = raw.standard
+  if (raw.technology)
+    fkNames.technology = raw.technology
+  if (raw.target)
+    fkNames.target = raw.target
+  if (raw.maintainer)
+    fkNames.maintainer = raw.maintainer
 
   // Build overrides
   const overrides: PrepareAddInput['overrides'] = {}
-  if (raw.name) overrides.name = raw.name
-  if (raw.slug) overrides.slug = raw.slug
-  if (raw.version) overrides.version = raw.version
-  if (raw.status) overrides.status = raw.status as any
-  if (raw.controlCount) overrides.controlCount = parseInt(raw.controlCount, 10)
-  if (raw.automationLevel) overrides.automationLevel = raw.automationLevel as any
+  if (raw.name)
+    overrides.name = raw.name
+  if (raw.slug)
+    overrides.slug = raw.slug
+  if (raw.version)
+    overrides.version = raw.version
+  if (raw.status)
+    overrides.status = raw.status as any
+  if (raw.controlCount)
+    overrides.controlCount = Number.parseInt(raw.controlCount, 10)
+  if (raw.automationLevel)
+    overrides.automationLevel = raw.automationLevel as any
 
   return {
     githubUrl: raw.url || '',
     contentType: (raw.type as 'validation' | 'hardening') || 'validation',
     fkNames: Object.keys(fkNames).length > 0 ? fkNames : undefined,
     overrides: Object.keys(overrides).length > 0 ? overrides : undefined,
-    errors
+    errors,
   }
 }
 
@@ -136,11 +149,16 @@ export function parseUpdateArgs(raw: RawUpdateArgs): UpdateCommandArgs {
 
   // Build updates
   const updates: Partial<UpdateContentInput> = {}
-  if (raw.name) updates.name = raw.name
-  if (raw.description) updates.description = raw.description
-  if (raw.version) updates.version = raw.version
-  if (raw.status) updates.status = raw.status as any
-  if (raw.controlCount) updates.controlCount = parseInt(raw.controlCount, 10)
+  if (raw.name)
+    updates.name = raw.name
+  if (raw.description)
+    updates.description = raw.description
+  if (raw.version)
+    updates.version = raw.version
+  if (raw.status)
+    updates.status = raw.status as any
+  if (raw.controlCount)
+    updates.controlCount = Number.parseInt(raw.controlCount, 10)
 
   // Check if any updates or syncReadme specified
   const hasUpdates = Object.keys(updates).length > 0 || raw.syncReadme
@@ -153,7 +171,7 @@ export function parseUpdateArgs(raw: RawUpdateArgs): UpdateCommandArgs {
     id: raw.id,
     updates: Object.keys(updates).length > 0 ? updates : undefined,
     syncReadme: raw.syncReadme,
-    errors
+    errors,
   }
 }
 
@@ -170,7 +188,7 @@ export function formatAddResult(result: PrepareAddResult, format: OutputFormat):
       success: result.success,
       content: result.content,
       warnings: result.warnings,
-      errors: result.errors
+      errors: result.errors,
     }, null, 2)
   }
 
@@ -219,7 +237,7 @@ export function formatAddResult(result: PrepareAddResult, format: OutputFormat):
 export function formatUpdateResult(
   result: PrepareUpdateResult,
   id: string,
-  format: OutputFormat
+  format: OutputFormat,
 ): string {
   if (format === 'json') {
     return JSON.stringify({
@@ -228,7 +246,7 @@ export function formatUpdateResult(
       hasChanges: result.hasChanges,
       changes: result.diff?.changes || {},
       warnings: result.warnings,
-      errors: result.errors
+      errors: result.errors,
     }, null, 2)
   }
 
@@ -248,7 +266,8 @@ export function formatUpdateResult(
       for (const [field, change] of Object.entries(result.diff.changes)) {
         lines.push(`  ${field}: ${pc.red(String(change.old))} → ${pc.green(String(change.new))}`)
       }
-    } else {
+    }
+    else {
       lines.push(pc.yellow('No changes detected'))
     }
   }
@@ -273,7 +292,7 @@ export function formatUpdateResult(
  */
 export function formatListResult(
   records: Array<Record<string, any>>,
-  format: OutputFormat
+  format: OutputFormat,
 ): string {
   if (format === 'json') {
     return JSON.stringify(records, null, 2)
@@ -291,9 +310,9 @@ export function formatListResult(
       pc.bold('Type'),
       pc.bold('Target'),
       pc.bold('Standard'),
-      pc.bold('Version')
+      pc.bold('Version'),
     ],
-    colWidths: [12, 35, 12, 20, 10, 10]
+    colWidths: [12, 35, 12, 20, 10, 10],
   })
 
   for (const record of records) {
@@ -303,7 +322,7 @@ export function formatListResult(
       record.content_type || '-',
       record.expand?.target?.name?.substring(0, 18) || '-',
       record.expand?.standard?.short_name || '-',
-      record.version || '-'
+      record.version || '-',
     ])
   }
 

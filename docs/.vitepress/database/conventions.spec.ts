@@ -4,15 +4,15 @@
  * Tests for slug generation and naming convention functions
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  abbreviateTarget,
   abbreviateStandard,
+  abbreviateTarget,
   extractVersion,
   generateContentSlug,
   parseRepoName,
   slugify,
-  suggestSlugFromRepo
+  suggestSlugFromRepo,
 } from './conventions.js'
 
 describe('abbreviateTarget', () => {
@@ -150,7 +150,7 @@ describe('parseRepoName', () => {
     expect(result).toEqual({
       target: 'redhat-enterprise-linux-9',
       standard: 'stig',
-      type: 'baseline'
+      type: 'baseline',
     })
   })
 
@@ -161,7 +161,7 @@ describe('parseRepoName', () => {
       technology: 'ansible',
       target: 'redhat-enterprise-linux-9',
       standard: 'stig',
-      type: 'hardening'
+      type: 'hardening',
     })
   })
 
@@ -171,7 +171,7 @@ describe('parseRepoName', () => {
     expect(result).toEqual({
       target: 'ubuntu-22.04',
       standard: 'cis',
-      type: 'baseline'
+      type: 'baseline',
     })
   })
 
@@ -182,7 +182,7 @@ describe('parseRepoName', () => {
       technology: 'chef',
       target: 'ubuntu-22.04',
       standard: 'cis',
-      type: 'hardening'
+      type: 'hardening',
     })
   })
 

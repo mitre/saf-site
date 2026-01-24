@@ -1,15 +1,15 @@
+import { flushPromises, mount } from '@vue/test-utils'
 /**
  * Integration tests for the Content Browse flow
  *
  * Tests the full filtering pipeline:
  * ContentFilters → filter logic → ContentCard display
  */
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
-import { ref, computed, defineComponent, h } from 'vue'
-import ContentFilters from './ContentFilters.vue'
-import ContentCard from './ContentCard.vue'
+import { describe, expect, it } from 'vitest'
+import { computed, defineComponent, ref } from 'vue'
 import { createFuzzyMatcher } from '@/composables/useFuzzySearch'
+import ContentCard from './ContentCard.vue'
+import ContentFilters from './ContentFilters.vue'
 
 // Sample content items representing real data structure
 const sampleContent = [
@@ -24,7 +24,7 @@ const sampleContent = [
     technology_name: 'InSpec',
     vendor_name: 'MITRE',
     standard_name: 'DISA STIG',
-    standard_short_name: 'STIG'
+    standard_short_name: 'STIG',
   },
   {
     id: '2',
@@ -37,7 +37,7 @@ const sampleContent = [
     technology_name: 'Ansible',
     vendor_name: 'MITRE',
     standard_name: 'DISA STIG',
-    standard_short_name: 'STIG'
+    standard_short_name: 'STIG',
   },
   {
     id: '3',
@@ -50,7 +50,7 @@ const sampleContent = [
     technology_name: 'InSpec',
     vendor_name: 'CIS',
     standard_name: 'CIS Benchmark',
-    standard_short_name: 'CIS'
+    standard_short_name: 'CIS',
   },
   {
     id: '4',
@@ -63,7 +63,7 @@ const sampleContent = [
     technology_name: 'Chef',
     vendor_name: 'MITRE',
     standard_name: 'DISA STIG',
-    standard_short_name: 'STIG'
+    standard_short_name: 'STIG',
   },
   {
     id: '5',
@@ -76,8 +76,8 @@ const sampleContent = [
     technology_name: 'InSpec',
     vendor_name: 'MITRE',
     standard_name: 'DISA STIG',
-    standard_short_name: 'STIG'
-  }
+    standard_short_name: 'STIG',
+  },
 ]
 
 /**
@@ -150,7 +150,7 @@ const ContentBrowseWrapper = defineComponent({
       selectedVendor,
       selectedStandard,
       searchQuery,
-      clearAllFilters
+      clearAllFilters,
     }
   },
   template: `
@@ -182,20 +182,20 @@ const ContentBrowseWrapper = defineComponent({
         />
       </div>
     </div>
-  `
+  `,
 })
 
-describe('Content Browse Integration', () => {
+describe('content Browse Integration', () => {
   const mountBrowse = () => {
     return mount(ContentBrowseWrapper, {
       global: {
         stubs: {
           // Stub router-link since we're not in a router context
           'router-link': {
-            template: '<a><slot /></a>'
-          }
-        }
-      }
+            template: '<a><slot /></a>',
+          },
+        },
+      },
     })
   }
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import ValidateIcon from './pillars/ValidateIcon.vue'
 import HardenIcon from './pillars/HardenIcon.vue'
-import PlanIcon from './pillars/PlanIcon.vue'
 import NormalizeIcon from './pillars/NormalizeIcon.vue'
+import PlanIcon from './pillars/PlanIcon.vue'
+import ValidateIcon from './pillars/ValidateIcon.vue'
 import VisualizeIcon from './pillars/VisualizeIcon.vue'
 
 export type PillarType = 'validate' | 'harden' | 'plan' | 'normalize' | 'visualize'
@@ -19,7 +19,7 @@ const iconComponent = computed(() => {
     harden: HardenIcon,
     plan: PlanIcon,
     normalize: NormalizeIcon,
-    visualize: VisualizeIcon
+    visualize: VisualizeIcon,
   }
   return icons[props.pillar]
 })

@@ -5,10 +5,9 @@
  * Handles building content records, resolving FKs, and diffing changes.
  */
 
-import type { RepoInfo, InspecProfile } from './github.js'
-import { generateSlug, extractControlCount } from './github.js'
-import type { FkMaps } from './pocketbase.js'
-import type { CreateContentInput } from './pocketbase.js'
+import type { InspecProfile, RepoInfo } from './github.js'
+import type { CreateContentInput, FkMaps } from './pocketbase.js'
+import { extractControlCount, generateSlug } from './github.js'
 
 // ============================================================================
 // TYPES
@@ -77,9 +76,11 @@ export function buildContentFromRepo(repoData: RepoData): CreateContentInput {
   let name: string
   if (inspecProfile?.title) {
     name = inspecProfile.title
-  } else if (repoInfo.description) {
+  }
+  else if (repoInfo.description) {
     name = repoInfo.description
-  } else {
+  }
+  else {
     name = repoInfo.repo
   }
 
@@ -104,16 +105,22 @@ export function buildContentFromRepo(repoData: RepoData): CreateContentInput {
     slug,
     contentType,
     status: 'active',
-    github: repoInfo.htmlUrl
+    github: repoInfo.htmlUrl,
   }
 
   // Add optional fields if present
-  if (description) content.description = description
-  if (version) content.version = version
-  if (license) content.license = license
-  if (controlCount) content.controlCount = controlCount
-  if (readme) content.readmeMarkdown = readme
-  if (automationLevel) content.automationLevel = automationLevel
+  if (description)
+    content.description = description
+  if (version)
+    content.version = version
+  if (license)
+    content.license = license
+  if (controlCount)
+    content.controlCount = controlCount
+  if (readme)
+    content.readmeMarkdown = readme
+  if (automationLevel)
+    content.automationLevel = automationLevel
 
   return content
 }
@@ -126,12 +133,12 @@ export function buildContentFromRepo(repoData: RepoData): CreateContentInput {
  * FK field configuration for resolution
  * Maps fkNames field to the corresponding fkMaps collection
  */
-const FK_FIELD_CONFIG: Array<{ field: keyof ContentFKNames; mapKey: keyof FkMaps }> = [
+const FK_FIELD_CONFIG: Array<{ field: keyof ContentFKNames, mapKey: keyof FkMaps }> = [
   { field: 'vendor', mapKey: 'organizations' },
   { field: 'standard', mapKey: 'standards' },
   { field: 'technology', mapKey: 'technologies' },
   { field: 'target', mapKey: 'targets' },
-  { field: 'maintainer', mapKey: 'teams' }
+  { field: 'maintainer', mapKey: 'teams' },
 ]
 
 /**
@@ -139,9 +146,10 @@ const FK_FIELD_CONFIG: Array<{ field: keyof ContentFKNames; mapKey: keyof FkMaps
  */
 function resolveSingleFK(
   name: string | undefined,
-  fkMap: Map<string, string>
+  fkMap: Map<string, string>,
 ): string | undefined {
-  if (!name) return undefined
+  if (!name)
+    return undefined
   return fkMap.get(name.toLowerCase())
 }
 
@@ -153,7 +161,8 @@ export function resolveContentFKs(fkNames: ContentFKNames, fkMaps: FkMaps): Reso
 
   for (const { field, mapKey } of FK_FIELD_CONFIG) {
     const id = resolveSingleFK(fkNames[field], fkMaps[mapKey])
-    if (id) result[field] = id
+    if (id)
+      result[field] = id
   }
 
   return result
@@ -164,7 +173,7 @@ export function resolveContentFKs(fkNames: ContentFKNames, fkMaps: FkMaps): Reso
  */
 export function checkUnresolvedFKs(
   fkNames: ContentFKNames,
-  resolvedFKs: ResolvedFKs
+  resolvedFKs: ResolvedFKs,
 ): string[] {
   const warnings: string[] = []
 
@@ -196,7 +205,7 @@ const snakeToCamelMap: Record<string, string> = {
   benchmark_version: 'benchmarkVersion',
   automation_level: 'automationLevel',
   is_featured: 'isFeatured',
-  featured_order: 'featuredOrder'
+  featured_order: 'featuredOrder',
 }
 
 /**
@@ -204,7 +213,7 @@ const snakeToCamelMap: Record<string, string> = {
  */
 export function diffContent(
   existing: Record<string, unknown>,
-  updated: Partial<CreateContentInput>
+  updated: Partial<CreateContentInput>,
 ): ContentDiff {
   const changes: Record<string, FieldChange> = {}
 
@@ -233,7 +242,7 @@ export function diffContent(
     'standard',
     'technology',
     'vendor',
-    'maintainer'
+    'maintainer',
   ]
 
   // Build reverse mapping (camelCase to snake_case)
@@ -247,7 +256,8 @@ export function diffContent(
     const updatedValue = updated[field as keyof CreateContentInput]
 
     // Skip if not provided in update
-    if (updatedValue === undefined) continue
+    if (updatedValue === undefined)
+      continue
 
     // Get existing value (may be snake_case)
     const snakeField = camelToSnakeMap[field] || field
@@ -257,13 +267,13 @@ export function diffContent(
     if (existingValue !== updatedValue) {
       changes[field] = {
         old: existingValue,
-        new: updatedValue
+        new: updatedValue,
       }
     }
   }
 
   return {
     hasChanges: Object.keys(changes).length > 0,
-    changes
+    changes,
   }
 }

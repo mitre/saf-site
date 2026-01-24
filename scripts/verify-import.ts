@@ -29,7 +29,7 @@ console.log(`  Tools: ${tools.length}`)
 // Check a sample profile with FK expansion
 console.log('\nSample profile with FK expansion:')
 const sampleProfile = await pb.collection('profiles').getFirstListItem('', {
-  expand: 'organization,team,technology,standard'
+  expand: 'organization,team,technology,standard',
 })
 console.log(`  Name: ${sampleProfile.name}`)
 console.log(`  Organization: ${(sampleProfile.expand?.organization as any)?.name}`)

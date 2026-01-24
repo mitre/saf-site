@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { ref } from 'vue'
-import { useFuzzySearch, createFuzzyMatcher } from './useFuzzySearch'
+import { createFuzzyMatcher, useFuzzySearch } from './useFuzzySearch'
 
 // Sample content items for testing
 const sampleItems = [
@@ -11,7 +11,7 @@ const sampleItems = [
     target_name: 'Red Hat Enterprise Linux 8',
     standard_name: 'DISA STIG',
     technology_name: 'InSpec',
-    vendor_name: 'MITRE'
+    vendor_name: 'MITRE',
   },
   {
     id: '2',
@@ -20,7 +20,7 @@ const sampleItems = [
     target_name: 'MySQL 8.0',
     standard_name: 'CIS Benchmark',
     technology_name: 'Ansible',
-    vendor_name: 'CIS'
+    vendor_name: 'CIS',
   },
   {
     id: '3',
@@ -29,7 +29,7 @@ const sampleItems = [
     target_name: 'Windows Server 2019',
     standard_name: 'DISA STIG',
     technology_name: 'Chef',
-    vendor_name: 'MITRE'
+    vendor_name: 'MITRE',
   },
   {
     id: '4',
@@ -38,8 +38,8 @@ const sampleItems = [
     target_name: 'Amazon Linux 2',
     standard_name: 'AWS Best Practices',
     technology_name: 'InSpec',
-    vendor_name: 'AWS'
-  }
+    vendor_name: 'AWS',
+  },
 ]
 
 describe('useFuzzySearch', () => {
@@ -84,7 +84,7 @@ describe('useFuzzySearch', () => {
       expect(result.value.length).toBeGreaterThan(0)
       // Should match either name or description containing RHEL
       const hasRhelMatch = result.value.some(
-        item => item.name.includes('Red Hat') || item.description?.includes('RHEL')
+        item => item.name.includes('Red Hat') || item.description?.includes('RHEL'),
       )
       expect(hasRhelMatch).toBe(true)
     })

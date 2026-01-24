@@ -4,15 +4,15 @@
  * TDD tests for GitHub API integration functions
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  parseGitHubUrl,
-  generateSlug,
   extractControlCount,
-  fetchRepoInfo,
-  fetchRawFile,
   fetchInspecYml,
-  fetchReadme
+  fetchRawFile,
+  fetchReadme,
+  fetchRepoInfo,
+  generateSlug,
+  parseGitHubUrl,
 } from './github.js'
 
 describe('parseGitHubUrl', () => {
@@ -20,7 +20,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline')
     expect(result).toEqual({
       owner: 'mitre',
-      repo: 'redhat-enterprise-linux-9-stig-baseline'
+      repo: 'redhat-enterprise-linux-9-stig-baseline',
     })
   })
 
@@ -28,7 +28,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('https://github.com/mitre/inspec-profile.git')
     expect(result).toEqual({
       owner: 'mitre',
-      repo: 'inspec-profile'
+      repo: 'inspec-profile',
     })
   })
 
@@ -36,7 +36,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('https://github.com/mitre/my-profile/')
     expect(result).toEqual({
       owner: 'mitre',
-      repo: 'my-profile'
+      repo: 'my-profile',
     })
   })
 
@@ -44,7 +44,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('https://github.com/mitre/my-profile/tree/main')
     expect(result).toEqual({
       owner: 'mitre',
-      repo: 'my-profile'
+      repo: 'my-profile',
     })
   })
 
@@ -52,7 +52,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('mitre/my-baseline')
     expect(result).toEqual({
       owner: 'mitre',
-      repo: 'my-baseline'
+      repo: 'my-baseline',
     })
   })
 
@@ -60,7 +60,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('http://github.com/owner/repo')
     expect(result).toEqual({
       owner: 'owner',
-      repo: 'repo'
+      repo: 'repo',
     })
   })
 
@@ -74,7 +74,7 @@ describe('parseGitHubUrl', () => {
     const result = parseGitHubUrl('https://github.com/org-name/repo_with.special-chars')
     expect(result).toEqual({
       owner: 'org-name',
-      repo: 'repo_with.special-chars'
+      repo: 'repo_with.special-chars',
     })
   })
 })
@@ -170,8 +170,8 @@ describe('fetchRepoInfo', () => {
         default_branch: 'main',
         license: { spdx_id: 'Apache-2.0' },
         topics: ['inspec', 'stig'],
-        html_url: 'https://github.com/mitre/test-profile'
-      })
+        html_url: 'https://github.com/mitre/test-profile',
+      }),
     })
 
     const result = await fetchRepoInfo('mitre', 'test-profile')
@@ -184,7 +184,7 @@ describe('fetchRepoInfo', () => {
       defaultBranch: 'main',
       license: 'Apache-2.0',
       topics: ['inspec', 'stig'],
-      htmlUrl: 'https://github.com/mitre/test-profile'
+      htmlUrl: 'https://github.com/mitre/test-profile',
     })
   })
 
@@ -197,8 +197,8 @@ describe('fetchRepoInfo', () => {
         default_branch: 'main',
         license: null,
         topics: [],
-        html_url: 'https://github.com/mitre/test'
-      })
+        html_url: 'https://github.com/mitre/test',
+      }),
     })
 
     const result = await fetchRepoInfo('mitre', 'test')
@@ -212,11 +212,12 @@ describe('fetchRepoInfo', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
-      statusText: 'Not Found'
+      statusText: 'Not Found',
     })
 
     await expect(fetchRepoInfo('mitre', 'nonexistent'))
-      .rejects.toThrow('GitHub API error: 404 Not Found')
+      .rejects
+      .toThrow('GitHub API error: 404 Not Found')
   })
 
   it('includes authorization header when GITHUB_TOKEN is set', async () => {
@@ -230,8 +231,8 @@ describe('fetchRepoInfo', () => {
         default_branch: 'main',
         license: null,
         topics: [],
-        html_url: 'https://github.com/mitre/test'
-      })
+        html_url: 'https://github.com/mitre/test',
+      }),
     })
 
     await fetchRepoInfo('mitre', 'test')
@@ -240,9 +241,9 @@ describe('fetchRepoInfo', () => {
       expect.any(String),
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: 'Bearer test-token'
-        })
-      })
+          Authorization: 'Bearer test-token',
+        }),
+      }),
     )
 
     delete process.env.GITHUB_TOKEN
@@ -264,7 +265,7 @@ describe('fetchRawFile', () => {
   it('fetches file content', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => 'file content here'
+      text: async () => 'file content here',
     })
 
     const result = await fetchRawFile('mitre', 'test', 'README.md')
@@ -272,21 +273,21 @@ describe('fetchRawFile', () => {
     expect(result).toBe('file content here')
     expect(mockFetch).toHaveBeenCalledWith(
       'https://api.github.com/repos/mitre/test/contents/README.md?ref=main',
-      expect.any(Object)
+      expect.any(Object),
     )
   })
 
   it('uses specified branch', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => 'content'
+      text: async () => 'content',
     })
 
     await fetchRawFile('mitre', 'test', 'file.txt', 'develop')
 
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('ref=develop'),
-      expect.any(Object)
+      expect.any(Object),
     )
   })
 
@@ -296,7 +297,7 @@ describe('fetchRawFile', () => {
     // Second call (master) succeeds
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => 'found on master'
+      text: async () => 'found on master',
     })
 
     const result = await fetchRawFile('mitre', 'test', 'README.md')
@@ -337,7 +338,7 @@ summary: A test profile
 `
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => inspecContent
+      text: async () => inspecContent,
     })
 
     const result = await fetchInspecYml('mitre', 'test')
@@ -348,7 +349,7 @@ summary: A test profile
       version: '1.2.3',
       maintainer: 'MITRE SAF Team',
       license: 'Apache-2.0',
-      summary: 'A test profile'
+      summary: 'A test profile',
     })
   })
 
@@ -363,7 +364,7 @@ summary: A test profile
   it('returns null for invalid YAML', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => 'invalid: yaml: content: here:'
+      text: async () => 'invalid: yaml: content: here:',
     })
 
     const result = await fetchInspecYml('mitre', 'test')
@@ -389,7 +390,7 @@ describe('fetchReadme', () => {
   it('fetches README.md', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => '# My Profile\n\nDescription here.'
+      text: async () => '# My Profile\n\nDescription here.',
     })
 
     const result = await fetchReadme('mitre', 'test')
@@ -404,7 +405,7 @@ describe('fetchReadme', () => {
     // readme.md succeeds
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      text: async () => '# Found it'
+      text: async () => '# Found it',
     })
 
     const result = await fetchReadme('mitre', 'test')

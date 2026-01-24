@@ -4,21 +4,21 @@
  * Provides authenticated access to the Pocketbase API
  */
 
-import PocketBase, { RecordModel } from 'pocketbase'
+import type { RecordModel } from 'pocketbase'
 import pc from 'picocolors'
-import { contentInputSchema } from '@schema/schemas.js'
+import PocketBase from 'pocketbase'
 import { z } from 'zod'
 import {
-  slugSchema,
-  optionalSlugSchema,
-  optionalSemverSchema,
+  contentTypeSchema,
+  controlCountSchema,
+  descriptionSchema,
+  githubUrlSchema,
   nameSchema,
   optionalNameSchema,
-  descriptionSchema,
-  contentTypeSchema,
+  optionalSemverSchema,
+  optionalSlugSchema,
+  slugSchema,
   statusSchema,
-  githubUrlSchema,
-  controlCountSchema
 } from './validation-schemas.js'
 
 // Default credentials for local development
@@ -44,7 +44,8 @@ export async function getPocketBase(): Promise<PocketBase> {
 
   try {
     await pbInstance.collection('_superusers').authWithPassword(email, password)
-  } catch (error) {
+  }
+  catch (error) {
     console.error(pc.red('Failed to authenticate with Pocketbase'))
     console.error(pc.dim('Make sure Pocketbase is running: cd .pocketbase && ./pocketbase serve'))
     throw error
@@ -61,7 +62,8 @@ export async function checkConnection(): Promise<boolean> {
     const pb = await getPocketBase()
     await pb.health.check()
     return true
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -72,7 +74,7 @@ export async function checkConnection(): Promise<boolean> {
  * These help resolve human-readable names to Pocketbase IDs
  */
 export interface FkMaps {
-  organizations: Map<string, string>  // name -> id
+  organizations: Map<string, string> // name -> id
   teams: Map<string, string>
   standards: Map<string, string>
   technologies: Map<string, string>
@@ -85,7 +87,7 @@ export interface FkMaps {
 /**
  * Create a lowercase name → ID map from records
  */
-function createLowerCaseIdMap(records: Array<{ name: string; id: string }>): Map<string, string> {
+function createLowerCaseIdMap(records: Array<{ name: string, id: string }>): Map<string, string> {
   return new Map(records.map(r => [r.name.toLowerCase(), r.id]))
 }
 
@@ -103,7 +105,7 @@ export async function loadFkMaps(): Promise<FkMaps> {
     targets,
     categories,
     capabilities,
-    tags
+    tags,
   ] = await Promise.all([
     pb.collection('organizations').getFullList(),
     pb.collection('teams').getFullList(),
@@ -112,7 +114,7 @@ export async function loadFkMaps(): Promise<FkMaps> {
     pb.collection('targets').getFullList(),
     pb.collection('categories').getFullList(),
     pb.collection('capabilities').getFullList(),
-    pb.collection('tags').getFullList()
+    pb.collection('tags').getFullList(),
   ])
 
   return {
@@ -123,7 +125,7 @@ export async function loadFkMaps(): Promise<FkMaps> {
     targets: createLowerCaseIdMap(targets),
     categories: createLowerCaseIdMap(categories),
     capabilities: createLowerCaseIdMap(capabilities),
-    tags: createLowerCaseIdMap(tags)
+    tags: createLowerCaseIdMap(tags),
   }
 }
 
@@ -235,7 +237,7 @@ function toSnakeCase(input: CreateContentInput | UpdateContentInput): Record<str
     benchmarkVersion: 'benchmark_version',
     automationLevel: 'automation_level',
     isFeatured: 'is_featured',
-    featuredOrder: 'featured_order'
+    featuredOrder: 'featured_order',
   }
 
   for (const [key, value] of Object.entries(input)) {
@@ -259,11 +261,11 @@ const createContentValidation = z.object({
   version: optionalSemverSchema,
   status: statusSchema.optional(),
   github: githubUrlSchema,
-  controlCount: controlCountSchema
+  controlCount: controlCountSchema,
 }).passthrough().meta({
   id: 'create_content_input',
   title: 'Create Content Input',
-  description: 'Validation schema for creating new content via CLI'
+  description: 'Validation schema for creating new content via CLI',
 })
 
 /**
@@ -274,11 +276,11 @@ const updateContentValidation = z.object({
   slug: optionalSlugSchema,
   contentType: contentTypeSchema.optional(),
   version: optionalSemverSchema,
-  status: statusSchema.optional()
+  status: statusSchema.optional(),
 }).passthrough().meta({
   id: 'update_content_input',
   title: 'Update Content Input',
-  description: 'Validation schema for updating content via CLI'
+  description: 'Validation schema for updating content via CLI',
 })
 
 /**
@@ -287,7 +289,7 @@ const updateContentValidation = z.object({
 export async function getContentBySlug(
   slug: string,
   pb: PocketBase,
-  options: GetContentOptions = {}
+  options: GetContentOptions = {},
 ): Promise<RecordModel | null> {
   try {
     const queryOptions: Record<string, string> = {}
@@ -298,9 +300,10 @@ export async function getContentBySlug(
 
     return await pb.collection('content').getFirstListItem(
       `slug = "${slug}"`,
-      queryOptions
+      queryOptions,
     )
-  } catch {
+  }
+  catch {
     return null
   }
 }
@@ -310,7 +313,7 @@ export async function getContentBySlug(
  */
 export async function listContent(
   options: ListContentOptions,
-  pb: PocketBase
+  pb: PocketBase,
 ): Promise<RecordModel[]> {
   const filters: string[] = []
 
@@ -323,7 +326,7 @@ export async function listContent(
   }
 
   const queryOptions: Record<string, string> = {
-    sort: options.sort || 'name'
+    sort: options.sort || 'name',
   }
 
   if (filters.length > 0) {
@@ -342,7 +345,7 @@ export async function listContent(
  */
 export async function createContent(
   input: CreateContentInput,
-  pb: PocketBase
+  pb: PocketBase,
 ): Promise<RecordModel> {
   // Validate input
   const validationResult = createContentValidation.safeParse(input)
@@ -362,7 +365,7 @@ export async function createContent(
 export async function updateContent(
   id: string,
   input: UpdateContentInput,
-  pb: PocketBase
+  pb: PocketBase,
 ): Promise<RecordModel> {
   // Validate input
   const validationResult = updateContentValidation.safeParse(input)

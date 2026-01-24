@@ -26,13 +26,13 @@ const slugSchema = z.string()
   .max(100, 'Slug must be at most 100 characters')
   .regex(slugPattern, 'Slug must be lowercase alphanumeric with hyphens')
   .refine(
-    (slug) => !slug.includes('--'),
-    'Slug cannot contain consecutive hyphens'
+    slug => !slug.includes('--'),
+    'Slug cannot contain consecutive hyphens',
   )
   .meta({
     id: 'slug',
     title: 'Slug',
-    description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens, no consecutive hyphens.'
+    description: 'URL-friendly identifier. Lowercase alphanumeric with hyphens, no consecutive hyphens.',
   })
 
 /**
@@ -41,7 +41,7 @@ const slugSchema = z.string()
 const urlSchema = z.string().url().optional().meta({
   id: 'url',
   title: 'URL',
-  description: 'Valid URL (optional)'
+  description: 'Valid URL (optional)',
 })
 
 /**
@@ -49,7 +49,7 @@ const urlSchema = z.string().url().optional().meta({
  * Examples: 1.0.0, 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0+build, 1.0.0-beta+build
  * See: https://semver.org/
  */
-const semverPattern = /^\d+\.\d+\.\d+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$/
+const semverPattern = /^\d+\.\d+\.\d+(-[0-9A-Z-]+(\.[0-9A-Z-]+)*)?(\+[0-9A-Z-]+(\.[0-9A-Z-]+)*)?$/i
 
 // ============================================================================
 // ENUMS
@@ -59,42 +59,42 @@ export const orgTypeEnum = z.enum(['vendor', 'government', 'community', 'standar
   .meta({
     id: 'org_type',
     title: 'Organization Type',
-    description: 'Classification of organization: vendor (commercial), government, community (open source), or standards_body'
+    description: 'Classification of organization: vendor (commercial), government, community (open source), or standards_body',
   })
 
 export const standardTypeEnum = z.enum(['regulatory', 'industry', 'government'])
   .meta({
     id: 'standard_type',
     title: 'Standard Type',
-    description: 'Classification of security standard: regulatory (compliance mandated), industry (best practices), or government (agency-specific)'
+    description: 'Classification of security standard: regulatory (compliance mandated), industry (best practices), or government (agency-specific)',
   })
 
 export const tagCategoryEnum = z.enum(['platform', 'compliance', 'feature', 'technology'])
   .meta({
     id: 'tag_category',
     title: 'Tag Category',
-    description: 'Classification of tag: platform (OS/cloud), compliance (standards), feature (capabilities), or technology (tools)'
+    description: 'Classification of tag: platform (OS/cloud), compliance (standards), feature (capabilities), or technology (tools)',
   })
 
 export const contentTypeEnum = z.enum(['validation', 'hardening'])
   .meta({
     id: 'content_type',
     title: 'Content Type',
-    description: 'Type of security content: validation (InSpec profiles for testing) or hardening (Ansible/Chef for remediation)'
+    description: 'Type of security content: validation (InSpec profiles for testing) or hardening (Ansible/Chef for remediation)',
   })
 
 export const statusEnum = z.enum(['active', 'beta', 'deprecated', 'draft'])
   .meta({
     id: 'status',
     title: 'Publication Status',
-    description: 'Lifecycle status: active (production-ready), beta (testing), deprecated (legacy), or draft (work-in-progress)'
+    description: 'Lifecycle status: active (production-ready), beta (testing), deprecated (legacy), or draft (work-in-progress)',
   })
 
 export const automationLevelEnum = z.enum(['full', 'partial', 'manual'])
   .meta({
     id: 'automation_level',
     title: 'Automation Level',
-    description: 'Degree of automation: full (no manual steps), partial (some manual steps), or manual (requires human intervention)'
+    description: 'Degree of automation: full (no manual steps), partial (some manual steps), or manual (requires human intervention)',
   })
 
 // ============================================================================
@@ -104,39 +104,39 @@ export const automationLevelEnum = z.enum(['full', 'partial', 'manual'])
 export const organizationSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Display name of the organization'
+    description: 'Display name of the organization',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of the organization and its role in security'
+    description: 'Brief description of the organization and its role in security',
   }),
   website: urlSchema.meta({
     title: 'Website',
-    description: 'Primary website URL'
+    description: 'Primary website URL',
   }),
   logo: urlSchema.meta({
     title: 'Logo URL',
-    description: 'URL to organization logo image'
+    description: 'URL to organization logo image',
   }),
   orgType: orgTypeEnum.optional().meta({
     title: 'Organization Type',
-    description: 'Classification of the organization'
-  })
+    description: 'Classification of the organization',
+  }),
 }).meta({
   id: 'organization',
   title: 'Organization',
-  description: 'An organization that creates, maintains, or sponsors security content (e.g., MITRE, CIS, DISA)'
+  description: 'An organization that creates, maintains, or sponsors security content (e.g., MITRE, CIS, DISA)',
 })
 
 export const organizationInputSchema = organizationSchema.omit({ id: true }).meta({
   id: 'organization_input',
   title: 'Organization Input',
-  description: 'Schema for creating a new organization (excludes auto-generated ID)'
+  description: 'Schema for creating a new organization (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -146,43 +146,43 @@ export const organizationInputSchema = organizationSchema.omit({ id: true }).met
 export const targetSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Display name of the target system'
+    description: 'Display name of the target system',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of the target system'
+    description: 'Brief description of the target system',
   }),
   category: z.string().optional().meta({
     title: 'Category',
-    description: 'FK to categories collection (e.g., operating-system, database, cloud)'
+    description: 'FK to categories collection (e.g., operating-system, database, cloud)',
   }),
   vendor: z.string().optional().meta({
     title: 'Vendor',
-    description: 'FK to organizations collection (the vendor/creator of this target)'
+    description: 'FK to organizations collection (the vendor/creator of this target)',
   }),
   website: urlSchema.meta({
     title: 'Website',
-    description: 'Official product/project website'
+    description: 'Official product/project website',
   }),
   logo: urlSchema.meta({
     title: 'Logo URL',
-    description: 'URL to target system logo image'
-  })
+    description: 'URL to target system logo image',
+  }),
 }).meta({
   id: 'target',
   title: 'Target',
-  description: 'A system, platform, or application that can be secured (e.g., RHEL 9, PostgreSQL, AWS)'
+  description: 'A system, platform, or application that can be secured (e.g., RHEL 9, PostgreSQL, AWS)',
 })
 
 export const targetInputSchema = targetSchema.omit({ id: true }).meta({
   id: 'target_input',
   title: 'Target Input',
-  description: 'Schema for creating a new target (excludes auto-generated ID)'
+  description: 'Schema for creating a new target (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -192,47 +192,47 @@ export const targetInputSchema = targetSchema.omit({ id: true }).meta({
 export const standardSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Full name of the security standard'
+    description: 'Full name of the security standard',
   }),
   shortName: z.string().optional().meta({
     title: 'Short Name',
-    description: 'Abbreviated name (e.g., STIG, CIS, NIST)'
+    description: 'Abbreviated name (e.g., STIG, CIS, NIST)',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of the standard and its purpose'
+    description: 'Brief description of the standard and its purpose',
   }),
   website: urlSchema.meta({
     title: 'Website',
-    description: 'Official standard documentation URL'
+    description: 'Official standard documentation URL',
   }),
   logo: urlSchema.meta({
     title: 'Logo URL',
-    description: 'URL to standard/organization logo'
+    description: 'URL to standard/organization logo',
   }),
   organization: z.string().optional().meta({
     title: 'Organization',
-    description: 'FK to organizations collection (the body that publishes this standard)'
+    description: 'FK to organizations collection (the body that publishes this standard)',
   }),
   standardType: standardTypeEnum.optional().meta({
     title: 'Standard Type',
-    description: 'Classification of the standard'
-  })
+    description: 'Classification of the standard',
+  }),
 }).meta({
   id: 'standard',
   title: 'Standard',
-  description: 'A security standard or benchmark (e.g., DISA STIG, CIS Benchmark, NIST 800-53)'
+  description: 'A security standard or benchmark (e.g., DISA STIG, CIS Benchmark, NIST 800-53)',
 })
 
 export const standardInputSchema = standardSchema.omit({ id: true }).meta({
   id: 'standard_input',
   title: 'Standard Input',
-  description: 'Schema for creating a new standard (excludes auto-generated ID)'
+  description: 'Schema for creating a new standard (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -242,55 +242,55 @@ export const standardInputSchema = standardSchema.omit({ id: true }).meta({
 export const technologySchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Display name of the technology'
+    description: 'Display name of the technology',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of the technology and its use in security'
+    description: 'Brief description of the technology and its use in security',
   }),
   website: urlSchema.meta({
     title: 'Website',
-    description: 'Official project/product website'
+    description: 'Official project/product website',
   }),
   logo: urlSchema.meta({
     title: 'Logo URL',
-    description: 'URL to technology logo image'
+    description: 'URL to technology logo image',
   }),
   github: urlSchema.meta({
     title: 'GitHub URL',
-    description: 'GitHub repository URL (if open source)'
+    description: 'GitHub repository URL (if open source)',
   }),
   organization: z.string().optional().meta({
     title: 'Organization',
-    description: 'FK to organizations collection (creator/maintainer)'
+    description: 'FK to organizations collection (creator/maintainer)',
   }),
   documentationUrl: urlSchema.meta({
     title: 'Documentation URL',
-    description: 'Link to official documentation'
+    description: 'Link to official documentation',
   }),
   quickStartTemplate: z.string().optional().meta({
     title: 'Quick Start Template',
-    description: 'Markdown template for quick start instructions'
+    description: 'Markdown template for quick start instructions',
   }),
   prerequisitesTemplate: z.string().optional().meta({
     title: 'Prerequisites Template',
-    description: 'Markdown template for prerequisites'
-  })
+    description: 'Markdown template for prerequisites',
+  }),
 }).meta({
   id: 'technology',
   title: 'Technology',
-  description: 'A tool or framework used for security automation (e.g., InSpec, Ansible, Chef, Terraform)'
+  description: 'A tool or framework used for security automation (e.g., InSpec, Ansible, Chef, Terraform)',
 })
 
 export const technologyInputSchema = technologySchema.omit({ id: true }).meta({
   id: 'technology_input',
   title: 'Technology Input',
-  description: 'Schema for creating a new technology (excludes auto-generated ID)'
+  description: 'Schema for creating a new technology (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -300,39 +300,39 @@ export const technologyInputSchema = technologySchema.omit({ id: true }).meta({
 export const teamSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Display name of the team'
+    description: 'Display name of the team',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of the team and its focus area'
+    description: 'Brief description of the team and its focus area',
   }),
   organization: z.string().optional().meta({
     title: 'Organization',
-    description: 'FK to organizations collection (parent organization)'
+    description: 'FK to organizations collection (parent organization)',
   }),
   website: urlSchema.meta({
     title: 'Website',
-    description: 'Team website or landing page'
+    description: 'Team website or landing page',
   }),
   logo: urlSchema.meta({
     title: 'Logo URL',
-    description: 'URL to team logo image'
-  })
+    description: 'URL to team logo image',
+  }),
 }).meta({
   id: 'team',
   title: 'Team',
-  description: 'A team that maintains security content (e.g., SAF Team, AWS Security Team)'
+  description: 'A team that maintains security content (e.g., SAF Team, AWS Security Team)',
 })
 
 export const teamInputSchema = teamSchema.omit({ id: true }).meta({
   id: 'team_input',
   title: 'Team Input',
-  description: 'Schema for creating a new team (excludes auto-generated ID)'
+  description: 'Schema for creating a new team (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -342,39 +342,39 @@ export const teamInputSchema = teamSchema.omit({ id: true }).meta({
 export const tagSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').meta({
     title: 'Name',
-    description: 'Internal tag name (used for filtering)'
+    description: 'Internal tag name (used for filtering)',
   }),
   slug: slugSchema,
   displayName: z.string().optional().meta({
     title: 'Display Name',
-    description: 'Human-friendly name shown in UI (defaults to name if not set)'
+    description: 'Human-friendly name shown in UI (defaults to name if not set)',
   }),
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description of what this tag represents'
+    description: 'Brief description of what this tag represents',
   }),
   tagCategory: tagCategoryEnum.optional().meta({
     title: 'Tag Category',
-    description: 'Classification of the tag for grouping'
+    description: 'Classification of the tag for grouping',
   }),
   badgeColor: z.string().optional().meta({
     title: 'Badge Color',
-    description: 'CSS color for the tag badge (e.g., #3b82f6, blue-500)'
-  })
+    description: 'CSS color for the tag badge (e.g., #3b82f6, blue-500)',
+  }),
 }).meta({
   id: 'tag',
   title: 'Tag',
-  description: 'A categorization tag for content items (e.g., kubernetes, aws, stig-ready)'
+  description: 'A categorization tag for content items (e.g., kubernetes, aws, stig-ready)',
 })
 
 export const tagInputSchema = tagSchema.omit({ id: true }).meta({
   id: 'tag_input',
   title: 'Tag Input',
-  description: 'Schema for creating a new tag (excludes auto-generated ID)'
+  description: 'Schema for creating a new tag (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -384,134 +384,134 @@ export const tagInputSchema = tagSchema.omit({ id: true }).meta({
 export const contentSchema = z.object({
   id: z.string().min(1).meta({
     title: 'ID',
-    description: 'Unique identifier (Pocketbase-generated)'
+    description: 'Unique identifier (Pocketbase-generated)',
   }),
   name: z.string().min(1, 'Name is required').max(200).meta({
     title: 'Name',
-    description: 'Display name of the content item'
+    description: 'Display name of the content item',
   }),
   slug: slugSchema,
   description: z.string().optional().meta({
     title: 'Description',
-    description: 'Brief description (shown in cards and search results)'
+    description: 'Brief description (shown in cards and search results)',
   }),
   longDescription: z.string().optional().meta({
     title: 'Long Description',
-    description: 'Detailed description (shown on detail page)'
+    description: 'Detailed description (shown on detail page)',
   }),
   version: z.string().regex(semverPattern, 'Version must be semver format (x.y.z[-prerelease][+build])').optional().meta({
     id: 'semver',
     title: 'Version',
-    description: 'Semantic version: MAJOR.MINOR.PATCH[-prerelease][+build]. See https://semver.org/'
+    description: 'Semantic version: MAJOR.MINOR.PATCH[-prerelease][+build]. See https://semver.org/',
   }),
 
   // Classification
   contentType: contentTypeEnum.meta({
     title: 'Content Type',
-    description: 'Type of security content'
+    description: 'Type of security content',
   }),
   status: statusEnum.optional().default('active').meta({
     title: 'Status',
-    description: 'Publication lifecycle status'
+    description: 'Publication lifecycle status',
   }),
 
   // Foreign Keys
   target: z.string().optional().meta({
     title: 'Target',
-    description: 'FK to targets collection (what system this content secures)'
+    description: 'FK to targets collection (what system this content secures)',
   }),
   standard: z.string().optional().meta({
     title: 'Standard',
-    description: 'FK to standards collection (what standard this implements)'
+    description: 'FK to standards collection (what standard this implements)',
   }),
   technology: z.string().optional().meta({
     title: 'Technology',
-    description: 'FK to technologies collection (what tool this uses)'
+    description: 'FK to technologies collection (what tool this uses)',
   }),
   vendor: z.string().optional().meta({
     title: 'Vendor',
-    description: 'FK to organizations collection (who created this)'
+    description: 'FK to organizations collection (who created this)',
   }),
   maintainer: z.string().optional().meta({
     title: 'Maintainer',
-    description: 'FK to teams collection (who maintains this)'
+    description: 'FK to teams collection (who maintains this)',
   }),
 
   // Links
   github: urlSchema.meta({
     title: 'GitHub URL',
-    description: 'GitHub repository URL'
+    description: 'GitHub repository URL',
   }),
   documentationUrl: urlSchema.meta({
     title: 'Documentation URL',
-    description: 'Link to external documentation'
+    description: 'Link to external documentation',
   }),
   referenceUrl: urlSchema.meta({
     title: 'Reference URL',
-    description: 'Link to reference material (e.g., STIG viewer)'
+    description: 'Link to reference material (e.g., STIG viewer)',
   }),
   readmeUrl: urlSchema.meta({
     title: 'README URL',
-    description: 'Direct link to README file (auto-populated from GitHub)'
+    description: 'Direct link to README file (auto-populated from GitHub)',
   }),
   readmeMarkdown: z.string().optional().meta({
     title: 'README Markdown',
-    description: 'Cached README content in markdown format'
+    description: 'Cached README content in markdown format',
   }),
 
   // Domain-specific (validation profiles)
   controlCount: z.number().int().positive().optional().meta({
     title: 'Control Count',
-    description: 'Number of controls/rules in this profile (validation only)'
+    description: 'Number of controls/rules in this profile (validation only)',
   }),
   stigId: z.string().optional().meta({
     title: 'STIG ID',
-    description: 'Official DISA STIG identifier (e.g., RHEL_9_STIG)'
+    description: 'Official DISA STIG identifier (e.g., RHEL_9_STIG)',
   }),
   benchmarkVersion: z.string().optional().meta({
     title: 'Benchmark Version',
-    description: 'Version of the benchmark this implements (e.g., V1R1)'
+    description: 'Version of the benchmark this implements (e.g., V1R1)',
   }),
 
   // Domain-specific (hardening)
   automationLevel: automationLevelEnum.optional().meta({
     title: 'Automation Level',
-    description: 'Degree of automation (hardening only)'
+    description: 'Degree of automation (hardening only)',
   }),
 
   // Featured/Curation
   isFeatured: z.boolean().optional().meta({
     title: 'Is Featured',
-    description: 'Whether to feature this content on the homepage'
+    description: 'Whether to feature this content on the homepage',
   }),
   featuredOrder: z.number().int().optional().meta({
     title: 'Featured Order',
-    description: 'Sort order for featured items (lower = first)'
+    description: 'Sort order for featured items (lower = first)',
   }),
 
   // Metadata
   license: z.string().optional().meta({
     title: 'License',
-    description: 'SPDX license identifier (e.g., Apache-2.0, MIT)'
+    description: 'SPDX license identifier (e.g., Apache-2.0, MIT)',
   }),
   releaseDate: z.date().optional().meta({
     title: 'Release Date',
-    description: 'Date of initial release'
+    description: 'Date of initial release',
   }),
   deprecatedAt: z.date().optional().meta({
     title: 'Deprecated At',
-    description: 'Date when this content was deprecated (if status=deprecated)'
-  })
+    description: 'Date when this content was deprecated (if status=deprecated)',
+  }),
 }).meta({
   id: 'content',
   title: 'Content',
-  description: 'A security content item: validation profile (InSpec) or hardening content (Ansible/Chef/Terraform)'
+  description: 'A security content item: validation profile (InSpec) or hardening content (Ansible/Chef/Terraform)',
 })
 
 export const contentInputSchema = contentSchema.omit({ id: true }).meta({
   id: 'content_input',
   title: 'Content Input',
-  description: 'Schema for creating new content (excludes auto-generated ID)'
+  description: 'Schema for creating new content (excludes auto-generated ID)',
 })
 
 // ============================================================================
@@ -550,32 +550,32 @@ export type ContentInput = z.infer<typeof contentInputSchema>
 export const pbRecordSchema = z.object({
   id: z.string().meta({
     title: 'ID',
-    description: 'Pocketbase-generated unique identifier'
+    description: 'Pocketbase-generated unique identifier',
   }),
   created: z.string().meta({
     title: 'Created',
-    description: 'ISO timestamp when record was created'
+    description: 'ISO timestamp when record was created',
   }),
   updated: z.string().meta({
     title: 'Updated',
-    description: 'ISO timestamp when record was last updated'
+    description: 'ISO timestamp when record was last updated',
   }),
   collectionId: z.string().meta({
     title: 'Collection ID',
-    description: 'ID of the Pocketbase collection'
+    description: 'ID of the Pocketbase collection',
   }),
   collectionName: z.string().meta({
     title: 'Collection Name',
-    description: 'Name of the Pocketbase collection'
+    description: 'Name of the Pocketbase collection',
   }),
   expand: z.record(z.unknown()).optional().meta({
     title: 'Expand',
-    description: 'Expanded FK relations (when using ?expand=)'
-  })
+    description: 'Expanded FK relations (when using ?expand=)',
+  }),
 }).meta({
   id: 'pb_record',
   title: 'Pocketbase Record',
-  description: 'Base schema for all Pocketbase records with standard metadata fields'
+  description: 'Base schema for all Pocketbase records with standard metadata fields',
 })
 
 /**
@@ -587,11 +587,11 @@ export const pbOrganizationSchema = pbRecordSchema.extend({
   description: z.string().nullable().optional().meta({ title: 'Description', description: 'Organization description' }),
   website: z.string().nullable().optional().meta({ title: 'Website', description: 'Website URL' }),
   logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' }),
-  org_type: z.string().nullable().optional().meta({ title: 'Organization Type', description: 'Type classification (snake_case from Pocketbase)' })
+  org_type: z.string().nullable().optional().meta({ title: 'Organization Type', description: 'Type classification (snake_case from Pocketbase)' }),
 }).meta({
   id: 'pb_organization',
   title: 'PB Organization',
-  description: 'Pocketbase organization record with snake_case field names'
+  description: 'Pocketbase organization record with snake_case field names',
 })
 
 /**
@@ -604,11 +604,11 @@ export const pbTargetSchema = pbRecordSchema.extend({
   category: z.string().nullable().optional().meta({ title: 'Category', description: 'FK to categories (string ID)' }),
   vendor: z.string().nullable().optional().meta({ title: 'Vendor', description: 'FK to organizations (string ID)' }),
   website: z.string().nullable().optional().meta({ title: 'Website', description: 'Website URL' }),
-  logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' })
+  logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' }),
 }).meta({
   id: 'pb_target',
   title: 'PB Target',
-  description: 'Pocketbase target record with snake_case field names'
+  description: 'Pocketbase target record with snake_case field names',
 })
 
 /**
@@ -622,11 +622,11 @@ export const pbStandardSchema = pbRecordSchema.extend({
   website: z.string().nullable().optional().meta({ title: 'Website', description: 'Website URL' }),
   logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' }),
   organization: z.string().nullable().optional().meta({ title: 'Organization', description: 'FK to organizations (string ID)' }),
-  standard_type: z.string().nullable().optional().meta({ title: 'Standard Type', description: 'Type classification (snake_case)' })
+  standard_type: z.string().nullable().optional().meta({ title: 'Standard Type', description: 'Type classification (snake_case)' }),
 }).meta({
   id: 'pb_standard',
   title: 'PB Standard',
-  description: 'Pocketbase standard record with snake_case field names'
+  description: 'Pocketbase standard record with snake_case field names',
 })
 
 /**
@@ -642,11 +642,11 @@ export const pbTechnologySchema = pbRecordSchema.extend({
   organization: z.string().nullable().optional().meta({ title: 'Organization', description: 'FK to organizations (string ID)' }),
   documentation_url: z.string().nullable().optional().meta({ title: 'Documentation URL', description: 'Documentation link (snake_case)' }),
   quick_start_template: z.string().nullable().optional().meta({ title: 'Quick Start Template', description: 'Markdown template (snake_case)' }),
-  prerequisites_template: z.string().nullable().optional().meta({ title: 'Prerequisites Template', description: 'Markdown template (snake_case)' })
+  prerequisites_template: z.string().nullable().optional().meta({ title: 'Prerequisites Template', description: 'Markdown template (snake_case)' }),
 }).meta({
   id: 'pb_technology',
   title: 'PB Technology',
-  description: 'Pocketbase technology record with snake_case field names'
+  description: 'Pocketbase technology record with snake_case field names',
 })
 
 /**
@@ -658,11 +658,11 @@ export const pbTeamSchema = pbRecordSchema.extend({
   description: z.string().nullable().optional().meta({ title: 'Description', description: 'Team description' }),
   organization: z.string().nullable().optional().meta({ title: 'Organization', description: 'FK to organizations (string ID)' }),
   website: z.string().nullable().optional().meta({ title: 'Website', description: 'Website URL' }),
-  logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' })
+  logo: z.string().nullable().optional().meta({ title: 'Logo', description: 'Logo URL' }),
 }).meta({
   id: 'pb_team',
   title: 'PB Team',
-  description: 'Pocketbase team record with snake_case field names'
+  description: 'Pocketbase team record with snake_case field names',
 })
 
 /**
@@ -709,11 +709,11 @@ export const pbContentSchema = pbRecordSchema.extend({
   // Metadata
   license: z.string().nullable().optional().meta({ title: 'License', description: 'SPDX license identifier' }),
   release_date: z.string().nullable().optional().meta({ title: 'Release Date', description: 'ISO date string (snake_case)' }),
-  deprecated_at: z.string().nullable().optional().meta({ title: 'Deprecated At', description: 'ISO date string (snake_case)' })
+  deprecated_at: z.string().nullable().optional().meta({ title: 'Deprecated At', description: 'ISO date string (snake_case)' }),
 }).meta({
   id: 'pb_content',
   title: 'PB Content',
-  description: 'Pocketbase content record with snake_case field names. Main schema for validation profiles and hardening content.'
+  description: 'Pocketbase content record with snake_case field names. Main schema for validation profiles and hardening content.',
 })
 
 /**
@@ -726,15 +726,15 @@ export const pbContentWithExpand = pbContentSchema.extend({
     standard: pbStandardSchema.optional(),
     technology: pbTechnologySchema.optional(),
     vendor: pbOrganizationSchema.optional(),
-    maintainer: pbTeamSchema.optional()
+    maintainer: pbTeamSchema.optional(),
   }).optional().meta({
     title: 'Expanded Relations',
-    description: 'Populated FK relations from ?expand= query parameter'
-  })
+    description: 'Populated FK relations from ?expand= query parameter',
+  }),
 }).meta({
   id: 'pb_content_expanded',
   title: 'PB Content (Expanded)',
-  description: 'Pocketbase content record with expanded FK relations'
+  description: 'Pocketbase content record with expanded FK relations',
 })
 
 // ============================================================================

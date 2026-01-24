@@ -12,7 +12,8 @@ const pb = new PocketBase('http://127.0.0.1:8090')
 try {
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
   console.log('✓ Authenticated\n')
-} catch (e) {
+}
+catch (e) {
   console.error('❌ Authentication failed:', e)
   process.exit(1)
 }
@@ -24,9 +25,18 @@ try {
 
   // Delete order: junction tables → collections with FKs → base collections
   const deleteOrder = [
-    'profiles_tags', 'hardening_profiles_tags', 'validation_to_hardening',  // Junction tables first
-    'profiles', 'hardening_profiles', 'tools', 'teams',  // Collections with FKs
-    'tags', 'organizations', 'technologies', 'standards', 'capabilities'  // Base collections last
+    'profiles_tags',
+    'hardening_profiles_tags',
+    'validation_to_hardening', // Junction tables first
+    'profiles',
+    'hardening_profiles',
+    'tools',
+    'teams', // Collections with FKs
+    'tags',
+    'organizations',
+    'technologies',
+    'standards',
+    'capabilities', // Base collections last
   ]
 
   for (const collName of deleteOrder) {
@@ -35,18 +45,20 @@ try {
       try {
         await pb.collections.delete(coll.id)
         console.log(`  ✓ Deleted ${coll.name}`)
-      } catch (e: any) {
+      }
+      catch (e: any) {
         console.log(`  ⚠️  Could not delete ${coll.name}: ${e.message}`)
       }
     }
   }
-} catch (e: any) {
+}
+catch (e: any) {
   console.log(`  ⚠️  Cleanup warning: ${e.message}`)
 }
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('PHASE 1: Creating base collections (no FKs)')
-console.log('='.repeat(60) + '\n')
+console.log(`${'='.repeat(60)}\n`)
 
 const collectionIds: Record<string, string> = {}
 
@@ -59,10 +71,10 @@ const tagsCollection = await pb.collections.create({
     { name: 'tag_id', type: 'text', required: true },
     { name: 'description', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['tags'] = tagsCollection.id
+collectionIds.tags = tagsCollection.id
 console.log(`  ✓ tags (ID: ${tagsCollection.id})`)
 
 // 2. Organizations
@@ -76,10 +88,10 @@ const orgCollection = await pb.collections.create({
     { name: 'description', type: 'text', required: false },
     { name: 'website', type: 'text', required: false },
     { name: 'logo', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['organizations'] = orgCollection.id
+collectionIds.organizations = orgCollection.id
 console.log(`  ✓ organizations (ID: ${orgCollection.id})`)
 
 // 3. Technologies
@@ -95,10 +107,10 @@ const techCollection = await pb.collections.create({
     { name: 'logo', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
     { name: 'type', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['technologies'] = techCollection.id
+collectionIds.technologies = techCollection.id
 console.log(`  ✓ technologies (ID: ${techCollection.id})`)
 
 // 4. Standards
@@ -116,10 +128,10 @@ const standardsCollection = await pb.collections.create({
     { name: 'vendor', type: 'text', required: false },
     { name: 'version', type: 'text', required: false },
     { name: 'logo', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['standards'] = standardsCollection.id
+collectionIds.standards = standardsCollection.id
 console.log(`  ✓ standards (ID: ${standardsCollection.id})`)
 
 // 5. Capabilities
@@ -132,15 +144,15 @@ const capabilitiesCollection = await pb.collections.create({
     { name: 'name', type: 'text', required: true, options: { min: 1, max: 200 } },
     { name: 'description', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['capabilities'] = capabilitiesCollection.id
+collectionIds.capabilities = capabilitiesCollection.id
 console.log(`  ✓ capabilities (ID: ${capabilitiesCollection.id})`)
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('PHASE 2: Creating collections with FK relations')
-console.log('='.repeat(60) + '\n')
+console.log(`${'='.repeat(60)}\n`)
 
 // 6. Teams (FK: organization)
 console.log('Creating teams collection...')
@@ -155,14 +167,14 @@ const teamsCollection = await pb.collections.create({
       name: 'organization',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['organizations'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.organizations,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['teams'] = teamsCollection.id
+collectionIds.teams = teamsCollection.id
 console.log(`  ✓ teams (ID: ${teamsCollection.id})`)
 
 // 7. Profiles (FKs: technology, organization, team, standard)
@@ -180,26 +192,26 @@ const profilesCollection = await pb.collections.create({
       name: 'technology',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['technologies'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.technologies,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'vendor', type: 'text', required: false },
     {
       name: 'organization',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['organizations'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.organizations,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     {
       name: 'team',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['teams'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.teams,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'github', type: 'text', required: false },
     { name: 'details', type: 'text', required: false },
@@ -207,18 +219,18 @@ const profilesCollection = await pb.collections.create({
       name: 'standard',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['standards'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.standards,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'standard_version', type: 'text', required: false },
     { name: 'short_description', type: 'text', required: false },
     { name: 'requirements', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['profiles'] = profilesCollection.id
+collectionIds.profiles = profilesCollection.id
 console.log(`  ✓ profiles (ID: ${profilesCollection.id})`)
 
 // 8. Hardening Profiles (FKs: technology, organization, team, standard)
@@ -236,26 +248,26 @@ const hardeningCollection = await pb.collections.create({
       name: 'technology',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['technologies'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.technologies,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'vendor', type: 'text', required: false },
     {
       name: 'organization',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['organizations'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.organizations,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     {
       name: 'team',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['teams'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.teams,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'github', type: 'text', required: false },
     { name: 'details', type: 'text', required: false },
@@ -263,19 +275,19 @@ const hardeningCollection = await pb.collections.create({
       name: 'standard',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['standards'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.standards,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'standard_version', type: 'text', required: false },
     { name: 'short_description', type: 'text', required: false },
     { name: 'requirements', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
     { name: 'difficulty', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['hardening_profiles'] = hardeningCollection.id
+collectionIds.hardening_profiles = hardeningCollection.id
 console.log(`  ✓ hardening_profiles (ID: ${hardeningCollection.id})`)
 
 // 9. Tools (FKs: technology, organization)
@@ -294,29 +306,29 @@ const toolsCollection = await pb.collections.create({
       name: 'technology',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['technologies'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.technologies,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     {
       name: 'organization',
       type: 'relation',
       required: false,
-      collectionId: collectionIds['organizations'],
-        cascadeDelete: false,
-        maxSelect: 1
+      collectionId: collectionIds.organizations,
+      cascadeDelete: false,
+      maxSelect: 1,
     },
     { name: 'github', type: 'text', required: false },
     { name: 'category', type: 'text', required: false },
-    { name: 'status', type: 'text', required: false }
-  ]
+    { name: 'status', type: 'text', required: false },
+  ],
 })
-collectionIds['tools'] = toolsCollection.id
+collectionIds.tools = toolsCollection.id
 console.log(`  ✓ tools (ID: ${toolsCollection.id})`)
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('PHASE 3: Creating junction tables (many-to-many)')
-console.log('='.repeat(60) + '\n')
+console.log(`${'='.repeat(60)}\n`)
 
 // 10. Profiles Tags Junction Table
 console.log('Creating profiles_tags junction table...')
@@ -328,19 +340,19 @@ const profilesTagsCollection = await pb.collections.create({
       name: 'profile_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['profiles'],
-        cascadeDelete: true,
-        maxSelect: 1
+      collectionId: collectionIds.profiles,
+      cascadeDelete: true,
+      maxSelect: 1,
     },
     {
       name: 'tag_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['tags'],
-        cascadeDelete: true,
-        maxSelect: 1
-    }
-  ]
+      collectionId: collectionIds.tags,
+      cascadeDelete: true,
+      maxSelect: 1,
+    },
+  ],
 })
 console.log(`  ✓ profiles_tags (ID: ${profilesTagsCollection.id})`)
 
@@ -354,19 +366,19 @@ const hardeningTagsCollection = await pb.collections.create({
       name: 'hardening_profile_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['hardening_profiles'],
-        cascadeDelete: true,
-        maxSelect: 1
+      collectionId: collectionIds.hardening_profiles,
+      cascadeDelete: true,
+      maxSelect: 1,
     },
     {
       name: 'tag_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['tags'],
-        cascadeDelete: true,
-        maxSelect: 1
-    }
-  ]
+      collectionId: collectionIds.tags,
+      cascadeDelete: true,
+      maxSelect: 1,
+    },
+  ],
 })
 console.log(`  ✓ hardening_profiles_tags (ID: ${hardeningTagsCollection.id})`)
 
@@ -380,23 +392,23 @@ const validationHardeningCollection = await pb.collections.create({
       name: 'validation_profile_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['profiles'],
-        cascadeDelete: true,
-        maxSelect: 1
+      collectionId: collectionIds.profiles,
+      cascadeDelete: true,
+      maxSelect: 1,
     },
     {
       name: 'hardening_profile_id',
       type: 'relation',
       required: true,
-      collectionId: collectionIds['hardening_profiles'],
-        cascadeDelete: true,
-        maxSelect: 1
-    }
-  ]
+      collectionId: collectionIds.hardening_profiles,
+      cascadeDelete: true,
+      maxSelect: 1,
+    },
+  ],
 })
 console.log(`  ✓ validation_to_hardening (ID: ${validationHardeningCollection.id})`)
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('✅ SUCCESS! All 12 collections created')
 console.log('='.repeat(60))
 console.log('\nVerify in Pocketbase UI: http://localhost:8090/_/')
@@ -404,4 +416,4 @@ console.log('\nCollections created:')
 console.log('  Base: tags, organizations, technologies, standards, capabilities')
 console.log('  With FKs: teams, profiles, hardening_profiles, tools')
 console.log('  Junction: profiles_tags, hardening_profiles_tags, validation_to_hardening')
-console.log('='.repeat(60) + '\n')
+console.log(`${'='.repeat(60)}\n`)

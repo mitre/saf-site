@@ -23,7 +23,7 @@ export interface FeatureItemProps {
 }
 
 const props = withDefaults(defineProps<FeatureItemProps>(), {
-  orientation: 'horizontal'
+  orientation: 'horizontal',
 })
 
 const isLink = computed(() => !!props.href)
@@ -39,7 +39,7 @@ const isExternal = computed(() => props.href?.startsWith('http'))
     class="feature-item"
     :class="[
       `feature-item--${orientation}`,
-      { 'feature-item--link': isLink }
+      { 'feature-item--link': isLink },
     ]"
   >
     <div v-if="icon || $slots.icon" class="feature-item-icon">
@@ -50,10 +50,14 @@ const isExternal = computed(() => props.href?.startsWith('http'))
 
     <div class="feature-item-content">
       <div class="feature-item-title">
-        <slot name="title">{{ title }}</slot>
+        <slot name="title">
+          {{ title }}
+        </slot>
       </div>
       <div v-if="description || $slots.description" class="feature-item-description">
-        <slot name="description">{{ description }}</slot>
+        <slot name="description">
+          {{ description }}
+        </slot>
       </div>
     </div>
   </component>

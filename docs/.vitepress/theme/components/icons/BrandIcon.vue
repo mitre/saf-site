@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
   name: string
@@ -76,7 +76,8 @@ const iconMap: Record<string, string> = {
 // Check for local SVG first
 const localSvg = computed(() => {
   const key = props.name.toLowerCase()
-  if (localSvgMap[key]) return localSvgMap[key]
+  if (localSvgMap[key])
+    return localSvgMap[key]
   for (const [name, path] of Object.entries(localSvgMap)) {
     if (key.includes(name) || name.includes(key)) {
       return path
@@ -86,10 +87,12 @@ const localSvg = computed(() => {
 })
 
 const iconName = computed(() => {
-  if (localSvg.value) return null // Use local SVG instead
+  if (localSvg.value)
+    return null // Use local SVG instead
   const key = props.name.toLowerCase()
   // Try exact match first
-  if (iconMap[key]) return iconMap[key]
+  if (iconMap[key])
+    return iconMap[key]
   // Try partial match
   for (const [name, icon] of Object.entries(iconMap)) {
     if (key.includes(name) || name.includes(key)) {
@@ -116,7 +119,7 @@ const isWideLogo = computed(() => {
     :height="iconSize"
     class="brand-icon brand-icon-local brand-icon-wide"
     :alt="name"
-  />
+  >
   <!-- Square logos - fixed width and height -->
   <img
     v-else-if="localSvg"
@@ -125,7 +128,7 @@ const isWideLogo = computed(() => {
     :height="iconSize"
     class="brand-icon brand-icon-local"
     :alt="name"
-  />
+  >
   <Icon
     v-else-if="iconName"
     :icon="iconName"

@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { PillarType } from './PillarBadge.vue'
 import { computed } from 'vue'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import PillarBadge, { type PillarType } from './PillarBadge.vue'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { getStatusVariant } from '@/lib/utils'
+import PillarBadge from './PillarBadge.vue'
 
 export interface ContentItem {
   id: string

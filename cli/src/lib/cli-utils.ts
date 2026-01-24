@@ -52,8 +52,10 @@ export type AutomationLevel = typeof VALID_AUTOMATION_LEVELS[number]
  * Priority: json > quiet > text
  */
 export function getOutputFormat(options: CommandOptions): OutputFormat {
-  if (options.json) return 'json'
-  if (options.quiet) return 'quiet'
+  if (options.json)
+    return 'json'
+  if (options.quiet)
+    return 'quiet'
   return 'text'
 }
 
@@ -98,7 +100,8 @@ export function outputErrors(errors: string[], format: OutputFormat): void {
   if (output) {
     if (format === 'json') {
       console.log(output)
-    } else {
+    }
+    else {
       console.error(output)
     }
   }
@@ -153,7 +156,8 @@ export function outputSuccess(message: string, format: OutputFormat, id?: string
  * Format warnings for text output
  */
 export function formatWarnings(warnings: string[]): string {
-  if (warnings.length === 0) return ''
+  if (warnings.length === 0)
+    return ''
 
   const lines: string[] = ['', pc.yellow('Warnings:')]
   for (const warning of warnings) {
@@ -182,7 +186,8 @@ export function outputWarnings(warnings: string[], format: OutputFormat): void {
  * for text-mode inline use in format result functions.
  */
 export function formatErrorsText(errors: string[]): string {
-  if (errors.length === 0) return ''
+  if (errors.length === 0)
+    return ''
 
   const lines: string[] = [pc.red('Errors:')]
   for (const error of errors) {
@@ -232,11 +237,12 @@ export function validateAutomationLevel(value: string | undefined): value is Aut
  */
 export async function withErrorHandling(
   format: OutputFormat,
-  fn: () => Promise<void>
+  fn: () => Promise<void>,
 ): Promise<void> {
   try {
     await fn()
-  } catch (error) {
+  }
+  catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     exitWithError(message, format)
   }

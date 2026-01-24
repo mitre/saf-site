@@ -1,4 +1,5 @@
-import { computed, type Ref, type ComputedRef } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
+import { computed } from 'vue'
 
 /**
  * Extract unique values from a list of items for filter dropdowns
@@ -9,13 +10,13 @@ import { computed, type Ref, type ComputedRef } from 'vue'
  */
 export function useUniqueValues<T extends Record<string, unknown>>(
   items: Ref<T[]> | T[],
-  fieldName: keyof T
+  fieldName: keyof T,
 ): ComputedRef<string[]> {
   return computed(() => {
     const itemsArray = 'value' in items ? items.value : items
     const unique = new Set<string>()
 
-    itemsArray.forEach(item => {
+    itemsArray.forEach((item) => {
       const value = item[fieldName]
       if (value && typeof value === 'string') {
         unique.add(value)
@@ -41,18 +42,18 @@ export interface StandardOption {
  * @param items - Reactive array of items with standard_name and standard_short_name fields
  * @returns Sorted array of standard options
  */
-export function useStandardOptions<T extends { standard_name?: string; standard_short_name?: string }>(
-  items: Ref<T[]> | T[]
+export function useStandardOptions<T extends { standard_name?: string, standard_short_name?: string }>(
+  items: Ref<T[]> | T[],
 ): ComputedRef<StandardOption[]> {
   return computed(() => {
     const itemsArray = 'value' in items ? items.value : items
     const standardsMap = new Map<string, string>()
 
-    itemsArray.forEach(item => {
+    itemsArray.forEach((item) => {
       if (item.standard_name) {
         standardsMap.set(
           item.standard_name,
-          item.standard_short_name || item.standard_name
+          item.standard_short_name || item.standard_name,
         )
       }
     })

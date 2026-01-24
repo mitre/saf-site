@@ -17,7 +17,8 @@ const pb = new PocketBase('http://127.0.0.1:8090')
 try {
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
   console.log('✓ Authenticated as admin\n')
-} catch (e) {
+}
+catch (e) {
   console.error('❌ Authentication failed:', e)
   process.exit(1)
 }
@@ -28,31 +29,31 @@ const newFields = [
     name: 'target_type',
     type: 'text',
     required: false,
-    options: { max: 100 }
+    options: { max: 100 },
   },
   {
     name: 'target_subtype',
     type: 'text',
     required: false,
-    options: { max: 100 }
+    options: { max: 100 },
   },
   {
     name: 'os_family',
     type: 'text',
     required: false,
-    options: { max: 50 }
+    options: { max: 50 },
   },
   {
     name: 'profile_maintainer',
     type: 'text',
     required: false,
-    options: { max: 100 }
-  }
+    options: { max: 100 },
+  },
 ]
 
 console.log('='.repeat(60))
 console.log('PHASE 1: Adding taxonomy fields to collections')
-console.log('='.repeat(60) + '\n')
+console.log(`${'='.repeat(60)}\n`)
 
 // Function to add fields to a collection
 async function addFieldsToCollection(collectionName: string) {
@@ -92,14 +93,15 @@ async function addFieldsToCollection(collectionName: string) {
 
     // Update collection with new fields
     await pb.collections.update(collection.id, {
-      fields: updatedFields
+      fields: updatedFields,
     })
 
     console.log(`  ✓ Added fields: ${fieldsToAdd.map(f => f.name).join(', ')}`)
     console.log(`  ✓ Total fields: ${updatedFields.length}\n`)
 
     return true
-  } catch (e: any) {
+  }
+  catch (e: any) {
     console.error(`  ❌ Failed to update ${collectionName}:`, e.message)
     return false
   }
@@ -129,7 +131,8 @@ if (profilesSuccess && hardeningSuccess) {
   console.log('  • profile_maintainer - Who maintains the profile (MITRE SAF, VMware, etc.)')
   console.log('\nNext: Phase 2 - Data transformation (transform-taxonomy-data.ts)')
   process.exit(0)
-} else {
+}
+else {
   console.log('❌ Phase 1 failed - please check errors above')
   process.exit(1)
 }

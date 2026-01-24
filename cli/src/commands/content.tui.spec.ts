@@ -16,10 +16,10 @@
  * Uses the test Pocketbase instance (port 8091) managed by global setup.
  */
 
-import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest'
-import { CLITest, ANSI } from 'interactive-cli-tester'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { ANSI, CLITest } from 'interactive-cli-tester'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -47,9 +47,9 @@ function createCliTest(args: string[]): CLITest {
       NO_COLOR: '1',
       PB_URL: TEST_PB_URL,
       PB_EMAIL: TEST_PB_EMAIL,
-      PB_PASSWORD: TEST_PB_PASSWORD
+      PB_PASSWORD: TEST_PB_PASSWORD,
     },
-    failOnStderr: false // Allow stderr output (errors are expected in some tests)
+    failOnStderr: false, // Allow stderr output (errors are expected in some tests)
   })
 }
 
@@ -59,8 +59,8 @@ function filterNpmWarnings(output: string): string {
   return output
     .split('\n')
     .filter(line =>
-      !line.startsWith('npm warn') &&
-      !line.startsWith('npm WARN')
+      !line.startsWith('npm warn')
+      && !line.startsWith('npm WARN'),
     )
     .join('\n')
 }
@@ -76,7 +76,7 @@ function getFirstContentLine(output: string): string | null {
 // TUI HELP TESTS (No Pocketbase required)
 // ============================================================================
 
-describe('Content TUI - Help', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Help', { timeout: TUI_TIMEOUT }, () => {
   it('shows content command help', async () => {
     const cli = createCliTest(['content', '--help'])
 
@@ -110,10 +110,10 @@ describe('Content TUI - Help', { timeout: TUI_TIMEOUT }, () => {
 // TUI ADD FLOW TESTS
 // ============================================================================
 
-describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
   // Pocketbase is always available via global setup (port 8091)
 
-  describe('URL input validation', () => {
+  describe('uRL input validation', () => {
     it('prompts for GitHub URL when not provided', async () => {
       const cli = createCliTest(['content', 'add'])
 
@@ -137,7 +137,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       await cli.waitForOutput('GitHub repository URL', 5000)
 
       // Enter invalid URL
-      await cli.write('not-a-valid-url' + ANSI.CR)
+      await cli.write(`not-a-valid-url${ANSI.CR}`)
 
       // Should show error and re-prompt
       await cli.waitForOutput('Invalid GitHub URL', 3000)
@@ -158,7 +158,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
 
       // 1. Enter GitHub URL
       await cli.waitForOutput('GitHub repository URL', 5000)
-      await cli.write('https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline' + ANSI.CR)
+      await cli.write(`https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline${ANSI.CR}`)
 
       // 2. Wait for repo fetch (spinner)
       await cli.waitForOutput('Fetching', 5000)
@@ -211,7 +211,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       // 14. Confirmation
       await cli.waitForOutput('Create this content record', 5000)
       // Cancel instead of creating to avoid polluting database
-      await cli.write('n' + ANSI.CR)
+      await cli.write(`n${ANSI.CR}`)
 
       const exitCode = await cli.waitForExit()
       expect([0, 130]).toContain(exitCode)
@@ -256,7 +256,7 @@ describe('Content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
 // TUI LIST TESTS
 // ============================================================================
 
-describe('Content TUI - List', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - List', { timeout: TUI_TIMEOUT }, () => {
   // Pocketbase is always available via global setup (port 8091)
 
   it('lists content in table format', async () => {
@@ -288,7 +288,7 @@ describe('Content TUI - List', { timeout: TUI_TIMEOUT }, () => {
 // TUI SHOW TESTS
 // ============================================================================
 
-describe('Content TUI - Show', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Show', { timeout: TUI_TIMEOUT }, () => {
   // Pocketbase is always available via global setup (port 8091)
   let testContentId: string | null = null
 
@@ -334,7 +334,7 @@ describe('Content TUI - Show', { timeout: TUI_TIMEOUT }, () => {
 // TUI UPDATE TESTS
 // ============================================================================
 
-describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
   // Pocketbase is always available via global setup (port 8091)
 
   it('shows error for missing ID', async () => {
@@ -375,7 +375,7 @@ describe('Content TUI - Update', { timeout: TUI_TIMEOUT }, () => {
 // TUI KEYBOARD NAVIGATION TESTS
 // ============================================================================
 
-describe('Content TUI - Keyboard Navigation', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Keyboard Navigation', { timeout: TUI_TIMEOUT }, () => {
   // Pocketbase is always available via global setup (port 8091)
 
   it('navigates select options with arrow keys', async () => {
@@ -411,7 +411,7 @@ describe('Content TUI - Keyboard Navigation', { timeout: TUI_TIMEOUT }, () => {
 // TUI ERROR RECOVERY TESTS
 // ============================================================================
 
-describe('Content TUI - Error Recovery', { timeout: TUI_TIMEOUT }, () => {
+describe('content TUI - Error Recovery', { timeout: TUI_TIMEOUT }, () => {
   it('handles network errors gracefully', async () => {
     // Use a URL that will fail (invalid repo)
     const cli = createCliTest(['content', 'add', 'https://github.com/invalid-org-12345/nonexistent-repo'])
@@ -423,7 +423,8 @@ describe('Content TUI - Error Recovery', { timeout: TUI_TIMEOUT }, () => {
       await cli.waitForOutput('Failed', 10000)
       const output = cli.getOutput()
       expect(output.toLowerCase()).toMatch(/failed|error|not found/i)
-    } catch {
+    }
+    catch {
       // Timeout is also acceptable - means it's still trying
     }
 

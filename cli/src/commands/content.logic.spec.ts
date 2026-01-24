@@ -5,18 +5,16 @@
  * These functions are independent of I/O (no prompts, no console, no network).
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { InspecProfile, RepoInfo } from '../lib/github.js'
+import type { FkMaps } from '../lib/pocketbase.js'
+import type { PrepareAddInput, PrepareUpdateInput, ServiceDeps } from './content.logic.js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+
   prepareContentAdd,
   prepareContentUpdate,
-  type PrepareAddInput,
-  type PrepareAddResult,
-  type PrepareUpdateInput,
-  type PrepareUpdateResult,
-  type ServiceDeps
+
 } from './content.logic.js'
-import type { FkMaps } from '../lib/pocketbase.js'
-import type { RepoInfo, InspecProfile } from '../lib/github.js'
 
 // ============================================================================
 // TEST DATA
@@ -32,7 +30,7 @@ function createMockRepoInfo(overrides: Partial<RepoInfo> = {}): RepoInfo {
     license: 'Apache-2.0',
     topics: ['inspec', 'stig', 'rhel'],
     htmlUrl: 'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -44,7 +42,7 @@ function createMockInspecProfile(overrides: Partial<InspecProfile> = {}): Inspec
     license: 'Apache-2.0',
     summary: 'InSpec validation profile for RHEL 9 STIG',
     version: '1.2.0',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -52,33 +50,33 @@ function createMockFkMaps(): FkMaps {
   return {
     organizations: new Map([
       ['mitre', 'org-mitre-123'],
-      ['disa', 'org-disa-456']
+      ['disa', 'org-disa-456'],
     ]),
     teams: new Map([
-      ['saf team', 'team-saf-001']
+      ['saf team', 'team-saf-001'],
     ]),
     standards: new Map([
       ['disa stig', 'std-stig-001'],
       ['stig', 'std-stig-001'],
-      ['cis benchmark', 'std-cis-002']
+      ['cis benchmark', 'std-cis-002'],
     ]),
     technologies: new Map([
       ['inspec', 'tech-inspec-001'],
-      ['ansible', 'tech-ansible-002']
+      ['ansible', 'tech-ansible-002'],
     ]),
     targets: new Map([
       ['red hat enterprise linux 9', 'tgt-rhel9-001'],
-      ['rhel 9', 'tgt-rhel9-001']
+      ['rhel 9', 'tgt-rhel9-001'],
     ]),
     categories: new Map([
-      ['operating system', 'cat-os-001']
+      ['operating system', 'cat-os-001'],
     ]),
     capabilities: new Map([
-      ['validate', 'cap-validate-001']
+      ['validate', 'cap-validate-001'],
     ]),
     tags: new Map([
-      ['linux', 'tag-linux-001']
-    ])
+      ['linux', 'tag-linux-001'],
+    ]),
   }
 }
 
@@ -88,7 +86,7 @@ function createMockServiceDeps(overrides: Partial<ServiceDeps> = {}): ServiceDep
     fetchRepoInfo: vi.fn().mockResolvedValue(createMockRepoInfo()),
     fetchInspecYml: vi.fn().mockResolvedValue(createMockInspecProfile()),
     fetchReadme: vi.fn().mockResolvedValue('# RHEL 9 STIG\n\n452 controls.'),
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -114,8 +112,8 @@ describe('prepareContentAdd', () => {
           vendor: 'MITRE',
           standard: 'DISA STIG',
           technology: 'InSpec',
-          target: 'Red Hat Enterprise Linux 9'
-        }
+          target: 'Red Hat Enterprise Linux 9',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -136,8 +134,8 @@ describe('prepareContentAdd', () => {
           vendor: 'MITRE',
           standard: 'DISA STIG',
           technology: 'InSpec',
-          target: 'RHEL 9'
-        }
+          target: 'RHEL 9',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -156,8 +154,8 @@ describe('prepareContentAdd', () => {
         overrides: {
           name: 'Custom Name Override',
           slug: 'custom-slug',
-          version: '2.0.0'
-        }
+          version: '2.0.0',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -171,7 +169,7 @@ describe('prepareContentAdd', () => {
     it('extracts control count from README', async () => {
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/test-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -185,8 +183,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/test-repo',
         contentType: 'validation',
         overrides: {
-          controlCount: 500
-        }
+          controlCount: 500,
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -197,7 +195,7 @@ describe('prepareContentAdd', () => {
     it('stores README markdown', async () => {
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/test-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -208,7 +206,7 @@ describe('prepareContentAdd', () => {
     it('sets status to active by default', async () => {
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/test-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -221,8 +219,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/test-repo',
         contentType: 'validation',
         overrides: {
-          status: 'beta'
-        }
+          status: 'beta',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -238,8 +236,8 @@ describe('prepareContentAdd', () => {
         contentType: 'validation',
         fkNames: {
           vendor: 'Unknown Vendor',
-          standard: 'Unknown Standard'
-        }
+          standard: 'Unknown Standard',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -254,8 +252,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/test-repo',
         contentType: 'validation',
         overrides: {
-          slug: 'red-hat-9-stig' // Should use 'rhel'
-        }
+          slug: 'red-hat-9-stig', // Should use 'rhel'
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -268,7 +266,7 @@ describe('prepareContentAdd', () => {
 
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/test-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -282,7 +280,7 @@ describe('prepareContentAdd', () => {
 
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/test-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -298,7 +296,7 @@ describe('prepareContentAdd', () => {
 
       const input: PrepareAddInput = {
         githubUrl: 'not-a-valid-url',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -312,7 +310,7 @@ describe('prepareContentAdd', () => {
 
       const input: PrepareAddInput = {
         githubUrl: 'https://github.com/mitre/nonexistent-repo',
-        contentType: 'validation'
+        contentType: 'validation',
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -326,8 +324,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/test-repo',
         contentType: 'validation',
         overrides: {
-          slug: 'INVALID--SLUG' // uppercase and consecutive hyphens
-        }
+          slug: 'INVALID--SLUG', // uppercase and consecutive hyphens
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -341,8 +339,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/test-repo',
         contentType: 'validation',
         overrides: {
-          version: 'not-semver'
-        }
+          version: 'not-semver',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -356,7 +354,7 @@ describe('prepareContentAdd', () => {
     it('prepares hardening content', async () => {
       deps.fetchRepoInfo = vi.fn().mockResolvedValue(createMockRepoInfo({
         repo: 'ansible-rhel-9-stig-hardening',
-        description: 'Ansible playbook for RHEL 9 STIG'
+        description: 'Ansible playbook for RHEL 9 STIG',
       }))
       deps.fetchInspecYml = vi.fn().mockResolvedValue(null) // No inspec.yml for hardening
 
@@ -364,8 +362,8 @@ describe('prepareContentAdd', () => {
         githubUrl: 'https://github.com/mitre/ansible-rhel-9-stig-hardening',
         contentType: 'hardening',
         overrides: {
-          automationLevel: 'full'
-        }
+          automationLevel: 'full',
+        },
       }
 
       const result = await prepareContentAdd(input, fkMaps, deps)
@@ -390,14 +388,14 @@ describe('prepareContentUpdate', () => {
         slug: 'rhel-9-stig',
         content_type: 'validation',
         version: '1.0.0',
-        control_count: 400
+        control_count: 400,
       }
 
       const input: PrepareUpdateInput = {
         updates: {
           version: '1.1.0',
-          controlCount: 452
-        }
+          controlCount: 452,
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -414,14 +412,14 @@ describe('prepareContentUpdate', () => {
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
         content_type: 'validation',
-        version: '1.0.0'
+        version: '1.0.0',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
           name: 'Red Hat Enterprise Linux 9 STIG',
-          version: '1.1.0'
-        }
+          version: '1.1.0',
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -429,11 +427,11 @@ describe('prepareContentUpdate', () => {
       expect(result.diff?.hasChanges).toBe(true)
       expect(result.diff?.changes.name).toEqual({
         old: 'RHEL 9 STIG',
-        new: 'Red Hat Enterprise Linux 9 STIG'
+        new: 'Red Hat Enterprise Linux 9 STIG',
       })
       expect(result.diff?.changes.version).toEqual({
         old: '1.0.0',
-        new: '1.1.0'
+        new: '1.1.0',
       })
     })
 
@@ -443,14 +441,14 @@ describe('prepareContentUpdate', () => {
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
         content_type: 'validation',
-        version: '1.0.0'
+        version: '1.0.0',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
           name: 'RHEL 9 STIG', // Same value
-          version: '1.0.0'     // Same value
-        }
+          version: '1.0.0', // Same value
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -466,14 +464,14 @@ describe('prepareContentUpdate', () => {
         slug: 'rhel-9-stig',
         content_type: 'validation',
         version: '1.0.0',
-        description: 'Original description'
+        description: 'Original description',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
-          name: 'RHEL 9 STIG',  // No change
-          version: '1.1.0'      // Changed
-        }
+          name: 'RHEL 9 STIG', // No change
+          version: '1.1.0', // Changed
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -489,13 +487,13 @@ describe('prepareContentUpdate', () => {
         id: 'content-123',
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
-        content_type: 'validation'
+        content_type: 'validation',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
-          slug: 'INVALID--SLUG'
-        }
+          slug: 'INVALID--SLUG',
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -509,13 +507,13 @@ describe('prepareContentUpdate', () => {
         id: 'content-123',
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
-        content_type: 'validation'
+        content_type: 'validation',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
-          version: 'not-semver'
-        }
+          version: 'not-semver',
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -529,13 +527,13 @@ describe('prepareContentUpdate', () => {
         id: 'content-123',
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
-        content_type: 'validation'
+        content_type: 'validation',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
-          status: 'invalid-status' as any
-        }
+          status: 'invalid-status' as any,
+        },
       }
 
       const result = prepareContentUpdate(existing, input)
@@ -550,13 +548,13 @@ describe('prepareContentUpdate', () => {
         id: 'content-123',
         name: 'RHEL 9 STIG',
         slug: 'rhel-9-stig',
-        content_type: 'validation'
+        content_type: 'validation',
       }
 
       const input: PrepareUpdateInput = {
         updates: {
-          slug: 'red-hat-9-stig' // valid format but poor convention
-        }
+          slug: 'red-hat-9-stig', // valid format but poor convention
+        },
       }
 
       const result = prepareContentUpdate(existing, input)

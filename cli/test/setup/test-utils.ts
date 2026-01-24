@@ -4,9 +4,9 @@
  * Shared utilities for test files that need Pocketbase
  */
 
-import { TEST_URL, TEST_EMAIL, TEST_PASSWORD, TEST_PORT } from './test-pocketbase.js'
+import { TEST_EMAIL, TEST_PASSWORD, TEST_PORT, TEST_URL } from './test-pocketbase.js'
 
-export { TEST_URL, TEST_EMAIL, TEST_PASSWORD, TEST_PORT }
+export { TEST_EMAIL, TEST_PASSWORD, TEST_PORT, TEST_URL }
 
 /**
  * Check if test Pocketbase is available
@@ -16,7 +16,8 @@ export async function isTestPocketbaseAvailable(): Promise<boolean> {
   try {
     const response = await fetch(`${TEST_URL}/api/health`)
     return response.ok
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -29,6 +30,6 @@ export function getTestPocketbaseConfig() {
     url: TEST_URL,
     email: TEST_EMAIL,
     password: TEST_PASSWORD,
-    port: TEST_PORT
+    port: TEST_PORT,
   }
 }

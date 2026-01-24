@@ -1,31 +1,31 @@
 #!/usr/bin/env tsx
 /**
  * Seed Database - Create schema and populate data
- * 
+ *
  * This script:
  * 1. Creates all Pocketbase collections with proper fields and indexes
  * 2. Populates reference data from v1-export JSON files
  * 3. Populates content data (profiles, tools, etc.)
- * 
+ *
  * Usage:
  *   npx tsx scripts/seed-database.ts              # Full setup (schema + data)
  *   npx tsx scripts/seed-database.ts --schema-only   # Only create collections
  *   npx tsx scripts/seed-database.ts --data-only     # Only populate data
- * 
+ *
  * Prerequisites:
  *   - Pocketbase running: cd .pocketbase && ./pocketbase serve
  *   - v1-export/ directory with JSON data files (for data population)
- * 
+ *
  * For restoring from git (recommended):
  *   Use: pnpm setup:force (uses sqlite-diffable to restore from diffable/)
- * 
+ *
  * Schema source of truth: docs/.vitepress/database/schema.ts (Drizzle)
  */
 
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import PocketBase from 'pocketbase'
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -69,23 +69,24 @@ function slugify(text: string): string {
 }
 
 function normalizeVersion(version: string | undefined): string {
-  if (!version) return ''
+  if (!version)
+    return ''
 
   // Strip leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
   // The display layer (Vue components) adds the "v" prefix for presentation
-  return version.replace(/^[vV]/, '')
+  return version.replace(/^v/i, '')
 }
 
 interface IndexConfig {
-  unique?: string[]       // Fields that need UNIQUE indexes
-  regular?: string[]      // Fields that need regular indexes (FKs, filters)
-  composite?: string[][]  // Composite indexes (array of field arrays)
+  unique?: string[] // Fields that need UNIQUE indexes
+  regular?: string[] // Fields that need regular indexes (FKs, filters)
+  composite?: string[][] // Composite indexes (array of field arrays)
 }
 
 async function createCollection(
   name: string,
   fields: any[],
-  indexConfig?: IndexConfig
+  indexConfig?: IndexConfig,
 ): Promise<string> {
   try {
     // Check if collection exists
@@ -125,7 +126,7 @@ async function createCollection(
       name,
       type: 'base',
       fields,
-      indexes
+      indexes,
     })
 
     console.log(`  ✓ Created ${name} (ID: ${collection.id})`)
@@ -133,7 +134,8 @@ async function createCollection(
       console.log(`      ${indexes.length} indexes created`)
     }
     return collection.id
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.error(`  ✗ Failed to create ${name}:`, error.message)
     if (error.response?.data) {
       console.error(`      Details:`, JSON.stringify(error.response.data, null, 2))
@@ -142,9 +144,8 @@ async function createCollection(
   }
 }
 
-
 // ============================================================================
-// MAIN ENTRY POINT  
+// MAIN ENTRY POINT
 // ============================================================================
 
 async function main() {
@@ -160,13 +161,13 @@ async function main() {
   }
 
   if (!schemaOnly) {
-    console.log('\n' + '='.repeat(70))
+    console.log(`\n${'='.repeat(70)}`)
     console.log('PHASE 2: POPULATING DATA')
     console.log('='.repeat(70))
     await populateData()
   }
 
-  console.log('\n' + '='.repeat(70))
+  console.log(`\n${'='.repeat(70)}`)
   console.log('✓ SEED COMPLETE')
   console.log('='.repeat(70))
 
@@ -174,7 +175,7 @@ async function main() {
   if (!schemaOnly) {
     fs.writeFileSync(
       path.join(EXPORT_DIR, 'id-mappings.json'),
-      JSON.stringify(idMaps, null, 2)
+      JSON.stringify(idMaps, null, 2),
     )
     console.log('\n✓ ID mappings saved to scripts/v1-export/id-mappings.json')
   }
@@ -192,9 +193,9 @@ async function createSchema() {
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
     { name: 'color', type: 'text', options: { max: 50 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Categories
@@ -203,9 +204,9 @@ async function createSchema() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Organizations
@@ -215,10 +216,10 @@ async function createSchema() {
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
-    { name: 'org_type', type: 'select', values: ['vendor', 'government', 'community', 'standards_body'] }
+    { name: 'org_type', type: 'select', values: ['vendor', 'government', 'community', 'standards_body'] },
   ], {
     unique: ['slug'],
-    regular: ['org_type']
+    regular: ['org_type'],
   })
 
   // Tags
@@ -228,10 +229,10 @@ async function createSchema() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'tag_category', type: 'select', values: ['platform', 'compliance', 'feature', 'technology', 'other'] },
-    { name: 'badge_color', type: 'text', options: { max: 50 } }
+    { name: 'badge_color', type: 'text', options: { max: 50 } },
   ], {
     unique: ['name', 'slug'],
-    regular: ['tag_category']
+    regular: ['tag_category'],
   })
 
   // Tool Types
@@ -240,9 +241,9 @@ async function createSchema() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Distribution Types
@@ -252,9 +253,9 @@ async function createSchema() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Registries
@@ -264,9 +265,9 @@ async function createSchema() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
-    { name: 'logo', type: 'text' }
+    { name: 'logo', type: 'text' },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Resource Types (for course learning resources)
@@ -276,9 +277,9 @@ async function createSchema() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Media Types (for SAF media library)
@@ -288,9 +289,9 @@ async function createSchema() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // ========================================================================
@@ -303,10 +304,10 @@ async function createSchema() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'website', type: 'url' }
+    { name: 'website', type: 'url' },
   ], {
     unique: ['slug'],
-    regular: ['organization']
+    regular: ['organization'],
   })
 
   // Standards (depends on organizations)
@@ -318,10 +319,10 @@ async function createSchema() {
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'standard_type', type: 'select', values: ['regulatory', 'industry', 'government', 'vendor'] }
+    { name: 'standard_type', type: 'select', values: ['regulatory', 'industry', 'government', 'vendor'] },
   ], {
     unique: ['slug'],
-    regular: ['organization', 'standard_type']
+    regular: ['organization', 'standard_type'],
   })
 
   // Technologies (depends on organizations)
@@ -333,10 +334,10 @@ async function createSchema() {
     { name: 'logo', type: 'text' },
     { name: 'github', type: 'url' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'documentation_url', type: 'url' }
+    { name: 'documentation_url', type: 'url' },
   ], {
     unique: ['slug'],
-    regular: ['organization']
+    regular: ['organization'],
   })
 
   // Targets (depends on categories, organizations)
@@ -347,10 +348,10 @@ async function createSchema() {
     { name: 'category', type: 'relation', collectionId: collectionIds.categories, maxSelect: 1 },
     { name: 'vendor', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
     { name: 'website', type: 'url' },
-    { name: 'logo', type: 'text' }
+    { name: 'logo', type: 'text' },
   ], {
     unique: ['slug'],
-    regular: ['category', 'vendor']
+    regular: ['category', 'vendor'],
   })
 
   // ========================================================================
@@ -363,7 +364,7 @@ async function createSchema() {
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'content_type', type: 'select', required: true, values: ['validation', 'hardening'] },
@@ -395,10 +396,10 @@ async function createSchema() {
     // Metadata
     { name: 'license', type: 'text', options: { max: 100 } },
     { name: 'release_date', type: 'date' },
-    { name: 'deprecated_at', type: 'date' }
+    { name: 'deprecated_at', type: 'date' },
   ], {
     unique: ['slug'],
-    regular: ['content_type', 'status', 'target', 'standard', 'technology', 'vendor', 'maintainer', 'is_featured']
+    regular: ['content_type', 'status', 'target', 'standard', 'technology', 'vendor', 'maintainer', 'is_featured'],
   })
 
   // Tools
@@ -407,7 +408,7 @@ async function createSchema() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'tool_type', type: 'relation', collectionId: collectionIds.tool_types, maxSelect: 1 },
@@ -432,10 +433,10 @@ async function createSchema() {
     { name: 'featured_order', type: 'number', options: { min: 0 } },
 
     // Metadata
-    { name: 'license', type: 'text', options: { max: 100 } }
+    { name: 'license', type: 'text', options: { max: 100 } },
   ], {
     unique: ['slug'],
-    regular: ['tool_type', 'status', 'organization', 'technology', 'is_featured']
+    regular: ['tool_type', 'status', 'organization', 'technology', 'is_featured'],
   })
 
   // Distributions
@@ -443,7 +444,7 @@ async function createSchema() {
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
@@ -462,10 +463,10 @@ async function createSchema() {
     { name: 'install_command', type: 'text' },
 
     // Metadata
-    { name: 'license', type: 'text', options: { max: 100 } }
+    { name: 'license', type: 'text', options: { max: 100 } },
   ], {
     unique: ['slug'],
-    regular: ['status', 'tool', 'distribution_type', 'registry']
+    regular: ['status', 'tool', 'distribution_type', 'registry'],
   })
 
   // Courses (training classes and educational content)
@@ -502,10 +503,10 @@ async function createSchema() {
 
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
-    { name: 'featured_order', type: 'number', options: { min: 0 } }
+    { name: 'featured_order', type: 'number', options: { min: 0 } },
   ], {
     unique: ['slug'],
-    regular: ['course_type', 'level', 'status', 'organization', 'is_featured']
+    regular: ['course_type', 'level', 'status', 'organization', 'is_featured'],
   })
 
   // Course Resources (learning materials for courses)
@@ -519,14 +520,14 @@ async function createSchema() {
     { name: 'resource_type', type: 'relation', required: true, collectionId: collectionIds.resource_types, maxSelect: 1 },
 
     // Display
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    regular: ['course', 'resource_type']
+    regular: ['course', 'resource_type'],
   })
 
   // Course Sessions (scheduled training dates - past and future)
   collectionIds.course_sessions = await createCollection('course_sessions', [
-    { name: 'title', type: 'text', options: { max: 200 } },  // Optional override like "Spring 2026 Cohort"
+    { name: 'title', type: 'text', options: { max: 200 } }, // Optional override like "Spring 2026 Cohort"
 
     // Foreign Keys
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
@@ -538,7 +539,7 @@ async function createSchema() {
 
     // Location
     { name: 'location_type', type: 'select', values: ['virtual', 'in_person', 'hybrid'] },
-    { name: 'location', type: 'text' },  // Room/venue or video platform
+    { name: 'location', type: 'text' }, // Room/venue or video platform
     { name: 'meeting_url', type: 'url' },
 
     // Capacity
@@ -549,9 +550,9 @@ async function createSchema() {
     { name: 'recording_url', type: 'url' },
 
     // Status
-    { name: 'status', type: 'select', values: ['scheduled', 'in_progress', 'completed', 'cancelled'] }
+    { name: 'status', type: 'select', values: ['scheduled', 'in_progress', 'completed', 'cancelled'] },
   ], {
-    regular: ['course', 'start_date', 'status', 'location_type']
+    regular: ['course', 'start_date', 'status', 'location_type'],
   })
 
   // Media (SAF media library - presentations, PDFs, videos, etc.)
@@ -569,17 +570,17 @@ async function createSchema() {
     { name: 'published_at', type: 'date' },
 
     // Content - URL or File (one or both)
-    { name: 'url', type: 'url' },                          // External link (YouTube, SlideShare, etc.)
-    { name: 'file', type: 'file', options: {              // Binary upload (PDF, PPT, etc.)
+    { name: 'url', type: 'url' }, // External link (YouTube, SlideShare, etc.)
+    { name: 'file', type: 'file', options: { // Binary upload (PDF, PPT, etc.)
       maxSelect: 1,
-      maxSize: 52428800  // 50MB
-    }},
+      maxSize: 52428800, // 50MB
+    } },
     { name: 'file_size', type: 'number', options: { min: 0 } },
     { name: 'thumbnail', type: 'file', options: {
       maxSelect: 1,
-      maxSize: 2097152,  // 2MB
-      mimeTypes: ['image/jpeg', 'image/png', 'image/webp']
-    }},
+      maxSize: 2097152, // 2MB
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    } },
 
     // Event context (optional - for conference talks, webinars)
     { name: 'event_name', type: 'text', options: { max: 200 } },
@@ -587,10 +588,10 @@ async function createSchema() {
 
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
-    { name: 'featured_order', type: 'number', options: { min: 0 } }
+    { name: 'featured_order', type: 'number', options: { min: 0 } },
   ], {
     unique: ['slug'],
-    regular: ['media_type', 'organization', 'published_at', 'is_featured']
+    regular: ['media_type', 'organization', 'published_at', 'is_featured'],
   })
 
   // Releases (version history - polymorphic)
@@ -611,11 +612,11 @@ async function createSchema() {
     { name: 'sha256', type: 'text', options: { max: 64 } },
 
     // Status
-    { name: 'is_latest', type: 'bool' }
+    { name: 'is_latest', type: 'bool' },
   ], {
     unique: ['slug'],
     regular: ['entity_type', 'entity_id', 'is_latest'],
-    composite: [['entity_type', 'entity_id', 'is_latest']]  // For "get latest" queries
+    composite: [['entity_type', 'entity_id', 'is_latest']], // For "get latest" queries
   })
 
   // ========================================================================
@@ -625,105 +626,103 @@ async function createSchema() {
   // Content ↔ Capabilities
   await createCollection('content_capabilities', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['content', 'capability']
+    regular: ['content', 'capability'],
   })
 
   // Content ↔ Tags
   await createCollection('content_tags', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['content', 'tag']
+    regular: ['content', 'tag'],
   })
 
   // Content ↔ Content (relationships)
   await createCollection('content_relationships', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
     { name: 'related_content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'relationship_type', type: 'select', required: true, values: ['validates', 'hardens', 'complements'] }
+    { name: 'relationship_type', type: 'select', required: true, values: ['validates', 'hardens', 'complements'] },
   ], {
-    regular: ['content', 'related_content', 'relationship_type']
+    regular: ['content', 'related_content', 'relationship_type'],
   })
 
   // Tools ↔ Capabilities
   await createCollection('tool_capabilities', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['tool', 'capability']
+    regular: ['tool', 'capability'],
   })
 
   // Tools ↔ Tags
   await createCollection('tool_tags', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['tool', 'tag']
+    regular: ['tool', 'tag'],
   })
 
   // Distributions ↔ Capabilities
   await createCollection('distribution_capabilities', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['distribution', 'capability']
+    regular: ['distribution', 'capability'],
   })
 
   // Distributions ↔ Tags
   await createCollection('distribution_tags', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['distribution', 'tag']
+    regular: ['distribution', 'tag'],
   })
 
   // Courses ↔ Capabilities
   await createCollection('course_capabilities', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'capability']
+    regular: ['course', 'capability'],
   })
 
   // Courses ↔ Tools
   await createCollection('course_tools', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true }
+    { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'tool']
+    regular: ['course', 'tool'],
   })
 
   // Courses ↔ Tags
   await createCollection('course_tags', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'tag']
+    regular: ['course', 'tag'],
   })
 
   // Media ↔ Capabilities
   await createCollection('media_capabilities', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['media', 'capability']
+    regular: ['media', 'capability'],
   })
 
   // Media ↔ Tags
   await createCollection('media_tags', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['media', 'tag']
+    regular: ['media', 'tag'],
   })
 
   // ========================================================================
   // SUMMARY
   // ========================================================================
-
-
 }
 
 async function populateData() {
@@ -776,17 +775,19 @@ async function migrateCapabilities() {
         description: item.description || '',
         icon: item.icon || '',
         color: item.color || '',
-        sort_order: item.sort_order || 0
+        sort_order: item.sort_order || 0,
       })
       idMaps.capabilities[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400 && error.response?.data?.slug) {
         // Duplicate slug - try to find existing
         const existing = await pb.collection('capabilities').getFirstListItem(`slug="${slugify(item.name)}"`)
         idMaps.capabilities[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -805,16 +806,18 @@ async function migrateOrganizations() {
         description: item.description || '',
         website: item.website || '',
         logo: item.logo || '',
-        org_type: mapOrgType(item.org_type || item.type)
+        org_type: mapOrgType(item.org_type || item.type),
       })
       idMaps.organizations[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('organizations').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.organizations[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -842,20 +845,23 @@ async function migrateTags() {
         display_name: item.display_name || formatTagName(tagName),
         description: item.description || '',
         tag_category: mapTagCategory(item.category || item.tag_category),
-        badge_color: item.badge_color || item.color || ''
+        badge_color: item.badge_color || item.color || '',
       })
       idMaps.tags[item.id] = v2Record.id
       console.log(`  ✓ ${tagName}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('tags').getFirstListItem(`slug="${tagSlug}"`)
           idMaps.tags[item.id] = existing.id
           console.log(`  ℹ️ ${tagName} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${tagName}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${tagName}: ${error.message}`)
       }
     }
@@ -885,16 +891,18 @@ async function migrateTeams() {
         slug: item.slug || slugify(item.name),
         description: item.description || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        website: item.website || ''
+        website: item.website || '',
       })
       idMaps.teams[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('teams').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.teams[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -914,16 +922,18 @@ async function migrateStandards() {
         website: item.website || '',
         logo: item.logo || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        standard_type: mapStandardType(item.standard_type || item.type)
+        standard_type: mapStandardType(item.standard_type || item.type),
       })
       idMaps.standards[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('standards').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.standards[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -944,16 +954,18 @@ async function migrateTechnologies() {
         logo: item.logo || '',
         github: item.github || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        documentation_url: item.documentation_url || ''
+        documentation_url: item.documentation_url || '',
       })
       idMaps.technologies[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('technologies').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.technologies[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -986,16 +998,18 @@ async function createCategories() {
         slug: cat.slug,
         description: cat.description,
         icon: cat.icon,
-        sort_order: CATEGORIES.indexOf(cat)
+        sort_order: CATEGORIES.indexOf(cat),
       })
       categoryIds[cat.slug] = record.id
       console.log(`  ✓ ${cat.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('categories').getFirstListItem(`slug="${cat.slug}"`)
         categoryIds[cat.slug] = existing.id
         console.log(`  ℹ️ ${cat.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${cat.name}: ${error.message}`)
       }
     }
@@ -1129,9 +1143,9 @@ async function createTargets() {
         // Find vendor org ID if specified
         let vendorId = ''
         if (targetInfo.vendor) {
-          const vendorOrg = await pb.collection('organizations').getFirstListItem(`slug="${targetInfo.vendor}"`)
-            .catch(() => null)
-          if (vendorOrg) vendorId = vendorOrg.id
+          const vendorOrg = await pb.collection('organizations').getFirstListItem(`slug="${targetInfo.vendor}"`).catch(() => null)
+          if (vendorOrg)
+            vendorId = vendorOrg.id
         }
 
         const record = await pb.collection('targets').create({
@@ -1141,16 +1155,18 @@ async function createTargets() {
           category: categoryIds[targetInfo.category] || '',
           vendor: vendorId,
           website: '',
-          logo: ''
+          logo: '',
         })
         targetIds[targetInfo.slug] = record.id
         console.log(`  ✓ ${targetInfo.name}`)
-      } catch (error: any) {
+      }
+      catch (error: any) {
         if (error.status === 400) {
           const existing = await pb.collection('targets').getFirstListItem(`slug="${targetInfo.slug}"`)
           targetIds[targetInfo.slug] = existing.id
           console.log(`  ℹ️ ${targetInfo.name} (already exists)`)
-        } else {
+        }
+        else {
           console.error(`  ✗ ${targetInfo.name}: ${error.message}`)
         }
       }
@@ -1185,7 +1201,7 @@ async function migrateTools() {
       screenshots: item.screenshots || [],
       is_featured: item.is_featured || false,
       featured_order: item.featured_order || 0,
-      license: item.license || ''
+      license: item.license || '',
     }
 
     // Only add FK fields if they have valid mapped IDs
@@ -1200,7 +1216,8 @@ async function migrateTools() {
       const v2Record = await pb.collection('tools').create(record)
       idMaps.tools[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       console.error(`  ✗ ${item.name}: ${error.message}`)
       if (error.response) {
         console.error(`      Response: ${JSON.stringify(error.response)}`)
@@ -1210,7 +1227,8 @@ async function migrateTools() {
           const existing = await pb.collection('tools').getFirstListItem(`slug="${toolSlug}"`)
           idMaps.tools[item.id] = existing.id
           console.log(`      → Found existing with slug`)
-        } catch {
+        }
+        catch {
           // ignore
         }
       }
@@ -1250,11 +1268,12 @@ async function migrateProfiles() {
         benchmark_version: item.standard_version || item.benchmark_version || '',
         is_featured: item.is_featured || false,
         featured_order: item.featured_order || 0,
-        license: item.license || ''
+        license: item.license || '',
       }
 
       // Only add FK fields if they have valid mapped IDs
-      if (targetId) contentRecord.target = targetId
+      if (targetId)
+        contentRecord.target = targetId
       if (item.standard && idMaps.standards[item.standard]) {
         contentRecord.standard = idMaps.standards[item.standard]
       }
@@ -1271,16 +1290,19 @@ async function migrateProfiles() {
       const v2Record = await pb.collection('content').create(contentRecord)
       idMaps.content[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('content').getFirstListItem(`slug="${profileSlug}"`)
           idMaps.content[item.id] = existing.id
           console.log(`  ℹ️ ${item.name} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${item.name}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
         if (error.response?.data) {
           console.error(`      Details: ${JSON.stringify(error.response.data)}`)
@@ -1303,10 +1325,13 @@ async function migrateHardeningProfiles() {
       const targetId = targetInfo ? targetIds[targetInfo.slug] : ''
 
       // Map difficulty to automation_level
-      const automationLevel = item.difficulty === 'easy' ? 'full'
-        : item.difficulty === 'medium' ? 'partial'
-        : item.difficulty === 'hard' ? 'manual'
-        : mapAutomationLevel(item.automation_level)
+      const automationLevel = item.difficulty === 'easy'
+        ? 'full'
+        : item.difficulty === 'medium'
+          ? 'partial'
+          : item.difficulty === 'hard'
+            ? 'manual'
+            : mapAutomationLevel(item.automation_level)
 
       // Build record with optional FK fields
       const hardeningRecord: Record<string, any> = {
@@ -1322,11 +1347,12 @@ async function migrateHardeningProfiles() {
         automation_level: automationLevel,
         is_featured: item.is_featured || false,
         featured_order: item.featured_order || 0,
-        license: item.license || ''
+        license: item.license || '',
       }
 
       // Only add FK fields if they have valid mapped IDs
-      if (targetId) hardeningRecord.target = targetId
+      if (targetId)
+        hardeningRecord.target = targetId
       if (item.standard && idMaps.standards[item.standard]) {
         hardeningRecord.standard = idMaps.standards[item.standard]
       }
@@ -1344,16 +1370,19 @@ async function migrateHardeningProfiles() {
       // Use special prefix to distinguish hardening profile IDs
       idMaps.content[`h_${item.id}`] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('content').getFirstListItem(`slug="${hardeningSlug}"`)
           idMaps.content[`h_${item.id}`] = existing.id
           console.log(`  ℹ️ ${item.name} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${item.name}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
         if (error.response?.data) {
           console.error(`      Details: ${JSON.stringify(error.response.data)}`)
@@ -1381,13 +1410,15 @@ async function migrateContentTags() {
       try {
         await pb.collection('content_tags').create({
           content: contentId,
-          tag: tagId
+          tag: tagId,
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -1404,13 +1435,15 @@ async function migrateContentTags() {
       try {
         await pb.collection('content_tags').create({
           content: contentId,
-          tag: tagId
+          tag: tagId,
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -1432,13 +1465,15 @@ async function migrateContentRelationships() {
         await pb.collection('content_relationships').create({
           content: validationId,
           related_content: hardeningId,
-          relationship_type: 'hardens'
+          relationship_type: 'hardens',
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -1460,57 +1495,58 @@ function slugify(text: string): string {
 
 function mapOrgType(type: string | undefined): string {
   const map: Record<string, string> = {
-    'vendor': 'vendor',
-    'government': 'government',
-    'community': 'community',
-    'standards': 'standards_body',
-    'standards_body': 'standards_body'
+    vendor: 'vendor',
+    government: 'government',
+    community: 'community',
+    standards: 'standards_body',
+    standards_body: 'standards_body',
   }
   return map[type || ''] || ''
 }
 
 function mapTagCategory(category: string | undefined): string {
   const map: Record<string, string> = {
-    'platform': 'platform',
-    'compliance': 'compliance',
-    'feature': 'feature',
-    'technology': 'technology',
-    'other': 'other'
+    platform: 'platform',
+    compliance: 'compliance',
+    feature: 'feature',
+    technology: 'technology',
+    other: 'other',
   }
   return map[category || ''] || 'other'
 }
 
 function mapStandardType(type: string | undefined): string {
   const map: Record<string, string> = {
-    'regulatory': 'regulatory',
-    'industry': 'industry',
-    'government': 'government',
-    'vendor': 'vendor'
+    regulatory: 'regulatory',
+    industry: 'industry',
+    government: 'government',
+    vendor: 'vendor',
   }
   return map[type || ''] || ''
 }
 
 function mapStatus(status: string | undefined): string {
   const map: Record<string, string> = {
-    'active': 'active',
-    'beta': 'beta',
-    'deprecated': 'deprecated',
-    'draft': 'draft'
+    active: 'active',
+    beta: 'beta',
+    deprecated: 'deprecated',
+    draft: 'draft',
   }
   return map[status || ''] || 'active'
 }
 
 function mapAutomationLevel(level: string | undefined): string {
   const map: Record<string, string> = {
-    'full': 'full',
-    'partial': 'partial',
-    'manual': 'manual'
+    full: 'full',
+    partial: 'partial',
+    manual: 'manual',
   }
   return map[level || ''] || ''
 }
 
 function normalizeUrl(url: string | undefined): string {
-  if (!url) return ''
+  if (!url)
+    return ''
 
   // Convert relative URLs to absolute (using saf.mitre.org as base)
   if (url.startsWith('/')) {
@@ -1527,11 +1563,12 @@ function normalizeUrl(url: string | undefined): string {
 }
 
 function normalizeVersion(version: string | undefined): string {
-  if (!version) return ''
+  if (!version)
+    return ''
 
   // Strip leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
   // The display layer (Vue components) adds the "v" prefix for presentation
-  return version.replace(/^[vV]/, '')
+  return version.replace(/^v/i, '')
 }
 
 main().catch(console.error)

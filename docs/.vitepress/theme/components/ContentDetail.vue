@@ -1,3 +1,141 @@
+<script setup lang="ts">
+import type { ContentItem } from '../composables/useContentDetail'
+import type { ActionItem } from './ActionButtons.vue'
+import type { PillarType } from './PillarBadge.vue'
+import { Marked } from 'marked'
+import { createHighlighter } from 'shiki'
+import { computed, onMounted, ref } from 'vue'
+import { buildMetadataItems, createMetadataItem } from '@/lib/metadata'
+import { useContentDetail } from '../composables/useContentDetail'
+import ContentHero from './ContentHero.vue'
+import BrandIcon from './icons/BrandIcon.vue'
+import PillarBadge from './PillarBadge.vue'
+
+const props = defineProps<{
+  content: ContentItem
+  relatedContent?: RelatedContentItem[]
+}>()
+// Store for highlighted HTML (populated async)
+const quickStartHighlighted = ref('')
+const prerequisitesHighlighted = ref('')
+const readmeHighlighted = ref('')
+
+// Create markdown renderer with shiki syntax highlighting
+async function createMarkedWithShiki() {
+  const highlighter = await createHighlighter({
+    themes: ['github-dark', 'github-light'],
+    langs: ['bash', 'shell', 'yaml', 'ruby', 'json', 'javascript', 'typescript', 'python', 'text'],
+  })
+
+  const markedInstance = new Marked()
+
+  markedInstance.use({
+    renderer: {
+      code(token) {
+        const lang = token.lang || 'text'
+        const code = token.text
+        try {
+          // Use lang if supported, fallback to text
+          const supportedLang = highlighter.getLoadedLanguages().includes(lang) ? lang : 'text'
+          return highlighter.codeToHtml(code, {
+            lang: supportedLang,
+            theme: 'github-dark',
+          })
+        }
+        catch {
+          return `<pre><code class="language-${lang}">${code}</code></pre>`
+        }
+      },
+    },
+  })
+
+  return markedInstance
+}
+
+// Render markdown with syntax highlighting
+async function renderMarkdownWithShiki(markdown: string): Promise<string> {
+  if (!markdown)
+    return ''
+  const markedInstance = await createMarkedWithShiki()
+  return markedInstance.parse(markdown, { gfm: true, breaks: true }) as string
+}
+
+interface RelatedContentItem {
+  id: string
+  slug: string
+  name: string
+  description: string
+  content_type: 'validation' | 'hardening'
+  technology_name: string
+}
+
+// Use composable for all logic
+const {
+  formattedProfileVersion,
+  benchmarkLabel,
+  actionUrls,
+  isValidation,
+  quickStart,
+  prerequisites,
+  hasQuickStart,
+  hasPrerequisites,
+  hasReadme,
+} = useContentDetail(props.content)
+
+// Render markdown with syntax highlighting on mount
+onMounted(async () => {
+  if (hasQuickStart.value) {
+    quickStartHighlighted.value = await renderMarkdownWithShiki(quickStart.value)
+  }
+  if (hasPrerequisites.value) {
+    prerequisitesHighlighted.value = await renderMarkdownWithShiki(prerequisites.value)
+  }
+  if (hasReadme.value) {
+    readmeHighlighted.value = await renderMarkdownWithShiki(props.content.readme_markdown || '')
+  }
+})
+
+// Map content_type to pillar
+const pillar = computed<PillarType>(() => {
+  return isValidation.value ? 'validate' : 'harden'
+})
+
+// Transform actionUrls for ActionButtons component
+const heroActions = computed<ActionItem[]>(() => {
+  return actionUrls.value.map(action => ({
+    label: action.label,
+    url: action.url,
+    primary: action.primary,
+  }))
+})
+
+// Build metadata items for sidebar using shared utilities
+const metadataItems = computed(() => {
+  // Determine standard display value (benchmark label or short name)
+  const standardValue = benchmarkLabel.value
+    || props.content.standard_short_name
+    || props.content.standard_name
+
+  return buildMetadataItems(
+    createMetadataItem('Target', props.content.target_name, { filterParam: 'target' }),
+    createMetadataItem('Standard', standardValue, {
+      href: props.content.standard_name
+        ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
+        : undefined,
+    }),
+    createMetadataItem('Tech', props.content.technology_name, { filterParam: 'technology' }),
+    createMetadataItem('Status', props.content.status),
+    createMetadataItem('Profile', formattedProfileVersion.value),
+    createMetadataItem('Controls', props.content.control_count),
+    createMetadataItem('Vendor', props.content.vendor_name, { filterParam: 'vendor' }),
+    createMetadataItem('Maintainer', props.content.maintainer_name),
+  )
+})
+
+// Related content with default empty array
+const relatedContent = computed(() => props.relatedContent || [])
+</script>
+
 <template>
   <div class="content-detail">
     <!-- Breadcrumb -->
@@ -18,25 +156,33 @@
 
     <!-- Quick Start Section -->
     <section v-if="hasQuickStart" class="content-section">
-      <h2 class="section-title">Quick Start</h2>
-      <div class="markdown-content" v-html="quickStartHighlighted"></div>
+      <h2 class="section-title">
+        Quick Start
+      </h2>
+      <div class="markdown-content" v-html="quickStartHighlighted" />
     </section>
 
     <!-- Prerequisites Section -->
     <section v-if="hasPrerequisites" class="content-section">
-      <h2 class="section-title">Prerequisites</h2>
-      <div class="markdown-content" v-html="prerequisitesHighlighted"></div>
+      <h2 class="section-title">
+        Prerequisites
+      </h2>
+      <div class="markdown-content" v-html="prerequisitesHighlighted" />
     </section>
 
     <!-- Documentation Section (README) -->
     <section v-if="hasReadme" class="content-section readme-section">
-      <h2 class="section-title">Documentation</h2>
-      <div class="markdown-content readme-content" v-html="readmeHighlighted"></div>
+      <h2 class="section-title">
+        Documentation
+      </h2>
+      <div class="markdown-content readme-content" v-html="readmeHighlighted" />
     </section>
 
     <!-- Related Content Section -->
     <section v-if="relatedContent.length > 0" class="related-content">
-      <h2 class="related-title">Related Content</h2>
+      <h2 class="related-title">
+        Related Content
+      </h2>
       <p class="related-description">
         Other security content for {{ content.target_name }}
       </p>
@@ -64,141 +210,6 @@
     </section>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Marked } from 'marked'
-import { createHighlighter } from 'shiki'
-import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
-import ContentHero from './ContentHero.vue'
-import PillarBadge, { type PillarType } from './PillarBadge.vue'
-import BrandIcon from './icons/BrandIcon.vue'
-import type { ActionItem } from './ActionButtons.vue'
-import { createMetadataItem, buildMetadataItems } from '@/lib/metadata'
-
-// Store for highlighted HTML (populated async)
-const quickStartHighlighted = ref('')
-const prerequisitesHighlighted = ref('')
-const readmeHighlighted = ref('')
-
-// Create markdown renderer with shiki syntax highlighting
-async function createMarkedWithShiki() {
-  const highlighter = await createHighlighter({
-    themes: ['github-dark', 'github-light'],
-    langs: ['bash', 'shell', 'yaml', 'ruby', 'json', 'javascript', 'typescript', 'python', 'text']
-  })
-
-  const markedInstance = new Marked()
-
-  markedInstance.use({
-    renderer: {
-      code(token) {
-        const lang = token.lang || 'text'
-        const code = token.text
-        try {
-          // Use lang if supported, fallback to text
-          const supportedLang = highlighter.getLoadedLanguages().includes(lang) ? lang : 'text'
-          return highlighter.codeToHtml(code, {
-            lang: supportedLang,
-            theme: 'github-dark'
-          })
-        } catch {
-          return `<pre><code class="language-${lang}">${code}</code></pre>`
-        }
-      }
-    }
-  })
-
-  return markedInstance
-}
-
-// Render markdown with syntax highlighting
-async function renderMarkdownWithShiki(markdown: string): Promise<string> {
-  if (!markdown) return ''
-  const markedInstance = await createMarkedWithShiki()
-  return markedInstance.parse(markdown, { gfm: true, breaks: true }) as string
-}
-
-interface RelatedContentItem {
-  id: string
-  slug: string
-  name: string
-  description: string
-  content_type: 'validation' | 'hardening'
-  technology_name: string
-}
-
-const props = defineProps<{
-  content: ContentItem
-  relatedContent?: RelatedContentItem[]
-}>()
-
-// Use composable for all logic
-const {
-  formattedProfileVersion,
-  benchmarkLabel,
-  actionUrls,
-  isValidation,
-  quickStart,
-  prerequisites,
-  hasQuickStart,
-  hasPrerequisites,
-  hasReadme
-} = useContentDetail(props.content)
-
-// Render markdown with syntax highlighting on mount
-onMounted(async () => {
-  if (hasQuickStart.value) {
-    quickStartHighlighted.value = await renderMarkdownWithShiki(quickStart.value)
-  }
-  if (hasPrerequisites.value) {
-    prerequisitesHighlighted.value = await renderMarkdownWithShiki(prerequisites.value)
-  }
-  if (hasReadme.value) {
-    readmeHighlighted.value = await renderMarkdownWithShiki(props.content.readme_markdown || '')
-  }
-})
-
-// Map content_type to pillar
-const pillar = computed<PillarType>(() => {
-  return isValidation.value ? 'validate' : 'harden'
-})
-
-// Transform actionUrls for ActionButtons component
-const heroActions = computed<ActionItem[]>(() => {
-  return actionUrls.value.map(action => ({
-    label: action.label,
-    url: action.url,
-    primary: action.primary
-  }))
-})
-
-// Build metadata items for sidebar using shared utilities
-const metadataItems = computed(() => {
-  // Determine standard display value (benchmark label or short name)
-  const standardValue = benchmarkLabel.value ||
-    props.content.standard_short_name ||
-    props.content.standard_name
-
-  return buildMetadataItems(
-    createMetadataItem('Target', props.content.target_name, { filterParam: 'target' }),
-    createMetadataItem('Standard', standardValue, {
-      href: props.content.standard_name
-        ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
-        : undefined
-    }),
-    createMetadataItem('Tech', props.content.technology_name, { filterParam: 'technology' }),
-    createMetadataItem('Status', props.content.status),
-    createMetadataItem('Profile', formattedProfileVersion.value),
-    createMetadataItem('Controls', props.content.control_count),
-    createMetadataItem('Vendor', props.content.vendor_name, { filterParam: 'vendor' }),
-    createMetadataItem('Maintainer', props.content.maintainer_name)
-  )
-})
-
-// Related content with default empty array
-const relatedContent = computed(() => props.relatedContent || [])
-</script>
 
 <style scoped>
 .content-detail {

@@ -27,8 +27,8 @@ program.hook('preAction', () => {
 })
 
 program.configureOutput({
-  writeErr: (str) => process.stderr.write(pc.red(str)),
-  outputError: (str, write) => write(pc.red(str))
+  writeErr: str => process.stderr.write(pc.red(str)),
+  outputError: (str, write) => write(pc.red(str)),
 })
 
 // Parse arguments

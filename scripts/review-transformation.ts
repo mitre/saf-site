@@ -7,7 +7,7 @@ await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
 const profiles = await pb.collection('profiles').getFullList({ sort: 'name' })
 
 console.log('First 15 transformed profiles:\n')
-profiles.slice(0, 15).forEach(p => {
+profiles.slice(0, 15).forEach((p) => {
   console.log(`${p.name}`)
   console.log(`  target_type: ${p.target_type}`)
   console.log(`  target_subtype: ${p.target_subtype}`)

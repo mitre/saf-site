@@ -1,7 +1,6 @@
-import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core'
-import { relations, sql } from 'drizzle-orm'
+import { relations } from 'drizzle-orm'
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { z } from 'zod'
 
 // Status enum values
 export const STATUS_ACTIVE = 'active'
@@ -18,7 +17,7 @@ export const tags = sqliteTable('tags', {
   category: text('category'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Organizations (defined before teams due to FK reference)
@@ -30,7 +29,7 @@ export const organizations = sqliteTable('organizations', {
   logo: text('logo'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Teams
@@ -41,7 +40,7 @@ export const teams = sqliteTable('teams', {
   organization: text('organization').references(() => organizations.id),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Technologies
@@ -55,7 +54,7 @@ export const technologies = sqliteTable('technologies', {
   type: text('type'), // 'validation', 'hardening', or 'both'
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Standards
@@ -71,7 +70,7 @@ export const standards = sqliteTable('standards', {
   logo: text('logo'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Profiles
@@ -94,15 +93,15 @@ export const profiles = sqliteTable('profiles', {
   category: text('category'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Profiles Tags Junction Table
 export const profilesTags = sqliteTable('profiles_tags', {
   profileId: text('profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
-}, (table) => ({
-  pk: primaryKey({ columns: [table.profileId, table.tagId] })
+  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
+}, table => ({
+  pk: primaryKey({ columns: [table.profileId, table.tagId] }),
 }))
 
 // Hardening Profiles
@@ -126,23 +125,23 @@ export const hardeningProfiles = sqliteTable('hardening_profiles', {
   difficulty: text('difficulty'), // easy, medium, hard
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Hardening Profiles Tags Junction Table
 export const hardeningProfilesTags = sqliteTable('hardening_profiles_tags', {
   hardeningProfileId: text('hardening_profile_id').notNull().references(() => hardeningProfiles.id, { onDelete: 'cascade' }),
-  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' })
-}, (table) => ({
-  pk: primaryKey({ columns: [table.hardeningProfileId, table.tagId] })
+  tagId: text('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
+}, table => ({
+  pk: primaryKey({ columns: [table.hardeningProfileId, table.tagId] }),
 }))
 
 // Validation-to-Hardening relationship
 export const validationToHardening = sqliteTable('validation_to_hardening', {
   validationProfileId: text('validation_profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  hardeningProfileId: text('hardening_profile_id').notNull().references(() => hardeningProfiles.id, { onDelete: 'cascade' })
-}, (table) => ({
-  pk: primaryKey({ columns: [table.validationProfileId, table.hardeningProfileId] })
+  hardeningProfileId: text('hardening_profile_id').notNull().references(() => hardeningProfiles.id, { onDelete: 'cascade' }),
+}, table => ({
+  pk: primaryKey({ columns: [table.validationProfileId, table.hardeningProfileId] }),
 }))
 
 // Tools
@@ -159,7 +158,7 @@ export const tools = sqliteTable('tools', {
   category: text('category'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // Capabilities
@@ -170,7 +169,7 @@ export const capabilities = sqliteTable('capabilities', {
   category: text('category'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   lastUpdated: integer('last_updated', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  status: text('status').notNull().default(STATUS_ACTIVE)
+  status: text('status').notNull().default(STATUS_ACTIVE),
 })
 
 // ============ RELATIONS ============
@@ -178,104 +177,104 @@ export const capabilities = sqliteTable('capabilities', {
 export const teamsRelations = relations(teams, ({ one, many }) => ({
   organizationRef: one(organizations, {
     fields: [teams.organization],
-    references: [organizations.id]
-  })
+    references: [organizations.id],
+  }),
 }))
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
   teams: many(teams),
   profiles: many(profiles),
   hardeningProfiles: many(hardeningProfiles),
-  tools: many(tools)
+  tools: many(tools),
 }))
 
 export const profilesRelations = relations(profiles, ({ one, many }) => ({
   organizationRef: one(organizations, {
     fields: [profiles.organization],
-    references: [organizations.id]
+    references: [organizations.id],
   }),
   teamRef: one(teams, {
     fields: [profiles.team],
-    references: [teams.id]
+    references: [teams.id],
   }),
   technologyRef: one(technologies, {
     fields: [profiles.technology],
-    references: [technologies.id]
+    references: [technologies.id],
   }),
   standardRef: one(standards, {
     fields: [profiles.standard],
-    references: [standards.id]
+    references: [standards.id],
   }),
-  tags: many(profilesTags)
+  tags: many(profilesTags),
 }))
 
 export const hardeningProfilesRelations = relations(hardeningProfiles, ({ one, many }) => ({
   organizationRef: one(organizations, {
     fields: [hardeningProfiles.organization],
-    references: [organizations.id]
+    references: [organizations.id],
   }),
   teamRef: one(teams, {
     fields: [hardeningProfiles.team],
-    references: [teams.id]
+    references: [teams.id],
   }),
   technologyRef: one(technologies, {
     fields: [hardeningProfiles.technology],
-    references: [technologies.id]
+    references: [technologies.id],
   }),
   standardRef: one(standards, {
     fields: [hardeningProfiles.standard],
-    references: [standards.id]
+    references: [standards.id],
   }),
-  tags: many(hardeningProfilesTags)
+  tags: many(hardeningProfilesTags),
 }))
 
 export const toolsRelations = relations(tools, ({ one }) => ({
   organizationRef: one(organizations, {
     fields: [tools.organization],
-    references: [organizations.id]
+    references: [organizations.id],
   }),
   technologyRef: one(technologies, {
     fields: [tools.technology],
-    references: [technologies.id]
-  })
+    references: [technologies.id],
+  }),
 }))
 
 export const technologiesRelations = relations(technologies, ({ many }) => ({
   profiles: many(profiles),
   hardeningProfiles: many(hardeningProfiles),
-  tools: many(tools)
+  tools: many(tools),
 }))
 
 export const standardsRelations = relations(standards, ({ many }) => ({
   profiles: many(profiles),
-  hardeningProfiles: many(hardeningProfiles)
+  hardeningProfiles: many(hardeningProfiles),
 }))
 
 export const tagsRelations = relations(tags, ({ many }) => ({
   profiles: many(profilesTags),
-  hardeningProfiles: many(hardeningProfilesTags)
+  hardeningProfiles: many(hardeningProfilesTags),
 }))
 
 export const profilesTagsRelations = relations(profilesTags, ({ one }) => ({
   profile: one(profiles, {
     fields: [profilesTags.profileId],
-    references: [profiles.id]
+    references: [profiles.id],
   }),
   tag: one(tags, {
     fields: [profilesTags.tagId],
-    references: [tags.id]
-  })
+    references: [tags.id],
+  }),
 }))
 
 export const hardeningProfilesTagsRelations = relations(hardeningProfilesTags, ({ one }) => ({
   hardeningProfile: one(hardeningProfiles, {
     fields: [hardeningProfilesTags.hardeningProfileId],
-    references: [hardeningProfiles.id]
+    references: [hardeningProfiles.id],
   }),
   tag: one(tags, {
     fields: [hardeningProfilesTags.tagId],
-    references: [tags.id]
-  })
+    references: [tags.id],
+  }),
 }))
 
 // ============ ZOD SCHEMAS ============

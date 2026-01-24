@@ -5,18 +5,15 @@
  * Tests argument parsing, output formatting, and error handling.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
+import { describe, expect, it } from 'vitest'
 import {
+  formatAddResult,
+  formatListResult,
+  formatUpdateResult,
   parseAddArgs,
   parseUpdateArgs,
-  formatAddResult,
-  formatUpdateResult,
-  formatListResult,
-  type AddCommandArgs,
-  type UpdateCommandArgs,
-  type OutputFormat
 } from './content.cli.js'
-import type { PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
 
 // ============================================================================
 // PARSE ADD ARGS
@@ -26,7 +23,7 @@ describe('parseAddArgs', () => {
   it('parses GitHub URL from positional argument', () => {
     const args = parseAddArgs({
       url: 'https://github.com/mitre/rhel-9-stig-baseline',
-      type: 'validation'
+      type: 'validation',
     })
 
     expect(args.githubUrl).toBe('https://github.com/mitre/rhel-9-stig-baseline')
@@ -41,7 +38,7 @@ describe('parseAddArgs', () => {
       standard: 'DISA STIG',
       technology: 'InSpec',
       target: 'RHEL 9',
-      maintainer: 'SAF Team'
+      maintainer: 'SAF Team',
     })
 
     expect(args.fkNames?.vendor).toBe('MITRE')
@@ -59,7 +56,7 @@ describe('parseAddArgs', () => {
       slug: 'custom-slug',
       version: '2.0.0',
       status: 'beta',
-      controlCount: '500'
+      controlCount: '500',
     })
 
     expect(args.overrides?.name).toBe('Custom Name')
@@ -73,7 +70,7 @@ describe('parseAddArgs', () => {
     const args = parseAddArgs({
       url: 'https://github.com/mitre/ansible-test',
       type: 'hardening',
-      automationLevel: 'full'
+      automationLevel: 'full',
     })
 
     expect(args.contentType).toBe('hardening')
@@ -82,7 +79,7 @@ describe('parseAddArgs', () => {
 
   it('returns error for missing required URL', () => {
     const args = parseAddArgs({
-      type: 'validation'
+      type: 'validation',
     })
 
     expect(args.errors).toContain('GitHub URL is required')
@@ -90,7 +87,7 @@ describe('parseAddArgs', () => {
 
   it('returns error for missing content type', () => {
     const args = parseAddArgs({
-      url: 'https://github.com/mitre/test'
+      url: 'https://github.com/mitre/test',
     })
 
     expect(args.errors).toContain('Content type is required (--type validation|hardening)')
@@ -99,7 +96,7 @@ describe('parseAddArgs', () => {
   it('returns error for invalid content type', () => {
     const args = parseAddArgs({
       url: 'https://github.com/mitre/test',
-      type: 'invalid'
+      type: 'invalid',
     })
 
     expect(args.errors).toContain('Content type must be "validation" or "hardening"')
@@ -109,7 +106,7 @@ describe('parseAddArgs', () => {
     const args = parseAddArgs({
       url: 'https://github.com/mitre/test',
       type: 'validation',
-      status: 'invalid'
+      status: 'invalid',
     })
 
     expect(args.errors).toContain('Status must be one of: active, beta, deprecated, draft')
@@ -119,7 +116,7 @@ describe('parseAddArgs', () => {
     const args = parseAddArgs({
       url: 'https://github.com/mitre/test',
       type: 'hardening',
-      automationLevel: 'invalid'
+      automationLevel: 'invalid',
     })
 
     expect(args.errors).toContain('Automation level must be one of: full, partial, manual')
@@ -134,7 +131,7 @@ describe('parseUpdateArgs', () => {
   it('parses ID from positional argument', () => {
     const args = parseUpdateArgs({
       id: 'content-123',
-      version: '2.0.0'
+      version: '2.0.0',
     })
 
     expect(args.id).toBe('content-123')
@@ -148,7 +145,7 @@ describe('parseUpdateArgs', () => {
       description: 'Updated description',
       version: '2.0.0',
       status: 'active',
-      controlCount: '500'
+      controlCount: '500',
     })
 
     expect(args.updates?.name).toBe('Updated Name')
@@ -161,7 +158,7 @@ describe('parseUpdateArgs', () => {
   it('parses sync-readme flag', () => {
     const args = parseUpdateArgs({
       id: 'content-123',
-      syncReadme: true
+      syncReadme: true,
     })
 
     expect(args.syncReadme).toBe(true)
@@ -169,7 +166,7 @@ describe('parseUpdateArgs', () => {
 
   it('returns error for missing ID', () => {
     const args = parseUpdateArgs({
-      version: '2.0.0'
+      version: '2.0.0',
     })
 
     expect(args.errors).toContain('Content ID is required')
@@ -177,7 +174,7 @@ describe('parseUpdateArgs', () => {
 
   it('returns error when no updates specified', () => {
     const args = parseUpdateArgs({
-      id: 'content-123'
+      id: 'content-123',
     })
 
     expect(args.errors).toContain('No updates specified')
@@ -196,10 +193,10 @@ describe('formatAddResult', () => {
       slug: 'rhel-9-stig',
       contentType: 'validation',
       version: '1.0.0',
-      status: 'active'
+      status: 'active',
     },
     warnings: [],
-    errors: []
+    errors: [],
   }
 
   const warningResult: PrepareAddResult = {
@@ -207,16 +204,16 @@ describe('formatAddResult', () => {
     content: {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation'
+      contentType: 'validation',
     },
     warnings: ['No inspec.yml found - using defaults', 'Could not resolve vendor: "Unknown"'],
-    errors: []
+    errors: [],
   }
 
   const errorResult: PrepareAddResult = {
     success: false,
     warnings: [],
-    errors: ['Invalid GitHub URL', 'Slug validation failed']
+    errors: ['Invalid GitHub URL', 'Slug validation failed'],
   }
 
   describe('json format', () => {
@@ -297,18 +294,18 @@ describe('formatUpdateResult', () => {
       hasChanges: true,
       changes: {
         version: { old: '1.0.0', new: '2.0.0' },
-        controlCount: { old: 400, new: 500 }
-      }
+        controlCount: { old: 400, new: 500 },
+      },
     },
     warnings: [],
-    errors: []
+    errors: [],
   }
 
   const noChangesResult: PrepareUpdateResult = {
     success: true,
     hasChanges: false,
     warnings: [],
-    errors: []
+    errors: [],
   }
 
   describe('json format', () => {
@@ -362,8 +359,8 @@ describe('formatListResult', () => {
       version: '1.0.0',
       expand: {
         target: { name: 'RHEL 9' },
-        standard: { short_name: 'STIG' }
-      }
+        standard: { short_name: 'STIG' },
+      },
     },
     {
       id: 'content-2',
@@ -373,9 +370,9 @@ describe('formatListResult', () => {
       version: '2.0.0',
       expand: {
         target: { name: 'Ubuntu 22.04' },
-        standard: { short_name: 'CIS' }
-      }
-    }
+        standard: { short_name: 'CIS' },
+      },
+    },
   ]
 
   describe('json format', () => {

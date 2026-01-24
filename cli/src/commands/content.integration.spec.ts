@@ -6,8 +6,22 @@
  * real command handler logic.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { FkMaps } from '../lib/pocketbase.js'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  fetchInspecYml,
+  fetchReadme,
+  fetchRepoInfo,
+  parseGitHubUrl,
+} from '../lib/github.js'
+// Import after mocking
+import {
+  createContent,
+  getPocketBase,
+  listContent,
+  loadFkMaps,
+} from '../lib/pocketbase.js'
 
 // Mock pocketbase module
 vi.mock('../lib/pocketbase.js', () => ({
@@ -16,7 +30,7 @@ vi.mock('../lib/pocketbase.js', () => ({
   createContent: vi.fn(),
   updateContent: vi.fn(),
   listContent: vi.fn(),
-  getContentBySlug: vi.fn()
+  getContentBySlug: vi.fn(),
 }))
 
 // Mock github module
@@ -26,23 +40,8 @@ vi.mock('../lib/github.js', () => ({
   fetchInspecYml: vi.fn(),
   fetchReadme: vi.fn(),
   generateSlug: vi.fn(),
-  extractControlCount: vi.fn()
+  extractControlCount: vi.fn(),
 }))
-
-// Import after mocking
-import {
-  getPocketBase,
-  loadFkMaps,
-  createContent,
-  updateContent,
-  listContent
-} from '../lib/pocketbase.js'
-import {
-  parseGitHubUrl,
-  fetchRepoInfo,
-  fetchInspecYml,
-  fetchReadme
-} from '../lib/github.js'
 
 // ============================================================================
 // TEST FIXTURES
@@ -52,23 +51,23 @@ import {
 const mockFkMaps: FkMaps = {
   organizations: new Map([
     ['mitre', 'org-001'],
-    ['cis', 'org-002']
+    ['cis', 'org-002'],
   ]),
   standards: new Map([
     ['disa stig', 'std-001'],
-    ['cis benchmark', 'std-002']
+    ['cis benchmark', 'std-002'],
   ]),
   technologies: new Map([
     ['inspec', 'tech-001'],
-    ['ansible', 'tech-002']
+    ['ansible', 'tech-002'],
   ]),
   targets: new Map([
     ['rhel 9', 'tgt-001'],
-    ['ubuntu 22.04', 'tgt-002']
+    ['ubuntu 22.04', 'tgt-002'],
   ]),
   teams: new Map([
-    ['saf team', 'team-001']
-  ])
+    ['saf team', 'team-001'],
+  ]),
 }
 
 const mockRepoInfo = {
@@ -77,7 +76,7 @@ const mockRepoInfo = {
   description: 'InSpec Profile for RHEL 9 STIG',
   defaultBranch: 'main',
   htmlUrl: 'https://github.com/mitre/rhel-9-stig-baseline',
-  license: 'Apache-2.0'
+  license: 'Apache-2.0',
 }
 
 const mockInspecProfile = {
@@ -87,7 +86,7 @@ const mockInspecProfile = {
   maintainer: 'MITRE SAF Team',
   summary: 'InSpec profile for RHEL 9 STIG compliance',
   license: 'Apache-2.0',
-  supports: [{ platform: 'redhat' }]
+  supports: [{ platform: 'redhat' }],
 }
 
 const mockCreatedRecord = {
@@ -98,14 +97,14 @@ const mockCreatedRecord = {
   status: 'active',
   version: '1.5.0',
   created: '2024-01-01T00:00:00Z',
-  updated: '2024-01-01T00:00:00Z'
+  updated: '2024-01-01T00:00:00Z',
 }
 
 // ============================================================================
 // INTEGRATION TEST: ADD COMMAND FLOW
 // ============================================================================
 
-describe('Content Add Command Integration', () => {
+describe('content Add Command Integration', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
 
@@ -147,16 +146,16 @@ describe('Content Add Command Integration', () => {
           fkNames: {
             vendor: 'MITRE',
             standard: 'DISA STIG',
-            target: 'RHEL 9'
-          }
+            target: 'RHEL 9',
+          },
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(true)
@@ -177,16 +176,16 @@ describe('Content Add Command Integration', () => {
           fkNames: {
             vendor: 'CIS',
             technology: 'InSpec',
-            maintainer: 'SAF Team'
-          }
+            maintainer: 'SAF Team',
+          },
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(true)
@@ -203,16 +202,16 @@ describe('Content Add Command Integration', () => {
           githubUrl: 'https://github.com/mitre/rhel-9-stig-baseline',
           contentType: 'validation',
           fkNames: {
-            vendor: 'NonexistentOrg'
-          }
+            vendor: 'NonexistentOrg',
+          },
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(true)
@@ -230,16 +229,16 @@ describe('Content Add Command Integration', () => {
             name: 'Custom Name',
             slug: 'custom-slug',
             version: '2.0.0',
-            status: 'beta'
-          }
+            status: 'beta',
+          },
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(true)
@@ -260,15 +259,15 @@ describe('Content Add Command Integration', () => {
       const result = await prepareContentAdd(
         {
           githubUrl: 'https://github.com/mitre/test',
-          contentType: 'validation'
+          contentType: 'validation',
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(false)
@@ -283,15 +282,15 @@ describe('Content Add Command Integration', () => {
       const result = await prepareContentAdd(
         {
           githubUrl: 'not-a-valid-url',
-          contentType: 'validation'
+          contentType: 'validation',
         },
         mockFkMaps,
         {
           parseGitHubUrl,
           fetchRepoInfo,
           fetchInspecYml,
-          fetchReadme
-        }
+          fetchReadme,
+        },
       )
 
       expect(result.success).toBe(false)
@@ -304,7 +303,7 @@ describe('Content Add Command Integration', () => {
 // INTEGRATION TEST: UPDATE COMMAND FLOW
 // ============================================================================
 
-describe('Content Update Command Integration', () => {
+describe('content Update Command Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -318,22 +317,22 @@ describe('Content Update Command Integration', () => {
         name: 'Original Name',
         version: '1.0.0',
         status: 'active',
-        controlCount: 100
+        controlCount: 100,
       }
 
       const result = prepareContentUpdate(existing, {
         updates: {
           name: 'Updated Name',
           version: '2.0.0',
-          controlCount: 100 // unchanged
-        }
+          controlCount: 100, // unchanged
+        },
       })
 
       expect(result.success).toBe(true)
       expect(result.hasChanges).toBe(true)
       expect(result.updates).toEqual({
         name: 'Updated Name',
-        version: '2.0.0'
+        version: '2.0.0',
         // controlCount NOT included (unchanged)
       })
     })
@@ -344,14 +343,14 @@ describe('Content Update Command Integration', () => {
       const existing = {
         id: 'content-123',
         name: 'Same Name',
-        version: '1.0.0'
+        version: '1.0.0',
       }
 
       const result = prepareContentUpdate(existing, {
         updates: {
           name: 'Same Name',
-          version: '1.0.0'
-        }
+          version: '1.0.0',
+        },
       })
 
       expect(result.success).toBe(true)
@@ -363,8 +362,8 @@ describe('Content Update Command Integration', () => {
 
       const result = prepareContentUpdate({}, {
         updates: {
-          version: 'invalid-version'
-        }
+          version: 'invalid-version',
+        },
       })
 
       expect(result.success).toBe(false)
@@ -377,7 +376,7 @@ describe('Content Update Command Integration', () => {
 // INTEGRATION TEST: LIST COMMAND FLOW
 // ============================================================================
 
-describe('Content List Command Integration', () => {
+describe('content List Command Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -385,7 +384,7 @@ describe('Content List Command Integration', () => {
   it('passes filter options to listContent service', async () => {
     const mockRecords = [
       { id: 'c1', name: 'Profile 1', content_type: 'validation' },
-      { id: 'c2', name: 'Profile 2', content_type: 'validation' }
+      { id: 'c2', name: 'Profile 2', content_type: 'validation' },
     ]
 
     vi.mocked(listContent).mockResolvedValue(mockRecords as any)
@@ -396,17 +395,17 @@ describe('Content List Command Integration', () => {
         contentType: 'validation',
         status: 'active',
         expand: ['target', 'standard'],
-        sort: '-created'
+        sort: '-created',
       },
-      {} as any // mock pb client
+      {} as any, // mock pb client
     )
 
     expect(listContent).toHaveBeenCalledWith(
       expect.objectContaining({
         contentType: 'validation',
-        status: 'active'
+        status: 'active',
       }),
-      expect.anything()
+      expect.anything(),
     )
     expect(result).toHaveLength(2)
   })
@@ -416,7 +415,7 @@ describe('Content List Command Integration', () => {
 // INTEGRATION TEST: CLI PARSING + LOGIC WIRING
 // ============================================================================
 
-describe('CLI Parsing + Logic Integration', () => {
+describe('cLI Parsing + Logic Integration', () => {
   it('parseAddArgs output is valid input for prepareContentAdd', async () => {
     const { parseAddArgs } = await import('./content.cli.js')
     const { prepareContentAdd } = await import('./content.logic.js')
@@ -432,7 +431,7 @@ describe('CLI Parsing + Logic Integration', () => {
       url: 'https://github.com/mitre/test',
       type: 'validation',
       vendor: 'MITRE',
-      status: 'beta'
+      status: 'beta',
     })
 
     expect(args.errors).toHaveLength(0)
@@ -443,15 +442,15 @@ describe('CLI Parsing + Logic Integration', () => {
         githubUrl: args.githubUrl,
         contentType: args.contentType,
         fkNames: args.fkNames,
-        overrides: args.overrides
+        overrides: args.overrides,
       },
       mockFkMaps,
       {
         parseGitHubUrl,
         fetchRepoInfo,
         fetchInspecYml,
-        fetchReadme
-      }
+        fetchReadme,
+      },
     )
 
     expect(result.success).toBe(true)
@@ -467,7 +466,7 @@ describe('CLI Parsing + Logic Integration', () => {
     const args = parseUpdateArgs({
       id: 'content-123',
       version: '2.0.0',
-      status: 'active'
+      status: 'active',
     })
 
     expect(args.errors).toHaveLength(0)
@@ -475,7 +474,7 @@ describe('CLI Parsing + Logic Integration', () => {
     // Feed to logic layer
     const result = prepareContentUpdate(
       { version: '1.0.0', status: 'beta' },
-      { updates: args.updates! }
+      { updates: args.updates! },
     )
 
     expect(result.success).toBe(true)
@@ -489,7 +488,7 @@ describe('CLI Parsing + Logic Integration', () => {
 // INTEGRATION TEST: OUTPUT FORMATTING
 // ============================================================================
 
-describe('Output Formatting Integration', () => {
+describe('output Formatting Integration', () => {
   it('formatAddResult correctly formats prepareContentAdd output', async () => {
     const { formatAddResult } = await import('./content.cli.js')
     const { prepareContentAdd } = await import('./content.logic.js')
@@ -503,15 +502,15 @@ describe('Output Formatting Integration', () => {
     const result = await prepareContentAdd(
       {
         githubUrl: 'https://github.com/mitre/test',
-        contentType: 'validation'
+        contentType: 'validation',
       },
       mockFkMaps,
       {
         parseGitHubUrl,
         fetchRepoInfo,
         fetchInspecYml,
-        fetchReadme
-      }
+        fetchReadme,
+      },
     )
 
     // JSON format
@@ -535,7 +534,7 @@ describe('Output Formatting Integration', () => {
 
     const result = prepareContentUpdate(
       { version: '1.0.0' },
-      { updates: { version: '2.0.0' } }
+      { updates: { version: '2.0.0' } },
     )
 
     // JSON format

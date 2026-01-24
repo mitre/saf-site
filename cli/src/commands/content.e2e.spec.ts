@@ -9,10 +9,11 @@
  * - @offline: Tests that can run without Pocketbase (validation, parsing errors)
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { execa, type ExecaError } from 'execa'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import type { ExecaError } from 'execa'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { execa } from 'execa'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -36,21 +37,22 @@ async function runCli(args: string[], options: { expectError?: boolean } = {}) {
         FORCE_COLOR: '0', // Disable colors for easier assertion
         PB_URL: TEST_PB_URL,
         PB_EMAIL: TEST_PB_EMAIL,
-        PB_PASSWORD: TEST_PB_PASSWORD
-      }
+        PB_PASSWORD: TEST_PB_PASSWORD,
+      },
     })
     return {
       stdout: result.stdout,
       stderr: result.stderr,
-      exitCode: result.exitCode
+      exitCode: result.exitCode,
     }
-  } catch (error) {
+  }
+  catch (error) {
     const execaError = error as ExecaError
     if (options.expectError) {
       return {
         stdout: execaError.stdout || '',
         stderr: execaError.stderr || '',
-        exitCode: execaError.exitCode || 1
+        exitCode: execaError.exitCode || 1,
       }
     }
     throw error
@@ -61,7 +63,7 @@ async function runCli(args: string[], options: { expectError?: boolean } = {}) {
 // OFFLINE E2E TESTS (No Pocketbase required)
 // ============================================================================
 
-describe('Content CLI E2E - Offline', () => {
+describe('content CLI E2E - Offline', () => {
   describe('help and usage', () => {
     it('shows help for content command', async () => {
       const { stdout } = await runCli(['content', '--help'])
@@ -105,10 +107,13 @@ describe('Content CLI E2E - Offline', () => {
   describe('input validation errors', () => {
     it('fails with error for invalid content type', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/test',
-        '--type', 'invalid',
-        '--yes', '--json'
+        '--type',
+        'invalid',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -119,9 +124,12 @@ describe('Content CLI E2E - Offline', () => {
 
     it('fails with error for missing URL in non-interactive mode', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
-        '--type', 'validation',
-        '--yes', '--json'
+        'content',
+        'add',
+        '--type',
+        'validation',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -132,9 +140,11 @@ describe('Content CLI E2E - Offline', () => {
 
     it('fails with error for missing content type in non-interactive mode', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/test',
-        '--yes', '--json'
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -145,10 +155,13 @@ describe('Content CLI E2E - Offline', () => {
 
     it('fails with error for invalid GitHub URL', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'not-a-valid-url',
-        '--type', 'validation',
-        '--yes', '--json'
+        '--type',
+        'validation',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -159,11 +172,15 @@ describe('Content CLI E2E - Offline', () => {
 
     it('fails with error for invalid status', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/test',
-        '--type', 'validation',
-        '--status', 'invalid',
-        '--yes', '--json'
+        '--type',
+        'validation',
+        '--status',
+        'invalid',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -174,11 +191,15 @@ describe('Content CLI E2E - Offline', () => {
 
     it('fails with error for invalid automation level', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/test',
-        '--type', 'hardening',
-        '--automation-level', 'invalid',
-        '--yes', '--json'
+        '--type',
+        'hardening',
+        '--automation-level',
+        'invalid',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -191,9 +212,12 @@ describe('Content CLI E2E - Offline', () => {
   describe('output formats', () => {
     it('outputs JSON with --json flag on validation error', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
-        '--type', 'invalid',
-        '--yes', '--json'
+        'content',
+        'add',
+        '--type',
+        'invalid',
+        '--yes',
+        '--json',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -206,9 +230,12 @@ describe('Content CLI E2E - Offline', () => {
 
     it('outputs nothing with --quiet flag on validation error', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
-        '--type', 'invalid',
-        '--yes', '--quiet'
+        'content',
+        'add',
+        '--type',
+        'invalid',
+        '--yes',
+        '--quiet',
       ], { expectError: true })
 
       expect(exitCode).toBe(1)
@@ -222,14 +249,18 @@ describe('Content CLI E2E - Offline', () => {
 // LIVE E2E TESTS (Require Pocketbase - provided by global setup)
 // ============================================================================
 
-describe('Content CLI E2E - Live', () => {
+describe('content CLI E2E - Live', () => {
   // Pocketbase is always available via global setup (port 8091)
   // If global setup fails, all tests will fail anyway
 
   describe('content list', () => {
     it('lists content with --json', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'list', '--json', '--limit', '5'
+        'content',
+        'list',
+        '--json',
+        '--limit',
+        '5',
       ])
 
       expect(exitCode).toBe(0)
@@ -239,7 +270,11 @@ describe('Content CLI E2E - Live', () => {
 
     it('lists content with --quiet (IDs only)', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'list', '--quiet', '--limit', '5'
+        'content',
+        'list',
+        '--quiet',
+        '--limit',
+        '5',
       ])
 
       expect(exitCode).toBe(0)
@@ -247,13 +282,19 @@ describe('Content CLI E2E - Live', () => {
       const lines = stdout.trim().split('\n').filter(Boolean)
       for (const line of lines) {
         // IDs are typically alphanumeric
-        expect(line).toMatch(/^[a-zA-Z0-9_-]+$/)
+        expect(line).toMatch(/^[\w-]+$/)
       }
     })
 
     it('filters by content type', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'list', '--type', 'validation', '--json', '--limit', '5'
+        'content',
+        'list',
+        '--type',
+        'validation',
+        '--json',
+        '--limit',
+        '5',
       ])
 
       expect(exitCode).toBe(0)
@@ -265,7 +306,13 @@ describe('Content CLI E2E - Live', () => {
 
     it('filters by status', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'list', '--status', 'active', '--json', '--limit', '5'
+        'content',
+        'list',
+        '--status',
+        'active',
+        '--json',
+        '--limit',
+        '5',
       ])
 
       expect(exitCode).toBe(0)
@@ -279,12 +326,18 @@ describe('Content CLI E2E - Live', () => {
   describe('content add --dry-run', () => {
     it('validates and prepares content without creating', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
-        '--type', 'validation',
-        '--vendor', 'MITRE',
-        '--standard', 'DISA STIG',
-        '--yes', '--json', '--dry-run'
+        '--type',
+        'validation',
+        '--vendor',
+        'MITRE',
+        '--standard',
+        'DISA STIG',
+        '--yes',
+        '--json',
+        '--dry-run',
       ])
 
       expect(exitCode).toBe(0)
@@ -296,11 +349,16 @@ describe('Content CLI E2E - Live', () => {
 
     it('shows warnings for unresolved FKs in dry-run', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'add',
+        'content',
+        'add',
         'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
-        '--type', 'validation',
-        '--vendor', 'NonexistentOrg',
-        '--yes', '--json', '--dry-run'
+        '--type',
+        'validation',
+        '--vendor',
+        'NonexistentOrg',
+        '--yes',
+        '--json',
+        '--dry-run',
       ])
 
       expect(exitCode).toBe(0)
@@ -318,7 +376,10 @@ describe('Content CLI E2E - Live', () => {
         const contentId = listResult.stdout.trim().split('\n')[0]
 
         const { stdout, exitCode } = await runCli([
-          'content', 'show', contentId, '--json'
+          'content',
+          'show',
+          contentId,
+          '--json',
         ])
 
         expect(exitCode).toBe(0)
@@ -335,7 +396,7 @@ describe('Content CLI E2E - Live', () => {
 // LIVE DATABASE TESTS (Actually create/update/delete records)
 // ============================================================================
 
-describe('Content CLI E2E - Live Database Operations', () => {
+describe('content CLI E2E - Live Database Operations', () => {
   // Shared test state - set up once in beforeAll
   const testSlug = `test-cli-e2e-${Date.now()}`
   let testRecordId: string
@@ -343,14 +404,21 @@ describe('Content CLI E2E - Live Database Operations', () => {
   // Create test record once before all tests in this suite
   beforeAll(async () => {
     const { stdout, exitCode } = await runCli([
-      'content', 'add',
+      'content',
+      'add',
       'https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline',
-      '--type', 'validation',
-      '--slug', testSlug,
-      '--name', 'CLI E2E Test Profile',
-      '--vendor', 'MITRE',
-      '--standard', 'DISA STIG',
-      '--yes', '--json'
+      '--type',
+      'validation',
+      '--slug',
+      testSlug,
+      '--name',
+      'CLI E2E Test Profile',
+      '--vendor',
+      'MITRE',
+      '--standard',
+      'DISA STIG',
+      '--yes',
+      '--json',
     ])
 
     if (exitCode !== 0) {
@@ -371,7 +439,9 @@ describe('Content CLI E2E - Live Database Operations', () => {
     it('creates record with correct slug', async () => {
       // Verify via list (independent check)
       const { stdout, exitCode } = await runCli([
-        'content', 'list', '--json'
+        'content',
+        'list',
+        '--json',
       ])
 
       expect(exitCode).toBe(0)
@@ -385,7 +455,10 @@ describe('Content CLI E2E - Live Database Operations', () => {
   describe('content show', () => {
     it('displays record details correctly', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'show', testRecordId, '--json'
+        'content',
+        'show',
+        testRecordId,
+        '--json',
       ])
 
       expect(exitCode).toBe(0)
@@ -399,9 +472,13 @@ describe('Content CLI E2E - Live Database Operations', () => {
   describe('content update', () => {
     it('updates version field successfully', async () => {
       const { stdout, exitCode } = await runCli([
-        'content', 'update', testRecordId,
-        '--set-version', '99.0.0-test',
-        '--yes', '--json'
+        'content',
+        'update',
+        testRecordId,
+        '--set-version',
+        '99.0.0-test',
+        '--yes',
+        '--json',
       ])
 
       expect(exitCode).toBe(0)
@@ -413,14 +490,21 @@ describe('Content CLI E2E - Live Database Operations', () => {
     it('persists version change to database', async () => {
       // First ensure version is set (in case tests run in different order)
       await runCli([
-        'content', 'update', testRecordId,
-        '--set-version', '99.0.0-verify',
-        '--yes', '--json'
+        'content',
+        'update',
+        testRecordId,
+        '--set-version',
+        '99.0.0-verify',
+        '--yes',
+        '--json',
       ])
 
       // Verify via show
       const { stdout, exitCode } = await runCli([
-        'content', 'show', testRecordId, '--json'
+        'content',
+        'show',
+        testRecordId,
+        '--json',
       ])
 
       expect(exitCode).toBe(0)
@@ -431,16 +515,24 @@ describe('Content CLI E2E - Live Database Operations', () => {
     it('reports no changes when version unchanged', async () => {
       // Set a known version
       await runCli([
-        'content', 'update', testRecordId,
-        '--set-version', '1.0.0',
-        '--yes', '--json'
+        'content',
+        'update',
+        testRecordId,
+        '--set-version',
+        '1.0.0',
+        '--yes',
+        '--json',
       ])
 
       // Try to set same version again
       const { stdout, exitCode } = await runCli([
-        'content', 'update', testRecordId,
-        '--set-version', '1.0.0',
-        '--yes', '--json'
+        'content',
+        'update',
+        testRecordId,
+        '--set-version',
+        '1.0.0',
+        '--yes',
+        '--json',
       ])
 
       expect(exitCode).toBe(0)
@@ -454,15 +546,20 @@ describe('Content CLI E2E - Live Database Operations', () => {
 // REGRESSION TESTS
 // ============================================================================
 
-describe('Content CLI E2E - Regression', () => {
+describe('content CLI E2E - Regression', () => {
   it('handles special characters in arguments', async () => {
     // Test with special characters - use simpler quote escaping
     const { stdout, exitCode } = await runCli([
-      'content', 'add',
+      'content',
+      'add',
       'https://github.com/mitre/test-repo',
-      '--type', 'validation',
-      '--name', "Test Name With Spaces",
-      '--yes', '--json', '--dry-run'
+      '--type',
+      'validation',
+      '--name',
+      'Test Name With Spaces',
+      '--yes',
+      '--json',
+      '--dry-run',
     ], { expectError: true })
 
     // Should not crash, even if it fails for other reasons (network, etc.)
@@ -472,10 +569,13 @@ describe('Content CLI E2E - Regression', () => {
 
   it('handles empty string arguments gracefully', async () => {
     const { stdout, exitCode } = await runCli([
-      'content', 'add',
+      'content',
+      'add',
       '',
-      '--type', 'validation',
-      '--yes', '--json'
+      '--type',
+      'validation',
+      '--yes',
+      '--json',
     ], { expectError: true })
 
     expect(exitCode).toBe(1)

@@ -43,16 +43,16 @@ interface ContentRecord {
   readme_url?: string
   readme_markdown?: string
   expand?: {
-    standard?: { id: string; short_name: string }
-    target?: { id: string; slug: string }
+    standard?: { id: string, short_name: string }
+    target?: { id: string, slug: string }
   }
 }
 
 interface ParsedGitHubUrl {
   owner: string
   repo: string
-  branch?: string  // If specified in URL (e.g., /tree/master/...)
-  path?: string    // Subdirectory path for monorepos
+  branch?: string // If specified in URL (e.g., /tree/master/...)
+  path?: string // Subdirectory path for monorepos
 }
 
 /**
@@ -70,7 +70,7 @@ function parseGitHubUrl(url: string): ParsedGitHubUrl | null {
   }
 
   // Match simple repo URL
-  const simpleMatch = url.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/)?$/)
+  const simpleMatch = url.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/)
   if (simpleMatch) {
     const [, owner, repo] = simpleMatch
     return { owner, repo: repo.replace(/\.git$/, '') }
@@ -95,11 +95,12 @@ async function checkRepoExists(owner: string, repo: string): Promise<boolean> {
     const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'saf-site-readme-fetcher'
-      }
+        'User-Agent': 'saf-site-readme-fetcher',
+      },
     })
     return response.ok
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -109,10 +110,12 @@ async function checkRepoExists(owner: string, repo: string): Promise<boolean> {
  */
 function deriveReferenceUrl(record: ContentRecord): string | null {
   const standardShortName = record.expand?.standard?.short_name
-  if (!standardShortName) return null
+  if (!standardShortName)
+    return null
 
   const pattern = REFERENCE_URLS[standardShortName]
-  if (!pattern) return null
+  if (!pattern)
+    return null
 
   // For CIS, substitute the target slug
   if (standardShortName === 'CIS' && pattern.includes('{target}')) {
@@ -120,11 +123,11 @@ function deriveReferenceUrl(record: ContentRecord): string | null {
     if (targetSlug) {
       // Normalize target slug for CIS URL (e.g., "docker-ce" -> "docker")
       const normalizedTarget = targetSlug
-        .replace(/-ce$/, '')           // docker-ce -> docker
-        .replace(/-ee$/, '')           // docker-ee -> docker
-        .replace(/-enterprise$/, '')   // remove enterprise suffix
-        .replace(/-community$/, '')    // remove community suffix
-        .split('-')[0]                 // take first part (e.g., "red-hat" -> "red")
+        .replace(/-ce$/, '') // docker-ce -> docker
+        .replace(/-ee$/, '') // docker-ee -> docker
+        .replace(/-enterprise$/, '') // remove enterprise suffix
+        .replace(/-community$/, '') // remove community suffix
+        .split('-')[0] // take first part (e.g., "red-hat" -> "red")
       return pattern.replace('{target}', normalizedTarget)
     }
     return null
@@ -136,7 +139,7 @@ function deriveReferenceUrl(record: ContentRecord): string | null {
 /**
  * Fetch README content, trying multiple branches and filenames
  */
-async function fetchReadme(githubUrl: string): Promise<{ url: string; content: string; error?: string } | null> {
+async function fetchReadme(githubUrl: string): Promise<{ url: string, content: string, error?: string } | null> {
   const parsed = parseGitHubUrl(githubUrl)
   if (!parsed) {
     return { url: '', content: '', error: 'Invalid GitHub URL format' }
@@ -164,7 +167,8 @@ async function fetchReadme(githubUrl: string): Promise<{ url: string; content: s
             return { url, content }
           }
         }
-      } catch {
+      }
+      catch {
         // Continue to next variant
       }
     }
@@ -176,10 +180,10 @@ async function fetchReadme(githubUrl: string): Promise<{ url: string; content: s
 async function main() {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
-  const force = args.includes('--force')  // Re-fetch even if already populated
-  const refsOnly = args.includes('--refs-only')  // Only populate reference_url
+  const force = args.includes('--force') // Re-fetch even if already populated
+  const refsOnly = args.includes('--refs-only') // Only populate reference_url
   const limitIndex = args.indexOf('--limit')
-  const limit = limitIndex !== -1 ? parseInt(args[limitIndex + 1], 10) : undefined
+  const limit = limitIndex !== -1 ? Number.parseInt(args[limitIndex + 1], 10) : undefined
 
   console.log(`🚀 Content Population Script`)
   console.log(`   Pocketbase: ${POCKETBASE_URL}`)
@@ -195,7 +199,8 @@ async function main() {
   try {
     await pb.collection('_superusers').authWithPassword(ADMIN_EMAIL, ADMIN_PASSWORD)
     console.log('✅ Authenticated with Pocketbase\n')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('❌ Failed to authenticate:', error)
     process.exit(1)
   }
@@ -204,7 +209,8 @@ async function main() {
   let filter: string
   if (refsOnly) {
     filter = force ? 'standard != ""' : 'standard != "" && reference_url = ""'
-  } else {
+  }
+  else {
     filter = force ? 'github != ""' : 'github != "" && readme_markdown = ""'
   }
 
@@ -214,10 +220,11 @@ async function main() {
     records = await pb.collection('content').getFullList<ContentRecord>({
       filter,
       expand: 'standard,target',
-      sort: 'name'
+      sort: 'name',
     })
     console.log(`📋 Found ${records.length} records ${force ? 'total' : 'needing updates'}\n`)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('❌ Failed to fetch records:', error)
     process.exit(1)
   }
@@ -235,7 +242,7 @@ async function main() {
   let noReadme = 0
   let updateFailed = 0
   let skipped = 0
-  const failures: { name: string; github: string; error: string }[] = []
+  const failures: { name: string, github: string, error: string }[] = []
 
   for (const record of records) {
     process.stdout.write(`📄 ${record.name.substring(0, 50).padEnd(50)} `)
@@ -259,7 +266,8 @@ async function main() {
         await pb.collection('content').update(record.id, { reference_url: refUrl })
         console.log(`✅ Set ref: ${refUrl}`)
         refsUpdated++
-      } catch (error) {
+      }
+      catch (error) {
         console.log(`❌ Update failed: ${error}`)
         updateFailed++
       }
@@ -281,7 +289,8 @@ async function main() {
       if (error.includes('not found')) {
         console.log(`🚫 ${error}`)
         repoNotFound++
-      } else {
+      }
+      else {
         console.log(`❌ ${error}`)
         noReadme++
       }
@@ -292,7 +301,7 @@ async function main() {
     // Build update payload
     const updateData: Record<string, string> = {
       readme_url: result.url,
-      readme_markdown: result.content
+      readme_markdown: result.content,
     }
 
     // Also set reference_url if not already set
@@ -316,7 +325,8 @@ async function main() {
       const refNote = updateData.reference_url ? ` + ref` : ''
       console.log(`✅ Updated (${result.content.length} chars${refNote})`)
       updated++
-    } catch (error) {
+    }
+    catch (error) {
       console.log(`❌ Update failed: ${error}`)
       updateFailed++
     }
@@ -330,7 +340,8 @@ async function main() {
   console.log(`📊 Summary:`)
   if (refsOnly) {
     console.log(`   ✅ Refs updated:   ${refsUpdated}`)
-  } else {
+  }
+  else {
     console.log(`   ✅ Updated:        ${updated}`)
     console.log(`   🚫 Repo not found: ${repoNotFound}`)
     console.log(`   ❌ No README:      ${noReadme}`)
@@ -352,7 +363,8 @@ async function main() {
 
   if (dryRun) {
     console.log('💡 Run without --dry-run to apply changes')
-  } else if (updated > 0) {
+  }
+  else if (updated > 0) {
     console.log('💡 Run "pnpm db:export" to export changes to git')
   }
 }

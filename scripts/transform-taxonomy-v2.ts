@@ -40,7 +40,7 @@ const rules: Rule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Ubuntu/i,
@@ -49,7 +49,7 @@ const rules: Rule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'Canonical',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /VMware Photon OS/i,
@@ -58,7 +58,7 @@ const rules: Rule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /Windows/i,
@@ -67,7 +67,7 @@ const rules: Rule[] = [
     os_family: 'Windows',
     category: 'Operating Systems',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -80,7 +80,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /AWS MSQL/i,
@@ -89,7 +89,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /AWS S3/i,
@@ -98,7 +98,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /AWS CIS/i,
@@ -107,7 +107,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /GKE/i,
@@ -116,7 +116,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Google',
-    profile_maintainer: 'Google'
+    profile_maintainer: 'Google',
   },
   {
     pattern: /GCP/i,
@@ -125,7 +125,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Google',
-    profile_maintainer: 'Google'
+    profile_maintainer: 'Google',
   },
   {
     pattern: /Azure/i,
@@ -134,7 +134,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -147,7 +147,7 @@ const rules: Rule[] = [
     os_family: 'Windows',
     category: 'Databases',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /MongoDB/i,
@@ -156,7 +156,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'MongoDB',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Oracle Database/i,
@@ -165,7 +165,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /MySQL/i,
@@ -174,7 +174,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /PostgreSQL/i,
@@ -183,7 +183,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -196,7 +196,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Web Infrastructure',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /IIS/i,
@@ -205,7 +205,7 @@ const rules: Rule[] = [
     os_family: 'Windows',
     category: 'Web Infrastructure',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /NGINX/i,
@@ -214,7 +214,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Web Infrastructure',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -227,7 +227,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Tomcat/i,
@@ -236,7 +236,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /JRE/i,
@@ -245,7 +245,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -258,7 +258,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'Docker',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /K3s/i,
@@ -267,7 +267,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'SUSE',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Kubernetes/i,
@@ -276,7 +276,7 @@ const rules: Rule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'CNCF',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // ============================================================
@@ -289,7 +289,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware vSphere VM/i,
@@ -298,7 +298,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware (VCSA|vCenter|vSphere)/i,
@@ -307,7 +307,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware NSX/i,
@@ -316,7 +316,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware (Aria|Cloud Director|Cloud Foundation)/i,
@@ -325,7 +325,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware Horizon/i,
@@ -334,7 +334,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware Identity Manager/i,
@@ -343,7 +343,7 @@ const rules: Rule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
 
   // ============================================================
@@ -356,7 +356,7 @@ const rules: Rule[] = [
     os_family: 'Cloud-Native',
     category: 'Utility',
     vendor: 'GitHub',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Red Hat CVE/i,
@@ -365,8 +365,8 @@ const rules: Rule[] = [
     os_family: 'Linux',
     category: 'Utility',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
-  }
+    profile_maintainer: 'MITRE SAF',
+  },
 ]
 
 // Transform profiles
@@ -388,11 +388,12 @@ async function transformCollection(name: string) {
         os_family: rule.os_family,
         category: rule.category,
         vendor: rule.vendor,
-        profile_maintainer: rule.profile_maintainer
+        profile_maintainer: rule.profile_maintainer,
       })
       matched++
       console.log(`  ✓ ${record.name} → ${rule.target_type} / ${rule.target_subtype}`)
-    } else {
+    }
+    else {
       unmatched++
       unmatchedList.push(record.name)
       console.log(`  ✗ ${record.name} (NO MATCH)`)
@@ -415,7 +416,7 @@ console.log('='.repeat(70))
 const p = await transformCollection('profiles')
 const h = await transformCollection('hardening_profiles')
 
-console.log('\n' + '='.repeat(70))
+console.log(`\n${'='.repeat(70)}`)
 console.log('FINAL RESULTS')
 console.log('='.repeat(70))
 console.log(`Profiles:          ${p.matched} matched, ${p.unmatched} unmatched`)
@@ -425,7 +426,8 @@ console.log(`Total:             ${p.matched + h.matched} matched, ${p.unmatched 
 if (p.unmatched + h.unmatched > 0) {
   console.log('\n⚠️  Some profiles did not match. Review rules above.')
   process.exit(1)
-} else {
+}
+else {
   console.log('\n✓ All profiles transformed successfully!')
   process.exit(0)
 }
