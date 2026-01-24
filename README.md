@@ -218,6 +218,14 @@ The setup script creates a `saf-site` context with all collections from the data
 | `pnpm test:run` | Run tests once |
 | `pnpm test:coverage` | Run tests with coverage |
 
+### Component Stories (Histoire)
+
+| Command | Description |
+|---------|-------------|
+| `pnpm story:dev` | Start Histoire dev server (component explorer) |
+| `pnpm story:build` | Build stories for production |
+| `pnpm story:preview` | Preview built stories |
+
 ### Task Tracking (Beads)
 
 This project uses [Beads](https://github.com/steveyegge/beads) for task tracking. Tasks live in `.beads/` and sync with git.
@@ -314,8 +322,46 @@ Output is in `docs/.vitepress/dist/`
 
 1. Create component in `docs/.vitepress/theme/components/`
 2. Create colocated test file (`ComponentName.spec.ts`)
-3. Register globally in `docs/.vitepress/theme/index.ts` if needed
-4. Run tests: `pnpm test:run`
+3. Create a story file (`ComponentName.story.vue`) for visual testing
+4. Register globally in `docs/.vitepress/theme/index.ts` if needed
+5. Run tests: `pnpm test:run`
+6. View in Histoire: `pnpm story:dev`
+
+### Component Development with Histoire
+
+[Histoire](https://histoire.dev/) provides an interactive component explorer (like Storybook).
+
+```bash
+# Start Histoire (separate from main dev server)
+pnpm story:dev
+```
+
+Histoire runs at http://localhost:6006
+
+**Creating stories:**
+```vue
+<!-- ComponentName.story.vue (colocated with component) -->
+<script setup lang="ts">
+import ComponentName from './ComponentName.vue'
+</script>
+
+<template>
+  <Story title="Category/ComponentName">
+    <Variant title="Default">
+      <ComponentName />
+    </Variant>
+    <Variant title="With Props">
+      <ComponentName :someProp="value" />
+    </Variant>
+  </Story>
+</template>
+```
+
+**Key features:**
+- Dark mode toggle syncs with component themes
+- Interactive controls panel for props
+- Source code viewer
+- Multiple variants per component
 
 ### Troubleshooting: Data Not Updating
 
@@ -475,6 +521,7 @@ Test files are colocated with source:
 | Content Database | Pocketbase 0.26 |
 | Schema Definition | Drizzle ORM |
 | Testing | Vitest 4 |
+| Component Stories | Histoire 1.0 |
 | Package Manager | pnpm 10 |
 
 ## Deployment
