@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    # Run CI on PRs targeting any branch
 
 concurrency:
   group: ci-${{ github.ref }}
