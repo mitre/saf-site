@@ -89,19 +89,10 @@
       "mdast-util-to-hast": ">=13.2.1"
     },
     "onlyBuiltDependencies": [
-      "-",
-      "3",
-      "b",
       "better-sqlite3",
-      "e",
       "esbuild",
-      "i",
-      "l",
-      "q",
-      "r",
-      "s",
-      "t",
-      "vue-demi"
+      "vue-demi",
+      "workerd"
     ]
   },
   "dependencies": {
