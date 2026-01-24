@@ -18,8 +18,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Path to the CLI entry point
-const CLI_PATH = join(__dirname, '../../dist/index.js')
+// Path to the CLI entry point (built version available but we use dev for tests)
+const _CLI_PATH = join(__dirname, '../../dist/index.js')
 const CLI_DEV_PATH = join(__dirname, '../index.ts')
 
 // Test Pocketbase configuration (managed by global setup)
@@ -549,7 +549,7 @@ describe('content CLI E2E - Live Database Operations', () => {
 describe('content CLI E2E - Regression', () => {
   it('handles special characters in arguments', async () => {
     // Test with special characters - use simpler quote escaping
-    const { stdout, exitCode } = await runCli([
+    const { stdout } = await runCli([
       'content',
       'add',
       'https://github.com/mitre/test-repo',

@@ -28,8 +28,8 @@ export default antfu({
     '*.min.js',
     'pnpm-lock.yaml',
     '**/*.md',
-    // CLI has minor test file issues - clean up separately
-    'cli/**/*.spec.ts',
+    // CLI has its own eslint.config.js
+    'cli/**',
   ],
 }, {
   // Custom rules for all files

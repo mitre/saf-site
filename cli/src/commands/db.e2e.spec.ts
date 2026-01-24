@@ -168,7 +168,7 @@ describe('db CLI - lookups', () => {
   })
 
   it('handles unknown collection gracefully', async () => {
-    const { stdout, exitCode } = await runCli(['db', 'lookups', 'nonexistent'])
+    const { stdout } = await runCli(['db', 'lookups', 'nonexistent'])
 
     // Should complete but show error for unknown collection
     expect(stdout).toContain('Unknown collection')
@@ -203,7 +203,7 @@ describe('db CLI - validate', () => {
 
 describe('db CLI - audit', () => {
   it('runs slug audit', async () => {
-    const { stdout, exitCode } = await runCli(['db', 'audit'], { expectError: true })
+    const { stdout } = await runCli(['db', 'audit'], { expectError: true })
 
     // Audit may exit 1 if errors found
     expect(stdout).toContain('Slug Convention Audit')

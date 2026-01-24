@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { checkConnection, getPocketBase, loadFkMaps } from '../lib/pocketbase.js'
 
 // Test Pocketbase configuration (managed by global setup)
-const TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
+const _TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
 
 // ============================================================================
 // CONNECTION TESTS
@@ -117,7 +117,7 @@ describe('db lookups - FK maps', () => {
     const maps = await loadFkMaps()
 
     // Check that values are IDs (non-empty strings)
-    for (const [name, id] of maps.organizations.entries()) {
+    for (const [_name, id] of maps.organizations.entries()) {
       expect(typeof id).toBe('string')
       expect(id.length).toBeGreaterThan(0)
     }

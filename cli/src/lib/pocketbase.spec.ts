@@ -6,8 +6,16 @@
 
 import type { CreateContentInput, FkMaps, UpdateContentInput } from './pocketbase.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { createContent, getContentBySlug, listContent, resolveFK, updateContent } from './pocketbase.js'
+import {
+  checkConnection,
+  createContent,
+  getContentBySlug,
+  getPocketBase,
+  listContent,
+  loadFkMaps,
+  resolveFK,
+  updateContent,
+} from './pocketbase.js'
 
 // ============================================================================
 // CRUD OPERATIONS (Phase 2.2)
@@ -15,7 +23,6 @@ import { createContent, getContentBySlug, listContent, resolveFK, updateContent 
 
 // Integration tests using test Pocketbase instance (port 8091)
 // Global setup starts Pocketbase and sets PB_URL environment variable
-import { checkConnection, getPocketBase, loadFkMaps } from './pocketbase.js'
 
 // Mock FkMaps for testing
 function createMockFkMaps(): FkMaps {
