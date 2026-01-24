@@ -14,7 +14,9 @@
     "lint:check": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "ci:check": "pnpm typecheck && pnpm lint:check && pnpm test:run",
+    "ci:security": "pnpm audit --audit-level=high"
   },
   "keywords": [
     "mitre",
@@ -24,6 +26,7 @@
   ],
   "author": "MITRE SAF Team",
   "license": "Apache-2.0",
+  "packageManager": "pnpm@10.26.2",
   "dependencies": {
     "@clack/prompts": "^0.10.0",
     "cli-table3": "^0.6.5",

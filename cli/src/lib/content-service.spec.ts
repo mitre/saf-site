@@ -104,7 +104,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme: '# RHEL 9 STIG\n\nThis profile has 452 controls.',
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -121,7 +121,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile({ title: 'Custom Profile Title' }),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -133,7 +133,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo({ description: 'Repo Description Here' }),
         inspecProfile: createMockInspecProfile({ title: undefined }),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -146,7 +146,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme: 'This profile validates 452 controls for RHEL 9.',
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -160,7 +160,7 @@ describe('buildContentFromRepo', () => {
         inspecProfile: createMockInspecProfile({
           summary: 'InSpec profile for validating RHEL 9 STIG compliance',
         }),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -174,7 +174,7 @@ describe('buildContentFromRepo', () => {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
         readme,
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -186,7 +186,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo({ repo: 'aws-rds-oracle-mysql-ee-5.7-cis-baseline' }),
         inspecProfile: createMockInspecProfile(),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -199,7 +199,7 @@ describe('buildContentFromRepo', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
         inspecProfile: createMockInspecProfile(),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -246,7 +246,7 @@ describe('buildContentFromRepo', () => {
           description: null,
           license: null,
         }),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -259,7 +259,7 @@ describe('buildContentFromRepo', () => {
     it('handles missing inspec profile', () => {
       const repoData: RepoData = {
         repoInfo: createMockRepoInfo(),
-        contentType: 'validation',
+        contentType: 'validation' as const,
       }
 
       const result = buildContentFromRepo(repoData)
@@ -456,7 +456,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       version: '1.0.0',
       controlCount: 452,
     }
@@ -478,7 +478,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'Red Hat Enterprise Linux 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
     }
 
     const diff = diffContent(existing, updated)
@@ -502,7 +502,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       version: '1.1.0',
     }
 
@@ -527,7 +527,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       controlCount: 452,
     }
 
@@ -554,10 +554,10 @@ describe('diffContent', () => {
     const updated = {
       name: 'Red Hat Enterprise Linux 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       version: '1.1.0',
       controlCount: 452,
-      status: 'active',
+      status: 'active' as const,
     }
 
     const diff = diffContent(existing, updated)
@@ -582,7 +582,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       // version not specified - should not show as a change
     }
 
@@ -604,7 +604,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       license: 'Apache-2.0',
     }
 
@@ -629,7 +629,7 @@ describe('diffContent', () => {
     const updated = {
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      contentType: 'validation',
+      contentType: 'validation' as const,
       vendor: 'org-mitre-123',
     }
 

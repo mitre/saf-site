@@ -86,9 +86,14 @@ export interface FkMaps {
 
 /**
  * Create a lowercase name → ID map from records
+ * Accepts Pocketbase RecordModel which has dynamic fields
  */
-function createLowerCaseIdMap(records: Array<{ name: string, id: string }>): Map<string, string> {
-  return new Map(records.map(r => [r.name.toLowerCase(), r.id]))
+function createLowerCaseIdMap(records: Array<{ name?: string, id: string }>): Map<string, string> {
+  return new Map(
+    records
+      .filter((r): r is { name: string, id: string } => typeof r.name === 'string')
+      .map(r => [r.name.toLowerCase(), r.id]),
+  )
 }
 
 /**

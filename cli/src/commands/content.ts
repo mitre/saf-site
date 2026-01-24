@@ -71,6 +71,7 @@ contentCommand
   .option('--json', 'Output as JSON')
   .option('--quiet', 'Output only IDs')
   .action(async (options) => {
+    const format = getOutputFormat(options)
     try {
       const pb = await getPocketBase()
 
@@ -83,9 +84,6 @@ contentCommand
 
       // Limit results
       const limited = records.slice(0, Number.parseInt(options.limit))
-
-      // Determine output format
-      const format = getOutputFormat(options)
 
       console.log(formatListResult(limited, format))
 

@@ -8,8 +8,8 @@
     "skipLibCheck": true,
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "resolveJsonModule": true,
+    "noEmit": true,
     "paths": {
       "@schema": ["../docs/.vitepress/database/schema.ts"],
       "@schema/*": ["../docs/.vitepress/database/*"],
@@ -17,6 +17,6 @@
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../docs/.vitepress/database/**/*"],
   "exclude": ["node_modules", "dist"]
 }

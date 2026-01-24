@@ -28,7 +28,7 @@ const TEST_PB_EMAIL = process.env.PB_EMAIL || 'admin@localhost.com'
 const TEST_PB_PASSWORD = process.env.PB_PASSWORD || 'testpassword123'
 
 // Helper to run CLI command with test Pocketbase env vars
-async function runCli(args: string[], options: { expectError?: boolean } = {}) {
+async function runCli(args: string[], options: { expectError?: boolean } = {}): Promise<{ stdout: string, stderr: string, exitCode: number }> {
   try {
     const result = await execa('npx', ['tsx', CLI_DEV_PATH, ...args], {
       cwd: join(__dirname, '../..'),
@@ -41,18 +41,18 @@ async function runCli(args: string[], options: { expectError?: boolean } = {}) {
       },
     })
     return {
-      stdout: result.stdout,
-      stderr: result.stderr,
-      exitCode: result.exitCode,
+      stdout: String(result.stdout ?? ''),
+      stderr: String(result.stderr ?? ''),
+      exitCode: result.exitCode ?? 0,
     }
   }
   catch (error) {
     const execaError = error as ExecaError
     if (options.expectError) {
       return {
-        stdout: execaError.stdout || '',
-        stderr: execaError.stderr || '',
-        exitCode: execaError.exitCode || 1,
+        stdout: String(execaError.stdout ?? ''),
+        stderr: String(execaError.stderr ?? ''),
+        exitCode: execaError.exitCode ?? 1,
       }
     }
     throw error

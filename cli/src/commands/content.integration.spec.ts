@@ -6,9 +6,9 @@
  * real command handler logic.
  */
 
+import type { RepoInfo } from '../lib/github.js'
 import type { FkMaps } from '../lib/pocketbase.js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import {
   fetchInspecYml,
   fetchReadme,
@@ -68,15 +68,28 @@ const mockFkMaps: FkMaps = {
   teams: new Map([
     ['saf team', 'team-001'],
   ]),
+  categories: new Map([
+    ['operating system', 'cat-001'],
+  ]),
+  capabilities: new Map([
+    ['validate', 'cap-001'],
+    ['harden', 'cap-002'],
+  ]),
+  tags: new Map([
+    ['stig', 'tag-001'],
+    ['linux', 'tag-002'],
+  ]),
 }
 
-const mockRepoInfo = {
-  name: 'rhel-9-stig-baseline',
+const mockRepoInfo: RepoInfo = {
+  owner: 'mitre',
+  repo: 'rhel-9-stig-baseline',
   fullName: 'mitre/rhel-9-stig-baseline',
   description: 'InSpec Profile for RHEL 9 STIG',
   defaultBranch: 'main',
   htmlUrl: 'https://github.com/mitre/rhel-9-stig-baseline',
   license: 'Apache-2.0',
+  topics: ['inspec', 'stig', 'rhel'],
 }
 
 const mockInspecProfile = {

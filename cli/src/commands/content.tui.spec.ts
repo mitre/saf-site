@@ -30,25 +30,13 @@ const CLI_ENTRY = join(__dirname, '../index.ts')
 // Timeout for TUI tests (they're slower due to real process spawning)
 const TUI_TIMEOUT = 15000
 
-// Test Pocketbase configuration (managed by global setup)
-const TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
-const TEST_PB_EMAIL = process.env.PB_EMAIL || 'admin@localhost.com'
-const TEST_PB_PASSWORD = process.env.PB_PASSWORD || 'testpassword123'
-
 // Ctrl+C character (not in ANSI constants)
 const CTRL_C = '\x03'
 
-// Helper to create CLI test instance with test Pocketbase env vars
+// Helper to create CLI test instance
+// Note: Pocketbase env vars are set by global setup (test/global-setup.ts)
 function createCliTest(args: string[]): CLITest {
   return new CLITest('npx', ['tsx', CLI_ENTRY, ...args], {
-    env: {
-      ...process.env,
-      FORCE_COLOR: '0', // Disable colors for cleaner output matching
-      NO_COLOR: '1',
-      PB_URL: TEST_PB_URL,
-      PB_EMAIL: TEST_PB_EMAIL,
-      PB_PASSWORD: TEST_PB_PASSWORD,
-    },
     failOnStderr: false, // Allow stderr output (errors are expected in some tests)
   })
 }
@@ -120,7 +108,7 @@ describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       await cli.run()
 
       // Wait for the URL prompt
-      await cli.waitForOutput('GitHub repository URL', 5000)
+      await cli.waitForOutput('GitHub repository URL')
 
       // Cancel the operation
       await cli.write(CTRL_C)
@@ -134,13 +122,13 @@ describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
-      await cli.waitForOutput('GitHub repository URL', 5000)
+      await cli.waitForOutput('GitHub repository URL')
 
       // Enter invalid URL
       await cli.write(`not-a-valid-url${ANSI.CR}`)
 
       // Should show error and re-prompt
-      await cli.waitForOutput('Invalid GitHub URL', 3000)
+      await cli.waitForOutput('Invalid GitHub URL')
 
       // Cancel
       await cli.write(CTRL_C)
@@ -157,59 +145,59 @@ describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       await cli.run()
 
       // 1. Enter GitHub URL
-      await cli.waitForOutput('GitHub repository URL', 5000)
+      await cli.waitForOutput('GitHub repository URL')
       await cli.write(`https://github.com/mitre/redhat-enterprise-linux-9-stig-baseline${ANSI.CR}`)
 
       // 2. Wait for repo fetch (spinner)
-      await cli.waitForOutput('Fetching', 5000)
+      await cli.waitForOutput('Fetching')
 
       // 3. Should show fetched info
-      await cli.waitForOutput('Repository', 10000)
+      await cli.waitForOutput('Repository')
 
       // 4. Content type selection
-      await cli.waitForOutput('Content type', 5000)
+      await cli.waitForOutput('Content type')
       // Default is validation, just press enter
       await cli.write(ANSI.CR)
 
       // 5. Name input
-      await cli.waitForOutput('Name', 5000)
+      await cli.waitForOutput('Name')
       await cli.write(ANSI.CR) // Accept default
 
       // 6. Slug input
-      await cli.waitForOutput('Slug', 5000)
+      await cli.waitForOutput('Slug')
       await cli.write(ANSI.CR) // Accept default
 
       // 7. Description
-      await cli.waitForOutput('Description', 5000)
+      await cli.waitForOutput('Description')
       await cli.write(ANSI.CR) // Accept default
 
       // 8. Version
-      await cli.waitForOutput('Version', 5000)
+      await cli.waitForOutput('Version')
       await cli.write(ANSI.CR) // Accept default
 
       // 9. Target platform selection
-      await cli.waitForOutput('Target', 5000)
+      await cli.waitForOutput('Target')
       // Navigate and select (or skip)
       await cli.write(ANSI.CR) // Select first option or skip
 
       // 10. Standard selection
-      await cli.waitForOutput('standard', 5000)
+      await cli.waitForOutput('standard')
       await cli.write(ANSI.CR)
 
       // 11. Technology selection
-      await cli.waitForOutput('Technology', 5000)
+      await cli.waitForOutput('Technology')
       await cli.write(ANSI.CR)
 
       // 12. Vendor selection
-      await cli.waitForOutput('Vendor', 5000)
+      await cli.waitForOutput('Vendor')
       await cli.write(ANSI.CR)
 
       // 13. Control count
-      await cli.waitForOutput('Control count', 5000)
+      await cli.waitForOutput('Control count')
       await cli.write(ANSI.CR)
 
       // 14. Confirmation
-      await cli.waitForOutput('Create this content record', 5000)
+      await cli.waitForOutput('Create this content record')
       // Cancel instead of creating to avoid polluting database
       await cli.write(`n${ANSI.CR}`)
 
@@ -223,7 +211,7 @@ describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
-      await cli.waitForOutput('GitHub repository URL', 5000)
+      await cli.waitForOutput('GitHub repository URL')
 
       // Send Ctrl+C
       await cli.write(CTRL_C)
@@ -236,7 +224,7 @@ describe('content TUI - Add Flow', { timeout: TUI_TIMEOUT }, () => {
       const cli = createCliTest(['content', 'add'])
 
       await cli.run()
-      await cli.waitForOutput('GitHub repository URL', 5000)
+      await cli.waitForOutput('GitHub repository URL')
 
       // Send Escape
       await cli.write(ANSI.ESC)
@@ -385,7 +373,7 @@ describe('content TUI - Keyboard Navigation', { timeout: TUI_TIMEOUT }, () => {
     await cli.run()
 
     // Wait for content type selection prompt
-    await cli.waitForOutput('Content type', 10000)
+    await cli.waitForOutput('Content type')
 
     // The select prompt shows both options:
     // - Validation (InSpec profile)
@@ -420,7 +408,7 @@ describe('content TUI - Error Recovery', { timeout: TUI_TIMEOUT }, () => {
 
     // Wait for error message
     try {
-      await cli.waitForOutput('Failed', 10000)
+      await cli.waitForOutput('Failed')
       const output = cli.getOutput()
       expect(output.toLowerCase()).toMatch(/failed|error|not found/i)
     }

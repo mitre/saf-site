@@ -542,7 +542,7 @@ describe('createContent', () => {
       name: 'Valid Name',
       slug: 'valid-slug',
       contentType: 'invalid-type',
-    } as CreateContentInput
+    } as unknown as CreateContentInput
 
     await expect(createContent(invalidInput, mockPb as any))
       .rejects
