@@ -30,6 +30,21 @@ bd ready
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
 - [AGENT.md](AGENT.md) - AI agent-specific guidance
 
+## Critical Development Principles
+
+**NEVER USE HACKS. ALWAYS FIX ROOT CAUSE.**
+
+- When encountering bugs, CSS conflicts, or unexpected behavior: investigate and fix the actual cause
+- Do not use `!important` hacks, inline style overrides, or workarounds that mask problems
+- If a fix requires `!important`, it belongs in the component definition with a comment explaining WHY (e.g., framework conflict), not in a separate CSS file
+- Understand the cascade, specificity, and architecture before proposing solutions
+- Quick fixes create technical debt - take the time to understand and fix properly
+- Document architectural decisions so future sessions understand the reasoning
+
+**Example - VitePress + shadcn-vue conflict:**
+- BAD: Add `!important` overrides in custom.css
+- GOOD: Add Tailwind's `!` modifier in button/index.ts with comment explaining VitePress `.vp-doc a` conflict
+
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
