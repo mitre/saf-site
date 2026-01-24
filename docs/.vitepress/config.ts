@@ -34,6 +34,7 @@ export default defineConfig({
       '/framework/': [
         {
           text: 'Framework',
+          link: '/framework/',
           items: [
             { text: 'Plan', link: '/framework/plan' },
             { text: 'Harden', link: '/framework/harden' },

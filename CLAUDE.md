@@ -78,8 +78,10 @@ pnpm dev                               # Terminal 2
 pnpm db:export                         # Export to git
 pnpm reload-data                       # Refresh dev server
 
-# Testing
-pnpm test:run
+# Testing & Linting
+pnpm test:run                          # Run tests
+pnpm lint:fix                          # Auto-fix code style (ESLint)
+pnpm ci:check                          # Full CI check (typecheck + lint + test + docs)
 
 # Component development (Histoire)
 pnpm story:dev     # Start Histoire on :6006
@@ -289,6 +291,33 @@ pnpm test:coverage   # With coverage
 pnpm test            # Watch mode
 ```
 
+## Component Documentation (DRY Pattern)
+
+Component documentation is auto-generated from JSDoc comments to maintain a single source of truth:
+
+1. **Write JSDoc in component:** Use `@component` tag with description and `@example` tags
+2. **Create story file:** `ComponentName.story.vue` with variants
+3. **Run doc generator:** `pnpm story:docs` injects `<docs>` block into story file
+4. **View in Histoire:** Documentation appears in docs panel
+
+**Example:**
+```vue
+<script setup lang="ts">
+/**
+ * @component LogoGrid - Display logos in responsive grid.
+ *
+ * @example Basic
+ * <LogoGrid :items="partners" />
+ */
+export interface LogoGridProps {
+  /** Array of logo items */
+  items: LogoItem[]
+}
+</script>
+```
+
+This keeps component docs, props table, and examples in sync automatically. See `docs/.vitepress/theme/components/STYLE-GUIDE.md` for full conventions.
+
 ## Scripts Reference
 
 | Script | Purpose |
@@ -299,13 +328,18 @@ pnpm test            # Watch mode
 | `pnpm db:export` | Export Pocketbase to diffable/ |
 | `pnpm reload-data` | Trigger data loader refresh |
 
-## Beads Task Tracking
+## Task Tracking
+
+This project uses **beads** for task management. Tasks are stored in `.beads/` and sync with git.
 
 ```bash
 bd ready                    # See available work
 bd list --status=open       # All open tasks
 bd show <id>                # Task details
+bd sync                     # Sync with remote (commit all changes first)
 ```
+
+**Note:** `bd sync` performs a `git pull` internally, so commit all modified files before running it.
 
 ## Common Issues
 
@@ -458,6 +492,7 @@ This means you can use Tailwind hover classes normally (`hover:border-primary`, 
 - Logic in composables, presentation in components
 - Tests colocated with source files
 - Path alias `@/` maps to `docs/.vitepress/theme/`
+- ESLint auto-formatting with `@antfu/eslint-config` (opinionated style, run `pnpm lint:fix` before commits)
 
 ## Icon Libraries
 
