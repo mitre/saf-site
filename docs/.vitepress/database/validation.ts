@@ -196,7 +196,7 @@ export function validateEntity<T extends EntityType>(
 
   return {
     valid: true,
-    data: result.data,
+    data: result.data as z.infer<typeof schemaMap[T]>,
     warnings,
   }
 }
@@ -301,8 +301,8 @@ export function auditEntity(
   const validation = validateEntity(entityType, data)
 
   if (!validation.valid && validation.errors) {
-    // Convert Zod errors to issue strings
-    for (const error of validation.errors.errors) {
+    // Convert Zod errors to issue strings (Zod v4 uses 'issues' property)
+    for (const error of validation.errors.issues) {
       issues.push(`${error.path.join('.')}: ${error.message}`)
     }
   }

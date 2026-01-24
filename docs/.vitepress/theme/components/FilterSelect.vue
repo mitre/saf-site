@@ -3,6 +3,7 @@
  * Reusable filter select dropdown
  * Wraps shadcn Select with consistent styling and "All X" option
  */
+import { computed } from 'vue'
 import {
   Select,
   SelectContent,
@@ -17,7 +18,7 @@ export interface FilterOption {
   label: string
 }
 
-defineProps<{
+const props = withDefaults(defineProps<{
   /** Current selected value */
   modelValue: string
   /** Available options (value used for both if label not specified) */
@@ -26,13 +27,20 @@ defineProps<{
   label: string
   /** Placeholder text (also used for "All X" option) */
   placeholder: string
-  /** Aria label for accessibility */
-  ariaLabel: string
-}>()
+  /** Aria label for accessibility (defaults to "Filter by {label}") */
+  ariaLabel?: string
+}>(), {
+  ariaLabel: undefined,
+})
 
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+// Computed aria-label that falls back to a generated value
+const computedAriaLabel = computed(() =>
+  props.ariaLabel || `Filter by ${props.label.toLowerCase()}`,
+)
 
 /**
  * Normalize options to FilterOption format
@@ -49,9 +57,9 @@ function normalizeOptions(options: string[] | FilterOption[]): FilterOption[] {
     <label class="filter-label">{{ label }}</label>
     <Select
       :model-value="modelValue"
-      @update:model-value="$emit('update:modelValue', $event)"
+      @update:model-value="$emit('update:modelValue', $event as string)"
     >
-      <SelectTrigger :aria-label="ariaLabel">
+      <SelectTrigger :aria-label="computedAriaLabel">
         <SelectValue :placeholder="placeholder" />
       </SelectTrigger>
       <SelectContent>

@@ -144,5 +144,4 @@ export interface LogoMarqueeProps {
   verticalAlign?: 'start' | 'center' | 'end'
 }
 ```
-
 </docs>

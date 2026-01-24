@@ -129,5 +129,4 @@ Icon-only button
 ## Notes
 
 **@see**: https://www.shadcn-vue.com/docs/components/button
-
 </docs>

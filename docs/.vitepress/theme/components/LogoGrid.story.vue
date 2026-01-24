@@ -137,5 +137,4 @@ export interface LogoGridProps {
   justify?: 'start' | 'center' | 'end' | 'between' | 'around'
 }
 ```
-
 </docs>

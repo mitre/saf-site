@@ -5,11 +5,12 @@
  * Inspired by Nuxt UI PageFeature. Use individually or within FeatureList.
  * Supports horizontal (icon left) and vertical (icon top) orientations.
  */
+import type { Component } from 'vue'
 import { computed } from 'vue'
 
 export interface FeatureItemProps {
-  /** Lucide icon name */
-  icon?: string
+  /** Lucide icon component (e.g., Shield from lucide-vue-next) */
+  icon?: Component
   /** Feature title */
   title: string
   /** Feature description */

@@ -194,5 +194,4 @@ export interface PageSectionProps {
   contained?: boolean
 }
 ```
-
 </docs>

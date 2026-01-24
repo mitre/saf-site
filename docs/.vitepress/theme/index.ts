@@ -1,3 +1,4 @@
+import type { EnhanceAppContext } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 // Content library components
 import ContentCard from './components/ContentCard.vue'
@@ -20,7 +21,7 @@ import './custom.css'
 
 export default {
   extends: DefaultTheme,
-  enhanceApp({ app }) {
+  enhanceApp({ app }: EnhanceAppContext) {
     // Content library
     app.component('ContentCard', ContentCard)
     app.component('ContentFilters', ContentFilters)

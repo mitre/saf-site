@@ -568,7 +568,7 @@ export const pbRecordSchema = z.object({
     title: 'Collection Name',
     description: 'Name of the Pocketbase collection',
   }),
-  expand: z.record(z.unknown()).optional().meta({
+  expand: z.record(z.string(), z.unknown()).optional().meta({
     title: 'Expand',
     description: 'Expanded FK relations (when using ?expand=)',
   }),

@@ -17,5 +17,8 @@
     "baseUrl": "."
   },
   "include": ["docs/.vitepress/**/*.ts", "docs/.vitepress/**/*.vue"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "docs/.vitepress/database/yaml-schemas.ts"
+  ]
 }

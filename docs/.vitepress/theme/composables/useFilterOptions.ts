@@ -8,7 +8,7 @@ import { computed } from 'vue'
  * @param fieldName - Name of the field to extract values from
  * @returns Sorted array of unique non-empty values
  */
-export function useUniqueValues<T extends Record<string, unknown>>(
+export function useUniqueValues<T extends object>(
   items: Ref<T[]> | T[],
   fieldName: keyof T,
 ): ComputedRef<string[]> {

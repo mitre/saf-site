@@ -101,7 +101,6 @@ watch(selectedStandard, value => emit('update:standard', value))
         :options="pillarOptions"
         label="Pillar"
         placeholder="All Pillars"
-        aria-label="Filter by SAF pillar"
       />
 
       <!-- Target Filter -->
@@ -110,7 +109,6 @@ watch(selectedStandard, value => emit('update:standard', value))
         :options="targets"
         label="Target"
         placeholder="All Targets"
-        aria-label="Filter by target platform"
       />
 
       <!-- Technology Filter -->
@@ -119,7 +117,6 @@ watch(selectedStandard, value => emit('update:standard', value))
         :options="technologies"
         label="Technology"
         placeholder="All Technologies"
-        aria-label="Filter by automation technology"
       />
 
       <!-- Vendor Filter -->
@@ -128,7 +125,6 @@ watch(selectedStandard, value => emit('update:standard', value))
         :options="vendors"
         label="Vendor"
         placeholder="All Vendors"
-        aria-label="Filter by vendor or organization"
       />
 
       <!-- Standard Filter -->
@@ -137,7 +133,6 @@ watch(selectedStandard, value => emit('update:standard', value))
         :options="standardOptions"
         label="Standard"
         placeholder="All Standards"
-        aria-label="Filter by compliance standard"
       />
     </div>
 

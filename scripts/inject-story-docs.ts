@@ -277,7 +277,7 @@ function findStoryFile(componentPath: string): string | null {
 function injectDocs(storyPath: string, markdown: string): boolean {
   const content = readFileSync(storyPath, 'utf-8')
 
-  const docsBlock = `<docs lang="md">\n${markdown}\n</docs>`
+  const docsBlock = `<docs lang="md">\n${markdown.trimEnd()}\n</docs>`
 
   // Check if <docs> block already exists
   const docsRegex = /<docs\s+lang="md">[\s\S]*?<\/docs>/
@@ -305,7 +305,7 @@ function injectDocs(storyPath: string, markdown: string): boolean {
  */
 function checkDocs(storyPath: string, markdown: string): boolean {
   const content = readFileSync(storyPath, 'utf-8')
-  const docsBlock = `<docs lang="md">\n${markdown}\n</docs>`
+  const docsBlock = `<docs lang="md">\n${markdown.trimEnd()}\n</docs>`
   const docsRegex = /<docs\s+lang="md">[\s\S]*?<\/docs>/
 
   let expectedContent: string
