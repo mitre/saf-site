@@ -37,6 +37,7 @@ export default defineConfig({
 
     // Aliases matching VitePress paths
     alias: {
+      '@/': fileURLToPath(new URL('./docs/.vitepress/theme/', import.meta.url)),
       '@theme': fileURLToPath(new URL('./docs/.vitepress/theme', import.meta.url)),
       '@composables': fileURLToPath(new URL('./docs/.vitepress/theme/composables', import.meta.url)),
       '@components': fileURLToPath(new URL('./docs/.vitepress/theme/components', import.meta.url))

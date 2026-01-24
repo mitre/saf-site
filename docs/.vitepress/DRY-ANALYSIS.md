@@ -245,10 +245,10 @@ defineEmits<{
 | Priority | Issue | Lines Saved | Effort | Status |
 |----------|-------|-------------|--------|--------|
 | P1 | Card component duplication | 96 | 1h | ✅ Done (Session 056) |
-| P2 | Filter component duplication | 60+ | 1.5h | ⬜ Todo |
+| P2 | Filter component duplication | 60+ | 1.5h | ✅ Done (Session 056) |
 | P3 | Data loader transformation | 50+ | 1h | ✅ Done (Session 056) |
 | P4 | Status variant logic | 16 | 15m | ✅ Done (Session 055) |
-| P5 | Filter select template | 60+ | 1h | ⬜ Todo |
+| P5 | Filter select template | 60+ | 1h | ✅ Done (Session 056) |
 | P6 | Metadata display logic | 40+ | 1.5h | ⬜ Todo |
 | P7 | Pocketbase types | 25+ | 30m | ✅ Done (Session 055) |
 | **Total** | | **347+** | **~7h** | |
@@ -264,8 +264,13 @@ defineEmits<{
 - **P3:** Created `lib/loader-utils.ts` with `initPocketBase()` and FK extraction helpers
 - Updated `content.data.ts` and `[slug].paths.ts` to use shared utilities
 - Removed `profiles.data.ts` loader (legacy)
+- **P2+P5:** Filter consolidation
+  - Created `composables/useFilterOptions.ts` with `useUniqueValues()` and `useStandardOptions()`
+  - Created `components/FilterSelect.vue` for reusable dropdown filters
+  - Refactored `ContentFilters.vue` to use new composable and component (356→241 lines)
+  - Added `@/` alias to vitest.config.ts for test imports
+  - Added 17 new tests (11 composable + 6 component)
 
 ## Remaining Work
 
-- **Session C:** P2 + P5 (~2.5h, ~120 lines) - Filter consolidation
 - **Session D:** P6 (~1.5h, ~40 lines) - Metadata cleanup

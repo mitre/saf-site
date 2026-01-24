@@ -2,114 +2,50 @@
   <div class="content-filters">
     <!-- Row 1: Dropdown filters -->
     <div class="filter-row filter-dropdowns">
-      <!-- Pillar Filter (SAF capability) -->
-      <div class="filter-item">
-        <label class="filter-label">Pillar</label>
-        <Select v-model="selectedPillar">
-          <SelectTrigger aria-label="Filter by SAF pillar">
-            <SelectValue placeholder="All Pillars" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <SelectItemText>All Pillars</SelectItemText>
-            </SelectItem>
-            <SelectItem value="validate">
-              <SelectItemText>Validate</SelectItemText>
-            </SelectItem>
-            <SelectItem value="harden">
-              <SelectItemText>Harden</SelectItemText>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <!-- Pillar Filter (SAF capability) - static options -->
+      <FilterSelect
+        v-model="selectedPillar"
+        :options="pillarOptions"
+        label="Pillar"
+        placeholder="All Pillars"
+        aria-label="Filter by SAF pillar"
+      />
 
-      <!-- Target Filter (what the content secures) -->
-      <div class="filter-item">
-        <label class="filter-label">Target</label>
-        <Select v-model="selectedTarget">
-          <SelectTrigger aria-label="Filter by target platform">
-            <SelectValue placeholder="All Targets" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <SelectItemText>All Targets</SelectItemText>
-            </SelectItem>
-            <SelectItem
-              v-for="target in targets"
-              :key="target"
-              :value="target"
-            >
-              <SelectItemText>{{ target }}</SelectItemText>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <!-- Target Filter -->
+      <FilterSelect
+        v-model="selectedTarget"
+        :options="targets"
+        label="Target"
+        placeholder="All Targets"
+        aria-label="Filter by target platform"
+      />
 
       <!-- Technology Filter -->
-      <div class="filter-item">
-        <label class="filter-label">Technology</label>
-        <Select v-model="selectedTech">
-          <SelectTrigger aria-label="Filter by automation technology">
-            <SelectValue placeholder="All Technologies" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <SelectItemText>All Technologies</SelectItemText>
-            </SelectItem>
-            <SelectItem
-              v-for="tech in technologies"
-              :key="tech"
-              :value="tech"
-            >
-              <SelectItemText>{{ tech }}</SelectItemText>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterSelect
+        v-model="selectedTech"
+        :options="technologies"
+        label="Technology"
+        placeholder="All Technologies"
+        aria-label="Filter by automation technology"
+      />
 
       <!-- Vendor Filter -->
-      <div class="filter-item">
-        <label class="filter-label">Vendor</label>
-        <Select v-model="selectedVendor">
-          <SelectTrigger aria-label="Filter by vendor or organization">
-            <SelectValue placeholder="All Vendors" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <SelectItemText>All Vendors</SelectItemText>
-            </SelectItem>
-            <SelectItem
-              v-for="vendor in vendors"
-              :key="vendor"
-              :value="vendor"
-            >
-              <SelectItemText>{{ vendor }}</SelectItemText>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterSelect
+        v-model="selectedVendor"
+        :options="vendors"
+        label="Vendor"
+        placeholder="All Vendors"
+        aria-label="Filter by vendor or organization"
+      />
 
       <!-- Standard Filter -->
-      <div class="filter-item">
-        <label class="filter-label">Standard</label>
-        <Select v-model="selectedStandard">
-          <SelectTrigger aria-label="Filter by compliance standard">
-            <SelectValue placeholder="All Standards" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <SelectItemText>All Standards</SelectItemText>
-            </SelectItem>
-            <SelectItem
-              v-for="standard in standards"
-              :key="standard.fullName"
-              :value="standard.fullName"
-            >
-              <SelectItemText>{{ standard.shortName }}</SelectItemText>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterSelect
+        v-model="selectedStandard"
+        :options="standardOptions"
+        label="Standard"
+        placeholder="All Standards"
+        aria-label="Filter by compliance standard"
+      />
     </div>
 
     <!-- Row 2: Search + Clear -->
@@ -137,17 +73,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectItemText,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { ref, computed, watch, toRef } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import FilterSelect, { type FilterOption } from './FilterSelect.vue'
+import { useUniqueValues, useStandardOptions } from '@/composables/useFilterOptions'
 
 interface ContentItem {
   id: string
@@ -179,12 +109,31 @@ const emit = defineEmits<{
   'clear': []
 }>()
 
+// Filter state
 const selectedPillar = ref(props.initialPillar || 'all')
 const selectedTarget = ref(props.initialTarget || 'all')
 const selectedTech = ref(props.initialTechnology || 'all')
 const selectedVendor = ref(props.initialVendor || 'all')
 const selectedStandard = ref(props.initialStandard || 'all')
 const searchQuery = ref(props.initialSearch || '')
+
+// Static pillar options
+const pillarOptions: FilterOption[] = [
+  { value: 'validate', label: 'Validate' },
+  { value: 'harden', label: 'Harden' }
+]
+
+// Dynamic filter options using composable
+const itemsRef = toRef(props, 'items')
+const targets = useUniqueValues(itemsRef, 'target_name')
+const technologies = useUniqueValues(itemsRef, 'technology_name')
+const vendors = useUniqueValues(itemsRef, 'vendor_name')
+const standards = useStandardOptions(itemsRef)
+
+// Transform standards to FilterOption format
+const standardOptions = computed<FilterOption[]>(() =>
+  standards.value.map(s => ({ value: s.fullName, label: s.shortName }))
+)
 
 // Check if any filters are active
 const hasActiveFilters = computed(() => {
@@ -207,74 +156,12 @@ function clearFilters() {
   emit('clear')
 }
 
-// Extract unique targets from items
-const targets = computed(() => {
-  const unique = new Set<string>()
-  props.items.forEach(item => {
-    if (item.target_name) {
-      unique.add(item.target_name)
-    }
-  })
-  return Array.from(unique).sort()
-})
-
-// Extract unique technologies from items
-const technologies = computed(() => {
-  const unique = new Set<string>()
-  props.items.forEach(item => {
-    if (item.technology_name) {
-      unique.add(item.technology_name)
-    }
-  })
-  return Array.from(unique).sort()
-})
-
-// Extract unique vendors from items
-const vendors = computed(() => {
-  const unique = new Set<string>()
-  props.items.forEach(item => {
-    if (item.vendor_name) {
-      unique.add(item.vendor_name)
-    }
-  })
-  return Array.from(unique).sort()
-})
-
-// Extract unique standards with both full and short names
-const standards = computed(() => {
-  const standardsMap = new Map<string, string>()
-  props.items.forEach(item => {
-    if (item.standard_name) {
-      standardsMap.set(
-        item.standard_name,
-        item.standard_short_name || item.standard_name
-      )
-    }
-  })
-  return Array.from(standardsMap.entries())
-    .map(([fullName, shortName]) => ({ fullName, shortName }))
-    .sort((a, b) => a.shortName.localeCompare(b.shortName))
-})
-
-watch(selectedPillar, (value) => {
-  emit('update:pillar', value)
-})
-
-watch(selectedTarget, (value) => {
-  emit('update:target', value)
-})
-
-watch(selectedTech, (value) => {
-  emit('update:technology', value)
-})
-
-watch(selectedVendor, (value) => {
-  emit('update:vendor', value)
-})
-
-watch(selectedStandard, (value) => {
-  emit('update:standard', value)
-})
+// Emit changes
+watch(selectedPillar, (value) => emit('update:pillar', value))
+watch(selectedTarget, (value) => emit('update:target', value))
+watch(selectedTech, (value) => emit('update:technology', value))
+watch(selectedVendor, (value) => emit('update:vendor', value))
+watch(selectedStandard, (value) => emit('update:standard', value))
 </script>
 
 <style scoped>
@@ -298,7 +185,8 @@ watch(selectedStandard, (value) => {
   flex-wrap: wrap;
 }
 
-.filter-dropdowns .filter-item {
+/* FilterSelect components in the dropdown row */
+.filter-dropdowns :deep(.filter-item) {
   flex: 1;
   min-width: 140px;
 }
@@ -309,18 +197,16 @@ watch(selectedStandard, (value) => {
   border-top: 1px solid var(--vp-c-divider);
 }
 
-.filter-search {
+/* Local filter-item for search (not from FilterSelect) */
+.filter-item.filter-search {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .filter-search :deep(input) {
   background: var(--vp-c-bg);
-}
-
-.filter-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .filter-label {
@@ -339,7 +225,7 @@ watch(selectedStandard, (value) => {
     flex-direction: column;
   }
 
-  .filter-dropdowns .filter-item {
+  .filter-dropdowns :deep(.filter-item) {
     min-width: 100%;
   }
 
