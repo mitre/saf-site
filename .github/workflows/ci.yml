@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # Run CI on all pushes to all branches
   pull_request:
-    # Run CI on PRs targeting any branch
+    # Run CI on all PRs
 
 concurrency:
   group: ci-${{ github.ref }}
