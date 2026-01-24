@@ -89,6 +89,7 @@
     "@vueuse/core": "^14.1.0",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
+    "fuse.js": "^7.1.0",
     "marked": "^17.0.1",
     "pocketbase": "^0.26.5",
     "reka-ui": "^2.7.0",

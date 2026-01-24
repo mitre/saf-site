@@ -8,8 +8,12 @@ aside: false
 import { ref, computed, onMounted } from 'vue'
 import { data } from '../.vitepress/loaders/content.data'
 import { inBrowser } from 'vitepress'
+import { createFuzzyMatcher } from '../.vitepress/theme/composables/useFuzzySearch'
 
 const allItems = data.items
+
+// Create fuzzy matcher for search (handles "redhat" → "Red Hat" etc.)
+const fuzzyMatch = createFuzzyMatcher(allItems)
 
 // Read URL query params (only in browser)
 function getUrlParam(name) {
@@ -70,13 +74,11 @@ const filteredItems = computed(() => {
     result = result.filter(item => item.standard_name === selectedStandard.value)
   }
 
-  // Filter by search query
+  // Filter by search query using fuzzy matching
+  // Handles variations like "redhat" → "Red Hat", "rhel" → "RHEL 8"
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(item =>
-      item.name.toLowerCase().includes(query) ||
-      (item.description && item.description.toLowerCase().includes(query))
-    )
+    const matchingItems = fuzzyMatch(searchQuery.value)
+    result = result.filter(item => matchingItems.has(item))
   }
 
   return result
