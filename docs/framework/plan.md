@@ -18,7 +18,7 @@ const planTools = [
   orientation="horizontal"
   headline="SAF Framework"
   title="Plan"
-  description="The Plan phase of the MITRE SAF helps you identify which security guidance applies to your software components. Whether you're implementing an existing system or developing a new one, Plan connects you with the right baselines and helps you create documentation where standards don't yet exist."
+  description="It's hard to hit a target that you can't see. Similarly, it's hard to implement quality security automation without understanding your requirements. The Plan phase of the MITRE SAF helps you identify which security guidance applies to your software components."
   :links="[
     { label: 'Browse Security Content', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
@@ -36,7 +36,7 @@ const planTools = [
   orientation="vertical"
   headline="Use Cases"
   title="Two Ways to Plan Your Security"
-  description="The Plan pillar supports both teams implementing existing software and developers creating new components. Start by identifying your software components, then either search for applicable security guidance from government and industry sources or create your own comprehensive validation profiles."
+  description="The Plan pillar supports both teams implementing existing software and developers creating new components. Start by identifying your software components, then either search for applicable security guidance from government and industry sources or create your own comprehensive validation profiles. Whether you're implementing a component into an existing system or developing new software from scratch, Plan connects you with the right baselines and helps you create documentation where standards don't yet exist."
 >
   <FeatureList
     :items="[
