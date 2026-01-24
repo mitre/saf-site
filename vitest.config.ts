@@ -11,6 +11,9 @@ export default defineConfig({
     // Global test utilities
     globals: true,
 
+    // Setup file to suppress happy-dom cleanup noise
+    setupFiles: ['./vitest.setup.ts'],
+
     // Test file patterns
     include: [
       'docs/.vitepress/theme/**/*.spec.ts',
