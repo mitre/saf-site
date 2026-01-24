@@ -57,7 +57,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/mitre/saf' },
+      { icon: 'github', link: 'https://github.com/mitre/saf-site' },
     ],
 
     footer: {
