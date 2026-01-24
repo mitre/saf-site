@@ -7,18 +7,10 @@
  * - Project partners (Navy, Army, etc.)
  * - Normalization tool integrations
  */
-import BrandIcon from './icons/BrandIcon.vue'
+import { LogoItemRenderer, type LogoItem } from './logos'
 
-export interface LogoItem {
-  /** Display name (used for BrandIcon lookup and alt text) */
-  name: string
-  /** Optional URL to link to */
-  href?: string
-  /** Optional custom image URL (overrides BrandIcon) */
-  image?: string
-  /** Optional description shown on hover */
-  description?: string
-}
+// Re-export for consumers
+export type { LogoItem }
 
 export interface LogoGridProps {
   /** Array of logo items to display */
@@ -29,52 +21,57 @@ export interface LogoGridProps {
   size?: number
   /** Show name labels below logos */
   showNames?: boolean
-  /** Grid columns (auto-fit by default) */
+  /** Fixed columns override (uses responsive defaults if not set) */
   columns?: number
   /** Variant styling */
   variant?: 'default' | 'compact' | 'card'
+  /** Use fluid auto-fit instead of fixed responsive columns */
+  fluid?: boolean
+  /** Layout mode: grid (default) or row (horizontal scrolling single row) */
+  layout?: 'grid' | 'row'
+  /** Override layout on mobile (useful for row on mobile, grid on desktop) */
+  mobileLayout?: 'grid' | 'row'
+  /** Horizontal alignment of items within container */
+  align?: 'start' | 'center' | 'end'
+  /** Justify content for row layout */
+  justify?: 'start' | 'center' | 'end' | 'between' | 'around'
 }
 
 const props = withDefaults(defineProps<LogoGridProps>(), {
   size: 48,
   showNames: false,
-  variant: 'default'
+  variant: 'default',
+  fluid: false,
+  layout: 'grid',
+  align: 'center',
+  justify: 'start'
 })
 </script>
 
 <template>
-  <div class="logo-grid" :class="[`logo-grid--${variant}`]">
+  <div class="logo-grid" :class="[
+    `logo-grid--${variant}`,
+    `logo-grid--${layout}`,
+    `logo-grid--align-${align}`,
+    `logo-grid--justify-${justify}`,
+    { 'logo-grid--fluid': fluid },
+    mobileLayout ? `logo-grid--mobile-${mobileLayout}` : ''
+  ]">
     <h3 v-if="title" class="logo-grid-title">{{ title }}</h3>
 
     <div
       class="logo-grid-items"
-      :style="columns ? `grid-template-columns: repeat(${columns}, 1fr)` : undefined"
+      :style="columns && layout === 'grid' ? `grid-template-columns: repeat(${columns}, 1fr)` : undefined"
     >
-      <component
-        :is="item.href ? 'a' : 'div'"
+      <LogoItemRenderer
         v-for="item in items"
         :key="item.name"
-        :href="item.href"
-        :target="item.href?.startsWith('http') ? '_blank' : undefined"
-        :rel="item.href?.startsWith('http') ? 'noopener noreferrer' : undefined"
+        :item="item"
+        :size="size"
         class="logo-item"
-        :title="item.description || item.name"
       >
-        <img
-          v-if="item.image"
-          :src="item.image"
-          :alt="item.name"
-          :width="size"
-          :height="size"
-          class="logo-image"
-        />
-        <BrandIcon
-          v-else
-          :name="item.name"
-          :size="size"
-        />
         <span v-if="showNames" class="logo-name">{{ item.name }}</span>
-      </component>
+      </LogoItemRenderer>
     </div>
   </div>
 </template>
@@ -96,13 +93,18 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   color: var(--vp-c-text-1);
 }
 
-/* Mobile: 3-4 columns, tight spacing */
+/* Mobile: 1 column (clean stacked layout) */
 .logo-grid-items {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.75rem;
   align-items: center;
   justify-items: center;
+}
+
+/* Fluid mode: auto-fit instead of fixed */
+.logo-grid--fluid .logo-grid-items {
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
 }
 
 .logo-item {
@@ -166,7 +168,7 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Tablet: larger items, more spacing */
+/* Tablet: 3 columns fixed */
 @media (min-width: 640px) {
   .logo-grid {
     margin: 1.25rem 0;
@@ -178,8 +180,12 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   }
 
   .logo-grid-items {
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+  }
+
+  .logo-grid--fluid .logo-grid-items {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
   }
 
   .logo-item {
@@ -197,7 +203,7 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   }
 }
 
-/* Desktop: full spacing, hover effects */
+/* Desktop: 4 columns fixed */
 @media (min-width: 1024px) {
   .logo-grid {
     margin: 1.5rem 0;
@@ -208,8 +214,12 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   }
 
   .logo-grid-items {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
+  }
+
+  .logo-grid--fluid .logo-grid-items {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   }
 
   .logo-item {
@@ -240,5 +250,146 @@ const props = withDefaults(defineProps<LogoGridProps>(), {
   .logo-grid--card .logo-item:hover {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   }
+}
+
+/* ===========================================
+   ROW LAYOUT: Horizontal scrolling single row
+   =========================================== */
+
+.logo-grid--row .logo-grid-items {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.logo-grid--row .logo-item {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* Hide scrollbar but keep functionality */
+.logo-grid--row .logo-grid-items::-webkit-scrollbar {
+  height: 4px;
+}
+
+.logo-grid--row .logo-grid-items::-webkit-scrollbar-track {
+  background: var(--vp-c-bg-soft);
+  border-radius: 2px;
+}
+
+.logo-grid--row .logo-grid-items::-webkit-scrollbar-thumb {
+  background: var(--vp-c-divider);
+  border-radius: 2px;
+}
+
+.logo-grid--row .logo-grid-items::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
+}
+
+@media (min-width: 640px) {
+  .logo-grid--row .logo-grid-items {
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo-grid--row .logo-grid-items {
+    gap: 1.5rem;
+  }
+}
+
+/* ===========================================
+   MOBILE LAYOUT OVERRIDE
+   Switch layout only on mobile (<640px)
+   =========================================== */
+
+/* Mobile row override: use row layout on mobile only */
+@media (max-width: 639px) {
+  .logo-grid--mobile-row .logo-grid-items {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .logo-grid--mobile-row .logo-item {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  .logo-grid--mobile-row .logo-grid-items::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .logo-grid--mobile-row .logo-grid-items::-webkit-scrollbar-track {
+    background: var(--vp-c-bg-soft);
+    border-radius: 2px;
+  }
+
+  .logo-grid--mobile-row .logo-grid-items::-webkit-scrollbar-thumb {
+    background: var(--vp-c-divider);
+    border-radius: 2px;
+  }
+}
+
+/* Mobile grid override: use grid layout on mobile only */
+@media (max-width: 639px) {
+  .logo-grid--mobile-grid.logo-grid--row .logo-grid-items {
+    display: grid;
+    grid-template-columns: 1fr;
+    flex-wrap: unset;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
+  .logo-grid--mobile-grid.logo-grid--row .logo-item {
+    flex-shrink: unset;
+    scroll-snap-align: unset;
+  }
+}
+
+/* ===========================================
+   ALIGNMENT UTILITIES
+   =========================================== */
+
+/* Grid alignment (justify-items for grid) */
+.logo-grid--align-start .logo-grid-items {
+  justify-items: start;
+}
+
+.logo-grid--align-center .logo-grid-items {
+  justify-items: center;
+}
+
+.logo-grid--align-end .logo-grid-items {
+  justify-items: end;
+}
+
+/* Row layout justify-content */
+.logo-grid--row.logo-grid--justify-start .logo-grid-items {
+  justify-content: flex-start;
+}
+
+.logo-grid--row.logo-grid--justify-center .logo-grid-items {
+  justify-content: center;
+}
+
+.logo-grid--row.logo-grid--justify-end .logo-grid-items {
+  justify-content: flex-end;
+}
+
+.logo-grid--row.logo-grid--justify-between .logo-grid-items {
+  justify-content: space-between;
+}
+
+.logo-grid--row.logo-grid--justify-around .logo-grid-items {
+  justify-content: space-around;
 }
 </style>
