@@ -15,6 +15,8 @@ export default defineConfig({
     include: [
       'docs/.vitepress/theme/**/*.spec.ts',
       'docs/.vitepress/theme/**/*.test.ts',
+      'docs/.vitepress/lib/**/*.spec.ts',
+      'docs/.vitepress/lib/**/*.test.ts',
       'scripts/**/*.spec.ts',
       'scripts/**/*.test.ts'
     ],

@@ -50,12 +50,10 @@
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import ActionButtons, { type ActionItem } from './ActionButtons.vue'
 import BrandIcon from './icons/BrandIcon.vue'
+import type { MetadataItem } from '@/lib/metadata'
 
-export interface MetadataItem {
-  label: string
-  value: string
-  href?: string
-}
+// Re-export for consumers
+export type { MetadataItem }
 
 defineProps<{
   title: string

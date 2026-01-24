@@ -249,7 +249,7 @@ defineEmits<{
 | P3 | Data loader transformation | 50+ | 1h | ✅ Done (Session 056) |
 | P4 | Status variant logic | 16 | 15m | ✅ Done (Session 055) |
 | P5 | Filter select template | 60+ | 1h | ✅ Done (Session 056) |
-| P6 | Metadata display logic | 40+ | 1.5h | ⬜ Todo |
+| P6 | Metadata display logic | 40+ | 1.5h | ✅ Done (Session 056) |
 | P7 | Pocketbase types | 25+ | 30m | ✅ Done (Session 055) |
 | **Total** | | **347+** | **~7h** | |
 
@@ -271,6 +271,18 @@ defineEmits<{
   - Added `@/` alias to vitest.config.ts for test imports
   - Added 17 new tests (11 composable + 6 component)
 
-## Remaining Work
+- **P6:** Metadata consolidation
+  - Created `lib/metadata.ts` with shared `MetadataItem` type and builder functions
+  - `createMetadataItem()` - creates item with optional filter link
+  - `buildMetadataItems()` - filters undefined entries
+  - Updated ContentHero.vue and MetadataStrip.vue to use shared type
+  - Refactored ContentDetail.vue metadata building (70→17 lines)
+  - Added 14 tests
 
-- **Session D:** P6 (~1.5h, ~40 lines) - Metadata cleanup
+## Summary
+
+All DRY work complete. Total improvements:
+- 7 priorities addressed across 2 sessions
+- Reusable utilities: loader-utils, useFilterOptions, metadata helpers
+- Reusable components: FilterSelect
+- Tests increased from 84 to 115

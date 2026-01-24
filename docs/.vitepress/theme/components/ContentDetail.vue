@@ -70,10 +70,11 @@ import { ref, computed, onMounted } from 'vue'
 import { Marked } from 'marked'
 import { createHighlighter } from 'shiki'
 import { useContentDetail, type ContentItem } from '../composables/useContentDetail'
-import ContentHero, { type MetadataItem } from './ContentHero.vue'
+import ContentHero from './ContentHero.vue'
 import PillarBadge, { type PillarType } from './PillarBadge.vue'
 import BrandIcon from './icons/BrandIcon.vue'
 import type { ActionItem } from './ActionButtons.vue'
+import { createMetadataItem, buildMetadataItems } from '@/lib/metadata'
 
 // Store for highlighted HTML (populated async)
 const quickStartHighlighted = ref('')
@@ -172,82 +173,27 @@ const heroActions = computed<ActionItem[]>(() => {
   }))
 })
 
-// Build metadata items for sidebar
-// All profile info consolidated in one place
-const metadataItems = computed<MetadataItem[]>(() => {
-  const items: MetadataItem[] = []
+// Build metadata items for sidebar using shared utilities
+const metadataItems = computed(() => {
+  // Determine standard display value (benchmark label or short name)
+  const standardValue = benchmarkLabel.value ||
+    props.content.standard_short_name ||
+    props.content.standard_name
 
-  if (props.content.target_name) {
-    items.push({
-      label: 'Target',
-      value: props.content.target_name,
-      href: `/content/?target=${encodeURIComponent(props.content.target_name)}`
-    })
-  }
-
-  // Use full benchmark label (e.g., "STIG V1R0") instead of just standard name
-  if (benchmarkLabel.value) {
-    items.push({
-      label: 'Standard',
-      value: benchmarkLabel.value,
-      href: `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
-    })
-  } else if (props.content.standard_short_name || props.content.standard_name) {
-    items.push({
-      label: 'Standard',
-      value: props.content.standard_short_name || props.content.standard_name,
-      href: `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
-    })
-  }
-
-  if (props.content.technology_name) {
-    items.push({
-      label: 'Tech',
-      value: props.content.technology_name,
-      href: `/content/?technology=${encodeURIComponent(props.content.technology_name)}`
-    })
-  }
-
-  // Status with indicator
-  if (props.content.status) {
-    items.push({
-      label: 'Status',
-      value: props.content.status
-    })
-  }
-
-  // Profile version
-  if (formattedProfileVersion.value) {
-    items.push({
-      label: 'Profile',
-      value: formattedProfileVersion.value
-    })
-  }
-
-  // Control count
-  if (props.content.control_count) {
-    items.push({
-      label: 'Controls',
-      value: `${props.content.control_count}`
-    })
-  }
-
-  if (props.content.vendor_name) {
-    items.push({
-      label: 'Vendor',
-      value: props.content.vendor_name,
-      href: `/content/?vendor=${encodeURIComponent(props.content.vendor_name)}`
-    })
-  }
-
-  if (props.content.maintainer_name) {
-    items.push({
-      label: 'Maintainer',
-      value: props.content.maintainer_name
-    })
-  }
-
-  return items
+  return buildMetadataItems(
+    createMetadataItem('Target', props.content.target_name, { filterParam: 'target' }),
+    createMetadataItem('Standard', standardValue, {
+      href: props.content.standard_name
+        ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
+        : undefined
+    }),
+    createMetadataItem('Tech', props.content.technology_name, { filterParam: 'technology' }),
+    createMetadataItem('Status', props.content.status),
+    createMetadataItem('Profile', formattedProfileVersion.value),
+    createMetadataItem('Controls', props.content.control_count),
+    createMetadataItem('Vendor', props.content.vendor_name, { filterParam: 'vendor' }),
+    createMetadataItem('Maintainer', props.content.maintainer_name)
+  )
 })
 
 // Related content with default empty array

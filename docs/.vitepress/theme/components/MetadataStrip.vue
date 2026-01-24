@@ -14,12 +14,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import MetadataPill from './MetadataPill.vue'
+import type { MetadataItem } from '@/lib/metadata'
 
-export interface MetadataItem {
-  label: string
-  value: string
-  href?: string
-}
+// Re-export for consumers
+export type { MetadataItem }
 
 const props = defineProps<{
   items: MetadataItem[]
