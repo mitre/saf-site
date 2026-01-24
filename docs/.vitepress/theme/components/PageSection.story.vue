@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { CheckCircle, FileCode, Shield } from 'lucide-vue-next'
+import FeatureList from './FeatureList.vue'
 import PageSection from './PageSection.vue'
 import Placeholder from './Placeholder.vue'
-import FeatureList from './FeatureList.vue'
-import { Shield, FileCode, CheckCircle } from 'lucide-vue-next'
 
 const features = [
   { icon: Shield, title: 'Feature One', description: 'Description of the first feature' },
@@ -90,3 +90,109 @@ const links = [
     </Variant>
   </Story>
 </template>
+
+<docs lang="md">
+# PageSection
+
+PageSection - Flexible two-column layout for feature/CTA sections. Supports vertical (stacked) and horizontal (side-by-side) orientations, with slots for content (text, links) and visuals (images, components).
+
+## Usage
+
+```vue
+Vertical hero section
+<PageSection
+headline="Security Automation"
+title="Validate your systems with InSpec"
+description="Run compliance checks against industry standards."
+:links="[{ label: 'Get Started', href: '/start' }]"
+/>
+```
+
+```vue
+Horizontal with visual slot
+<PageSection
+orientation="horizontal"
+title="Supported Platforms"
+description="InSpec runs on any platform."
+>
+<LogoGrid :items="platforms" />
+</PageSection>
+```
+
+```vue
+Reversed layout with muted background
+<PageSection
+orientation="horizontal"
+:reverse="true"
+variant="muted"
+title="Enterprise Ready"
+>
+<img src="/enterprise.png" alt="Enterprise" />
+</PageSection>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `as` | `string` | `'section'` | Render as different element |
+| `headline` | `string` | `-` | Small text above title |
+| `title` | `string` | `-` | Main section title |
+| `description` | `string` | `-` | Section description |
+| `orientation` | `union` | `'vertical'` | Layout orientation |
+| `reverse` | `boolean` | `false` | Reverse content and visual order |
+| `variant` | `union` | `'default'` | Background variant |
+| `links` | `Array` | `-` | Array of link buttons |
+| `align` | `union` | `'center'` | Vertical alignment of content and visual |
+| `contained` | `boolean` | `true` | Constrain width |
+
+## Slots
+
+| Slot | Description |
+|------|-------------|
+| `top` |  |
+| `header` |  |
+| `headline` |  |
+| `title` |  |
+| `description` |  |
+| `body` |  |
+| `footer` |  |
+| `links` |  |
+| `default` |  |
+| `bottom` |  |
+
+## Types
+
+```typescript
+export interface PageSectionLink {
+  label: string
+  href: string
+  variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link'
+  external?: boolean
+}
+
+export interface PageSectionProps {
+  /** Render as different element */
+  as?: string
+  /** Small text above title */
+  headline?: string
+  /** Main section title */
+  title?: string
+  /** Section description */
+  description?: string
+  /** Layout orientation */
+  orientation?: 'vertical' | 'horizontal'
+  /** Reverse content and visual order */
+  reverse?: boolean
+  /** Background variant */
+  variant?: 'default' | 'muted' | 'dark'
+  /** Array of link buttons */
+  links?: PageSectionLink[]
+  /** Vertical alignment of content and visual */
+  align?: 'start' | 'center' | 'end'
+  /** Constrain width */
+  contained?: boolean
+}
+```
+
+</docs>

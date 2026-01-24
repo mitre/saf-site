@@ -1,12 +1,35 @@
 <script setup lang="ts">
 /**
- * PageSection - Two-column layout for feature/CTA sections
+ * @component PageSection - Flexible two-column layout for feature/CTA sections.
+ * Supports vertical (stacked) and horizontal (side-by-side) orientations,
+ * with slots for content (text, links) and visuals (images, components).
  *
- * Inspired by Nuxt UI PageHero/PageCTA. Provides slots for:
- * - Content side: headline, title, description, body, footer, links
- * - Visual side: default slot for images, marquees, grids, etc.
+ * @example Vertical hero section
+ * <PageSection
+ *   headline="Security Automation"
+ *   title="Validate your systems with InSpec"
+ *   description="Run compliance checks against industry standards."
+ *   :links="[{ label: 'Get Started', href: '/start' }]"
+ * />
  *
- * Use orientation="horizontal" for side-by-side layout on desktop.
+ * @example Horizontal with visual slot
+ * <PageSection
+ *   orientation="horizontal"
+ *   title="Supported Platforms"
+ *   description="InSpec runs on any platform."
+ * >
+ *   <LogoGrid :items="platforms" />
+ * </PageSection>
+ *
+ * @example Reversed layout with muted background
+ * <PageSection
+ *   orientation="horizontal"
+ *   :reverse="true"
+ *   variant="muted"
+ *   title="Enterprise Ready"
+ * >
+ *   <img src="/enterprise.png" alt="Enterprise" />
+ * </PageSection>
  */
 import { computed, useSlots } from 'vue'
 import { Button } from '@/components/ui/button'
@@ -47,22 +70,22 @@ const props = withDefaults(defineProps<PageSectionProps>(), {
   reverse: false,
   variant: 'default',
   align: 'center',
-  contained: true
+  contained: true,
 })
 
 const slots = useSlots()
 
 const hasContent = computed(() => {
-  return props.headline ||
-    props.title ||
-    props.description ||
-    props.links?.length ||
-    slots.headline ||
-    slots.title ||
-    slots.description ||
-    slots.body ||
-    slots.footer ||
-    slots.links
+  return props.headline
+    || props.title
+    || props.description
+    || props.links?.length
+    || slots.headline
+    || slots.title
+    || slots.description
+    || slots.body
+    || slots.footer
+    || slots.links
 })
 
 const hasVisual = computed(() => !!slots.default)
@@ -78,8 +101,8 @@ const hasVisual = computed(() => !!slots.default)
       `page-section--align-${align}`,
       {
         'page-section--reverse': reverse,
-        'page-section--contained': contained
-      }
+        'page-section--contained': contained,
+      },
     ]"
   >
     <slot name="top" />
@@ -89,15 +112,21 @@ const hasVisual = computed(() => !!slots.default)
       <div v-if="hasContent" class="page-section-content">
         <slot name="header">
           <div v-if="headline || $slots.headline" class="page-section-headline">
-            <slot name="headline">{{ headline }}</slot>
+            <slot name="headline">
+              {{ headline }}
+            </slot>
           </div>
 
           <h2 v-if="title || $slots.title" class="page-section-title">
-            <slot name="title">{{ title }}</slot>
+            <slot name="title">
+              {{ title }}
+            </slot>
           </h2>
 
           <div v-if="description || $slots.description" class="page-section-description">
-            <slot name="description">{{ description }}</slot>
+            <slot name="description">
+              {{ description }}
+            </slot>
           </div>
         </slot>
 
@@ -112,7 +141,7 @@ const hasVisual = computed(() => !!slots.default)
                 <Button
                   v-for="(link, index) in links"
                   :key="index"
-                  :as="'a'"
+                  as="a"
                   :href="link.href"
                   :target="link.external ? '_blank' : undefined"
                   :rel="link.external ? 'noopener noreferrer' : undefined"

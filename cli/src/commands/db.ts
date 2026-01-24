@@ -4,12 +4,12 @@
  * Commands for exporting, validating, and managing the database
  */
 
-import { Command } from 'commander'
+import { execSync } from 'node:child_process'
 import * as p from '@clack/prompts'
+import { auditSlug } from '@schema/validation.js'
+import { Command } from 'commander'
 import pc from 'picocolors'
-import { execSync } from 'child_process'
-import { getPocketBase, checkConnection, loadFkMaps } from '../lib/pocketbase.js'
-import { auditSlug, validateSlug } from '@schema/validation.js'
+import { checkConnection, getPocketBase, loadFkMaps } from '../lib/pocketbase.js'
 
 export const dbCommand = new Command('db')
   .description('Database management commands')
@@ -39,7 +39,7 @@ dbCommand
         'targets',
         'teams',
         'tags',
-        'tools'
+        'tools',
       ]
 
       console.log(pc.bold('\nCollection Statistics:'))
@@ -49,11 +49,13 @@ dbCommand
         try {
           const result = await pb.collection(collection).getList(1, 1)
           console.log(`${collection.padEnd(20)} ${pc.cyan(result.totalItems.toString())} records`)
-        } catch {
+        }
+        catch {
           console.log(`${collection.padEnd(20)} ${pc.red('error')}`)
         }
       }
-    } else {
+    }
+    else {
       s.stop(pc.red('Pocketbase is not running'))
       console.log(pc.dim('\nStart with: cd .pocketbase && ./pocketbase serve'))
     }
@@ -72,7 +74,8 @@ dbCommand
     try {
       execSync('pnpm db:export', { stdio: 'pipe' })
       s.stop(pc.green('Database exported to .pocketbase/pb_data/diffable/'))
-    } catch (error) {
+    }
+    catch (error) {
       s.stop(pc.red('Export failed'))
       if (error instanceof Error) {
         console.error(pc.dim(error.message))
@@ -95,8 +98,8 @@ dbCommand
     const pb = await getPocketBase()
     const issues: string[] = []
 
-    // Load FK maps
-    const fkMaps = await loadFkMaps()
+    // Load FK maps (available for future validation logic)
+    const _fkMaps = await loadFkMaps()
     s.stop('Database loaded')
 
     // Validate content records
@@ -120,12 +123,13 @@ dbCommand
         validateFK(pb, record.id, record.target, 'targets', 'target'),
         validateFK(pb, record.id, record.standard, 'standards', 'standard'),
         validateFK(pb, record.id, record.technology, 'technologies', 'technology'),
-        validateFK(pb, record.id, record.vendor, 'organizations', 'vendor')
+        validateFK(pb, record.id, record.vendor, 'organizations', 'vendor'),
       ])
 
       // Collect any validation errors
       for (const error of fkValidations) {
-        if (error) issues.push(error)
+        if (error)
+          issues.push(error)
       }
     }
     s.stop(`Validated ${content.length} content records`)
@@ -146,7 +150,8 @@ dbCommand
     // Report results
     if (issues.length === 0) {
       p.outro(pc.green('All validations passed'))
-    } else {
+    }
+    else {
       console.log(pc.bold(pc.red(`\nFound ${issues.length} issues:\n`)))
       for (const issue of issues) {
         console.log(pc.yellow(`  • ${issue}`))
@@ -216,15 +221,17 @@ dbCommand
 
       if (audit.compliant) {
         compliant++
-      } else {
+      }
+      else {
         const hasErrors = audit.issues.some(i =>
-          !i.startsWith('Use ') && !i.startsWith('Consider ') && !i.startsWith('Expected ')
+          !i.startsWith('Use ') && !i.startsWith('Consider ') && !i.startsWith('Expected '),
         )
 
         if (hasErrors) {
           errors++
           console.log(pc.red(`✗ ${record.slug}`))
-        } else {
+        }
+        else {
           warnings++
           console.log(pc.yellow(`⚠ ${record.slug}`))
         }
@@ -252,9 +259,11 @@ dbCommand
     if (errors > 0) {
       p.outro(pc.red('Audit found errors'))
       process.exit(1)
-    } else if (warnings > 0) {
+    }
+    else if (warnings > 0) {
       p.outro(pc.yellow('Audit passed with warnings'))
-    } else {
+    }
+    else {
       p.outro(pc.green('All slugs compliant'))
     }
   })
@@ -265,12 +274,13 @@ dbCommand
 async function recordExists(
   pb: Awaited<ReturnType<typeof getPocketBase>>,
   collection: string,
-  id: string
+  id: string,
 ): Promise<boolean> {
   try {
     await pb.collection(collection).getOne(id)
     return true
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -283,9 +293,10 @@ async function validateFK(
   recordId: string,
   fkValue: string | undefined | null,
   collection: string,
-  fieldName: string
+  fieldName: string,
 ): Promise<string | null> {
-  if (!fkValue) return null
+  if (!fkValue)
+    return null
   if (!await recordExists(pb, collection, fkValue)) {
     return `Content ${recordId}: invalid ${fieldName} reference "${fkValue}"`
   }

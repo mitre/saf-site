@@ -5,30 +5,28 @@
  * Uses schemas from schemas.ts as the source of truth.
  */
 
-import { z, ZodError } from 'zod'
+import type { z, ZodError } from 'zod'
+import type { ContentInput, OrganizationInput, StandardInput, TagInput, TargetInput, TeamInput, TechnologyInput } from './schemas.js'
 import {
-  organizationInputSchema,
-  targetInputSchema,
-  standardInputSchema,
-  technologyInputSchema,
-  teamInputSchema,
-  tagInputSchema,
-  contentInputSchema,
-  type OrganizationInput,
-  type TargetInput,
-  type StandardInput,
-  type TechnologyInput,
-  type TeamInput,
-  type TagInput,
-  type ContentInput
-} from './schemas.js'
-import {
-  TARGET_ABBREVIATIONS,
+  abbreviateTarget,
   STANDARD_IDENTIFIERS,
-  TECHNOLOGY_PREFIXES,
-  generateContentSlug,
-  abbreviateTarget
 } from './conventions.js'
+import {
+
+  contentInputSchema,
+
+  organizationInputSchema,
+
+  standardInputSchema,
+
+  tagInputSchema,
+
+  targetInputSchema,
+
+  teamInputSchema,
+
+  technologyInputSchema,
+} from './schemas.js'
 
 // ============================================================================
 // TYPES
@@ -51,7 +49,7 @@ export interface AuditResult {
 // SLUG VALIDATION
 // ============================================================================
 
-const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const standardIdentifiers = Object.values(STANDARD_IDENTIFIERS)
 
 /**
@@ -91,7 +89,7 @@ export function validateSlug(slug: string): {
   const possibleStandards = [
     lastPart,
     secondLastPart ? `${secondLastPart}-${lastPart}` : null,
-    parts.length > 2 ? `${parts[parts.length - 3]}-${secondLastPart}-${lastPart}` : null
+    parts.length > 2 ? `${parts[parts.length - 3]}-${secondLastPart}-${lastPart}` : null,
   ].filter(Boolean) as string[]
 
   const hasValidStandard = possibleStandards.some(s => standardIdentifiers.includes(s))
@@ -116,7 +114,7 @@ export function validateSlug(slug: string): {
   return {
     valid: errors.length === 0,
     errors,
-    warnings
+    warnings,
   }
 }
 
@@ -156,7 +154,7 @@ const schemaMap = {
   technology: technologyInputSchema,
   team: teamInputSchema,
   tag: tagInputSchema,
-  content: contentInputSchema
+  content: contentInputSchema,
 } as const
 
 /**
@@ -164,7 +162,7 @@ const schemaMap = {
  */
 export function validateEntity<T extends EntityType>(
   entityType: T,
-  data: unknown
+  data: unknown,
 ): ValidationResult<z.infer<typeof schemaMap[T]>> {
   const schema = schemaMap[entityType]
 
@@ -179,18 +177,19 @@ export function validateEntity<T extends EntityType>(
     return {
       valid: false,
       errors: result.error,
-      warnings
+      warnings,
     }
   }
 
   // Add convention warnings based on entity type
-  const typedData = result.data as { slug?: string; name?: string; contentType?: string }
+  const typedData = result.data as { slug?: string, name?: string, contentType?: string }
 
   if (typedData.slug && typedData.name) {
     if (entityType === 'content') {
       const slugValidation = validateSlug(typedData.slug)
       warnings.push(...slugValidation.warnings)
-    } else if (entityType === 'target') {
+    }
+    else if (entityType === 'target') {
       warnings.push(...checkTargetSlugConventions(typedData.slug, typedData.name))
     }
   }
@@ -198,7 +197,7 @@ export function validateEntity<T extends EntityType>(
   return {
     valid: true,
     data: result.data,
-    warnings
+    warnings,
   }
 }
 
@@ -284,7 +283,7 @@ export function auditSlug(slug: string, name: string): AuditResult {
   return {
     compliant: issues.length === 0,
     issues,
-    suggestedSlug: issues.length > 0 ? undefined : slug
+    suggestedSlug: issues.length > 0 ? undefined : slug,
   }
 }
 
@@ -293,7 +292,7 @@ export function auditSlug(slug: string, name: string): AuditResult {
  */
 export function auditEntity(
   entityType: EntityType,
-  data: { name: string; slug: string; contentType?: string; [key: string]: unknown }
+  data: { name: string, slug: string, contentType?: string, [key: string]: unknown },
 ): AuditResult {
   const issues: string[] = []
   let suggestedSlug: string | undefined
@@ -349,7 +348,8 @@ export function auditEntity(
           : `${targetAbbrev}-${standard}`
       }
     }
-  } else if (entityType === 'target') {
+  }
+  else if (entityType === 'target') {
     const targetWarnings = checkTargetSlugConventions(data.slug, data.name)
     for (const warning of targetWarnings) {
       if (!issues.includes(warning)) {
@@ -361,7 +361,7 @@ export function auditEntity(
   return {
     compliant: issues.length === 0,
     issues,
-    suggestedSlug
+    suggestedSlug,
   }
 }
 

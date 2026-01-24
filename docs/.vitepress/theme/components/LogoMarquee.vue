@@ -1,15 +1,37 @@
 <script setup lang="ts">
+import type { LogoItem } from './logos'
 /**
- * LogoMarquee - Animated scrolling logo display
+ * @component LogoMarquee - Animated infinite-scrolling logo display.
+ * Creates a smooth horizontal scroll of logos for visual interest.
+ * Supports multiple rows with alternating directions for large logo sets.
  *
- * Creates an infinite horizontal scroll of logos.
- * Good for partner/sponsor sections that need visual interest.
+ * @example Basic single-row marquee
+ * <LogoMarquee
+ *   :items="[
+ *     { name: 'AWS' },
+ *     { name: 'GitHub' },
+ *     { name: 'Docker' }
+ *   ]"
+ *   :duration="20"
+ * />
  *
- * For large sets (35+ items), use the `rows` prop to split into multiple
- * rows with alternating scroll directions.
+ * @example Multi-row with alternating directions
+ * <LogoMarquee
+ *   :items="allPartners"
+ *   :rows="3"
+ *   :size="32"
+ *   :duration="25"
+ * />
+ *
+ * @example Reversed direction, no overlay
+ * <LogoMarquee
+ *   :items="tools"
+ *   :reverse="true"
+ *   :overlay="false"
+ * />
  */
 import { computed } from 'vue'
-import { LogoItemRenderer, type LogoItem } from './logos'
+import { LogoItemRenderer } from './logos'
 
 // Re-export for consumers
 export type { LogoItem }
@@ -45,7 +67,7 @@ const props = withDefaults(defineProps<LogoMarqueeProps>(), {
   overlay: true,
   rows: 1,
   alternateDirection: true,
-  verticalAlign: 'center'
+  verticalAlign: 'center',
 })
 
 // Split items into rows
@@ -71,7 +93,7 @@ const itemRows = computed(() => {
 })
 
 // Determine if a row should be reversed
-const isRowReversed = (rowIndex: number): boolean => {
+function isRowReversed(rowIndex: number): boolean {
   if (!props.alternateDirection) {
     return props.reverse
   }
@@ -88,8 +110,8 @@ const isRowReversed = (rowIndex: number): boolean => {
       {
         'logo-marquee--pause-hover': pauseOnHover,
         'logo-marquee--overlay': overlay,
-        'logo-marquee--multi-row': rows > 1
-      }
+        'logo-marquee--multi-row': rows > 1,
+      },
     ]"
   >
     <!-- Each row -->

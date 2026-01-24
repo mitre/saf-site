@@ -1,13 +1,36 @@
 <script setup lang="ts">
+import type { LogoItem } from './logos'
 /**
- * LogoGrid - Display partner/sponsor logos in a responsive grid
+ * @component LogoGrid - Display partner/sponsor logos in a responsive grid.
+ * Supports multiple variants (default, compact, card), layouts (grid, row),
+ * and automatic logo resolution via SimpleIcons or custom icons.
  *
- * Use cases:
- * - Partners page (Oracle, GitHub, AWS, etc.)
- * - Project partners (Navy, Army, etc.)
- * - Normalization tool integrations
+ * @example Basic usage with auto-resolved logos
+ * <LogoGrid
+ *   :items="[
+ *     { name: 'AWS', href: 'https://aws.amazon.com' },
+ *     { name: 'GitHub', href: 'https://github.com' },
+ *     { name: 'Red Hat', href: 'https://redhat.com' }
+ *   ]"
+ *   :showNames="true"
+ * />
+ *
+ * @example Card variant for partners section
+ * <LogoGrid
+ *   :items="partners"
+ *   variant="card"
+ *   :showNames="true"
+ *   :size="64"
+ * />
+ *
+ * @example Horizontal scrolling row
+ * <LogoGrid
+ *   :items="tools"
+ *   layout="row"
+ *   :size="32"
+ * />
  */
-import { LogoItemRenderer, type LogoItem } from './logos'
+import { LogoItemRenderer } from './logos'
 
 // Re-export for consumers
 export type { LogoItem }
@@ -37,27 +60,31 @@ export interface LogoGridProps {
   justify?: 'start' | 'center' | 'end' | 'between' | 'around'
 }
 
-const props = withDefaults(defineProps<LogoGridProps>(), {
+withDefaults(defineProps<LogoGridProps>(), {
   size: 48,
   showNames: false,
   variant: 'default',
   fluid: false,
   layout: 'grid',
   align: 'center',
-  justify: 'start'
+  justify: 'start',
 })
 </script>
 
 <template>
-  <div class="logo-grid" :class="[
-    `logo-grid--${variant}`,
-    `logo-grid--${layout}`,
-    `logo-grid--align-${align}`,
-    `logo-grid--justify-${justify}`,
-    { 'logo-grid--fluid': fluid },
-    mobileLayout ? `logo-grid--mobile-${mobileLayout}` : ''
-  ]">
-    <h3 v-if="title" class="logo-grid-title">{{ title }}</h3>
+  <div
+    class="logo-grid" :class="[
+      `logo-grid--${variant}`,
+      `logo-grid--${layout}`,
+      `logo-grid--align-${align}`,
+      `logo-grid--justify-${justify}`,
+      { 'logo-grid--fluid': fluid },
+      mobileLayout ? `logo-grid--mobile-${mobileLayout}` : '',
+    ]"
+  >
+    <h3 v-if="title" class="logo-grid-title">
+      {{ title }}
+    </h3>
 
     <div
       class="logo-grid-items"

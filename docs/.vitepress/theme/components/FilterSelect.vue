@@ -17,7 +17,7 @@ export interface FilterOption {
   label: string
 }
 
-const props = defineProps<{
+defineProps<{
   /** Current selected value */
   modelValue: string
   /** Available options (value used for both if label not specified) */
@@ -39,7 +39,7 @@ defineEmits<{
  */
 function normalizeOptions(options: string[] | FilterOption[]): FilterOption[] {
   return options.map(opt =>
-    typeof opt === 'string' ? { value: opt, label: opt } : opt
+    typeof opt === 'string' ? { value: opt, label: opt } : opt,
   )
 }
 </script>

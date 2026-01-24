@@ -5,7 +5,7 @@
  * Pass an array of feature objects or use the default slot for custom items.
  * Good for benefit lists, feature highlights, capability descriptions.
  */
-import { type Component } from 'vue'
+import type { Component } from 'vue'
 import FeatureItem from './FeatureItem.vue'
 
 export interface FeatureItemData {
@@ -30,10 +30,10 @@ export interface FeatureListProps {
   direction?: 'column' | 'row'
 }
 
-const props = withDefaults(defineProps<FeatureListProps>(), {
+withDefaults(defineProps<FeatureListProps>(), {
   orientation: 'horizontal',
   gap: 'md',
-  direction: 'column'
+  direction: 'column',
 })
 </script>
 
@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<FeatureListProps>(), {
     class="feature-list"
     :class="[
       `feature-list--gap-${gap}`,
-      `feature-list--${direction}`
+      `feature-list--${direction}`,
     ]"
   >
     <slot>

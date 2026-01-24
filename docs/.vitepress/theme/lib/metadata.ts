@@ -12,16 +12,6 @@ export interface MetadataItem {
 }
 
 /**
- * Configuration for a metadata field that can be extracted from content
- */
-interface MetadataFieldConfig {
-  label: string
-  field: string
-  /** Generate filter link (e.g., /content/?target=value) */
-  filterParam?: string
-}
-
-/**
  * Build a filter URL for the content library
  */
 export function buildFilterUrl(param: string, value: string): string {
@@ -35,7 +25,7 @@ export function buildFilterUrl(param: string, value: string): string {
 export function createMetadataItem(
   label: string,
   value: string | number | undefined | null,
-  options?: { filterParam?: string; href?: string }
+  options?: { filterParam?: string, href?: string },
 ): MetadataItem | undefined {
   // Treat 0, empty string, null, undefined as "no value"
   if (value === undefined || value === null || value === '' || value === 0) {
@@ -53,7 +43,7 @@ export function createMetadataItem(
   return {
     label,
     value: stringValue,
-    href
+    href,
   }
 }
 

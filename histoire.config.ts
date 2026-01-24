@@ -1,7 +1,7 @@
 import { HstVue } from '@histoire/plugin-vue'
-import { defineConfig } from 'histoire'
-import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'histoire'
 
 export default defineConfig({
   plugins: [HstVue()],
@@ -10,6 +10,9 @@ export default defineConfig({
   setupFile: 'docs/.vitepress/theme/histoire.setup.ts',
 
   // Story file patterns
+  // NOTE: Using storyMatch breaks sibling .story.md file discovery (Issue #680)
+  // We use <docs> blocks instead until that bug is fixed.
+  // https://github.com/histoire-dev/histoire/issues/680
   storyMatch: ['docs/.vitepress/theme/**/*.story.vue'],
 
   // Ignore patterns (avoid watching socket files, etc.)

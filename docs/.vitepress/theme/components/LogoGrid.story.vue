@@ -1,32 +1,6 @@
 <script setup lang="ts">
 import LogoGrid from './LogoGrid.vue'
 
-/**
- * @docs
- * LogoGrid displays a responsive grid of brand/partner logos.
- *
- * ## Props
- * | Prop | Type | Default | Description |
- * |------|------|---------|-------------|
- * | `items` | `LogoItem[]` | required | Array of logo items |
- * | `size` | `number` | `48` | Logo size in pixels |
- * | `showNames` | `boolean` | `false` | Show name labels |
- * | `columns` | `number` | - | Fixed columns (overrides responsive) |
- * | `variant` | `'default' \| 'compact' \| 'card'` | `'default'` | Visual style |
- * | `fluid` | `boolean` | `false` | Use auto-fit grid |
- * | `layout` | `'grid' \| 'row'` | `'grid'` | Layout mode |
- * | `align` | `'start' \| 'center' \| 'end'` | `'center'` | Item alignment |
- *
- * ## LogoItem Interface
- * ```ts
- * interface LogoItem {
- *   name: string       // Brand name (for BrandIcon)
- *   href?: string      // Link URL
- *   image?: string     // Custom image path
- * }
- * ```
- */
-
 const techPartners = [
   { name: 'AWS', href: 'https://aws.amazon.com' },
   { name: 'GitHub', href: 'https://github.com' },
@@ -52,11 +26,11 @@ const projectPartners = [
     </Variant>
 
     <Variant title="With Names">
-      <LogoGrid :items="techPartners" :showNames="true" />
+      <LogoGrid :items="techPartners" :show-names="true" />
     </Variant>
 
     <Variant title="Card Variant">
-      <LogoGrid :items="projectPartners" variant="card" :showNames="true" />
+      <LogoGrid :items="projectPartners" variant="card" :show-names="true" />
     </Variant>
 
     <Variant title="Compact Variant">
@@ -68,11 +42,11 @@ const projectPartners = [
     </Variant>
 
     <Variant title="Fixed Columns (3)">
-      <LogoGrid :items="projectPartners" :columns="3" :showNames="true" />
+      <LogoGrid :items="projectPartners" :columns="3" :show-names="true" />
     </Variant>
 
     <Variant title="Large Size">
-      <LogoGrid :items="projectPartners" :size="64" :showNames="true" />
+      <LogoGrid :items="projectPartners" :size="64" :show-names="true" />
     </Variant>
 
     <Variant title="Fluid (Auto-fit)">
@@ -80,3 +54,88 @@ const projectPartners = [
     </Variant>
   </Story>
 </template>
+
+<docs lang="md">
+# LogoGrid
+
+LogoGrid - Display partner/sponsor logos in a responsive grid. Supports multiple variants (default, compact, card), layouts (grid, row), and automatic logo resolution via SimpleIcons or custom icons.
+
+## Usage
+
+```vue
+Basic usage with auto-resolved logos
+<LogoGrid
+:items="[
+{ name: 'AWS', href: 'https://aws.amazon.com' },
+{ name: 'GitHub', href: 'https://github.com' },
+{ name: 'Red Hat', href: 'https://redhat.com' }
+]"
+:showNames="true"
+/>
+```
+
+```vue
+Card variant for partners section
+<LogoGrid
+:items="partners"
+variant="card"
+:showNames="true"
+:size="64"
+/>
+```
+
+```vue
+Horizontal scrolling row
+<LogoGrid
+:items="tools"
+layout="row"
+:size="32"
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `Array` | `-` | Array of logo items to display **(required)** |
+| `title` | `string` | `-` | Optional section title |
+| `size` | `number` | `48` | Logo size in pixels |
+| `showNames` | `boolean` | `false` | Show name labels below logos |
+| `columns` | `number` | `-` | Fixed columns override (uses responsive defaults if not set) |
+| `variant` | `union` | `'default'` | Variant styling |
+| `fluid` | `boolean` | `false` | Use fluid auto-fit instead of fixed responsive columns |
+| `layout` | `union` | `'grid'` | Layout mode: grid (default) or row (horizontal scrolling single row) |
+| `mobileLayout` | `union` | `-` | Override layout on mobile (useful for row on mobile, grid on desktop) |
+| `align` | `union` | `'center'` | Horizontal alignment of items within container |
+| `justify` | `union` | `'start'` | Justify content for row layout |
+
+## Types
+
+```typescript
+export interface LogoGridProps {
+  /** Array of logo items to display */
+  items: LogoItem[]
+  /** Optional section title */
+  title?: string
+  /** Logo size in pixels */
+  size?: number
+  /** Show name labels below logos */
+  showNames?: boolean
+  /** Fixed columns override (uses responsive defaults if not set) */
+  columns?: number
+  /** Variant styling */
+  variant?: 'default' | 'compact' | 'card'
+  /** Use fluid auto-fit instead of fixed responsive columns */
+  fluid?: boolean
+  /** Layout mode: grid (default) or row (horizontal scrolling single row) */
+  layout?: 'grid' | 'row'
+  /** Override layout on mobile (useful for row on mobile, grid on desktop) */
+  mobileLayout?: 'grid' | 'row'
+  /** Horizontal alignment of items within container */
+  align?: 'start' | 'center' | 'end'
+  /** Justify content for row layout */
+  justify?: 'start' | 'center' | 'end' | 'between' | 'around'
+}
+```
+
+</docs>

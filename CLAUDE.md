@@ -31,6 +31,8 @@ bd ready
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow, PR process
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
 - [AGENT.md](AGENT.md) - AI agent-specific guidance
+- [Components CLAUDE.md](docs/.vitepress/theme/components/CLAUDE.md) - Component patterns, testing, Histoire stories
+- [Components STYLE-GUIDE.md](docs/.vitepress/theme/components/STYLE-GUIDE.md) - Documentation conventions
 
 ## Critical Development Principles
 
@@ -78,11 +80,16 @@ pnpm reload-data                       # Refresh dev server
 
 # Testing
 pnpm test:run
+
+# Component development (Histoire)
+pnpm story:dev     # Start Histoire on :6006
+pnpm story:docs    # Generate docs from component JSDoc
 ```
 
 **URLs:**
 - Dev site: http://localhost:5173
 - Pocketbase Admin: http://localhost:8090/_/
+- Histoire: http://localhost:6006/
 - Login: `admin@localhost.com` / `testpassword123`
 
 ## Architecture
