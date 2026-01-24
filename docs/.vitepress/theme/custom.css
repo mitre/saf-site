@@ -5,8 +5,8 @@
 @source '../../**/*.{vue,ts,md}';
 @source '../**/*.{vue,ts}';
 
-/* Configure dark mode to use .dark class (VitePress pattern) */
-@custom-variant dark (&:is(.dark *));
+/* Configure dark mode to use .dark class (VitePress) or .htw-dark (Histoire) */
+@custom-variant dark (&:is(.dark *, .htw-dark *));
 
 /* ==========================================================================
    MITRE SAF Theme - CSS Variables (shadcn-vue compatible)
@@ -21,6 +21,16 @@
   --vp-c-brand-1: #005288;
   --vp-c-brand-2: #0066a8;
   --vp-c-brand-3: #0080cc;
+
+  /* VitePress-compatible variables for standalone use (Histoire, etc.)
+     These mirror VitePress defaults so components work outside VitePress */
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-soft: #f6f6f7;
+  --vp-c-bg-alt: #f1f1f2;
+  --vp-c-text-1: rgba(60, 60, 67);
+  --vp-c-text-2: rgba(60, 60, 67, 0.78);
+  --vp-c-text-3: rgba(60, 60, 67, 0.56);
+  --vp-c-divider: rgba(60, 60, 67, 0.12);
 
   /* SAF Pillar icons - Light mode */
   --pillar-primary: #005B94;
@@ -49,7 +59,18 @@
   --ring: oklch(0.35 0.15 230);
 }
 
-.dark {
+/* Dark mode: .dark (VitePress) or .htw-dark (Histoire) */
+.dark,
+.htw-dark {
+  /* VitePress-compatible variables - Dark mode */
+  --vp-c-bg: #1b1b1f;
+  --vp-c-bg-soft: #202127;
+  --vp-c-bg-alt: #161618;
+  --vp-c-text-1: rgba(255, 255, 245, 0.86);
+  --vp-c-text-2: rgba(235, 235, 245, 0.6);
+  --vp-c-text-3: rgba(235, 235, 245, 0.38);
+  --vp-c-divider: rgba(82, 82, 89, 0.32);
+
   /* SAF Pillar icons - Dark mode */
   --pillar-primary: #4A9FD4;
   --pillar-secondary: #9CA3AF;
@@ -110,6 +131,14 @@
    VitePress Overrides
    ========================================================================== */
 
+/* Reset VitePress link styles for buttons rendered as <a> tags
+   VitePress applies: .vp-doc a { text-decoration: underline; font-weight: 500; }
+   Text colors are handled via Tailwind's ! modifier in button/index.ts */
+.vp-doc a.inline-flex {
+  text-decoration: none;
+  font-weight: inherit;
+}
+
 .VPDoc [class*="transition-"] {
   transition-duration: revert-layer;
 }
@@ -133,6 +162,8 @@
 }
 
 /* MITRE logo - white in dark mode, blue (original) in light mode */
-.dark img[src*="/icons/mitre-m"] {
+/* Dark mode image filter: .dark (VitePress) or .htw-dark (Histoire) */
+.dark img[src*="/icons/mitre-m"],
+.htw-dark img[src*="/icons/mitre-m"] {
   filter: brightness(0) invert(1);
 }

@@ -9,13 +9,10 @@
  * rows with alternating scroll directions.
  */
 import { computed } from 'vue'
-import BrandIcon from './icons/BrandIcon.vue'
+import { LogoItemRenderer, type LogoItem } from './logos'
 
-export interface LogoItem {
-  name: string
-  href?: string
-  image?: string
-}
+// Re-export for consumers
+export type { LogoItem }
 
 export interface LogoMarqueeProps {
   items: LogoItem[]
@@ -35,6 +32,8 @@ export interface LogoMarqueeProps {
   rows?: number
   /** Alternate scroll direction per row */
   alternateDirection?: boolean
+  /** Vertical alignment within parent container */
+  verticalAlign?: 'start' | 'center' | 'end'
 }
 
 const props = withDefaults(defineProps<LogoMarqueeProps>(), {
@@ -45,7 +44,8 @@ const props = withDefaults(defineProps<LogoMarqueeProps>(), {
   repeat: 2,
   overlay: true,
   rows: 1,
-  alternateDirection: true
+  alternateDirection: true,
+  verticalAlign: 'center'
 })
 
 // Split items into rows
@@ -83,11 +83,14 @@ const isRowReversed = (rowIndex: number): boolean => {
 <template>
   <div
     class="logo-marquee-container"
-    :class="{
-      'logo-marquee--pause-hover': pauseOnHover,
-      'logo-marquee--overlay': overlay,
-      'logo-marquee--multi-row': rows > 1
-    }"
+    :class="[
+      `logo-marquee--valign-${verticalAlign}`,
+      {
+        'logo-marquee--pause-hover': pauseOnHover,
+        'logo-marquee--overlay': overlay,
+        'logo-marquee--multi-row': rows > 1
+      }
+    ]"
   >
     <!-- Each row -->
     <div
@@ -104,30 +107,14 @@ const isRowReversed = (rowIndex: number): boolean => {
           :key="i"
           class="logo-marquee-content"
         >
-          <component
-            :is="item.href ? 'a' : 'span'"
+          <LogoItemRenderer
             v-for="item in rowItems"
             :key="`${rowIndex}-${i}-${item.name}`"
-            :href="item.href"
-            :target="item.href?.startsWith('http') ? '_blank' : undefined"
-            :rel="item.href?.startsWith('http') ? 'noopener noreferrer' : undefined"
+            :item="item"
+            :size="size"
+            tag="span"
             class="logo-marquee-item"
-            :title="item.name"
-          >
-            <img
-              v-if="item.image"
-              :src="item.image"
-              :alt="item.name"
-              :width="size"
-              :height="size"
-              class="logo-image"
-            />
-            <BrandIcon
-              v-else
-              :name="item.name"
-              :size="size"
-            />
-          </component>
+          />
         </div>
       </div>
     </div>
@@ -194,26 +181,23 @@ const isRowReversed = (rowIndex: number): boolean => {
   object-fit: contain;
 }
 
-/* Gradient overlay - smaller on mobile */
-.logo-marquee--overlay::before,
-.logo-marquee--overlay::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.logo-marquee--overlay::before {
-  left: 0;
-  background: linear-gradient(to right, var(--vp-c-bg), transparent);
-}
-
-.logo-marquee--overlay::after {
-  right: 0;
-  background: linear-gradient(to left, var(--vp-c-bg), transparent);
+/* Gradient fade at edges using mask-image
+   This fades the CONTENT to transparent, so it works on ANY background color */
+.logo-marquee--overlay {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 40px,
+    black calc(100% - 40px),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 40px,
+    black calc(100% - 40px),
+    transparent
+  );
 }
 
 /* Multi-row - tight on mobile */
@@ -247,9 +231,21 @@ const isRowReversed = (rowIndex: number): boolean => {
     padding: 0 1rem;
   }
 
-  .logo-marquee--overlay::before,
-  .logo-marquee--overlay::after {
-    width: 60px;
+  .logo-marquee--overlay {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 60px,
+      black calc(100% - 60px),
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 60px,
+      black calc(100% - 60px),
+      transparent
+    );
   }
 
   .logo-marquee--multi-row {
@@ -272,9 +268,21 @@ const isRowReversed = (rowIndex: number): boolean => {
     padding: 0 1.25rem;
   }
 
-  .logo-marquee--overlay::before,
-  .logo-marquee--overlay::after {
-    width: 80px;
+  .logo-marquee--overlay {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 80px,
+      black calc(100% - 80px),
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 80px,
+      black calc(100% - 80px),
+      transparent
+    );
   }
 
   .logo-marquee--multi-row {
@@ -293,9 +301,21 @@ const isRowReversed = (rowIndex: number): boolean => {
     padding: 0 1.5rem;
   }
 
-  .logo-marquee--overlay::before,
-  .logo-marquee--overlay::after {
-    width: 100px;
+  .logo-marquee--overlay {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 100px,
+      black calc(100% - 100px),
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 100px,
+      black calc(100% - 100px),
+      transparent
+    );
   }
 }
 
@@ -304,5 +324,22 @@ const isRowReversed = (rowIndex: number): boolean => {
   .logo-marquee-track {
     animation: none;
   }
+}
+
+/* ===========================================
+   VERTICAL ALIGNMENT
+   For use within flex/grid parent containers
+   =========================================== */
+
+.logo-marquee--valign-start {
+  align-self: flex-start;
+}
+
+.logo-marquee--valign-center {
+  align-self: center;
+}
+
+.logo-marquee--valign-end {
+  align-self: flex-end;
 }
 </style>

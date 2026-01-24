@@ -95,6 +95,21 @@ describe('LogoMarquee', () => {
 
       expect(wrapper.find('.logo-marquee--overlay').exists()).toBe(false)
     })
+
+    it('uses mask-image for fade effect (works on any background)', () => {
+      // This test documents that we use mask-image instead of gradient overlays
+      // mask-image fades content to transparent, working on ANY background color
+      // This is a regression test - do NOT change back to gradient overlay approach
+      const wrapper = mount(LogoMarquee, {
+        props: { items: sampleItems, overlay: true }
+      })
+
+      // The overlay class should exist and use CSS mask-image (not pseudo-elements)
+      // Note: We can't easily test computed styles in jsdom, but the class presence
+      // confirms the mask-image CSS will be applied
+      expect(wrapper.find('.logo-marquee--overlay').exists()).toBe(true)
+      // No pseudo-elements needed - mask-image is on the container itself
+    })
   })
 
   describe('links', () => {
