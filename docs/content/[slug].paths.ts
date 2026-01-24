@@ -1,50 +1,12 @@
-import PocketBase from 'pocketbase'
-
-// Pocketbase content record types
-interface PBContent {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  long_description?: string
-  version?: string
-  content_type: 'validation' | 'hardening'
-  status?: 'active' | 'beta' | 'deprecated' | 'draft'
-  github?: string
-  documentation_url?: string
-  reference_url?: string
-  readme_url?: string
-  readme_markdown?: string
-  control_count?: number
-  stig_id?: string
-  benchmark_version?: string
-  license?: string
-  release_date?: string
-  target?: string  // FK ID
-  expand?: {
-    target?: { id: string; name: string; slug: string; category?: string }
-    standard?: { id: string; name: string; short_name?: string; slug: string }
-    technology?: {
-      id: string
-      name: string
-      slug: string
-      logo?: string
-      quick_start_template?: string
-      prerequisites_template?: string
-    }
-    vendor?: { id: string; name: string; slug: string; logo?: string }
-    maintainer?: {
-      id: string
-      name: string
-      slug: string
-      logo?: string
-      organization?: string
-      expand?: {
-        organization?: { id: string; name: string; logo?: string }
-      }
-    }
-  }
-}
+import type { PBContent } from '../.vitepress/theme/lib/pocketbase-types'
+import {
+  initPocketBase,
+  extractFK,
+  extractStandardFK,
+  extractTechnologyFK,
+  extractOrgFK,
+  extractMaintainerFK
+} from '../.vitepress/lib/loader-utils'
 
 // Simplified related content item
 interface RelatedContent {
@@ -59,15 +21,7 @@ interface RelatedContent {
 export default {
   async paths() {
     try {
-      const pb = new PocketBase(
-        process.env.POCKETBASE_URL || 'http://localhost:8090'
-      )
-
-      // PocketBase 0.23+ uses _superusers collection for admin auth
-      await pb.collection('_superusers').authWithPassword(
-        process.env.POCKETBASE_ADMIN_EMAIL || 'admin@localhost.com',
-        process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
-      )
+      const pb = await initPocketBase()
 
       // Query ALL content with FK expansion (no filter - both validation and hardening)
       // Include maintainer.organization to get org logo as fallback for teams without logos
@@ -79,6 +33,13 @@ export default {
       console.log(`✓ Generating ${records.length} content detail pages`)
 
       return records.map(record => {
+        // Extract FK data using shared utilities
+        const target = extractFK(record.expand, 'target')
+        const standard = extractStandardFK(record.expand)
+        const technology = extractTechnologyFK(record.expand)
+        const vendor = extractOrgFK(record.expand, 'vendor')
+        const maintainer = extractMaintainerFK(record.expand)
+
         // Find related content (same target, different content_type)
         const relatedContent: RelatedContent[] = records
           .filter(r =>
@@ -109,25 +70,24 @@ export default {
               status: record.status || 'active',
               content_type: record.content_type,
               // Target
-              target_name: record.expand?.target?.name || '',
-              target_slug: record.expand?.target?.slug || '',
+              target_name: target.name || '',
+              target_slug: target.slug || '',
               // Standard
-              standard_name: record.expand?.standard?.name || '',
-              standard_short_name: record.expand?.standard?.short_name || '',
-              standard_slug: record.expand?.standard?.slug || '',
+              standard_name: standard.name || '',
+              standard_short_name: standard.short_name || '',
+              standard_slug: standard.slug || '',
               // Technology
-              technology_name: record.expand?.technology?.name || '',
-              technology_slug: record.expand?.technology?.slug || '',
-              technology_logo: record.expand?.technology?.logo || '',
+              technology_name: technology.name || '',
+              technology_slug: technology.slug || '',
+              technology_logo: technology.logo || '',
               // Vendor
-              vendor_name: record.expand?.vendor?.name || '',
-              vendor_slug: record.expand?.vendor?.slug || '',
-              vendor_logo: record.expand?.vendor?.logo || '',
-              // Maintainer (logo falls back to organization logo)
-              maintainer_name: record.expand?.maintainer?.name || '',
-              maintainer_slug: record.expand?.maintainer?.slug || '',
-              maintainer_logo: record.expand?.maintainer?.logo ||
-                record.expand?.maintainer?.expand?.organization?.logo || '',
+              vendor_name: vendor.name || '',
+              vendor_slug: vendor.slug || '',
+              vendor_logo: vendor.logo || '',
+              // Maintainer
+              maintainer_name: maintainer.name || '',
+              maintainer_slug: maintainer.slug || '',
+              maintainer_logo: maintainer.logo || '',
               // Links
               github_url: record.github || '',
               documentation_url: record.documentation_url || '',
@@ -136,8 +96,8 @@ export default {
               readme_url: record.readme_url || '',
               readme_markdown: record.readme_markdown || '',
               // Technology templates
-              quick_start_template: record.expand?.technology?.quick_start_template || '',
-              prerequisites_template: record.expand?.technology?.prerequisites_template || '',
+              quick_start_template: technology.quick_start_template || '',
+              prerequisites_template: technology.prerequisites_template || '',
               // Domain-specific
               control_count: record.control_count || 0,
               stig_id: record.stig_id || '',

@@ -1,6 +1,13 @@
 import { defineLoader } from 'vitepress'
-import PocketBase from 'pocketbase'
 import type { PBContent } from '../theme/lib/pocketbase-types'
+import {
+  initPocketBase,
+  extractFK,
+  extractStandardFK,
+  extractTechnologyFK,
+  extractOrgFK,
+  extractMaintainerFK
+} from '../lib/loader-utils'
 
 // Flattened content item for VitePress consumption
 export interface ContentItem {
@@ -66,15 +73,7 @@ export { data }
 export default defineLoader({
   async load(): Promise<ContentData> {
     try {
-      const pb = new PocketBase(
-        process.env.POCKETBASE_URL || 'http://localhost:8090'
-      )
-
-      // PocketBase 0.23+ uses _superusers collection for admin auth
-      await pb.collection('_superusers').authWithPassword(
-        process.env.POCKETBASE_ADMIN_EMAIL || 'admin@localhost.com',
-        process.env.POCKETBASE_ADMIN_PASSWORD || 'testpassword123'
-      )
+      const pb = await initPocketBase()
 
       // Query ALL content with FK expansion (no filter)
       // Include maintainer.organization to get org logo as fallback for teams without logos
@@ -84,56 +83,63 @@ export default defineLoader({
       })
 
       // Transform Pocketbase records to flattened ContentItem format
-      const items: ContentItem[] = records.map(record => ({
-        id: record.id,
-        slug: record.slug,
-        name: record.name,
-        description: record.description,
-        long_description: record.long_description,
-        version: record.version,
-        content_type: record.content_type,
-        status: record.status,
-        // Target
-        target: record.expand?.target?.id,
-        target_name: record.expand?.target?.name,
-        target_slug: record.expand?.target?.slug,
-        // Standard
-        standard: record.expand?.standard?.id,
-        standard_name: record.expand?.standard?.name,
-        standard_short_name: record.expand?.standard?.short_name,
-        standard_slug: record.expand?.standard?.slug,
-        // Technology
-        technology: record.expand?.technology?.id,
-        technology_name: record.expand?.technology?.name,
-        technology_slug: record.expand?.technology?.slug,
-        technology_logo: record.expand?.technology?.logo,
-        // Vendor
-        vendor: record.expand?.vendor?.id,
-        vendor_name: record.expand?.vendor?.name,
-        vendor_slug: record.expand?.vendor?.slug,
-        vendor_logo: record.expand?.vendor?.logo,
-        // Maintainer (logo falls back to organization logo)
-        maintainer: record.expand?.maintainer?.id,
-        maintainer_name: record.expand?.maintainer?.name,
-        maintainer_slug: record.expand?.maintainer?.slug,
-        maintainer_logo: record.expand?.maintainer?.logo ||
-          record.expand?.maintainer?.expand?.organization?.logo,
-        // Links
-        github_url: record.github,
-        documentation_url: record.documentation_url,
-        reference_url: record.reference_url,
-        // README content
-        readme_url: record.readme_url,
-        readme_markdown: record.readme_markdown,
-        // Technology templates
-        quick_start_template: record.expand?.technology?.quick_start_template,
-        prerequisites_template: record.expand?.technology?.prerequisites_template,
-        // Domain-specific
-        control_count: record.control_count,
-        stig_id: record.stig_id,
-        benchmark_version: record.benchmark_version,
-        is_featured: record.is_featured
-      }))
+      const items: ContentItem[] = records.map(record => {
+        const target = extractFK(record.expand, 'target')
+        const standard = extractStandardFK(record.expand)
+        const technology = extractTechnologyFK(record.expand)
+        const vendor = extractOrgFK(record.expand, 'vendor')
+        const maintainer = extractMaintainerFK(record.expand)
+
+        return {
+          id: record.id,
+          slug: record.slug,
+          name: record.name,
+          description: record.description,
+          long_description: record.long_description,
+          version: record.version,
+          content_type: record.content_type,
+          status: record.status,
+          // Target
+          target: target.id,
+          target_name: target.name,
+          target_slug: target.slug,
+          // Standard
+          standard: standard.id,
+          standard_name: standard.name,
+          standard_short_name: standard.short_name,
+          standard_slug: standard.slug,
+          // Technology
+          technology: technology.id,
+          technology_name: technology.name,
+          technology_slug: technology.slug,
+          technology_logo: technology.logo,
+          // Vendor
+          vendor: vendor.id,
+          vendor_name: vendor.name,
+          vendor_slug: vendor.slug,
+          vendor_logo: vendor.logo,
+          // Maintainer
+          maintainer: maintainer.id,
+          maintainer_name: maintainer.name,
+          maintainer_slug: maintainer.slug,
+          maintainer_logo: maintainer.logo,
+          // Links
+          github_url: record.github,
+          documentation_url: record.documentation_url,
+          reference_url: record.reference_url,
+          // README content
+          readme_url: record.readme_url,
+          readme_markdown: record.readme_markdown,
+          // Technology templates
+          quick_start_template: technology.quick_start_template,
+          prerequisites_template: technology.prerequisites_template,
+          // Domain-specific
+          control_count: record.control_count,
+          stig_id: record.stig_id,
+          benchmark_version: record.benchmark_version,
+          is_featured: record.is_featured
+        }
+      })
 
       // Group by content type
       const validation = items.filter(item => item.content_type === 'validation')

@@ -244,24 +244,28 @@ defineEmits<{
 
 | Priority | Issue | Lines Saved | Effort | Status |
 |----------|-------|-------------|--------|--------|
-| P1 | Card component duplication | 96 | 1h | ⬜ Todo |
+| P1 | Card component duplication | 96 | 1h | ✅ Done (Session 056) |
 | P2 | Filter component duplication | 60+ | 1.5h | ⬜ Todo |
-| P3 | Data loader transformation | 50+ | 1h | ⬜ Todo |
-| P4 | Status variant logic | 16 | 15m | ⬜ Todo |
+| P3 | Data loader transformation | 50+ | 1h | ✅ Done (Session 056) |
+| P4 | Status variant logic | 16 | 15m | ✅ Done (Session 055) |
 | P5 | Filter select template | 60+ | 1h | ⬜ Todo |
 | P6 | Metadata display logic | 40+ | 1.5h | ⬜ Todo |
-| P7 | Pocketbase types | 25+ | 30m | ⬜ Todo |
+| P7 | Pocketbase types | 25+ | 30m | ✅ Done (Session 055) |
 | **Total** | | **347+** | **~7h** | |
 
-## Quick Wins (Do First)
+## Completed Work
 
-1. **P4: Status variant** - Simple extraction, 15 min
-2. **P1: Delete ProfileCard** - Just delete and update imports, 1h
-3. **P7: Extract PB types** - Simple move, 30 min
+### Session 055
+- **P4:** Extracted `getStatusVariant()` to `lib/utils.ts`
+- **P7:** Created `lib/pocketbase-types.ts` with shared interfaces
 
-## Session Planning
+### Session 056
+- **P1:** Removed legacy `/validate/` route and Profile* components (ProfileCard, ProfileFilters, ProfileDetail)
+- **P3:** Created `lib/loader-utils.ts` with `initPocketBase()` and FK extraction helpers
+- Updated `content.data.ts` and `[slug].paths.ts` to use shared utilities
+- Removed `profiles.data.ts` loader (legacy)
 
-- **Session A:** P4 + P7 (~45 min, ~40 lines) - Quick wins
-- **Session B:** P1 + P3 (~2h, ~145 lines) - Card + loader consolidation
+## Remaining Work
+
 - **Session C:** P2 + P5 (~2.5h, ~120 lines) - Filter consolidation
 - **Session D:** P6 (~1.5h, ~40 lines) - Metadata cleanup

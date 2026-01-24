@@ -25,7 +25,15 @@ export interface PBContent {
   control_count?: number
   stig_id?: string
   benchmark_version?: string
+  license?: string
+  release_date?: string
   is_featured?: boolean
+  // FK IDs (raw, before expansion)
+  target?: string
+  standard?: string
+  technology?: string
+  vendor?: string
+  maintainer?: string
   expand?: {
     target?: PBTarget
     standard?: PBStandard
