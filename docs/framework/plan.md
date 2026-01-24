@@ -5,7 +5,7 @@ aside: false
 ---
 
 <script setup>
-import { FileSearch, FileText } from 'lucide-vue-next'
+import { FileSearch, PenTool } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const planTools = [
@@ -29,8 +29,6 @@ const planTools = [
   </div>
 </PageSection>
 
----
-
 <PageSection
   variant="muted"
   orientation="vertical"
@@ -46,7 +44,7 @@ const planTools = [
         description: 'Discover which STIGs, CIS Benchmarks, and security baselines apply to your technology stack. Browse our content library to find validated InSpec profiles and hardening guides for common software components.'
       },
       {
-        icon: FileText,
+        icon: PenTool,
         title: 'Create New Documentation',
         description: 'Build security guidance for software components that lack government or industry standards. Author InSpec profiles to define security requirements and provide clear configuration guidance for your customers. Use Vulcan to create comprehensive security validation profiles that document security controls and testing procedures.'
       }
@@ -54,8 +52,6 @@ const planTools = [
     gap="lg"
   />
 </PageSection>
-
----
 
 <PageSection
   orientation="horizontal"

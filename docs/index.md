@@ -70,8 +70,6 @@ import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
   </div>
 </PageSection>
 
----
-
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -105,8 +103,6 @@ import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
     </a>
   </div>
 </PageSection>
-
----
 
 ## What is MITRE SAF?
 

@@ -54,8 +54,6 @@ const pillars = [
   ]"
 />
 
----
-
 <PageSection
   variant="muted"
   headline="The Five Pillars"
@@ -90,6 +88,11 @@ const pillars = [
 
 .pillar-card:hover {
   text-decoration: none !important;
+}
+
+/* Lighten pillar cards in dark mode for better contrast */
+.dark .pillar-card {
+  background-color: var(--vp-c-bg-soft) !important;
 }
 </style>
 
