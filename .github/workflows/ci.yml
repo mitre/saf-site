@@ -2,9 +2,8 @@ name: CI
 
 on:
   push:
-    # Run CI on all pushes to all branches
-  pull_request:
-    # Run CI on all PRs
+    branches: [main]  # CI on merge to main
+  pull_request:       # CI on all PRs (single run per update)
 
 concurrency:
   group: ci-${{ github.ref }}
