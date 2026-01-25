@@ -5,7 +5,7 @@
  * Exports SQLite databases to git-friendly NDJSON format and restores them.
  * Each table becomes two files:
  *   - table.metadata.json: column names and CREATE TABLE schema
- *   - table.ndjson: one JSON array per row (values in column order)
+ *   - table.ndjson: one JSON object per row (self-documenting, git-diff friendly)
  *
  * Usage:
  *   pnpm db:dump              # Export data.db to diffable/
@@ -55,9 +55,7 @@ function toJsonValue(value: unknown): unknown {
   return value
 }
 
-export type DumpFormat = 'array' | 'object'
-
-export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[], format?: DumpFormat } = {}): number {
+export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
   const excludeSet = new Set(options.exclude || [])
   const tablesSet = options.tables ? new Set(options.tables) : null
@@ -122,24 +120,15 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
     }
     writeFileSync(join(outDir, `${table.name}.metadata.json`), `${JSON.stringify(metadata, null, 4)}\n`)
 
-    // Write data as NDJSON (convert non-JSON types before serializing)
+    // Write data as NDJSON objects (self-documenting, git-diff friendly)
     const rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
-    const format = options.format || 'array'
 
     const ndjsonLines = rows.map((row) => {
-      if (format === 'object') {
-        // Object format: {"col1": val1, "col2": val2, ...}
-        const obj: Record<string, unknown> = {}
-        for (const col of columnNames) {
-          obj[col] = toJsonValue(row[col])
-        }
-        return JSON.stringify(obj)
+      const obj: Record<string, unknown> = {}
+      for (const col of columnNames) {
+        obj[col] = toJsonValue(row[col])
       }
-      else {
-        // Array format (default): [val1, val2, ...]
-        const values = columnNames.map(col => toJsonValue(row[col]))
-        return JSON.stringify(values)
-      }
+      return JSON.stringify(obj)
     })
     writeFileSync(join(outDir, `${table.name}.ndjson`), ndjsonLines.join('\n') + (ndjsonLines.length ? '\n' : ''))
 
@@ -345,7 +334,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
 
   if (!command) {
     console.log(`
-SQLite Diffable - Export/import SQLite to git-friendly format
+SQLite Diffable - Export/import SQLite to git-friendly NDJSON format
 
 Usage:
   tsx scripts/db-diffable.ts dump <database.db> <output-dir> [options]
@@ -353,19 +342,17 @@ Usage:
   tsx scripts/db-diffable.ts objects <file.ndjson> [--array]
 
 Commands:
-  dump      Export database to NDJSON format
-  load      Restore database from NDJSON format
+  dump      Export database to NDJSON (one JSON object per row)
+  load      Restore database from NDJSON (auto-detects format)
   objects   Convert NDJSON to JSON objects (debugging)
 
 Options:
-  --format     Output format: 'array' (default) or 'object' (dump command)
   --exclude    Skip specific tables (dump command)
   --replace    Drop existing tables before loading (load command)
   --array      Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
   tsx scripts/db-diffable.ts dump .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
-  tsx scripts/db-diffable.ts dump data.db diffable/ --format object
   tsx scripts/db-diffable.ts dump data.db diffable/ --exclude temp_table log_table
   tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
   tsx scripts/db-diffable.ts load data.db diffable/ --replace
@@ -381,22 +368,10 @@ Examples:
     const dbPath = args[1]
     const dirPath = args[2]
     const excludeArgs: string[] = []
-    let format: DumpFormat | undefined
     let i = 3
     while (i < args.length) {
       if (args[i] === '--exclude' && args[i + 1]) {
         excludeArgs.push(args[i + 1])
-        i += 2
-      }
-      else if (args[i] === '--format' && args[i + 1]) {
-        const fmt = args[i + 1]
-        if (fmt === 'array' || fmt === 'object') {
-          format = fmt
-        }
-        else {
-          console.error(`Error: Invalid format '${fmt}'. Use 'array' or 'object'.`)
-          process.exit(1)
-        }
         i += 2
       }
       else {
@@ -407,7 +382,7 @@ Examples:
       console.error('Error: dump requires <database.db> <output-dir>')
       process.exit(1)
     }
-    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined, format })
+    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined })
   }
   else if (command === 'load') {
     const dbPath = args[1]

@@ -81,12 +81,12 @@ describe('db-diffable', () => {
       expect(existsSync(ndjsonPath)).toBe(true)
       expect(existsSync(metadataPath)).toBe(true)
 
-      // Verify exact NDJSON content (matches Python test)
+      // Verify exact NDJSON content (object format - self-documenting)
       const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
       expect(lines.map(l => JSON.parse(l))).toEqual([
-        [1, 'Stacey'],
-        [2, 'Tilda'],
-        [3, 'Bartek'],
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+        { id: 3, name: 'Bartek' },
       ])
 
       // Verify metadata content
@@ -167,11 +167,11 @@ describe('db-diffable', () => {
       expect(result).toBe(0)
 
       const lines = readFileSync(join(diffableDir, 'special.ndjson'), 'utf-8').trim().split('\n')
-      expect(JSON.parse(lines[0])).toEqual([1, 'line1\nline2'])
-      expect(JSON.parse(lines[1])).toEqual([2, 'quote"test'])
-      expect(JSON.parse(lines[2])).toEqual([3, 'backslash\\test'])
-      expect(JSON.parse(lines[3])).toEqual([4, 'unicode: 日本語'])
-      expect(JSON.parse(lines[4])).toEqual([5, 'tab\there'])
+      expect(JSON.parse(lines[0])).toEqual({ id: 1, data: 'line1\nline2' })
+      expect(JSON.parse(lines[1])).toEqual({ id: 2, data: 'quote"test' })
+      expect(JSON.parse(lines[2])).toEqual({ id: 3, data: 'backslash\\test' })
+      expect(JSON.parse(lines[3])).toEqual({ id: 4, data: 'unicode: 日本語' })
+      expect(JSON.parse(lines[4])).toEqual({ id: 5, data: 'tab\there' })
     })
 
     it('handles NULL values', () => {
@@ -188,9 +188,9 @@ describe('db-diffable', () => {
       expect(result).toBe(0)
 
       const lines = readFileSync(join(diffableDir, 'nullable.ndjson'), 'utf-8').trim().split('\n')
-      expect(JSON.parse(lines[0])).toEqual([1, 'has value', 100])
-      expect(JSON.parse(lines[1])).toEqual([2, null, null])
-      expect(JSON.parse(lines[2])).toEqual([3, 'only name', null])
+      expect(JSON.parse(lines[0])).toEqual({ id: 1, name: 'has value', value: 100 })
+      expect(JSON.parse(lines[1])).toEqual({ id: 2, name: null, value: null })
+      expect(JSON.parse(lines[2])).toEqual({ id: 3, name: 'only name', value: null })
     })
 
     it('handles various data types', () => {
@@ -214,12 +214,12 @@ describe('db-diffable', () => {
 
       const lines = readFileSync(join(diffableDir, 'types.ndjson'), 'utf-8').trim().split('\n')
       const row1 = JSON.parse(lines[0])
-      expect(row1[0]).toBe(1)
-      expect(row1[1]).toBe(42)
-      expect(row1[2]).toBeCloseTo(3.14159)
-      expect(row1[3]).toBe('hello')
+      expect(row1.id).toBe(1)
+      expect(row1.int_val).toBe(42)
+      expect(row1.real_val).toBeCloseTo(3.14159)
+      expect(row1.text_val).toBe('hello')
       // BLOB is base64 encoded
-      expect(typeof row1[4]).toBe('string')
+      expect(typeof row1.blob_val).toBe('string')
     })
 
     it('returns error for non-existent database', () => {
@@ -238,31 +238,13 @@ describe('db-diffable', () => {
     })
 
     // ========================================================================
-    // OBJECT FORMAT TESTS (saf-site-0by)
+    // OBJECT FORMAT TESTS (standardized format)
     // ========================================================================
-
-    it('outputs NDJSON with objects when format=object', () => {
-      createOneTableDb(dbPath)
-
-      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
-      expect(result).toBe(0)
-
-      // Verify each line is a JSON object with column names as keys
-      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
-      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
-      const objects = lines.map(l => JSON.parse(l))
-
-      expect(objects).toEqual([
-        { id: 1, name: 'Stacey' },
-        { id: 2, name: 'Tilda' },
-        { id: 3, name: 'Bartek' },
-      ])
-    })
 
     it('each object line is self-contained with all column names', () => {
       createOneTableDb(dbPath)
 
-      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      const result = dump(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
       const ndjsonPath = join(diffableDir, 'one_table.ndjson')
@@ -274,74 +256,6 @@ describe('db-diffable', () => {
         expect(obj).toHaveProperty('id')
         expect(obj).toHaveProperty('name')
       }
-    })
-
-    it('maintains backward compatibility with format=array (default)', () => {
-      createOneTableDb(dbPath)
-
-      // Default should be array format
-      const result = dump(dbPath, diffableDir, { quiet: true })
-      expect(result).toBe(0)
-
-      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
-      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
-
-      // Default format should still be arrays
-      expect(lines.map(l => JSON.parse(l))).toEqual([
-        [1, 'Stacey'],
-        [2, 'Tilda'],
-        [3, 'Bartek'],
-      ])
-    })
-
-    it('explicit format=array outputs arrays', () => {
-      createOneTableDb(dbPath)
-
-      const result = dump(dbPath, diffableDir, { quiet: true, format: 'array' })
-      expect(result).toBe(0)
-
-      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
-      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
-
-      // Array format should output arrays
-      expect(lines.map(l => JSON.parse(l))).toEqual([
-        [1, 'Stacey'],
-        [2, 'Tilda'],
-        [3, 'Bartek'],
-      ])
-    })
-
-    it('object format handles NULL values correctly', () => {
-      const db = new Database(dbPath)
-      db.exec(`
-        CREATE TABLE with_nulls (id INTEGER PRIMARY KEY, name TEXT, value TEXT);
-        INSERT INTO with_nulls VALUES (1, 'test', NULL);
-        INSERT INTO with_nulls VALUES (2, NULL, 'data');
-      `)
-      db.close()
-
-      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
-      expect(result).toBe(0)
-
-      const ndjsonPath = join(diffableDir, 'with_nulls.ndjson')
-      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
-      const objects = lines.map(l => JSON.parse(l))
-
-      expect(objects[0]).toEqual({ id: 1, name: 'test', value: null })
-      expect(objects[1]).toEqual({ id: 2, name: null, value: 'data' })
-    })
-
-    it('object format handles empty tables', () => {
-      const db = new Database(dbPath)
-      db.exec('CREATE TABLE empty_table (id INTEGER PRIMARY KEY, name TEXT)')
-      db.close()
-
-      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
-      expect(result).toBe(0)
-
-      const ndjsonPath = join(diffableDir, 'empty_table.ndjson')
-      const content = readFileSync(ndjsonPath, 'utf-8')
-      expect(content.trim()).toBe('')
     })
   })
 
@@ -720,8 +634,8 @@ describe('db-diffable', () => {
       `)
       db.close()
 
-      // Dump in object format
-      const dumpResult = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      // Dump (object format is standard)
+      const dumpResult = dump(dbPath, diffableDir, { quiet: true })
       expect(dumpResult).toBe(0)
 
       // Verify dump produced object format
