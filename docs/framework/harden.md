@@ -9,8 +9,12 @@ import { Wrench, Shield, Spool } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const hardenTools = [
-  { name: 'Ansible', href: '/content/' },
-  { name: 'Chef', href: '/content/' }
+  { name: 'Ansible', href: '/content/?technology=Ansible' },
+  { name: 'Chef', href: '/content/?technology=Chef' },
+  { name: 'Terraform', href: '/content/?technology=Terraform' },
+  { name: 'Puppet', href: '/content/?technology=Puppet' },
+  { name: 'PowerShell', href: '/content/?technology=PowerShell' },
+  { name: 'Salt', href: '/content/?technology=Salt' }
 ]
 </script>
 
@@ -61,8 +65,8 @@ const hardenTools = [
 <PageSection
   orientation="horizontal"
   headline="Tools"
-  title="Harden with SAF Tools"
-  description="Use our hardening content library or convert security guidance into Infrastructure as Code with SAF CLI."
+  title="Harden with SAF Content"
+  description="Use our hardening content library and tailor it to reflect your organization's secuity requirements."
 >
   <template #body>
     <FeatureList
@@ -82,7 +86,7 @@ const hardenTools = [
     />
   </template>
 
-  <LogoGrid :items="hardenTools" :size="56" :showNames="true" variant="card" :columns="2" />
+  <LogoGrid :items="hardenTools" :size="56" :showNames="true" variant="card" :columns="3" />
 </PageSection>
 
 <style>
