@@ -67,29 +67,63 @@ bd update saf-site-jur --status=in_progress
 
 **Goal:** Create clean Drizzle-managed SQLite database with proper FK constraints
 
-**Steps:**
-1. `drizzle-kit push` → Creates fresh DB with FK constraints
-2. Use `getInsertOrder(schema)` from fk-utils to get table order
-3. `db-diffable load --data-only --skip-tables '_*' --table-order <order>`
-4. Verify all data migrated correctly
-5. Update references to use new DB path
+### Source Data (diffable/)
+- 43 total tables in diffable/
+- 8 PB internal tables to skip: `_authOrigins`, `_collections`, `_externalAuths`, `_mfas`, `_migrations`, `_otps`, `_params`, `_superusers`
+- 35 user tables to migrate
 
-**TDD Approach:**
+### Drizzle Schema Tables (schema.ts)
+```
+capabilities, categories, organizations, teams, standards, technologies,
+targets, tags, toolTypes, distributionTypes, registries, resourceTypes,
+mediaTypes, content, tools, courses, courseResources, courseSessions,
+media, distributions, contentReleases, toolReleases, distributionReleases,
+contentCapabilities, contentTags, contentRelationships, toolCapabilities,
+toolTags, courseCapabilities, courseTags, courseTools, mediaCapabilities,
+mediaTags, distributionCapabilities, distributionTags
+```
+
+### Migration Steps
+
 ```typescript
-describe('migration', () => {
-  it('creates database with FK constraints')
-  it('imports all content records')
-  it('imports all reference data (orgs, targets, etc.)')
-  it('FK relationships are enforced')
-  it('record counts match source')
+// 1. Get FK-safe insert order
+import * as schema from './docs/.vitepress/database/schema'
+import { getInsertOrder } from './docs/.vitepress/database/fk-utils'
+
+const tableOrder = getInsertOrder(schema)
+console.log(tableOrder) // Use this for --table-order
+
+// 2. Create fresh Drizzle DB
+// drizzle-kit push --config=drizzle.config.ts
+
+// 3. Load data
+import { load } from './scripts/db-diffable'
+load('new-drizzle.db', '.pocketbase/pb_data/diffable', {
+  dataOnly: true,
+  skipTables: ['_*'],
+  tableOrder: tableOrder
 })
 ```
 
-**Key Files:**
+### TDD Approach
+```typescript
+// scripts/migrate-to-drizzle.spec.ts
+describe('Drizzle migration', () => {
+  it('getInsertOrder returns valid table order')
+  it('creates database with drizzle-kit push')
+  it('loads data with --data-only --skip-tables')
+  it('FK constraints are enforced (try invalid insert)')
+  it('record counts match source diffable/')
+  it('content table has correct FK references')
+})
+```
+
+### Key Files
 - `docs/.vitepress/database/schema.ts` - Drizzle schema (source of truth)
 - `docs/.vitepress/database/fk-utils.ts` - getInsertOrder()
 - `scripts/db-diffable.ts` - load() with all options
-- `.pocketbase/pb_data/diffable/` - Source data
+- `.pocketbase/pb_data/diffable/` - Source data (35 user tables)
+- `drizzle.config.ts` - Drizzle Kit configuration
 
 ---
 
