@@ -1,0 +1,18 @@
+{
+    "name": "tool_releases",
+    "columns": [
+        "created_at",
+        "download_url",
+        "id",
+        "is_latest",
+        "platforms",
+        "release_date",
+        "release_notes",
+        "sha256",
+        "slug",
+        "tool_id",
+        "updated_at",
+        "version"
+    ],
+    "schema": "CREATE TABLE `tool_releases` (`created_at` TEXT DEFAULT '' NOT NULL, `download_url` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `is_latest` BOOLEAN DEFAULT FALSE NOT NULL, `platforms` TEXT DEFAULT '' NOT NULL, `release_date` TEXT DEFAULT '' NOT NULL, `release_notes` TEXT DEFAULT '' NOT NULL, `sha256` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `tool_id` TEXT DEFAULT '' NOT NULL, `updated_at` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL)"
+}

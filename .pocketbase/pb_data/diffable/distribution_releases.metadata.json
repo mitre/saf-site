@@ -1,0 +1,19 @@
+{
+    "name": "distribution_releases",
+    "columns": [
+        "created_at",
+        "digest",
+        "distribution_id",
+        "download_url",
+        "id",
+        "is_latest",
+        "registry_url",
+        "release_date",
+        "release_notes",
+        "sha256",
+        "slug",
+        "updated_at",
+        "version"
+    ],
+    "schema": "CREATE TABLE `distribution_releases` (`created_at` TEXT DEFAULT '' NOT NULL, `digest` TEXT DEFAULT '' NOT NULL, `distribution_id` TEXT DEFAULT '' NOT NULL, `download_url` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `is_latest` BOOLEAN DEFAULT FALSE NOT NULL, `registry_url` TEXT DEFAULT '' NOT NULL, `release_date` TEXT DEFAULT '' NOT NULL, `release_notes` TEXT DEFAULT '' NOT NULL, `sha256` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `updated_at` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL)"
+}

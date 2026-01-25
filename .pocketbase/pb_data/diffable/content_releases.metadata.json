@@ -1,0 +1,17 @@
+{
+    "name": "content_releases",
+    "columns": [
+        "content_id",
+        "created_at",
+        "id",
+        "is_latest",
+        "release_date",
+        "release_notes",
+        "slug",
+        "srg_version",
+        "stig_version",
+        "updated_at",
+        "version"
+    ],
+    "schema": "CREATE TABLE `content_releases` (`content_id` TEXT DEFAULT '' NOT NULL, `created_at` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `is_latest` BOOLEAN DEFAULT FALSE NOT NULL, `release_date` TEXT DEFAULT '' NOT NULL, `release_notes` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `srg_version` TEXT DEFAULT '' NOT NULL, `stig_version` TEXT DEFAULT '' NOT NULL, `updated_at` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL)"
+}

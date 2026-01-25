@@ -195,3 +195,7 @@
 ["1769132244_add_content_architecture_fields.js",1769132313939550]
 ["1769135000_fix_readme_field_type.js",1769137289928884]
 ["1769143948_updated_teams.js",1769143948558846]
+["1769311863_create_content_releases.js",1769349703026228]
+["1769311863_create_distribution_releases.js",1769349703029246]
+["1769311863_create_tool_releases.js",1769349703034060]
+["1769311863_delete_releases.js",1769349703038570]
