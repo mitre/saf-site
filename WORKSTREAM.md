@@ -15,14 +15,17 @@ cat WORKSTREAM.md
 
 # 2. Check current progress
 bd ready                    # What's ready to work on
-bd show saf-site-jur        # Next task: Migration
+bd show saf-site-gf9        # Next task: CLI CRUD
 
 # 3. Verify tests pass
-pnpm test:run               # Should be 423 tests
+pnpm test:run               # Should be 432 tests
 cd cli && pnpm test:run     # Should be 476 tests
 
-# 4. Start migration task
-bd update saf-site-jur --status=in_progress
+# 4. Verify drizzle.db exists
+ls -la docs/.vitepress/database/drizzle.db  # Should be ~1.3MB
+
+# 5. Start CLI CRUD task
+bd update saf-site-gf9 --status=in_progress
 ```
 
 ---
@@ -54,14 +57,24 @@ bd update saf-site-jur --status=in_progress
 |------|-------------|--------|
 | **saf-site-jur** | Migrate to fresh Drizzle DB | **DONE ✅** |
 
-### PHASE 4: Loaders + CLI ← NEXT
+### PHASE 4: CLI CRUD + Validation ← IN PROGRESS
 
 | Task | Description | Status |
 |------|-------------|--------|
-| **saf-site-3b9** | Update VitePress loaders to use Drizzle | **READY ← NEXT** |
-| saf-site-gf9 | Schema-driven CLI CRUD operations | READY |
+| **saf-site-gf9** | Schema-driven CLI CRUD operations | **IN PROGRESS** |
+| └── Phase 1 | Drizzle data layer (lib/drizzle.ts) | **DONE ✅** (21 tests) |
+| └── Phase 2 | Migrate content commands to Drizzle | NEXT |
+| └── Phase 3 | Generic table commands | - |
+| └── Phase 4 | Domain commands | - |
+| (validation) | Validate diffable/ ↔ drizzle.db round-trip | After gf9 |
 
-### PHASE 5-6: Not Started
+### PHASE 5: Loaders Migration
+
+| Task | Description | Status |
+|------|-------------|--------|
+| saf-site-3b9 | Update VitePress loaders to use Drizzle | BLOCKED (needs CLI validation) |
+
+### PHASE 6-7: Automation & CI/CD (Not Started)
 
 See dependency chain below.
 
@@ -72,8 +85,8 @@ See dependency chain below.
 | Suite | Count | Command |
 |-------|-------|---------|
 | VitePress | 432 | `pnpm test:run` |
-| CLI | 476 | `cd cli && pnpm test:run` |
-| **Total** | **908** | |
+| CLI | 497 | `cd cli && pnpm test:run` |
+| **Total** | **929** | |
 
 ---
 
@@ -130,17 +143,20 @@ Phase 3 (migration) ✅ DONE
 └── jur (migrate to Drizzle) ✅
         │
         ▼
-Phase 4 (CLI + loaders) ← WE ARE HERE
-├── gf9 (CRUD) ← READY
-└── 3b9 (loaders) ← NEXT
+Phase 4 (CLI CRUD) ← WE ARE HERE
+└── gf9 (CRUD) ← NEXT
         │
         ▼
-Phase 5 (automation)
+Phase 5 (loaders)
+└── 3b9 (loaders) ← After CLI validated
+        │
+        ▼
+Phase 6 (automation)
 ├── c9k (releases)
 └── u62 (automation)
         │
         ▼
-Phase 6 (CI/CD)
+Phase 7 (CI/CD)
 ├── 0j8 (Actions)
 └── tdi EPIC COMPLETE
 ```
@@ -157,6 +173,8 @@ Phase 6 (CI/CD)
 | `docs/.vitepress/database/fk-utils.ts` | FK detection & ordering |
 | `docs/.vitepress/database/field-mapping.ts` | Case conversion |
 | `scripts/db-diffable.ts` | Export/import tool (fully featured) |
+| `cli/src/lib/drizzle.ts` | CLI Drizzle data layer (generic CRUD) |
+| `cli/src/lib/pocketbase.ts` | Legacy Pocketbase layer (to be replaced) |
 
 ---
 
