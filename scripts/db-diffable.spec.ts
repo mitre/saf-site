@@ -659,6 +659,131 @@ describe('db-diffable', () => {
       ])
       restored.close()
     })
+
+    // ========================================================================
+    // DATA-ONLY TESTS (saf-site-o2f)
+    // ========================================================================
+
+    it('--data-only inserts into existing tables without recreating schema', () => {
+      // Pre-create database with schema (simulates Drizzle-created DB)
+      const db = new Database(dbPath)
+      db.exec('CREATE TABLE existing_table (id INTEGER PRIMARY KEY, name TEXT, extra TEXT DEFAULT "drizzle")')
+      db.close()
+
+      // Create diffable files (note: schema in metadata differs from actual DB)
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'existing_table.metadata.json'),
+        JSON.stringify({
+          name: 'existing_table',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE existing_table (id INTEGER PRIMARY KEY, name TEXT)', // No 'extra' column
+        }),
+      )
+      writeFileSync(
+        join(diffableDir, 'existing_table.ndjson'),
+        '{"id":1,"name":"Alice"}\n{"id":2,"name":"Bob"}\n',
+      )
+
+      // Load with --data-only
+      const result = load(dbPath, diffableDir, { dataOnly: true, quiet: true })
+      expect(result).toBe(0)
+
+      // Verify data was inserted AND schema preserved (extra column still exists)
+      const restored = new Database(dbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM existing_table ORDER BY id').all() as { id: number, name: string, extra: string }[]
+      expect(rows).toEqual([
+        { id: 1, name: 'Alice', extra: 'drizzle' },
+        { id: 2, name: 'Bob', extra: 'drizzle' },
+      ])
+      restored.close()
+    })
+
+    it('--data-only fails if table does not exist', () => {
+      // Create empty database (no tables)
+      const db = new Database(dbPath)
+      db.close()
+
+      // Create diffable files for a table that doesn't exist
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'missing_table.metadata.json'),
+        JSON.stringify({
+          name: 'missing_table',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE missing_table (id INTEGER PRIMARY KEY, name TEXT)',
+        }),
+      )
+      writeFileSync(join(diffableDir, 'missing_table.ndjson'), '{"id":1,"name":"Test"}\n')
+
+      // Load with --data-only should fail
+      const result = load(dbPath, diffableDir, { dataOnly: true, quiet: true })
+      expect(result).toBe(1)
+    })
+
+    it('--data-only skips table creation phase entirely', () => {
+      // Pre-create database with existing data
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE keep_data (id INTEGER PRIMARY KEY, name TEXT);
+        INSERT INTO keep_data VALUES (1, 'existing');
+      `)
+      db.close()
+
+      // Create diffable files for a DIFFERENT table
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'new_table.metadata.json'),
+        JSON.stringify({
+          name: 'new_table',
+          columns: ['id', 'value'],
+          schema: 'CREATE TABLE new_table (id INTEGER PRIMARY KEY, value TEXT)',
+        }),
+      )
+      writeFileSync(join(diffableDir, 'new_table.ndjson'), '{"id":1,"value":"test"}\n')
+
+      // Load with --data-only - should fail because new_table doesn't exist
+      const result = load(dbPath, diffableDir, { dataOnly: true, quiet: true })
+      expect(result).toBe(1)
+
+      // Verify original data is untouched
+      const restored = new Database(dbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM keep_data').all()
+      expect(rows).toEqual([{ id: 1, name: 'existing' }])
+      restored.close()
+    })
+
+    it('--data-only works with multiple existing tables', () => {
+      // Pre-create database with multiple tables
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
+        CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT, user_id INTEGER);
+      `)
+      db.close()
+
+      // Create diffable files
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'users.metadata.json'),
+        JSON.stringify({ name: 'users', columns: ['id', 'name'], schema: 'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'users.ndjson'), '{"id":1,"name":"Alice"}\n{"id":2,"name":"Bob"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'posts.metadata.json'),
+        JSON.stringify({ name: 'posts', columns: ['id', 'title', 'user_id'], schema: 'CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT, user_id INTEGER)' }),
+      )
+      writeFileSync(join(diffableDir, 'posts.ndjson'), '{"id":1,"title":"Hello","user_id":1}\n{"id":2,"title":"World","user_id":2}\n')
+
+      const result = load(dbPath, diffableDir, { dataOnly: true, quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM users').get()).toEqual({ c: 2 })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM posts').get()).toEqual({ c: 2 })
+      restored.close()
+    })
   })
 
   // ==========================================================================

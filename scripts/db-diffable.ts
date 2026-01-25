@@ -141,7 +141,7 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
   return 0
 }
 
-export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean } = {}): number {
+export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean } = {}): number {
   const log = options.quiet ? () => {} : console.log
 
   if (!existsSync(srcDir)) {
@@ -149,11 +149,13 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
     return 1
   }
 
-  // Remove existing database files if they exist
-  for (const suffix of ['', '-shm', '-wal']) {
-    const file = dbPath + suffix
-    if (existsSync(file)) {
-      rmSync(file)
+  // Remove existing database files if they exist (unless --data-only)
+  if (!options.dataOnly) {
+    for (const suffix of ['', '-shm', '-wal']) {
+      const file = dbPath + suffix
+      if (existsSync(file)) {
+        rmSync(file)
+      }
     }
   }
 
@@ -168,39 +170,61 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
 
   let loadedCount = 0
 
-  // First pass: create all tables
-  for (const metaFile of metadataFiles) {
-    const metadata: TableMetadata = JSON.parse(readFileSync(join(srcDir, metaFile), 'utf-8'))
+  // First pass: create tables (skip if --data-only)
+  if (options.dataOnly) {
+    // Verify all tables exist
+    for (const metaFile of metadataFiles) {
+      const metadata: TableMetadata = JSON.parse(readFileSync(join(srcDir, metaFile), 'utf-8'))
 
-    if (SKIP_TABLES.has(metadata.name)) {
-      log(`  Skipping ${metadata.name} (internal SQLite table)`)
-      continue
-    }
-
-    // Drop table if --replace and it exists
-    if (options.replace) {
-      try {
-        db.exec(`DROP TABLE IF EXISTS "${metadata.name}"`)
+      if (SKIP_TABLES.has(metadata.name)) {
+        continue
       }
-      catch {
-        // Ignore errors
-      }
-    }
 
-    // Create table using original schema
-    try {
-      db.exec(metadata.schema)
-    }
-    catch (err) {
-      const msg = (err as Error).message
-      if (msg.includes('already exists')) {
-        console.error(`Error: Table ${metadata.name} already exists. Use --replace to overwrite.`)
+      // Check if table exists
+      const tableExists = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`).get(metadata.name)
+      if (!tableExists) {
+        console.error(`Error: Table ${metadata.name} does not exist. --data-only requires existing tables.`)
         db.close()
         return 1
       }
-      console.error(`Error creating ${metadata.name}: ${msg}`)
-      db.close()
-      return 1
+    }
+    log(`  Using existing schema (--data-only)`)
+  }
+  else {
+    // Normal mode: create all tables
+    for (const metaFile of metadataFiles) {
+      const metadata: TableMetadata = JSON.parse(readFileSync(join(srcDir, metaFile), 'utf-8'))
+
+      if (SKIP_TABLES.has(metadata.name)) {
+        log(`  Skipping ${metadata.name} (internal SQLite table)`)
+        continue
+      }
+
+      // Drop table if --replace and it exists
+      if (options.replace) {
+        try {
+          db.exec(`DROP TABLE IF EXISTS "${metadata.name}"`)
+        }
+        catch {
+          // Ignore errors
+        }
+      }
+
+      // Create table using original schema
+      try {
+        db.exec(metadata.schema)
+      }
+      catch (err) {
+        const msg = (err as Error).message
+        if (msg.includes('already exists')) {
+          console.error(`Error: Table ${metadata.name} already exists. Use --replace to overwrite.`)
+          db.close()
+          return 1
+        }
+        console.error(`Error creating ${metadata.name}: ${msg}`)
+        db.close()
+        return 1
+      }
     }
   }
 
@@ -338,7 +362,7 @@ SQLite Diffable - Export/import SQLite to git-friendly NDJSON format
 
 Usage:
   tsx scripts/db-diffable.ts dump <database.db> <output-dir> [options]
-  tsx scripts/db-diffable.ts load <database.db> <source-dir> [--replace]
+  tsx scripts/db-diffable.ts load <database.db> <source-dir> [options]
   tsx scripts/db-diffable.ts objects <file.ndjson> [--array]
 
 Commands:
@@ -349,6 +373,7 @@ Commands:
 Options:
   --exclude    Skip specific tables (dump command)
   --replace    Drop existing tables before loading (load command)
+  --data-only  Insert data into existing tables only, don't create schema (load command)
   --array      Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
@@ -356,6 +381,7 @@ Examples:
   tsx scripts/db-diffable.ts dump data.db diffable/ --exclude temp_table log_table
   tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
   tsx scripts/db-diffable.ts load data.db diffable/ --replace
+  tsx scripts/db-diffable.ts load data.db diffable/ --data-only
   tsx scripts/db-diffable.ts objects diffable/users.ndjson
   tsx scripts/db-diffable.ts objects diffable/users.ndjson --array
 `)
@@ -387,12 +413,18 @@ Examples:
   else if (command === 'load') {
     const dbPath = args[1]
     const dirPath = args[2]
-    const hasReplace = args.slice(3).includes('--replace')
+    const loadArgs = args.slice(3)
+    const hasReplace = loadArgs.includes('--replace')
+    const hasDataOnly = loadArgs.includes('--data-only')
     if (!dbPath || !dirPath) {
       console.error('Error: load requires <database.db> <source-dir>')
       process.exit(1)
     }
-    exitCode = load(dbPath, dirPath, { replace: hasReplace })
+    if (hasReplace && hasDataOnly) {
+      console.error('Error: --replace and --data-only are mutually exclusive')
+      process.exit(1)
+    }
+    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly })
   }
   else if (command === 'objects') {
     const ndjsonPath = args[1]
