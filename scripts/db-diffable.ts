@@ -141,7 +141,7 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
   return 0
 }
 
-export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean } = {}): number {
+export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean, tableOrder?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
 
   if (!existsSync(srcDir)) {
@@ -162,9 +162,17 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
   const db = new Database(dbPath)
 
   // Find all metadata files
-  const metadataFiles = readdirSync(srcDir)
+  let metadataFiles = readdirSync(srcDir)
     .filter(f => f.endsWith('.metadata.json'))
     .sort()
+
+  // If tableOrder is specified, filter and reorder metadata files
+  if (options.tableOrder) {
+    const orderSet = new Set(options.tableOrder)
+    metadataFiles = options.tableOrder
+      .map(tableName => `${tableName}.metadata.json`)
+      .filter(f => existsSync(join(srcDir, f)))
+  }
 
   log(`Restoring ${metadataFiles.length} tables from ${srcDir}/`)
 
@@ -277,7 +285,19 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
         return parsed as unknown[]
       }
     })
-    insertMany(rows)
+
+    try {
+      insertMany(rows)
+    }
+    catch (err) {
+      const msg = (err as Error).message
+      if (msg.includes('FOREIGN KEY constraint failed')) {
+        console.error(`Error: FK constraint failed inserting into ${metadata.name}. Check table order.`)
+        db.close()
+        return 1
+      }
+      throw err // Re-throw other errors
+    }
 
     log(`  ${metadata.name}: ${rows.length} rows`)
     loadedCount++
@@ -371,10 +391,11 @@ Commands:
   objects   Convert NDJSON to JSON objects (debugging)
 
 Options:
-  --exclude    Skip specific tables (dump command)
-  --replace    Drop existing tables before loading (load command)
-  --data-only  Insert data into existing tables only, don't create schema (load command)
-  --array      Output as JSON array instead of newline-delimited (objects command)
+  --exclude      Skip specific tables (dump command)
+  --replace      Drop existing tables before loading (load command)
+  --data-only    Insert data into existing tables only, don't create schema (load command)
+  --table-order  Load tables in specified order, comma-separated (load command)
+  --array        Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
   tsx scripts/db-diffable.ts dump .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
@@ -382,6 +403,7 @@ Examples:
   tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
   tsx scripts/db-diffable.ts load data.db diffable/ --replace
   tsx scripts/db-diffable.ts load data.db diffable/ --data-only
+  tsx scripts/db-diffable.ts load data.db diffable/ --data-only --table-order orgs,users,posts
   tsx scripts/db-diffable.ts objects diffable/users.ndjson
   tsx scripts/db-diffable.ts objects diffable/users.ndjson --array
 `)
@@ -413,9 +435,13 @@ Examples:
   else if (command === 'load') {
     const dbPath = args[1]
     const dirPath = args[2]
-    const loadArgs = args.slice(3)
-    const hasReplace = loadArgs.includes('--replace')
-    const hasDataOnly = loadArgs.includes('--data-only')
+    const hasReplace = args.includes('--replace')
+    const hasDataOnly = args.includes('--data-only')
+    let tableOrder: string[] | undefined
+    const tableOrderIdx = args.indexOf('--table-order')
+    if (tableOrderIdx !== -1 && args[tableOrderIdx + 1]) {
+      tableOrder = args[tableOrderIdx + 1].split(',').map(t => t.trim())
+    }
     if (!dbPath || !dirPath) {
       console.error('Error: load requires <database.db> <source-dir>')
       process.exit(1)
@@ -424,7 +450,7 @@ Examples:
       console.error('Error: --replace and --data-only are mutually exclusive')
       process.exit(1)
     }
-    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly })
+    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly, tableOrder })
   }
   else if (command === 'objects') {
     const ndjsonPath = args[1]

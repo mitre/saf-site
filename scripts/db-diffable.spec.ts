@@ -784,6 +784,129 @@ describe('db-diffable', () => {
       expect(restored.prepare('SELECT COUNT(*) as c FROM posts').get()).toEqual({ c: 2 })
       restored.close()
     })
+
+    // ========================================================================
+    // TABLE ORDER TESTS (saf-site-97p)
+    // ========================================================================
+
+    it('tableOrder processes tables in specified order', () => {
+      // Create database with FK constraint
+      const db = new Database(dbPath)
+      db.exec(`
+        PRAGMA foreign_keys = ON;
+        CREATE TABLE authors (id TEXT PRIMARY KEY, name TEXT);
+        CREATE TABLE books (id TEXT PRIMARY KEY, title TEXT, author_id TEXT REFERENCES authors(id));
+      `)
+      db.close()
+
+      // Create diffable files (alphabetically: authors, books)
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'authors.metadata.json'),
+        JSON.stringify({ name: 'authors', columns: ['id', 'name'], schema: 'CREATE TABLE authors (id TEXT PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'authors.ndjson'), '{"id":"a1","name":"Jane"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'books.metadata.json'),
+        JSON.stringify({ name: 'books', columns: ['id', 'title', 'author_id'], schema: 'CREATE TABLE books (id TEXT PRIMARY KEY, title TEXT, author_id TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'books.ndjson'), '{"id":"b1","title":"Novel","author_id":"a1"}\n')
+
+      // Load with explicit order: authors first (parent), then books (child)
+      const result = load(dbPath, diffableDir, { dataOnly: true, tableOrder: ['authors', 'books'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      expect(restored.prepare('SELECT * FROM authors').all()).toEqual([{ id: 'a1', name: 'Jane' }])
+      expect(restored.prepare('SELECT * FROM books').all()).toEqual([{ id: 'b1', title: 'Novel', author_id: 'a1' }])
+      restored.close()
+    })
+
+    it('tableOrder fails with FK violation if order is wrong', () => {
+      // Create database with FK constraint ENFORCED
+      const db = new Database(dbPath)
+      db.exec(`
+        PRAGMA foreign_keys = ON;
+        CREATE TABLE parents (id TEXT PRIMARY KEY, name TEXT);
+        CREATE TABLE children (id TEXT PRIMARY KEY, name TEXT, parent_id TEXT REFERENCES parents(id));
+      `)
+      db.close()
+
+      // Create diffable files
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'parents.metadata.json'),
+        JSON.stringify({ name: 'parents', columns: ['id', 'name'], schema: 'CREATE TABLE parents (id TEXT PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'parents.ndjson'), '{"id":"p1","name":"Parent"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'children.metadata.json'),
+        JSON.stringify({ name: 'children', columns: ['id', 'name', 'parent_id'], schema: 'CREATE TABLE children (id TEXT PRIMARY KEY, name TEXT, parent_id TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'children.ndjson'), '{"id":"c1","name":"Child","parent_id":"p1"}\n')
+
+      // Load with WRONG order: children first (will fail FK check)
+      const result = load(dbPath, diffableDir, { dataOnly: true, tableOrder: ['children', 'parents'], quiet: true })
+      expect(result).toBe(1) // Should fail due to FK violation
+    })
+
+    it('tableOrder skips tables not in the order list', () => {
+      // Create database with multiple tables
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE included (id INTEGER PRIMARY KEY, data TEXT);
+        CREATE TABLE excluded (id INTEGER PRIMARY KEY, data TEXT);
+      `)
+      db.close()
+
+      // Create diffable files for both
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'included.metadata.json'),
+        JSON.stringify({ name: 'included', columns: ['id', 'data'], schema: 'CREATE TABLE included (id INTEGER PRIMARY KEY, data TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'included.ndjson'), '{"id":1,"data":"yes"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'excluded.metadata.json'),
+        JSON.stringify({ name: 'excluded', columns: ['id', 'data'], schema: 'CREATE TABLE excluded (id INTEGER PRIMARY KEY, data TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'excluded.ndjson'), '{"id":1,"data":"no"}\n')
+
+      // Load only 'included' table
+      const result = load(dbPath, diffableDir, { dataOnly: true, tableOrder: ['included'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM included').get()).toEqual({ c: 1 })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM excluded').get()).toEqual({ c: 0 }) // Not loaded
+      restored.close()
+    })
+
+    it('tableOrder with empty array loads nothing', () => {
+      // Create database
+      const db = new Database(dbPath)
+      db.exec('CREATE TABLE data (id INTEGER PRIMARY KEY, value TEXT)')
+      db.close()
+
+      // Create diffable files
+      mkdirSync(diffableDir, { recursive: true })
+      writeFileSync(
+        join(diffableDir, 'data.metadata.json'),
+        JSON.stringify({ name: 'data', columns: ['id', 'value'], schema: 'CREATE TABLE data (id INTEGER PRIMARY KEY, value TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'data.ndjson'), '{"id":1,"value":"test"}\n')
+
+      // Load with empty tableOrder
+      const result = load(dbPath, diffableDir, { dataOnly: true, tableOrder: [], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM data').get()).toEqual({ c: 0 }) // Nothing loaded
+      restored.close()
+    })
   })
 
   // ==========================================================================
