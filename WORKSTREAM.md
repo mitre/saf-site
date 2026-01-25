@@ -15,21 +15,21 @@ cat WORKSTREAM.md
 
 # 2. Check current progress
 bd ready                    # What's ready to work on
-bd list --status=in_progress  # What's in flight
+bd show saf-site-jur        # Next task: Migration
 
 # 3. Verify tests pass
-pnpm test:run               # Should be 410+ tests
-cd cli && pnpm test:run     # Should be 453 tests
+pnpm test:run               # Should be 423 tests
+cd cli && pnpm test:run     # Should be 476 tests
 
-# 4. Continue with next ready task (currently km5)
-bd show saf-site-km5
+# 4. Start migration task
+bd update saf-site-jur --status=in_progress
 ```
 
 ---
 
-## Current Progress: ~15% Complete
+## Current Progress: ~40% Complete
 
-### PHASE 1: DRY Foundation ✅ COMPLETE (2/3 needed)
+### PHASE 1: DRY Foundation ✅ COMPLETE
 
 | Task | Description | Status | Tests |
 |------|-------------|--------|-------|
@@ -37,25 +37,24 @@ bd show saf-site-km5
 | **saf-site-jr5** | field-mapping.ts - camelCase ↔ snake_case | **DONE ✅** | 23 |
 | saf-site-jg4 | slug-utils.ts - consolidate slug generation | READY (not critical) | - |
 
-**Files created:**
-- `docs/.vitepress/database/fk-utils.ts` + spec
-- `docs/.vitepress/database/field-mapping.ts` + spec
-
-### PHASE 2: db-diffable Feature Complete (IN PROGRESS)
+### PHASE 2: db-diffable Feature Complete ✅ COMPLETE
 
 | Task | Description | Status | Tests |
 |------|-------------|--------|-------|
-| **saf-site-0by** | Object format dump (`--format object`) | **DONE ✅** | 6 |
-| **saf-site-km5** | Format auto-detection on load | **READY ← NEXT** | - |
-| saf-site-6uf | Re-export diffable/ in object format | blocked by km5 | - |
-| saf-site-o2f | --data-only flag | blocked by 6uf | - |
-| saf-site-3cn | --skip-tables option | blocked by o2f | - |
-| saf-site-97p | FK dependency ordering | blocked by o2f | - |
+| **saf-site-0by** | Object format dump | **DONE ✅** | 6 |
+| **saf-site-km5** | Format auto-detection on load | **DONE ✅** | 6 |
+| **saf-site-o2f** | --data-only flag | **DONE ✅** | 4 |
+| **saf-site-97p** | tableOrder (FK ordering) | **DONE ✅** | 4 |
+| **saf-site-3cn** | --skip-tables (glob patterns) | **DONE ✅** | 4 |
+| saf-site-6uf | Re-export diffable/ in object format | DEFERRED (not critical) | - |
 
-**Files modified:**
-- `scripts/db-diffable.ts` - added `format` option to dump()
+### PHASE 3: Migration ← NEXT
 
-### PHASE 3-6: Not Started
+| Task | Description | Status |
+|------|-------------|--------|
+| **saf-site-jur** | Migrate to fresh Drizzle DB | **READY ← NEXT** |
+
+### PHASE 4-6: Not Started
 
 See dependency chain below.
 
@@ -65,9 +64,9 @@ See dependency chain below.
 
 | Suite | Count | Command |
 |-------|-------|---------|
-| VitePress | 410 | `pnpm test:run` |
-| CLI | 453 | `cd cli && pnpm test:run` |
-| **Total** | **863** | |
+| VitePress | 423 | `pnpm test:run` |
+| CLI | 476 | `cd cli && pnpm test:run` |
+| **Total** | **899** | |
 
 ---
 
@@ -92,7 +91,7 @@ Community PR        ──┘
 **Current State:**
 - Pocketbase database at `.pocketbase/pb_data/data.db`
 - Pocketbase handles FK relationships at application level (not SQL level)
-- Data exported to `diffable/` as NDJSON
+- Data exported to `diffable/` as NDJSON (object format)
 - 85 content records, 16 organizations, etc.
 
 **Target State:**
@@ -112,17 +111,16 @@ Phase 1 (DRY) ✅ DONE
 └── jg4 (slug-utils) - optional
         │
         ▼
-Phase 2 (db-diffable) ← WE ARE HERE
+Phase 2 (db-diffable) ✅ DONE
 ├── 0by (object dump) ✅
-├── km5 (auto-detect) ← NEXT
-│   └─► 6uf (re-export)
-│       └─► o2f (--data-only)
-│           ├─► 3cn (--skip-tables)
-│           └─► 97p (FK ordering) ← uses fk-utils
-│                   │
-│                   ▼
-Phase 3 (migration)
-└── jur (migrate to Drizzle)
+├── km5 (auto-detect) ✅
+├── o2f (--data-only) ✅
+├── 97p (tableOrder) ✅
+└── 3cn (--skip-tables) ✅
+        │
+        ▼
+Phase 3 (migration) ← WE ARE HERE
+└── jur (migrate to Drizzle) ← NEXT
         │
         ▼
 Phase 4 (CLI + loaders)
@@ -147,11 +145,31 @@ Phase 6 (CI/CD)
 | File | Purpose |
 |------|---------|
 | `WORKSTREAM.md` | This file - primary recovery doc |
-| `docs/.vitepress/database/WORK-ORDER.md` | TDD specs for each task |
+| `RECOVERY.md` | Detailed recovery with TDD specs |
 | `docs/.vitepress/database/schema.ts` | Drizzle schema (source of truth) |
-| `docs/.vitepress/database/fk-utils.ts` | FK detection & ordering (NEW) |
-| `docs/.vitepress/database/field-mapping.ts` | Case conversion (NEW) |
-| `scripts/db-diffable.ts` | Export/import tool (enhanced) |
+| `docs/.vitepress/database/fk-utils.ts` | FK detection & ordering |
+| `docs/.vitepress/database/field-mapping.ts` | Case conversion |
+| `scripts/db-diffable.ts` | Export/import tool (fully featured) |
+
+---
+
+## db-diffable API (Fully Featured)
+
+```typescript
+// Load with all options
+load(dbPath, srcDir, {
+  replace?: boolean,      // Drop tables first
+  dataOnly?: boolean,     // Skip table creation, insert only
+  tableOrder?: string[],  // Process tables in this order (FK safe)
+  skipTables?: string[],  // Skip tables matching patterns ('_*')
+})
+
+// CLI example for migration
+tsx scripts/db-diffable.ts load new.db diffable/ \
+  --data-only \
+  --skip-tables '_*' \
+  --table-order orgs,targets,content
+```
 
 ---
 
@@ -168,8 +186,8 @@ Phase 6 (CI/CD)
    └── Run tests, confirm they PASS
 
 3. Verify all existing tests pass
-   └── pnpm test:run (410+)
-   └── cd cli && pnpm test:run (453)
+   └── pnpm test:run (423)
+   └── cd cli && pnpm test:run (476)
 
 4. Close task
    └── bd close <id> --reason="..."
@@ -183,12 +201,11 @@ Phase 6 (CI/CD)
 # Primary recovery
 cat WORKSTREAM.md
 bd ready
-bd show saf-site-km5
+bd show saf-site-jur
 
 # Check progress
 bd stats
 bd list --status=in_progress
-bd blocked
 
 # Verify tests
 pnpm test:run
