@@ -510,25 +510,77 @@ export const distributions = sqliteTable('distributions', {
 })
 
 /**
- * Releases - Version history for content, tools, and distributions
- * Polymorphic table: entityType + entityId pattern
+ * Content Releases - Version history for content (validation/hardening profiles)
+ * Proper 3NF: FK constraint to content table
  */
-export const releases = sqliteTable('releases', {
+export const contentReleases = sqliteTable('content_releases', {
   id: text('id').primaryKey(),
-  slug: text('slug').notNull().unique(), // URL-friendly: heimdall-v3-2-0, rhel8-stig-v1r3
+  contentId: text('content_id').notNull().references(() => content.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull().unique(), // URL-friendly: rhel8-stig-v1r3
 
-  // Polymorphic reference
-  entityType: text('entity_type').notNull(), // 'content', 'tool', 'distribution'
-  entityId: text('entity_id').notNull(), // ID of the entity
-
-  // Version info (format varies by entity type: semver "3.2.0" for tools, STIG "V1R3" for content)
-  version: text('version').notNull(), // No pattern validation - supports multiple formats
+  // Version info (STIG format: "V1R3", or semver for non-STIG content)
+  version: text('version').notNull(),
   releaseDate: integer('release_date', { mode: 'timestamp' }),
   releaseNotes: text('release_notes'),
 
-  // Download/verification
+  // Content-specific: STIG/SRG version mapping
+  stigVersion: text('stig_version'), // e.g., "V1R3"
+  srgVersion: text('srg_version'), // e.g., "V2R1"
+
+  // Status
+  isLatest: integer('is_latest', { mode: 'boolean' }).default(false),
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+})
+
+/**
+ * Tool Releases - Version history for tools (Heimdall, SAF CLI, etc.)
+ * Proper 3NF: FK constraint to tools table
+ */
+export const toolReleases = sqliteTable('tool_releases', {
+  id: text('id').primaryKey(),
+  toolId: text('tool_id').notNull().references(() => tools.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull().unique(), // URL-friendly: heimdall-v3-2-0
+
+  // Version info (semver format)
+  version: text('version').notNull(),
+  releaseDate: integer('release_date', { mode: 'timestamp' }),
+  releaseNotes: text('release_notes'),
+
+  // Tool-specific: download and verification
   downloadUrl: text('download_url'),
   sha256: text('sha256'), // For integrity verification
+  platforms: text('platforms'), // JSON array: ["macos", "linux", "windows"]
+
+  // Status
+  isLatest: integer('is_latest', { mode: 'boolean' }).default(false),
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+})
+
+/**
+ * Distribution Releases - Version history for distributions (helm charts, npm packages, etc.)
+ * Proper 3NF: FK constraint to distributions table
+ */
+export const distributionReleases = sqliteTable('distribution_releases', {
+  id: text('id').primaryKey(),
+  distributionId: text('distribution_id').notNull().references(() => distributions.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull().unique(), // URL-friendly: heimdall-helm-v1-0-0
+
+  // Version info (semver format)
+  version: text('version').notNull(),
+  releaseDate: integer('release_date', { mode: 'timestamp' }),
+  releaseNotes: text('release_notes'),
+
+  // Distribution-specific: registry and verification
+  registryUrl: text('registry_url'), // Direct link to this version in registry
+  downloadUrl: text('download_url'),
+  sha256: text('sha256'),
+  digest: text('digest'), // Container digest for docker images
 
   // Status
   isLatest: integer('is_latest', { mode: 'boolean' }).default(false),
@@ -898,7 +950,9 @@ export type Content = typeof content.$inferSelect
 export type Tool = typeof tools.$inferSelect
 export type Course = typeof courses.$inferSelect
 export type Distribution = typeof distributions.$inferSelect
-export type Release = typeof releases.$inferSelect
+export type ContentRelease = typeof contentReleases.$inferSelect
+export type ToolRelease = typeof toolReleases.$inferSelect
+export type DistributionRelease = typeof distributionReleases.$inferSelect
 export type ResourceType = typeof resourceTypes.$inferSelect
 export type CourseResource = typeof courseResources.$inferSelect
 export type CourseSession = typeof courseSessions.$inferSelect

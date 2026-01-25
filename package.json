@@ -24,6 +24,7 @@
     "db:populate": "tsx scripts/fetch-readmes.ts",
     "db:populate:refs": "tsx scripts/fetch-readmes.ts --refs-only",
     "db:dbml": "tsx scripts/gen-dbml.ts",
+    "schema:generate": "tsx scripts/gen-pb-migrations.ts",
     "pb:setup": "./scripts/setup-pb-cli.sh",
     "reload-data": "touch 'docs/validate/[slug].paths.ts'",
     "cli": "./scripts/cli.sh",

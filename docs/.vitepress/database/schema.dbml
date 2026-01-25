@@ -13,6 +13,7 @@ TableGroup core_content {
   targets
   tags
   content
+  content_releases
   content_capabilities
   content_tags
   content_relationships
@@ -24,6 +25,8 @@ TableGroup tools_distributions {
   registries
   tools
   distributions
+  tool_releases
+  distribution_releases
   tool_capabilities
   tool_tags
   distribution_capabilities
@@ -42,10 +45,6 @@ TableGroup learning {
   course_tags
   media_capabilities
   media_tags
-}
-
-TableGroup reference {
-  releases
 }
 
 table capabilities {
@@ -120,6 +119,20 @@ table content_relationships {
   indexes {
     (content_id, related_content_id) [pk]
   }
+}
+
+table content_releases {
+  id text [pk, not null]
+  content_id text [not null]
+  slug text [not null, unique]
+  version text [not null]
+  release_date integer
+  release_notes text
+  stig_version text
+  srg_version text
+  is_latest integer [default: 0]
+  created_at integer
+  updated_at integer
 }
 
 table content_tags {
@@ -220,6 +233,22 @@ table distribution_capabilities {
   indexes {
     (distribution_id, capability_id) [pk]
   }
+}
+
+table distribution_releases {
+  id text [pk, not null]
+  distribution_id text [not null]
+  slug text [not null, unique]
+  version text [not null]
+  release_date integer
+  release_notes text
+  registry_url text
+  download_url text
+  sha256 text
+  digest text
+  is_latest integer [default: 0]
+  created_at integer
+  updated_at integer
 }
 
 table distribution_tags {
@@ -337,21 +366,6 @@ table registries {
   updated_at integer
 }
 
-table releases {
-  id text [pk, not null]
-  slug text [not null, unique]
-  entity_type text [not null]
-  entity_id text [not null]
-  version text [not null]
-  release_date integer
-  release_notes text
-  download_url text
-  sha256 text
-  is_latest integer [default: 0]
-  created_at integer
-  updated_at integer
-}
-
 table resource_types {
   id text [pk, not null]
   name text [not null, unique]
@@ -438,6 +452,21 @@ table tool_capabilities {
   indexes {
     (tool_id, capability_id) [pk]
   }
+}
+
+table tool_releases {
+  id text [pk, not null]
+  tool_id text [not null]
+  slug text [not null, unique]
+  version text [not null]
+  release_date integer
+  release_notes text
+  download_url text
+  sha256 text
+  platforms text
+  is_latest integer [default: 0]
+  created_at integer
+  updated_at integer
 }
 
 table tool_tags {
@@ -542,6 +571,9 @@ ref: course_resources.resourceType > resource_types.id
 ref: media.mediaType > media_types.id
 ref: media.organization > organizations.id
 ref: distributions.distributionType > distribution_types.id
+ref: content_releases.contentId > content.id
+ref: tool_releases.toolId > tools.id
+ref: distribution_releases.distributionId > distributions.id
 ref: content_capabilities.contentId > content.id
 ref: content_capabilities.capabilityId > capabilities.id
 ref: content_tags.contentId > content.id
