@@ -64,3 +64,4 @@ drizzle/
 *.pglite
 .pglite/
 .trailbase/
+docs/.vitepress/database/drizzle.db
