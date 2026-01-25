@@ -159,7 +159,14 @@ function matchesSkipPattern(tableName: string, patterns: string[]): boolean {
   return false
 }
 
-export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean, tableOrder?: string[], skipTables?: string[] } = {}): number {
+export interface ColumnMapping {
+  /** Map old column names to new column names */
+  rename?: Record<string, string>
+  /** Columns to skip (not import) */
+  skip?: string[]
+}
+
+export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean, tableOrder?: string[], skipTables?: string[], emptyToNull?: boolean, columnMappings?: Record<string, ColumnMapping>, ignoreConflicts?: boolean } = {}): number {
   const log = options.quiet ? () => {} : console.log
 
   if (!existsSync(srcDir)) {
@@ -288,9 +295,22 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
     const firstParsed = JSON.parse(lines[0])
     const isObjectFormat = !Array.isArray(firstParsed)
 
-    const placeholders = metadata.columns.map(() => '?').join(', ')
-    const columnList = metadata.columns.map(c => `"${c}"`).join(', ')
-    const insert = db.prepare(`INSERT INTO "${metadata.name}" (${columnList}) VALUES (${placeholders})`)
+    // Apply column mappings if configured for this table (saf-site-jur)
+    const tableMapping = options.columnMappings?.[metadata.name]
+    const skipCols = new Set(tableMapping?.skip || [])
+    const renameMap = tableMapping?.rename || {}
+
+    // Filter out skipped columns and apply renames
+    const sourceColumns = metadata.columns.filter(c => !skipCols.has(c))
+    const targetColumns = sourceColumns.map(c => renameMap[c] || c)
+
+    const placeholders = targetColumns.map(() => '?').join(', ')
+    const columnList = targetColumns.map(c => `"${c}"`).join(', ')
+    // Use INSERT OR IGNORE when ignoreConflicts is set (handles duplicate composite keys)
+    const insertSql = options.ignoreConflicts
+      ? `INSERT OR IGNORE INTO "${metadata.name}" (${columnList}) VALUES (${placeholders})`
+      : `INSERT INTO "${metadata.name}" (${columnList}) VALUES (${placeholders})`
+    const insert = db.prepare(insertSql)
 
     const insertMany = db.transaction((rows: unknown[][]) => {
       for (const row of rows) {
@@ -298,17 +318,30 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
       }
     })
 
-    // Convert rows to array format (in column order from metadata)
+    // Convert rows to array format (in column order from source columns)
     const rows = lines.map((line) => {
       const parsed = JSON.parse(line)
+      let row: unknown[]
       if (isObjectFormat) {
-        // Object format: extract values in column order from metadata
-        return metadata.columns.map(col => (parsed as Record<string, unknown>)[col])
+        // Object format: extract values in source column order (skipping excluded)
+        row = sourceColumns.map(col => (parsed as Record<string, unknown>)[col])
       }
       else {
-        // Array format: use as-is
-        return parsed as unknown[]
+        // Array format: need to map by index, excluding skipped columns
+        const allValues = parsed as unknown[]
+        row = sourceColumns.map((col) => {
+          const idx = metadata.columns.indexOf(col)
+          return allValues[idx]
+        })
       }
+
+      // Convert empty strings to null if option is set (saf-site-jur)
+      // This is needed for SQLite FK constraints which don't accept empty strings
+      if (options.emptyToNull) {
+        row = row.map(value => (value === '' ? null : value))
+      }
+
+      return row
     })
 
     try {
@@ -416,12 +449,13 @@ Commands:
   objects   Convert NDJSON to JSON objects (debugging)
 
 Options:
-  --exclude      Skip specific tables (dump command)
-  --replace      Drop existing tables before loading (load command)
-  --data-only    Insert data into existing tables only, don't create schema (load command)
-  --table-order  Load tables in specified order, comma-separated (load command)
-  --skip-tables  Skip tables matching patterns, comma-separated, supports * glob (load command)
-  --array        Output as JSON array instead of newline-delimited (objects command)
+  --exclude       Skip specific tables (dump command)
+  --replace       Drop existing tables before loading (load command)
+  --data-only     Insert data into existing tables only, don't create schema (load command)
+  --table-order   Load tables in specified order, comma-separated (load command)
+  --skip-tables   Skip tables matching patterns, comma-separated, supports * glob (load command)
+  --empty-to-null Convert empty strings to NULL (load command, needed for SQLite FK constraints)
+  --array         Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
   tsx scripts/db-diffable.ts dump .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
@@ -464,6 +498,7 @@ Examples:
     const dirPath = args[2]
     const hasReplace = args.includes('--replace')
     const hasDataOnly = args.includes('--data-only')
+    const hasEmptyToNull = args.includes('--empty-to-null')
     let tableOrder: string[] | undefined
     let skipTables: string[] | undefined
     const tableOrderIdx = args.indexOf('--table-order')
@@ -482,7 +517,7 @@ Examples:
       console.error('Error: --replace and --data-only are mutually exclusive')
       process.exit(1)
     }
-    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly, tableOrder, skipTables })
+    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly, tableOrder, skipTables, emptyToNull: hasEmptyToNull })
   }
   else if (command === 'objects') {
     const ndjsonPath = args[1]
