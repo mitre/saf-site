@@ -236,6 +236,113 @@ describe('db-diffable', () => {
       expect(existsSync(nestedDir)).toBe(true)
       expect(existsSync(join(nestedDir, 'one_table.ndjson'))).toBe(true)
     })
+
+    // ========================================================================
+    // OBJECT FORMAT TESTS (saf-site-0by)
+    // ========================================================================
+
+    it('outputs NDJSON with objects when format=object', () => {
+      createOneTableDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      expect(result).toBe(0)
+
+      // Verify each line is a JSON object with column names as keys
+      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
+      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
+      const objects = lines.map(l => JSON.parse(l))
+
+      expect(objects).toEqual([
+        { id: 1, name: 'Stacey' },
+        { id: 2, name: 'Tilda' },
+        { id: 3, name: 'Bartek' },
+      ])
+    })
+
+    it('each object line is self-contained with all column names', () => {
+      createOneTableDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      expect(result).toBe(0)
+
+      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
+      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
+
+      // Each line should parse independently and have all columns
+      for (const line of lines) {
+        const obj = JSON.parse(line)
+        expect(obj).toHaveProperty('id')
+        expect(obj).toHaveProperty('name')
+      }
+    })
+
+    it('maintains backward compatibility with format=array (default)', () => {
+      createOneTableDb(dbPath)
+
+      // Default should be array format
+      const result = dump(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
+      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
+
+      // Default format should still be arrays
+      expect(lines.map(l => JSON.parse(l))).toEqual([
+        [1, 'Stacey'],
+        [2, 'Tilda'],
+        [3, 'Bartek'],
+      ])
+    })
+
+    it('explicit format=array outputs arrays', () => {
+      createOneTableDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true, format: 'array' })
+      expect(result).toBe(0)
+
+      const ndjsonPath = join(diffableDir, 'one_table.ndjson')
+      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
+
+      // Array format should output arrays
+      expect(lines.map(l => JSON.parse(l))).toEqual([
+        [1, 'Stacey'],
+        [2, 'Tilda'],
+        [3, 'Bartek'],
+      ])
+    })
+
+    it('object format handles NULL values correctly', () => {
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE with_nulls (id INTEGER PRIMARY KEY, name TEXT, value TEXT);
+        INSERT INTO with_nulls VALUES (1, 'test', NULL);
+        INSERT INTO with_nulls VALUES (2, NULL, 'data');
+      `)
+      db.close()
+
+      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      expect(result).toBe(0)
+
+      const ndjsonPath = join(diffableDir, 'with_nulls.ndjson')
+      const lines = readFileSync(ndjsonPath, 'utf-8').trim().split('\n')
+      const objects = lines.map(l => JSON.parse(l))
+
+      expect(objects[0]).toEqual({ id: 1, name: 'test', value: null })
+      expect(objects[1]).toEqual({ id: 2, name: null, value: 'data' })
+    })
+
+    it('object format handles empty tables', () => {
+      const db = new Database(dbPath)
+      db.exec('CREATE TABLE empty_table (id INTEGER PRIMARY KEY, name TEXT)')
+      db.close()
+
+      const result = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      expect(result).toBe(0)
+
+      const ndjsonPath = join(diffableDir, 'empty_table.ndjson')
+      const content = readFileSync(ndjsonPath, 'utf-8')
+      expect(content.trim()).toBe('')
+    })
   })
 
   // ==========================================================================

@@ -55,7 +55,9 @@ function toJsonValue(value: unknown): unknown {
   return value
 }
 
-export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[] } = {}): number {
+export type DumpFormat = 'array' | 'object'
+
+export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[], format?: DumpFormat } = {}): number {
   const log = options.quiet ? () => {} : console.log
   const excludeSet = new Set(options.exclude || [])
   const tablesSet = options.tables ? new Set(options.tables) : null
@@ -122,9 +124,22 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
 
     // Write data as NDJSON (convert non-JSON types before serializing)
     const rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
+    const format = options.format || 'array'
+
     const ndjsonLines = rows.map((row) => {
-      const values = columnNames.map(col => toJsonValue(row[col]))
-      return JSON.stringify(values)
+      if (format === 'object') {
+        // Object format: {"col1": val1, "col2": val2, ...}
+        const obj: Record<string, unknown> = {}
+        for (const col of columnNames) {
+          obj[col] = toJsonValue(row[col])
+        }
+        return JSON.stringify(obj)
+      }
+      else {
+        // Array format (default): [val1, val2, ...]
+        const values = columnNames.map(col => toJsonValue(row[col]))
+        return JSON.stringify(values)
+      }
     })
     writeFileSync(join(outDir, `${table.name}.ndjson`), ndjsonLines.join('\n') + (ndjsonLines.length ? '\n' : ''))
 
@@ -317,7 +332,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
 SQLite Diffable - Export/import SQLite to git-friendly format
 
 Usage:
-  tsx scripts/db-diffable.ts dump <database.db> <output-dir> [--exclude table1 ...]
+  tsx scripts/db-diffable.ts dump <database.db> <output-dir> [options]
   tsx scripts/db-diffable.ts load <database.db> <source-dir> [--replace]
   tsx scripts/db-diffable.ts objects <file.ndjson> [--array]
 
@@ -327,12 +342,14 @@ Commands:
   objects   Convert NDJSON to JSON objects (debugging)
 
 Options:
-  --replace    Drop existing tables before loading (load command)
+  --format     Output format: 'array' (default) or 'object' (dump command)
   --exclude    Skip specific tables (dump command)
+  --replace    Drop existing tables before loading (load command)
   --array      Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
   tsx scripts/db-diffable.ts dump .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
+  tsx scripts/db-diffable.ts dump data.db diffable/ --format object
   tsx scripts/db-diffable.ts dump data.db diffable/ --exclude temp_table log_table
   tsx scripts/db-diffable.ts load .pocketbase/pb_data/data.db .pocketbase/pb_data/diffable
   tsx scripts/db-diffable.ts load data.db diffable/ --replace
@@ -348,10 +365,22 @@ Examples:
     const dbPath = args[1]
     const dirPath = args[2]
     const excludeArgs: string[] = []
+    let format: DumpFormat | undefined
     let i = 3
     while (i < args.length) {
       if (args[i] === '--exclude' && args[i + 1]) {
         excludeArgs.push(args[i + 1])
+        i += 2
+      }
+      else if (args[i] === '--format' && args[i + 1]) {
+        const fmt = args[i + 1]
+        if (fmt === 'array' || fmt === 'object') {
+          format = fmt
+        }
+        else {
+          console.error(`Error: Invalid format '${fmt}'. Use 'array' or 'object'.`)
+          process.exit(1)
+        }
         i += 2
       }
       else {
@@ -362,7 +391,7 @@ Examples:
       console.error('Error: dump requires <database.db> <output-dir>')
       process.exit(1)
     }
-    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined })
+    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined, format })
   }
   else if (command === 'load') {
     const dbPath = args[1]
