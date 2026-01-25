@@ -9,6 +9,7 @@ import { Command } from 'commander'
 import pc from 'picocolors'
 import { contentCommand } from './commands/content.js'
 import { dbCommand } from './commands/db.js'
+import { tableCommand } from './commands/table.js'
 
 const program = new Command()
 
@@ -20,6 +21,7 @@ program
 // Register commands
 program.addCommand(contentCommand)
 program.addCommand(dbCommand)
+program.addCommand(tableCommand)
 
 // Global error handling
 program.hook('preAction', () => {
