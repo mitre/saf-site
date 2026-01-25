@@ -907,6 +907,142 @@ describe('db-diffable', () => {
       expect(restored.prepare('SELECT COUNT(*) as c FROM data').get()).toEqual({ c: 0 }) // Nothing loaded
       restored.close()
     })
+
+    // ========================================================================
+    // SKIP-TABLES TESTS (saf-site-3cn)
+    // ========================================================================
+
+    it('skipTables excludes specific tables from loading', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Create diffable files for two tables
+      writeFileSync(
+        join(diffableDir, 'keep_table.metadata.json'),
+        JSON.stringify({ name: 'keep_table', columns: ['id', 'data'], schema: 'CREATE TABLE keep_table (id INTEGER PRIMARY KEY, data TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'keep_table.ndjson'), '{"id":1,"data":"kept"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'skip_table.metadata.json'),
+        JSON.stringify({ name: 'skip_table', columns: ['id', 'data'], schema: 'CREATE TABLE skip_table (id INTEGER PRIMARY KEY, data TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'skip_table.ndjson'), '{"id":1,"data":"skipped"}\n')
+
+      // Load with skipTables
+      const result = load(dbPath, diffableDir, { skipTables: ['skip_table'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      // keep_table should exist and have data
+      expect(restored.prepare('SELECT * FROM keep_table').all()).toEqual([{ id: 1, data: 'kept' }])
+      // skip_table should NOT exist
+      const tables = restored.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+      expect(tables.map(t => t.name)).not.toContain('skip_table')
+      restored.close()
+    })
+
+    it('skipTables supports glob patterns for Pocketbase internal tables', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // User table (should be loaded)
+      writeFileSync(
+        join(diffableDir, 'users.metadata.json'),
+        JSON.stringify({ name: 'users', columns: ['id', 'name'], schema: 'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'users.ndjson'), '{"id":1,"name":"Alice"}\n')
+
+      // PB internal tables (should be skipped)
+      writeFileSync(
+        join(diffableDir, '_collections.metadata.json'),
+        JSON.stringify({ name: '_collections', columns: ['id', 'name'], schema: 'CREATE TABLE _collections (id TEXT PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, '_collections.ndjson'), '{"id":"c1","name":"users"}\n')
+
+      writeFileSync(
+        join(diffableDir, '_authOrigins.metadata.json'),
+        JSON.stringify({ name: '_authOrigins', columns: ['id', 'data'], schema: 'CREATE TABLE _authOrigins (id TEXT PRIMARY KEY, data TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, '_authOrigins.ndjson'), '{"id":"a1","data":"origin"}\n')
+
+      // Load with glob pattern to skip all underscore-prefixed tables
+      const result = load(dbPath, diffableDir, { skipTables: ['_*'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      const tables = restored.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+      expect(tables.map(t => t.name)).toContain('users')
+      expect(tables.map(t => t.name)).not.toContain('_collections')
+      expect(tables.map(t => t.name)).not.toContain('_authOrigins')
+      restored.close()
+    })
+
+    it('skipTables works with --data-only mode', () => {
+      // Pre-create database with tables
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);
+        CREATE TABLE logs (id INTEGER PRIMARY KEY, message TEXT);
+      `)
+      db.close()
+
+      mkdirSync(diffableDir, { recursive: true })
+
+      writeFileSync(
+        join(diffableDir, 'users.metadata.json'),
+        JSON.stringify({ name: 'users', columns: ['id', 'name'], schema: 'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'users.ndjson'), '{"id":1,"name":"Bob"}\n')
+
+      writeFileSync(
+        join(diffableDir, 'logs.metadata.json'),
+        JSON.stringify({ name: 'logs', columns: ['id', 'message'], schema: 'CREATE TABLE logs (id INTEGER PRIMARY KEY, message TEXT)' }),
+      )
+      writeFileSync(join(diffableDir, 'logs.ndjson'), '{"id":1,"message":"test log"}\n')
+
+      // Load with dataOnly and skipTables
+      const result = load(dbPath, diffableDir, { dataOnly: true, skipTables: ['logs'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM users').get()).toEqual({ c: 1 })
+      expect(restored.prepare('SELECT COUNT(*) as c FROM logs').get()).toEqual({ c: 0 }) // Skipped
+      restored.close()
+    })
+
+    it('skipTables with multiple patterns', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Regular table
+      writeFileSync(
+        join(diffableDir, 'data.metadata.json'),
+        JSON.stringify({ name: 'data', columns: ['id'], schema: 'CREATE TABLE data (id INTEGER PRIMARY KEY)' }),
+      )
+      writeFileSync(join(diffableDir, 'data.ndjson'), '{"id":1}\n')
+
+      // Tables to skip
+      writeFileSync(
+        join(diffableDir, '_internal.metadata.json'),
+        JSON.stringify({ name: '_internal', columns: ['id'], schema: 'CREATE TABLE _internal (id INTEGER PRIMARY KEY)' }),
+      )
+      writeFileSync(join(diffableDir, '_internal.ndjson'), '{"id":1}\n')
+
+      writeFileSync(
+        join(diffableDir, 'temp_cache.metadata.json'),
+        JSON.stringify({ name: 'temp_cache', columns: ['id'], schema: 'CREATE TABLE temp_cache (id INTEGER PRIMARY KEY)' }),
+      )
+      writeFileSync(join(diffableDir, 'temp_cache.ndjson'), '{"id":1}\n')
+
+      // Skip both underscore-prefixed and temp_* tables
+      const result = load(dbPath, diffableDir, { skipTables: ['_*', 'temp_*'], quiet: true })
+      expect(result).toBe(0)
+
+      const restored = new Database(dbPath, { readonly: true })
+      const tables = restored.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+      expect(tables.map(t => t.name)).toContain('data')
+      expect(tables.map(t => t.name)).not.toContain('_internal')
+      expect(tables.map(t => t.name)).not.toContain('temp_cache')
+      restored.close()
+    })
   })
 
   // ==========================================================================

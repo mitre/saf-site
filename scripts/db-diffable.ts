@@ -141,7 +141,25 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
   return 0
 }
 
-export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean, tableOrder?: string[] } = {}): number {
+/**
+ * Check if a table name matches any skip pattern (supports glob with *)
+ */
+function matchesSkipPattern(tableName: string, patterns: string[]): boolean {
+  for (const pattern of patterns) {
+    if (pattern.includes('*')) {
+      // Convert glob pattern to regex: _* -> ^_.*$
+      const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`)
+      if (regex.test(tableName)) return true
+    }
+    else {
+      // Exact match
+      if (tableName === pattern) return true
+    }
+  }
+  return false
+}
+
+export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean, dataOnly?: boolean, tableOrder?: string[], skipTables?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
 
   if (!existsSync(srcDir)) {
@@ -168,10 +186,17 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
 
   // If tableOrder is specified, filter and reorder metadata files
   if (options.tableOrder) {
-    const orderSet = new Set(options.tableOrder)
     metadataFiles = options.tableOrder
       .map(tableName => `${tableName}.metadata.json`)
       .filter(f => existsSync(join(srcDir, f)))
+  }
+
+  // Filter out skipped tables
+  if (options.skipTables && options.skipTables.length > 0) {
+    metadataFiles = metadataFiles.filter((f) => {
+      const tableName = f.replace('.metadata.json', '')
+      return !matchesSkipPattern(tableName, options.skipTables!)
+    })
   }
 
   log(`Restoring ${metadataFiles.length} tables from ${srcDir}/`)
@@ -395,6 +420,7 @@ Options:
   --replace      Drop existing tables before loading (load command)
   --data-only    Insert data into existing tables only, don't create schema (load command)
   --table-order  Load tables in specified order, comma-separated (load command)
+  --skip-tables  Skip tables matching patterns, comma-separated, supports * glob (load command)
   --array        Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
@@ -404,6 +430,7 @@ Examples:
   tsx scripts/db-diffable.ts load data.db diffable/ --replace
   tsx scripts/db-diffable.ts load data.db diffable/ --data-only
   tsx scripts/db-diffable.ts load data.db diffable/ --data-only --table-order orgs,users,posts
+  tsx scripts/db-diffable.ts load data.db diffable/ --skip-tables '_*,temp_*'
   tsx scripts/db-diffable.ts objects diffable/users.ndjson
   tsx scripts/db-diffable.ts objects diffable/users.ndjson --array
 `)
@@ -438,9 +465,14 @@ Examples:
     const hasReplace = args.includes('--replace')
     const hasDataOnly = args.includes('--data-only')
     let tableOrder: string[] | undefined
+    let skipTables: string[] | undefined
     const tableOrderIdx = args.indexOf('--table-order')
     if (tableOrderIdx !== -1 && args[tableOrderIdx + 1]) {
       tableOrder = args[tableOrderIdx + 1].split(',').map(t => t.trim())
+    }
+    const skipTablesIdx = args.indexOf('--skip-tables')
+    if (skipTablesIdx !== -1 && args[skipTablesIdx + 1]) {
+      skipTables = args[skipTablesIdx + 1].split(',').map(t => t.trim())
     }
     if (!dbPath || !dirPath) {
       console.error('Error: load requires <database.db> <source-dir>')
@@ -450,7 +482,7 @@ Examples:
       console.error('Error: --replace and --data-only are mutually exclusive')
       process.exit(1)
     }
-    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly, tableOrder })
+    exitCode = load(dbPath, dirPath, { replace: hasReplace, dataOnly: hasDataOnly, tableOrder, skipTables })
   }
   else if (command === 'objects') {
     const ndjsonPath = args[1]
