@@ -133,6 +133,27 @@ pnpm dev
 | `pnpm db:export` | Export database to git-friendly format |
 | `pnpm db:export:diff` | Export and show git diff |
 
+### Database Schema (DBML)
+
+Generate DBML documentation from the Drizzle schema:
+
+| Command | Description |
+|---------|-------------|
+| `pnpm db:dbml` | Generate DBML from Drizzle schema |
+
+The script dynamically parses `docs/.vitepress/database/schema.ts` to:
+- Extract all tables and columns
+- Find all foreign key relationships (including junction tables)
+- Auto-generate TableGroups for organization
+
+Output: `docs/.vitepress/database/schema.dbml`
+
+**Visualizing the Schema:**
+1. Run `pnpm db:dbml` to generate fresh DBML
+2. Copy contents to [dbdiagram.io](https://dbdiagram.io/d)
+3. Drag tables to arrange layout
+4. Export as PNG/SVG for documentation
+
 ### Content Population
 
 Fetch README content from GitHub and populate reference URLs:

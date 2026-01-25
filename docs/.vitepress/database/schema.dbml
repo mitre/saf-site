@@ -1,0 +1,568 @@
+// SAF Content Catalog - Database Schema
+// Auto-generated from Drizzle schema
+// Run: pnpm db:dbml
+// DO NOT EDIT - changes will be overwritten
+
+TableGroup core_content {
+  capabilities
+  categories
+  organizations
+  teams
+  standards
+  technologies
+  targets
+  tags
+  content
+  content_capabilities
+  content_tags
+  content_relationships
+}
+
+TableGroup tools_distributions {
+  tool_types
+  distribution_types
+  registries
+  tools
+  distributions
+  tool_capabilities
+  tool_tags
+  distribution_capabilities
+  distribution_tags
+}
+
+TableGroup learning {
+  resource_types
+  media_types
+  courses
+  course_resources
+  course_sessions
+  media
+  course_capabilities
+  course_tools
+  course_tags
+  media_capabilities
+  media_tags
+}
+
+TableGroup reference {
+  releases
+}
+
+table capabilities {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  description text
+  icon text
+  color text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table categories {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  description text
+  icon text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table content {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  long_description text
+  version text
+  content_type text [not null]
+  status text [default: 'active']
+  target text
+  standard text
+  technology text
+  vendor text
+  maintainer text
+  github text
+  documentation_url text
+  reference_url text
+  readme_url text
+  readme_markdown text
+  control_count integer
+  stig_id text
+  benchmark_version text
+  automation_level text
+  is_featured integer [default: 0]
+  featured_order integer
+  license text
+  release_date integer
+  deprecated_at integer
+  created_at integer
+  updated_at integer
+}
+
+table content_capabilities {
+  content_id text [not null]
+  capability_id text [not null]
+
+  indexes {
+    (content_id, capability_id) [pk]
+  }
+}
+
+table content_relationships {
+  content_id text [not null]
+  related_content_id text [not null]
+  relationship_type text [not null]
+
+  indexes {
+    (content_id, related_content_id) [pk]
+  }
+}
+
+table content_tags {
+  content_id text [not null]
+  tag_id text [not null]
+
+  indexes {
+    (content_id, tag_id) [pk]
+  }
+}
+
+table course_capabilities {
+  course_id text [not null]
+  capability_id text [not null]
+
+  indexes {
+    (course_id, capability_id) [pk]
+  }
+}
+
+table course_resources {
+  id text [pk, not null]
+  title text [not null]
+  description text
+  url text [not null]
+  course text [not null]
+  resource_type text [not null]
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table course_sessions {
+  id text [pk, not null]
+  title text
+  course text [not null]
+  start_date integer [not null]
+  end_date integer
+  timezone text
+  location_type text
+  location text
+  meeting_url text
+  instructor text
+  max_attendees integer
+  recording_url text
+  status text [default: 'scheduled']
+  created_at integer
+  updated_at integer
+}
+
+table course_tags {
+  course_id text [not null]
+  tag_id text [not null]
+
+  indexes {
+    (course_id, tag_id) [pk]
+  }
+}
+
+table course_tools {
+  course_id text [not null]
+  tool_id text [not null]
+
+  indexes {
+    (course_id, tool_id) [pk]
+  }
+}
+
+table courses {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  long_description text
+  course_type text
+  level text
+  status text [default: 'active']
+  organization text
+  website text
+  registration_url text
+  materials_url text
+  logo text
+  duration_minutes integer
+  is_free integer [default: 1]
+  price_usd integer
+  target_audience text
+  registration_active integer [default: 0]
+  is_featured integer [default: 0]
+  featured_order integer
+  created_at integer
+  updated_at integer
+}
+
+table distribution_capabilities {
+  distribution_id text [not null]
+  capability_id text [not null]
+
+  indexes {
+    (distribution_id, capability_id) [pk]
+  }
+}
+
+table distribution_tags {
+  distribution_id text [not null]
+  tag_id text [not null]
+
+  indexes {
+    (distribution_id, tag_id) [pk]
+  }
+}
+
+table distribution_types {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  display_name text
+  description text
+  icon text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table distributions {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  version text
+  status text [default: 'active']
+  tool text
+  distribution_type text
+  registry text
+  registry_url text
+  github text
+  documentation_url text
+  install_command text
+  license text
+  created_at integer
+  updated_at integer
+}
+
+table media {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  media_type text [not null]
+  author text
+  organization text
+  published_at integer
+  url text
+  file text
+  file_size integer
+  thumbnail text
+  event_name text
+  event_date integer
+  is_featured integer [default: 0]
+  featured_order integer
+  created_at integer
+  updated_at integer
+}
+
+table media_capabilities {
+  media_id text [not null]
+  capability_id text [not null]
+
+  indexes {
+    (media_id, capability_id) [pk]
+  }
+}
+
+table media_tags {
+  media_id text [not null]
+  tag_id text [not null]
+
+  indexes {
+    (media_id, tag_id) [pk]
+  }
+}
+
+table media_types {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  display_name text
+  description text
+  icon text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table organizations {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  website text
+  logo text
+  org_type text
+  created_at integer
+  updated_at integer
+}
+
+table registries {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  display_name text
+  description text
+  website text
+  logo text
+  created_at integer
+  updated_at integer
+}
+
+table releases {
+  id text [pk, not null]
+  slug text [not null, unique]
+  entity_type text [not null]
+  entity_id text [not null]
+  version text [not null]
+  release_date integer
+  release_notes text
+  download_url text
+  sha256 text
+  is_latest integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table resource_types {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  display_name text
+  description text
+  icon text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table standards {
+  id text [pk, not null]
+  name text [not null]
+  short_name text
+  slug text [not null, unique]
+  description text
+  website text
+  logo text
+  organization text
+  standard_type text
+  created_at integer
+  updated_at integer
+}
+
+table tags {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  display_name text
+  description text
+  tag_category text
+  badge_color text
+  created_at integer
+  updated_at integer
+}
+
+table targets {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  category text
+  vendor text
+  website text
+  logo text
+  created_at integer
+  updated_at integer
+}
+
+table teams {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  organization text
+  website text
+  logo text
+  created_at integer
+  updated_at integer
+}
+
+table technologies {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  website text
+  logo text
+  github text
+  organization text
+  documentation_url text
+  quick_start_template text
+  prerequisites_template text
+  created_at integer
+  updated_at integer
+}
+
+table tool_capabilities {
+  tool_id text [not null]
+  capability_id text [not null]
+
+  indexes {
+    (tool_id, capability_id) [pk]
+  }
+}
+
+table tool_tags {
+  tool_id text [not null]
+  tag_id text [not null]
+
+  indexes {
+    (tool_id, tag_id) [pk]
+  }
+}
+
+table tool_types {
+  id text [pk, not null]
+  name text [not null, unique]
+  slug text [not null, unique]
+  description text
+  icon text
+  sort_order integer [default: 0]
+  created_at integer
+  updated_at integer
+}
+
+table tools {
+  id text [pk, not null]
+  name text [not null]
+  slug text [not null, unique]
+  description text
+  long_description text
+  version text
+  tool_type text
+  status text [default: 'active']
+  organization text
+  technology text
+  website text
+  github text
+  documentation_url text
+  logo text
+  screenshot text
+  screenshots text
+  is_featured integer [default: 0]
+  featured_order integer
+  license text
+  created_at integer
+  updated_at integer
+}
+
+ref: content.target > targets.id
+
+ref: content.standard > standards.id
+
+ref: content.technology > technologies.id
+
+ref: content.vendor > organizations.id
+
+ref: content.maintainer > teams.id
+
+ref: course_resources.course > courses.id
+
+ref: course_resources.resource_type > resource_types.id
+
+ref: course_sessions.course > courses.id
+
+ref: courses.organization - organizations.id
+
+ref: distributions.tool > tools.id
+
+ref: distributions.distribution_type > distribution_types.id
+
+ref: distributions.registry > registries.id
+
+ref: media_capabilities.media_id > media.id
+
+ref: media_capabilities.capability_id > capabilities.id
+
+ref: media.media_type > media_types.id
+
+ref: media.organization - organizations.id
+
+ref: media_tags.media_id > media.id
+
+ref: media_tags.tag_id > tags.id
+
+ref: standards.organization > organizations.id
+
+ref: targets.category > categories.id
+
+ref: targets.vendor > organizations.id
+
+ref: teams.organization > organizations.id
+
+ref: technologies.organization > organizations.id
+
+ref: tools.tool_type > tool_types.id
+
+ref: tools.organization > organizations.id
+
+ref: tools.technology > technologies.id
+// Additional refs found in schema
+ref: tools.toolType > tool_types.id
+ref: courses.organization > organizations.id
+ref: course_resources.resourceType > resource_types.id
+ref: media.mediaType > media_types.id
+ref: media.organization > organizations.id
+ref: distributions.distributionType > distribution_types.id
+ref: content_capabilities.contentId > content.id
+ref: content_capabilities.capabilityId > capabilities.id
+ref: content_tags.contentId > content.id
+ref: content_tags.tagId > tags.id
+ref: content_relationships.contentId > content.id
+ref: content_relationships.relatedContentId > content.id
+ref: tool_capabilities.toolId > tools.id
+ref: tool_capabilities.capabilityId > capabilities.id
+ref: tool_tags.toolId > tools.id
+ref: tool_tags.tagId > tags.id
+ref: distribution_capabilities.distributionId > distributions.id
+ref: distribution_capabilities.capabilityId > capabilities.id
+ref: distribution_tags.distributionId > distributions.id
+ref: distribution_tags.tagId > tags.id
+ref: course_capabilities.courseId > courses.id
+ref: course_capabilities.capabilityId > capabilities.id
+ref: course_tools.courseId > courses.id
+ref: course_tools.toolId > tools.id
+ref: course_tags.courseId > courses.id
+ref: course_tags.tagId > tags.id
+ref: media_capabilities.mediaId > media.id
+ref: media_capabilities.capabilityId > capabilities.id
+ref: media_tags.mediaId > media.id
+ref: media_tags.tagId > tags.id
