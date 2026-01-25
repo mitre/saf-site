@@ -8,7 +8,7 @@
  *
  * Usage: pnpm db:dbml
  */
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { sqliteGenerate } from 'drizzle-dbml-generator'
 import * as schema from '../docs/.vitepress/database/schema'
 
@@ -16,15 +16,14 @@ const SCHEMA_PATH = 'docs/.vitepress/database/schema.ts'
 const OUTPUT_PATH = 'docs/.vitepress/database/schema.dbml'
 
 // Parse schema file to find ALL references dynamically
-function findAllRefs(schemaContent: string): string[] {
+export function findAllRefs(schemaContent: string): string[] {
   const refs: string[] = []
 
   // Find all sqliteTable definitions
   const tableRegex = /export const (\w+) = sqliteTable\('([^']+)'/g
   const tables: Map<string, string> = new Map() // varName -> tableName
 
-  let match
-  while ((match = tableRegex.exec(schemaContent)) !== null) {
+  for (const match of schemaContent.matchAll(tableRegex)) {
     tables.set(match[1], match[2])
   }
 
@@ -38,12 +37,11 @@ function findAllRefs(schemaContent: string): string[] {
     // Also handles .notNull() before .references()
     const refRegex = /(\w+):\s*text\([^)]+\)(?:\.notNull\(\))?\.references\(\(\)\s*=>\s*(\w+)\.(\w+)/g
 
-    let refMatch
-    while ((refMatch = refRegex.exec(tableBlock)) !== null) {
+    for (const refMatch of tableBlock.matchAll(refRegex)) {
       const fieldName = refMatch[1]
       const targetVar = refMatch[2]
       const targetCol = refMatch[3]
-      const targetTable = tables.get(targetVar) || targetVar
+      const targetTable = tables.get(targetVar) ?? targetVar
 
       refs.push(`ref: ${tableName}.${fieldName} > ${targetTable}.${targetCol}`)
     }
@@ -53,33 +51,32 @@ function findAllRefs(schemaContent: string): string[] {
 }
 
 // Auto-detect table groups based on naming patterns
-function generateTableGroups(schemaContent: string): string {
-  const tableRegex = /export const (\w+) = sqliteTable\('([^']+)'/g
+export function generateTableGroups(schemaContent: string): string {
+  const tableRegex = /export const \w+ = sqliteTable\('([^']+)'/g
   const allTables: string[] = []
 
-  let match
-  while ((match = tableRegex.exec(schemaContent)) !== null) {
-    allTables.push(match[2])
+  for (const match of schemaContent.matchAll(tableRegex)) {
+    allTables.push(match[1])
   }
 
   // Group by prefix/pattern
   const coreContent = allTables.filter(t =>
-    ['content', 'targets', 'standards', 'technologies', 'organizations', 'teams', 'categories', 'capabilities', 'tags'].includes(t) ||
-    t.startsWith('content_')
+    ['content', 'targets', 'standards', 'technologies', 'organizations', 'teams', 'categories', 'capabilities', 'tags'].includes(t)
+    || t.startsWith('content_'),
   )
 
   const tools = allTables.filter(t =>
-    ['tools', 'tool_types', 'distributions', 'distribution_types', 'registries'].includes(t) ||
-    t.startsWith('tool_') || t.startsWith('distribution_')
+    ['tools', 'tool_types', 'distributions', 'distribution_types', 'registries'].includes(t)
+    || t.startsWith('tool_') || t.startsWith('distribution_'),
   )
 
   const learning = allTables.filter(t =>
-    ['courses', 'media', 'resource_types', 'media_types'].includes(t) ||
-    t.startsWith('course_') || t.startsWith('media_')
+    ['courses', 'media', 'resource_types', 'media_types'].includes(t)
+    || t.startsWith('course_') || t.startsWith('media_'),
   )
 
   const reference = allTables.filter(t =>
-    !coreContent.includes(t) && !tools.includes(t) && !learning.includes(t)
+    !coreContent.includes(t) && !tools.includes(t) && !learning.includes(t),
   )
 
   let groups = ''
@@ -100,38 +97,45 @@ function generateTableGroups(schemaContent: string): string {
   return groups
 }
 
-// Main
-const schemaContent = readFileSync(SCHEMA_PATH, 'utf-8')
+// Main - only run when executed directly
+function main() {
+  const schemaContent = readFileSync(SCHEMA_PATH, 'utf-8')
 
-// Generate base DBML from drizzle-dbml-generator
-let dbml = sqliteGenerate({ schema, relational: true })
+  // Generate base DBML from drizzle-dbml-generator
+  const dbml = sqliteGenerate({ schema, relational: true })
 
-// Find all refs from schema (drizzle-dbml-generator misses some)
-const allRefs = findAllRefs(schemaContent)
-const existingRefs = new Set(dbml.match(/ref: .+/g) || [])
+  // Find all refs from schema (drizzle-dbml-generator misses some)
+  const allRefs = findAllRefs(schemaContent)
+  const existingRefs = new Set(dbml.match(/ref: .+/g) || [])
 
-// Find missing refs
-const missingRefs = allRefs.filter(ref => !existingRefs.has(ref))
+  // Find missing refs
+  const missingRefs = allRefs.filter(ref => !existingRefs.has(ref))
 
-// Generate table groups
-const tableGroups = generateTableGroups(schemaContent)
+  // Generate table groups
+  const tableGroups = generateTableGroups(schemaContent)
 
-// Build final output
-const header = `// SAF Content Catalog - Database Schema
+  // Build final output
+  const header = `// SAF Content Catalog - Database Schema
 // Auto-generated from Drizzle schema
 // Run: pnpm db:dbml
 // DO NOT EDIT - changes will be overwritten
 
 `
 
-let output = header + tableGroups + dbml
+  let output = header + tableGroups + dbml
 
-if (missingRefs.length > 0) {
-  output += '\n// Additional refs found in schema\n'
-  output += missingRefs.join('\n') + '\n'
+  if (missingRefs.length > 0) {
+    output += '\n// Additional refs found in schema\n'
+    output += `${missingRefs.join('\n')}\n`
+  }
+
+  writeFileSync(OUTPUT_PATH, output)
+  console.log(`✅ Generated ${OUTPUT_PATH}`)
+  console.log(`   Tables: ${(schemaContent.match(/sqliteTable/g) || []).length}`)
+  console.log(`   Refs: ${allRefs.length} (${missingRefs.length} added by this script)`)
 }
 
-writeFileSync(OUTPUT_PATH, output)
-console.log(`✅ Generated ${OUTPUT_PATH}`)
-console.log(`   Tables: ${(schemaContent.match(/sqliteTable/g) || []).length}`)
-console.log(`   Refs: ${allRefs.length} (${missingRefs.length} added by this script)`)
+// Run only when executed directly (not imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main()
+}
