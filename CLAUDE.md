@@ -125,6 +125,11 @@ pnpm story:docs    # Generate docs from component JSDoc
 docs/
 ├── .vitepress/
 │   ├── config.ts                 # VitePress config, nav, sidebar
+│   ├── database/
+│   │   ├── schema.ts             # Drizzle schema (source of truth)
+│   │   ├── schema.zod.ts         # drizzle-zod generated validation
+│   │   ├── validation.ts         # Convention-aware validators
+│   │   └── schemas.ts            # Pocketbase API response schemas
 │   ├── loaders/
 │   │   └── profiles.data.ts      # Build-time Pocketbase queries
 │   └── theme/
@@ -194,7 +199,22 @@ scripts/
 | tools | 7 | SAF CLI, Heimdall, etc. |
 | capabilities | 5 | SAF pillars (validate, harden, etc.) |
 
-**Schema source of truth:** `docs/.vitepress/database/schema.ts` (Drizzle)
+**Schema source of truth:** `docs/.vitepress/database/schema.ts` (Drizzle) → `schema.zod.ts` (drizzle-zod validation)
+
+### Schema Architecture (Single Source of Truth)
+
+```
+schema.ts (Drizzle)     →  schema.zod.ts (drizzle-zod)  →  CLI + VitePress
+(table definitions)        (Zod validation schemas)        (shared imports)
+```
+
+**Key files:**
+- `schema.ts` - Drizzle table definitions (edit this to change schema)
+- `schema.zod.ts` - Generated Zod schemas with custom refinements
+- `validation.ts` - Convention-aware validation (imports from schema.zod.ts)
+- `schemas.ts` - Pocketbase API response schemas (separate concern)
+
+**CLI imports:** `@schema/schema.zod.js` (path alias in tsconfig)
 
 ### Pocketbase API Patterns
 

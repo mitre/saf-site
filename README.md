@@ -475,7 +475,8 @@ docs/
 ├── .vitepress/
 │   ├── config.ts              # VitePress configuration
 │   ├── database/
-│   │   └── schema.ts          # Drizzle schema (source of truth)
+│   │   ├── schema.ts          # Drizzle schema (source of truth)
+│   │   └── schema.zod.ts      # drizzle-zod generated validation
 │   ├── loaders/
 │   │   └── profiles.data.ts   # Build-time Pocketbase queries
 │   └── theme/

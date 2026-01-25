@@ -195,13 +195,58 @@ Start Pocketbase → VitePress dev (queries Pocketbase) → Hot reload on data c
 - **hardening_profiles_tags** - Links hardening profiles to tags
 - **validation_to_hardening** - Links validation profiles to hardening profiles
 
+## Schema Architecture (Single Source of Truth)
+
+The schema flows through a layered architecture:
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  schema.ts (Drizzle)          ← SINGLE SOURCE OF TRUTH        │
+│  docs/.vitepress/database/schema.ts                            │
+│  - Table definitions with types, constraints, defaults         │
+│  - FK relationships                                            │
+│  - Enum definitions                                            │
+└──────────────────────┬─────────────────────────────────────────┘
+                       │ drizzle-zod
+                       ▼
+┌────────────────────────────────────────────────────────────────┐
+│  schema.zod.ts (drizzle-zod)  ← GENERATED VALIDATION          │
+│  docs/.vitepress/database/schema.zod.ts                        │
+│  - Insert/Select schemas for all tables                        │
+│  - Custom refinements (slug, semver, URL patterns)             │
+│  - Enum schemas (contentType, status, orgType, etc.)           │
+│  - Type exports (ContentInsert, ContentSelect, etc.)           │
+└──────────────────────┬─────────────────────────────────────────┘
+                       │ imports
+           ┌───────────┴───────────┐
+           ▼                       ▼
+┌──────────────────────┐  ┌──────────────────────┐
+│  CLI                 │  │  VitePress           │
+│  cli/src/lib/        │  │  validation.ts       │
+│  - pocketbase.ts     │  │  - Entity validation │
+│  - content.logic.ts  │  │  - Audit functions   │
+└──────────────────────┘  └──────────────────────┘
+```
+
+**Key files:**
+- `schema.ts` - Drizzle table definitions (edit this to change schema)
+- `schema.zod.ts` - Generated Zod schemas (regenerate after schema changes)
+- `validation.ts` - Convention-aware validation (imports from schema.zod.ts)
+- `schemas.ts` - Pocketbase API response schemas (separate concern)
+
+**Benefits:**
+- Single source of truth for all validation
+- Type-safe validation shared between CLI and VitePress
+- Automatic sync between database schema and runtime validation
+- No duplicate manual Zod schemas to maintain
+
 ## Key Differences from PGlite/Drizzle Architecture
 
 ### What Changed
 - ❌ No PGlite (replaced with Pocketbase SQLite)
 - ❌ No Drizzle Studio (replaced with Pocketbase admin UI)
 - ❌ No YAML exports (database is source of truth)
-- ❌ No Drizzle ORM (Pocketbase provides REST API)
+- ❌ No Drizzle ORM for queries (Pocketbase provides REST API)
 
 ### What We Gained
 - ✅ Single source of truth (no YAML duplication)
@@ -210,8 +255,10 @@ Start Pocketbase → VitePress dev (queries Pocketbase) → Hot reload on data c
 - ✅ Git-friendly version control (NDJSON format)
 - ✅ Self-contained deployment (single Pocketbase binary)
 - ✅ No intermediate export step (direct API queries)
+- ✅ drizzle-zod for consistent validation (CLI + VitePress)
 
 ### What We Kept
+- ✅ Drizzle for schema definition (generates Zod schemas)
 - ✅ SQLite backend (via Pocketbase)
 - ✅ Relational data with FK constraints
 - ✅ VitePress for static site generation
@@ -245,7 +292,8 @@ saf-site-vitepress/
 │   │   │       ├── ProfileCard.vue
 │   │   │       └── ProfileFilters.vue
 │   │   └── database/
-│   │       └── schema.ts       # Legacy Drizzle schema (reference only)
+│   │       ├── schema.ts       # Drizzle schema (source of truth)
+│   │       └── schema.zod.ts   # drizzle-zod generated Zod schemas
 │   ├── public/
 │   │   └── img/                # Logos, icons, badges
 │   ├── index.md                # Home page

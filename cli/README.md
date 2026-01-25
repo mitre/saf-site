@@ -240,8 +240,10 @@ src/
     ├── pocketbase.ts     # Pocketbase client, FK maps
     ├── github.ts         # GitHub API client
     ├── content-service.ts # Content building, diffing
-    ├── cli-utils.ts      # Output formatting utilities
-    └── validation-schemas.ts # Zod validation schemas
+    └── cli-utils.ts      # Output formatting utilities
+
+# Validation schemas imported from VitePress database layer:
+# @schema/schema.zod.js → docs/.vitepress/database/schema.zod.ts
 ```
 
 See [SPEC.md](SPEC.md) for detailed technical specification.
