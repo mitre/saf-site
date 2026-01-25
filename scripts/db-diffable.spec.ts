@@ -553,6 +553,198 @@ describe('db-diffable', () => {
       expect(tableNames).not.toContain('sqlite_stat1')
       db.close()
     })
+
+    // ========================================================================
+    // FORMAT AUTO-DETECTION TESTS (saf-site-km5)
+    // ========================================================================
+
+    it('auto-detects array format from first line', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Array format NDJSON (current format)
+      writeFileSync(
+        join(diffableDir, 'array_table.metadata.json'),
+        JSON.stringify({
+          name: 'array_table',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE array_table (id INTEGER PRIMARY KEY, name TEXT)',
+        }),
+      )
+      writeFileSync(
+        join(diffableDir, 'array_table.ndjson'),
+        '[1,"Alice"]\n[2,"Bob"]\n',
+      )
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const rows = db.prepare('SELECT * FROM array_table ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+      ])
+      db.close()
+    })
+
+    it('auto-detects object format from first line', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Object format NDJSON (new format)
+      writeFileSync(
+        join(diffableDir, 'object_table.metadata.json'),
+        JSON.stringify({
+          name: 'object_table',
+          columns: ['id', 'name'],
+          schema: 'CREATE TABLE object_table (id INTEGER PRIMARY KEY, name TEXT)',
+        }),
+      )
+      writeFileSync(
+        join(diffableDir, 'object_table.ndjson'),
+        '{"id":1,"name":"Alice"}\n{"id":2,"name":"Bob"}\n',
+      )
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const rows = db.prepare('SELECT * FROM object_table ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+      ])
+      db.close()
+    })
+
+    it('handles object format with columns in different order than metadata', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Metadata has columns: id, name, value
+      // But JSON objects have keys in different order
+      writeFileSync(
+        join(diffableDir, 'reordered.metadata.json'),
+        JSON.stringify({
+          name: 'reordered',
+          columns: ['id', 'name', 'value'],
+          schema: 'CREATE TABLE reordered (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)',
+        }),
+      )
+      // JSON objects with keys in different order
+      writeFileSync(
+        join(diffableDir, 'reordered.ndjson'),
+        '{"value":100,"name":"first","id":1}\n{"name":"second","id":2,"value":200}\n',
+      )
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const rows = db.prepare('SELECT * FROM reordered ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'first', value: 100 },
+        { id: 2, name: 'second', value: 200 },
+      ])
+      db.close()
+    })
+
+    it('handles object format with NULL values', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      writeFileSync(
+        join(diffableDir, 'obj_nulls.metadata.json'),
+        JSON.stringify({
+          name: 'obj_nulls',
+          columns: ['id', 'name', 'value'],
+          schema: 'CREATE TABLE obj_nulls (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)',
+        }),
+      )
+      writeFileSync(
+        join(diffableDir, 'obj_nulls.ndjson'),
+        '{"id":1,"name":"test","value":null}\n{"id":2,"name":null,"value":42}\n',
+      )
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      const rows = db.prepare('SELECT * FROM obj_nulls ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'test', value: null },
+        { id: 2, name: null, value: 42 },
+      ])
+      db.close()
+    })
+
+    it('handles mixed tables with different formats in same directory', () => {
+      mkdirSync(diffableDir, { recursive: true })
+
+      // Table 1: array format
+      writeFileSync(
+        join(diffableDir, 'array_tbl.metadata.json'),
+        JSON.stringify({
+          name: 'array_tbl',
+          columns: ['id', 'data'],
+          schema: 'CREATE TABLE array_tbl (id INTEGER PRIMARY KEY, data TEXT)',
+        }),
+      )
+      writeFileSync(join(diffableDir, 'array_tbl.ndjson'), '[1,"from_array"]\n')
+
+      // Table 2: object format
+      writeFileSync(
+        join(diffableDir, 'object_tbl.metadata.json'),
+        JSON.stringify({
+          name: 'object_tbl',
+          columns: ['id', 'data'],
+          schema: 'CREATE TABLE object_tbl (id INTEGER PRIMARY KEY, data TEXT)',
+        }),
+      )
+      writeFileSync(join(diffableDir, 'object_tbl.ndjson'), '{"id":1,"data":"from_object"}\n')
+
+      const result = load(dbPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(dbPath, { readonly: true })
+      expect(db.prepare('SELECT * FROM array_tbl').all()).toEqual([{ id: 1, data: 'from_array' }])
+      expect(db.prepare('SELECT * FROM object_tbl').all()).toEqual([{ id: 1, data: 'from_object' }])
+      db.close()
+    })
+
+    it('roundtrip works with object format dump and load', () => {
+      // Create database
+      const db = new Database(dbPath)
+      db.exec(`
+        CREATE TABLE roundtrip_obj (id INTEGER PRIMARY KEY, name TEXT, count INTEGER);
+        INSERT INTO roundtrip_obj VALUES (1, 'first', 10);
+        INSERT INTO roundtrip_obj VALUES (2, 'second', 20);
+        INSERT INTO roundtrip_obj VALUES (3, 'third', 30);
+      `)
+      db.close()
+
+      // Dump in object format
+      const dumpResult = dump(dbPath, diffableDir, { quiet: true, format: 'object' })
+      expect(dumpResult).toBe(0)
+
+      // Verify dump produced object format
+      const ndjsonContent = readFileSync(join(diffableDir, 'roundtrip_obj.ndjson'), 'utf-8')
+      const firstLine = JSON.parse(ndjsonContent.split('\n')[0])
+      expect(firstLine).toHaveProperty('id')
+      expect(firstLine).toHaveProperty('name')
+
+      // Load into new database
+      const newDbPath = join(testDir, 'roundtrip_restored.db')
+      const loadResult = load(newDbPath, diffableDir, { quiet: true })
+      expect(loadResult).toBe(0)
+
+      // Verify data matches
+      const restored = new Database(newDbPath, { readonly: true })
+      const rows = restored.prepare('SELECT * FROM roundtrip_obj ORDER BY id').all()
+      expect(rows).toEqual([
+        { id: 1, name: 'first', count: 10 },
+        { id: 2, name: 'second', count: 20 },
+        { id: 3, name: 'third', count: 30 },
+      ])
+      restored.close()
+    })
   })
 
   // ==========================================================================

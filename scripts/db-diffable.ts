@@ -237,6 +237,11 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
     }
 
     const lines = content.split('\n')
+
+    // Auto-detect format from first line (saf-site-km5)
+    const firstParsed = JSON.parse(lines[0])
+    const isObjectFormat = !Array.isArray(firstParsed)
+
     const placeholders = metadata.columns.map(() => '?').join(', ')
     const columnList = metadata.columns.map(c => `"${c}"`).join(', ')
     const insert = db.prepare(`INSERT INTO "${metadata.name}" (${columnList}) VALUES (${placeholders})`)
@@ -247,7 +252,18 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
       }
     })
 
-    const rows = lines.map(line => JSON.parse(line) as unknown[])
+    // Convert rows to array format (in column order from metadata)
+    const rows = lines.map((line) => {
+      const parsed = JSON.parse(line)
+      if (isObjectFormat) {
+        // Object format: extract values in column order from metadata
+        return metadata.columns.map(col => (parsed as Record<string, unknown>)[col])
+      }
+      else {
+        // Array format: use as-is
+        return parsed as unknown[]
+      }
+    })
     insertMany(rows)
 
     log(`  ${metadata.name}: ${rows.length} rows`)
