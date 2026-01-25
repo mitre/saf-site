@@ -1,4 +1,17 @@
-# Session Recovery - 2026-01-25 (Post db-diffable)
+# Session Recovery - 2026-01-25 (Drizzle DB Created)
+
+## IMPORTANT: Drizzle database exists!
+- Location: `docs/.vitepress/database/drizzle.db` (1.3MB, gitignored)
+- 85 content, 27 targets, 52 tags, 115 content_tags, 85 content_capabilities
+- FK constraints enforced, data verified
+
+## Next Steps
+1. Add migration script to `pnpm dev:setup`
+2. Update VitePress loaders to use Drizzle (saf-site-3b9)
+
+---
+
+# Previous Recovery Info
 
 ## Quick Start
 
