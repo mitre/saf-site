@@ -59,14 +59,56 @@ bd update saf-site-gf9 --status=in_progress
 
 ### PHASE 4: CLI CRUD + Validation ← IN PROGRESS
 
+**Architecture (Option A - Service Layer):**
+```
+┌─────────────────────────────────────┐
+│           CLI Layer                 │  table.ts, content.ts, db.ts
+│   (argument parsing, output)        │
+├─────────────────────────────────────┤
+│        Service Layer                │  content-service.ts (domain logic)
+│   (validation, GitHub, FK by name)  │  Generic commands skip this layer
+├─────────────────────────────────────┤
+│        Data Layer                   │  drizzle.ts (generic CRUD)
+│   (listRecords, createRecord, etc)  │
+└─────────────────────────────────────┘
+```
+
 | Task | Description | Status |
 |------|-------------|--------|
 | **saf-site-gf9** | Schema-driven CLI CRUD operations | **IN PROGRESS** |
-| └── Phase 1 | Drizzle data layer (lib/drizzle.ts) | **DONE ✅** (21 tests) |
-| └── Phase 2 | Migrate content commands to Drizzle | NEXT |
-| └── Phase 3 | Generic table commands | - |
-| └── Phase 4 | Domain commands | - |
+| └── Step 1 | Data layer (lib/drizzle.ts) | **DONE ✅** (21 tests) |
+| └── Step 2 | Generic table commands (commands/table.ts) | **NEXT** |
+| └── Step 3 | Service layer (services/content-service.ts) | - |
+| └── Step 4 | Migrate domain commands to service+drizzle | - |
+| └── Step 5 | Delete pocketbase.ts | - |
 | (validation) | Validate diffable/ ↔ drizzle.db round-trip | After gf9 |
+
+**Step 2: Generic table commands (TDD)**
+```bash
+# Commands to implement:
+pnpm cli table list <table> [--filter key=value] [--json]
+pnpm cli table show <table> <id> [--json]
+pnpm cli table add <table> [--json] [--interactive]
+pnpm cli table update <table> <id> [--json]
+pnpm cli table delete <table> <id> [--yes]
+```
+- Thin CLI wrapper around drizzle.ts
+- No service layer needed (pure CRUD)
+- Works with any of 35 tables
+
+**Step 3: Service layer (TDD)**
+- Extract business logic from content.ts into content-service.ts
+- GitHub integration, validation, FK resolution by name
+- Service uses drizzle.ts for data access
+
+**Step 4: Migrate domain commands (TDD)**
+- content.ts becomes thin: parse args → call service → format output
+- Existing content tests validate the migration
+
+**Step 5: Delete pocketbase.ts**
+- All imports removed
+- File deleted
+- No Pocketbase dependency
 
 ### PHASE 5: Loaders Migration
 
@@ -144,7 +186,11 @@ Phase 3 (migration) ✅ DONE
         │
         ▼
 Phase 4 (CLI CRUD) ← WE ARE HERE
-└── gf9 (CRUD) ← NEXT
+└── gf9 Step 1: drizzle.ts ✅
+└── gf9 Step 2: table.ts ← NEXT
+└── gf9 Step 3: content-service.ts
+└── gf9 Step 4: migrate content.ts
+└── gf9 Step 5: delete pocketbase.ts
         │
         ▼
 Phase 5 (loaders)
@@ -211,8 +257,8 @@ tsx scripts/db-diffable.ts load new.db diffable/ \
    └── Run tests, confirm they PASS
 
 3. Verify all existing tests pass
-   └── pnpm test:run (423)
-   └── cd cli && pnpm test:run (476)
+   └── pnpm test:run (432)
+   └── cd cli && pnpm test:run (497)
 
 4. Close task
    └── bd close <id> --reason="..."
