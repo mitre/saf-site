@@ -27,7 +27,7 @@ bd update saf-site-jur --status=in_progress
 
 ---
 
-## Current Progress: ~40% Complete
+## Current Progress: ~50% Complete
 
 ### PHASE 1: DRY Foundation ✅ COMPLETE
 
@@ -48,11 +48,11 @@ bd update saf-site-jur --status=in_progress
 | **saf-site-3cn** | --skip-tables (glob patterns) | **DONE ✅** | 4 |
 | saf-site-6uf | Re-export diffable/ in object format | DEFERRED (not critical) | - |
 
-### PHASE 3: Migration ← NEXT
+### PHASE 3: Migration ✅ COMPLETE
 
 | Task | Description | Status |
 |------|-------------|--------|
-| **saf-site-jur** | Migrate to fresh Drizzle DB | **READY ← NEXT** |
+| **saf-site-jur** | Migrate to fresh Drizzle DB | **DONE ✅** |
 
 ### PHASE 4-6: Not Started
 
@@ -64,9 +64,9 @@ See dependency chain below.
 
 | Suite | Count | Command |
 |-------|-------|---------|
-| VitePress | 423 | `pnpm test:run` |
+| VitePress | 432 | `pnpm test:run` |
 | CLI | 476 | `cd cli && pnpm test:run` |
-| **Total** | **899** | |
+| **Total** | **908** | |
 
 ---
 
@@ -119,8 +119,8 @@ Phase 2 (db-diffable) ✅ DONE
 └── 3cn (--skip-tables) ✅
         │
         ▼
-Phase 3 (migration) ← WE ARE HERE
-└── jur (migrate to Drizzle) ← NEXT
+Phase 3 (migration) ✅ DONE
+└── jur (migrate to Drizzle) ✅
         │
         ▼
 Phase 4 (CLI + loaders)

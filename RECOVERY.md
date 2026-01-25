@@ -89,19 +89,38 @@ mediaTags, distributionCapabilities, distributionTags
 // 1. Get FK-safe insert order
 import * as schema from './docs/.vitepress/database/schema'
 import { getInsertOrder } from './docs/.vitepress/database/fk-utils'
+import { ColumnMapping, load } from './scripts/db-diffable'
 
 const tableOrder = getInsertOrder(schema)
-console.log(tableOrder) // Use this for --table-order
 
-// 2. Create fresh Drizzle DB
-// drizzle-kit push --config=drizzle.config.ts
+// 2. Define column mappings (PB → Drizzle)
+// Junction tables use different column names
+const COLUMN_MAPPINGS: Record<string, ColumnMapping> = {
+  content_capabilities: { rename: { content: 'content_id', capability: 'capability_id' }, skip: ['id'] },
+  content_relationships: { rename: { content: 'content_id', related_content: 'related_content_id' }, skip: ['id'] },
+  content_tags: { rename: { content: 'content_id', tag: 'tag_id' }, skip: ['id'] },
+  course_capabilities: { rename: { course: 'course_id', capability: 'capability_id' }, skip: ['id'] },
+  course_tags: { rename: { course: 'course_id', tag: 'tag_id' }, skip: ['id'] },
+  course_tools: { rename: { course: 'course_id', tool: 'tool_id' }, skip: ['id'] },
+  distribution_capabilities: { rename: { distribution: 'distribution_id', capability: 'capability_id' }, skip: ['id'] },
+  distribution_tags: { rename: { distribution: 'distribution_id', tag: 'tag_id' }, skip: ['id'] },
+  media_capabilities: { rename: { media: 'media_id', capability: 'capability_id' }, skip: ['id'] },
+  media_tags: { rename: { media: 'media_id', tag: 'tag_id' }, skip: ['id'] },
+  tool_capabilities: { rename: { tool: 'tool_id', capability: 'capability_id' }, skip: ['id'] },
+  tool_tags: { rename: { tool: 'tool_id', tag: 'tag_id' }, skip: ['id'] },
+}
 
-// 3. Load data
-import { load } from './scripts/db-diffable'
+// 3. Create fresh Drizzle DB
+// npx drizzle-kit push --dialect=sqlite --schema=docs/.vitepress/database/schema.ts --url="file:new-drizzle.db"
+
+// 4. Load data with all migration options
 load('new-drizzle.db', '.pocketbase/pb_data/diffable', {
   dataOnly: true,
   skipTables: ['_*'],
-  tableOrder: tableOrder
+  tableOrder,
+  emptyToNull: true,      // FK constraints need NULL not empty string
+  columnMappings: COLUMN_MAPPINGS,  // PB → Drizzle column renames
+  ignoreConflicts: true,  // Handle duplicate composite keys in junction tables
 })
 ```
 
