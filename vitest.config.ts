@@ -20,6 +20,8 @@ export default defineConfig({
       'docs/.vitepress/theme/**/*.test.ts',
       'docs/.vitepress/lib/**/*.spec.ts',
       'docs/.vitepress/lib/**/*.test.ts',
+      'docs/.vitepress/database/**/*.spec.ts',
+      'docs/.vitepress/database/**/*.test.ts',
       'scripts/**/*.spec.ts',
       'scripts/**/*.test.ts',
     ],

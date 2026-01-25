@@ -19,7 +19,7 @@ import {
   optionalSlugSchema,
   slugSchema,
   statusSchema,
-} from './validation-schemas.js'
+} from '@schema/schema.zod.js'
 
 // Default credentials for local development
 const DEFAULT_URL = 'http://localhost:8090'

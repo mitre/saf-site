@@ -2,31 +2,24 @@
  * Entity Validation (Phase 1.3)
  *
  * Validation functions that combine Zod schema validation with convention checks.
- * Uses schemas from schemas.ts as the source of truth.
+ * Uses schemas from schema.zod.ts (generated via drizzle-zod) as the source of truth.
  */
 
 import type { z, ZodError } from 'zod'
-import type { ContentInput, OrganizationInput, StandardInput, TagInput, TargetInput, TeamInput, TechnologyInput } from './schemas.js'
+import type { ContentInsert, OrganizationInsert, StandardInsert, TagInsert, TargetInsert, TeamInsert, TechnologyInsert } from './schema.zod.js'
 import {
   abbreviateTarget,
   STANDARD_IDENTIFIERS,
 } from './conventions.js'
 import {
-
-  contentInputSchema,
-
-  organizationInputSchema,
-
-  standardInputSchema,
-
-  tagInputSchema,
-
-  targetInputSchema,
-
-  teamInputSchema,
-
-  technologyInputSchema,
-} from './schemas.js'
+  contentInsertSchema,
+  organizationInsertSchema,
+  standardInsertSchema,
+  tagInsertSchema,
+  targetInsertSchema,
+  teamInsertSchema,
+  technologyInsertSchema,
+} from './schema.zod.js'
 
 // ============================================================================
 // TYPES
@@ -148,13 +141,13 @@ function checkTargetSlugConventions(slug: string, name: string): string[] {
 type EntityType = 'organization' | 'target' | 'standard' | 'technology' | 'team' | 'tag' | 'content'
 
 const schemaMap = {
-  organization: organizationInputSchema,
-  target: targetInputSchema,
-  standard: standardInputSchema,
-  technology: technologyInputSchema,
-  team: teamInputSchema,
-  tag: tagInputSchema,
-  content: contentInputSchema,
+  organization: organizationInsertSchema,
+  target: targetInsertSchema,
+  standard: standardInsertSchema,
+  technology: technologyInsertSchema,
+  team: teamInsertSchema,
+  tag: tagInsertSchema,
+  content: contentInsertSchema,
 } as const
 
 /**
@@ -208,50 +201,50 @@ export function validateEntity<T extends EntityType>(
 /**
  * Validate organization input
  */
-export function validateOrganization(data: unknown): ValidationResult<OrganizationInput> {
-  return validateEntity('organization', data) as ValidationResult<OrganizationInput>
+export function validateOrganization(data: unknown): ValidationResult<OrganizationInsert> {
+  return validateEntity('organization', data) as ValidationResult<OrganizationInsert>
 }
 
 /**
  * Validate target input
  */
-export function validateTarget(data: unknown): ValidationResult<TargetInput> {
-  return validateEntity('target', data) as ValidationResult<TargetInput>
+export function validateTarget(data: unknown): ValidationResult<TargetInsert> {
+  return validateEntity('target', data) as ValidationResult<TargetInsert>
 }
 
 /**
  * Validate standard input
  */
-export function validateStandard(data: unknown): ValidationResult<StandardInput> {
-  return validateEntity('standard', data) as ValidationResult<StandardInput>
+export function validateStandard(data: unknown): ValidationResult<StandardInsert> {
+  return validateEntity('standard', data) as ValidationResult<StandardInsert>
 }
 
 /**
  * Validate technology input
  */
-export function validateTechnology(data: unknown): ValidationResult<TechnologyInput> {
-  return validateEntity('technology', data) as ValidationResult<TechnologyInput>
+export function validateTechnology(data: unknown): ValidationResult<TechnologyInsert> {
+  return validateEntity('technology', data) as ValidationResult<TechnologyInsert>
 }
 
 /**
  * Validate team input
  */
-export function validateTeam(data: unknown): ValidationResult<TeamInput> {
-  return validateEntity('team', data) as ValidationResult<TeamInput>
+export function validateTeam(data: unknown): ValidationResult<TeamInsert> {
+  return validateEntity('team', data) as ValidationResult<TeamInsert>
 }
 
 /**
  * Validate tag input
  */
-export function validateTag(data: unknown): ValidationResult<TagInput> {
-  return validateEntity('tag', data) as ValidationResult<TagInput>
+export function validateTag(data: unknown): ValidationResult<TagInsert> {
+  return validateEntity('tag', data) as ValidationResult<TagInsert>
 }
 
 /**
  * Validate content input
  */
-export function validateContent(data: unknown): ValidationResult<ContentInput> {
-  return validateEntity('content', data) as ValidationResult<ContentInput>
+export function validateContent(data: unknown): ValidationResult<ContentInsert> {
+  return validateEntity('content', data) as ValidationResult<ContentInsert>
 }
 
 // ============================================================================
@@ -370,5 +363,5 @@ export function auditEntity(
 // ============================================================================
 
 // Re-export schemas that were previously in this file
-export { contentInputSchema as contentSchema } from './schemas.js'
+export { contentInsertSchema as contentSchema } from './schemas.js'
 export { z } from 'zod'

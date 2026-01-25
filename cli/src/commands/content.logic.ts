@@ -21,7 +21,7 @@ import {
   semverSchema,
   slugSchema,
   statusSchema,
-} from '../lib/validation-schemas.js'
+} from '@schema/schema.zod.js'
 
 // ============================================================================
 // TYPES
@@ -78,7 +78,7 @@ export interface PrepareUpdateResult {
   errors: string[]
 }
 
-// Validation schemas imported from ../lib/validation-schemas.js
+// Validation schemas imported from @schema/schema.zod.js
 
 // ============================================================================
 // PREPARE CONTENT ADD
