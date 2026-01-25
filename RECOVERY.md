@@ -1,32 +1,49 @@
 # Session Recovery - 2026-01-25 (Drizzle DB Created)
 
-## IMPORTANT: Drizzle database exists!
-- Location: `docs/.vitepress/database/drizzle.db` (1.3MB, gitignored)
-- 85 content, 27 targets, 52 tags, 115 content_tags, 85 content_capabilities
-- FK constraints enforced, data verified
-
-## Next Steps
-1. Add migration script to `pnpm dev:setup`
-2. Update VitePress loaders to use Drizzle (saf-site-3b9)
-
----
-
-# Previous Recovery Info
-
 ## Quick Start
 
 ```bash
 # 1. Read context
 cat WORKSTREAM.md
-bd show saf-site-jur
+bd show saf-site-3b9
 
-# 2. Verify tests pass
-pnpm test:run           # Should be 423
+# 2. Verify drizzle.db exists
+ls -la docs/.vitepress/database/drizzle.db  # Should be ~1.3MB
+
+# 3. If missing, regenerate it:
+npx drizzle-kit push --dialect=sqlite --schema=docs/.vitepress/database/schema.ts --url="file:docs/.vitepress/database/drizzle.db"
+# Then run migration script (see below)
+
+# 4. Verify tests pass
+pnpm test:run           # Should be 432
 cd cli && pnpm test:run # Should be 476
-
-# 3. Start migration task
-bd update saf-site-jur --status=in_progress
 ```
+
+---
+
+## Drizzle Database Status: ✅ CREATED
+
+**Location:** `docs/.vitepress/database/drizzle.db` (1.3MB, gitignored)
+
+### Record Counts
+| Table | Count |
+|-------|-------|
+| content | 85 |
+| organizations | 16 |
+| targets | 27 |
+| standards | 18 |
+| tags | 52 |
+| capabilities | 5 |
+| technologies | 8 |
+| tools | 7 |
+| content_tags | 115 |
+| content_capabilities | 85 |
+| content_relationships | 4 |
+
+### Data Quality
+- FK constraints enforced ✅
+- All content linked to capabilities ✅
+- Validation ↔ Hardening relationships ✅
 
 ---
 
@@ -34,80 +51,52 @@ bd update saf-site-jur --status=in_progress
 
 **Epic:** saf-site-tdi - Automated Content Pipeline
 **Branch:** feature/drizzle-pocketbase-sync
+**Progress:** ~50% complete
+
 **Goal:** Self-maintaining SAF site where upstream releases auto-trigger content updates via CI/CD
 
-**Key Decision:** SQLite + Drizzle + Domain CLI (No Pocketbase GUI)
-- Fresh Drizzle database will have SQL-level FK constraints
-- Current Pocketbase DB has NO SQL-level FK constraints (app-level only)
+---
+
+## Completed This Session
+
+### Phase 3: Migration ✅ COMPLETE
+- Added db-diffable options: `emptyToNull`, `columnMappings`, `ignoreConflicts`
+- Created drizzle.db with all data migrated
+- Fixed content_capabilities (populated 85 rows from content_type)
+- Added drizzle.db to .gitignore
 
 ---
 
-## Current Progress: ~40%
+## Next Tasks
 
-### PHASE 1: DRY Foundation ✅ COMPLETE
-| Task | Description | Status |
-|------|-------------|--------|
-| saf-site-zpj | fk-utils.ts | DONE ✅ |
-| saf-site-jr5 | field-mapping.ts | DONE ✅ |
+### 1. Add migration to dev:setup (not tracked as beads task)
+Create script to regenerate drizzle.db from diffable/ so other devs can set up.
 
-### PHASE 2: db-diffable Feature Complete ✅ COMPLETE
-| Task | Description | Status |
-|------|-------------|--------|
-| saf-site-0by | Object format dump | DONE ✅ |
-| saf-site-km5 | Format auto-detection | DONE ✅ |
-| saf-site-o2f | --data-only flag | DONE ✅ |
-| saf-site-97p | tableOrder (FK ordering) | DONE ✅ |
-| saf-site-3cn | --skip-tables (glob patterns) | DONE ✅ |
-
-### PHASE 3: Migration ← NEXT
-| Task | Description | Status |
-|------|-------------|--------|
-| **saf-site-jur** | Migrate to Drizzle DB | **READY** |
+### 2. saf-site-3b9: Update VitePress loaders to use Drizzle
+- Currently: Loaders query Pocketbase API at build time
+- Target: Loaders query drizzle.db directly (no Pocketbase needed)
 
 ---
 
-## Test Counts
+## Key Files
 
-| Suite | Count | Command |
-|-------|-------|---------|
-| VitePress | 423 | `pnpm test:run` |
-| CLI | 476 | `cd cli && pnpm test:run` |
-| **Total** | **899** | |
+| File | Purpose |
+|------|---------|
+| `docs/.vitepress/database/drizzle.db` | Drizzle SQLite database (gitignored) |
+| `docs/.vitepress/database/schema.ts` | Drizzle schema (source of truth) |
+| `scripts/db-diffable.ts` | Export/import tool with migration options |
+| `scripts/migrate-to-drizzle.spec.ts` | Migration tests (9 tests) |
+| `.pocketbase/pb_data/diffable/` | Source data (NDJSON, git-tracked) |
 
 ---
 
-## Next Task: saf-site-jur (Migration)
-
-**Goal:** Create clean Drizzle-managed SQLite database with proper FK constraints
-
-### Source Data (diffable/)
-- 43 total tables in diffable/
-- 8 PB internal tables to skip: `_authOrigins`, `_collections`, `_externalAuths`, `_mfas`, `_migrations`, `_otps`, `_params`, `_superusers`
-- 35 user tables to migrate
-
-### Drizzle Schema Tables (schema.ts)
-```
-capabilities, categories, organizations, teams, standards, technologies,
-targets, tags, toolTypes, distributionTypes, registries, resourceTypes,
-mediaTypes, content, tools, courses, courseResources, courseSessions,
-media, distributions, contentReleases, toolReleases, distributionReleases,
-contentCapabilities, contentTags, contentRelationships, toolCapabilities,
-toolTags, courseCapabilities, courseTags, courseTools, mediaCapabilities,
-mediaTags, distributionCapabilities, distributionTags
-```
-
-### Migration Steps
+## Migration Script (for regenerating drizzle.db)
 
 ```typescript
-// 1. Get FK-safe insert order
 import * as schema from './docs/.vitepress/database/schema'
 import { getInsertOrder } from './docs/.vitepress/database/fk-utils'
 import { ColumnMapping, load } from './scripts/db-diffable'
 
-const tableOrder = getInsertOrder(schema)
-
-// 2. Define column mappings (PB → Drizzle)
-// Junction tables use different column names
 const COLUMN_MAPPINGS: Record<string, ColumnMapping> = {
   content_capabilities: { rename: { content: 'content_id', capability: 'capability_id' }, skip: ['id'] },
   content_relationships: { rename: { content: 'content_id', related_content: 'related_content_id' }, skip: ['id'] },
@@ -123,77 +112,40 @@ const COLUMN_MAPPINGS: Record<string, ColumnMapping> = {
   tool_tags: { rename: { tool: 'tool_id', tag: 'tag_id' }, skip: ['id'] },
 }
 
-// 3. Create fresh Drizzle DB
-// npx drizzle-kit push --dialect=sqlite --schema=docs/.vitepress/database/schema.ts --url="file:new-drizzle.db"
+const tableOrder = getInsertOrder(schema)
 
-// 4. Load data with all migration options
-load('new-drizzle.db', '.pocketbase/pb_data/diffable', {
+// 1. Create schema: npx drizzle-kit push --dialect=sqlite --schema=docs/.vitepress/database/schema.ts --url="file:docs/.vitepress/database/drizzle.db"
+
+// 2. Load data
+load('docs/.vitepress/database/drizzle.db', '.pocketbase/pb_data/diffable', {
   dataOnly: true,
   skipTables: ['_*'],
   tableOrder,
-  emptyToNull: true,      // FK constraints need NULL not empty string
-  columnMappings: COLUMN_MAPPINGS,  // PB → Drizzle column renames
-  ignoreConflicts: true,  // Handle duplicate composite keys in junction tables
-})
-```
-
-### TDD Approach
-```typescript
-// scripts/migrate-to-drizzle.spec.ts
-describe('Drizzle migration', () => {
-  it('getInsertOrder returns valid table order')
-  it('creates database with drizzle-kit push')
-  it('loads data with --data-only --skip-tables')
-  it('FK constraints are enforced (try invalid insert)')
-  it('record counts match source diffable/')
-  it('content table has correct FK references')
-})
-```
-
-### Key Files
-- `docs/.vitepress/database/schema.ts` - Drizzle schema (source of truth)
-- `docs/.vitepress/database/fk-utils.ts` - getInsertOrder()
-- `scripts/db-diffable.ts` - load() with all options
-- `.pocketbase/pb_data/diffable/` - Source data (35 user tables)
-- `drizzle.config.ts` - Drizzle Kit configuration
-
----
-
-## db-diffable API Reference
-
-```typescript
-// Dump (always object format now)
-dump(dbPath, outDir, { exclude?: string[], tables?: string[] })
-
-// Load with all options
-load(dbPath, srcDir, {
-  replace?: boolean,      // Drop tables first
-  dataOnly?: boolean,     // Skip table creation, insert only
-  tableOrder?: string[],  // Process tables in this order
-  skipTables?: string[],  // Skip tables matching patterns ('_*')
+  emptyToNull: true,
+  columnMappings: COLUMN_MAPPINGS,
+  ignoreConflicts: true,
 })
 
-// CLI
-tsx scripts/db-diffable.ts load db.sqlite diffable/ \
-  --data-only \
-  --skip-tables '_*' \
-  --table-order orgs,users,content
+// 3. Populate content_capabilities from content_type
+// sqlite3 drizzle.db "INSERT INTO content_capabilities (content_id, capability_id) SELECT id, 'l39v4q9e3gol7p1' FROM content WHERE content_type = 'validation';"
+// sqlite3 drizzle.db "INSERT INTO content_capabilities (content_id, capability_id) SELECT id, 'k9862idzj7324cf' FROM content WHERE content_type = 'hardening';"
 ```
 
 ---
 
-## Recovery Commands
+## Test Counts
 
-```bash
-# Primary recovery
-cat WORKSTREAM.md
-bd ready
-bd show saf-site-jur
+| Suite | Count | Command |
+|-------|-------|---------|
+| VitePress | 432 | `pnpm test:run` |
+| CLI | 476 | `cd cli && pnpm test:run` |
+| **Total** | **908** | |
 
-# Verify tests
-pnpm test:run
-cd cli && pnpm test:run
+---
 
-# Git status
-git log --oneline -5
-```
+## Git Commits This Session
+
+1. `feat(db-diffable): add migration options for Drizzle transition (saf-site-jur)`
+2. `docs: update RECOVERY.md and WORKSTREAM.md for completed migration`
+3. `chore: gitignore drizzle.db (generated from diffable/)`
+4. `docs: update RECOVERY.md with Drizzle DB status`

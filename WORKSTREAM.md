@@ -54,7 +54,14 @@ bd update saf-site-jur --status=in_progress
 |------|-------------|--------|
 | **saf-site-jur** | Migrate to fresh Drizzle DB | **DONE ✅** |
 
-### PHASE 4-6: Not Started
+### PHASE 4: Loaders + CLI ← NEXT
+
+| Task | Description | Status |
+|------|-------------|--------|
+| **saf-site-3b9** | Update VitePress loaders to use Drizzle | **READY ← NEXT** |
+| saf-site-gf9 | Schema-driven CLI CRUD operations | READY |
+
+### PHASE 5-6: Not Started
 
 See dependency chain below.
 
@@ -123,9 +130,9 @@ Phase 3 (migration) ✅ DONE
 └── jur (migrate to Drizzle) ✅
         │
         ▼
-Phase 4 (CLI + loaders)
-├── gf9 (CRUD) ← uses jr5, zpj
-└── 3b9 (loaders) ← uses jr5, zpj
+Phase 4 (CLI + loaders) ← WE ARE HERE
+├── gf9 (CRUD) ← READY
+└── 3b9 (loaders) ← NEXT
         │
         ▼
 Phase 5 (automation)
