@@ -95,4 +95,3 @@ const pillars = [
   background-color: var(--vp-c-bg-soft) !important;
 }
 </style>
-

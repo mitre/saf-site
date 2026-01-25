@@ -21,14 +21,20 @@ const hardenTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  title="Harden"
   description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? MITRE SAF's hardening pillar helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
   :links="[
     { label: 'Browse Hardening Content', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
-  <div class="flex items-center justify-center" style="min-height: 300px;">
+  <template #title>
+    <span class="framework-page-title">
+      <PillarIcon pillar="harden" :size="36" class="framework-mobile-icon" />
+      Harden
+    </span>
+  </template>
+
+  <div class="framework-desktop-icon">
     <PillarIcon pillar="harden" :size="280" />
   </div>
 </PageSection>
@@ -95,5 +101,36 @@ const hardenTools = [
 }
 .VPDoc .content {
   max-width: none !important;
+}
+
+/* Framework page icon responsive behavior */
+.framework-page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Mobile: show small icon next to title */
+.framework-mobile-icon {
+  display: inline-block;
+}
+
+/* Mobile: hide large icon */
+.framework-desktop-icon {
+  display: none;
+}
+
+/* Desktop (1024px+): hide small icon, show large icon */
+@media (min-width: 1024px) {
+  .framework-mobile-icon {
+    display: none;
+  }
+
+  .framework-desktop-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
 }
 </style>

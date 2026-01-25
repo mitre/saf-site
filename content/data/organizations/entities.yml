@@ -7,98 +7,98 @@ organizations:
     logo: "/img/logos/organizations/mitre.png"
     contact: "info@mitre.org"
     type: "ffrdc"
-  
+
   - id: disa
     name: "Defense Information Systems Agency"
     description: "DoD combat support agency that provides IT and communications support"
     website: "https://disa.mil"
     logo: "/img/logos/organizations/disa.png"
     type: "government"
-  
+
   - id: cis
     name: "Center for Internet Security"
     description: "Non-profit organization focused on developing best practice solutions for cyber defense"
     website: "https://www.cisecurity.org"
     logo: "/img/logos/organizations/cis.png"
     type: "community"
-  
+
   - id: vmware
     name: "VMware"
     description: "Cloud computing and virtualization technology company"
     website: "https://vmware.com"
     logo: "/img/logos/organizations/vmware.png"
     type: "commercial"
-  
+
   - id: chef
     name: "Progress Chef"
     description: "Enterprise automation platform company, now part of Progress"
     website: "https://www.chef.io"
     logo: "/img/logos/organizations/chef.svg"
     type: "commercial"
-  
+
   - id: pci-ssc
     name: "PCI Security Standards Council"
     description: "Global organization that develops and maintains security standards for payment card data protection"
     website: "https://www.pcisecuritystandards.org"
     logo: "/img/logos/organizations/pci-ssc.png"
     type: "community"
-  
+
   - id: ansible-lockdown
     name: "Ansible Lockdown"
     description: "Community-driven project that provides hardened configurations for common software platforms"
     website: "https://github.com/ansible-lockdown"
     logo: "/img/logos/organizations/ansible-lockdown.png"
     type: "community"
-  
+
   - id: lockheed-martin
     name: "Lockheed Martin"
     description: "Global aerospace, defense, security and advanced technologies company"
     website: "https://www.lockheedmartin.com"
     logo: "/img/logos/organizations/lockheed-martin.png"
     type: "commercial"
-  
+
   - id: github
     name: "GitHub"
     description: "Platform and cloud-based service for software development and version control using Git"
     website: "https://github.com"
     logo: "/img/logos/organizations/github.svg"
     type: "commercial"
-  
+
   - id: cdc
     name: "Centers for Disease Control and Prevention"
     description: "National public health agency of the United States"
     website: "https://www.cdc.gov"
     logo: "/img/logos/organizations/cdc.svg"
     type: "government"
-  
+
   - id: dcsa
     name: "Defense Counterintelligence and Security Agency"
     description: "Federal agency responsible for conducting background investigations and securing the trustworthiness of the U.S. government workforce"
     website: "https://www.dcsa.mil"
     logo: "/img/logos/organizations/dcsa.png"
     type: "government"
-  
+
   - id: mitre-saf
     name: "MITRE Security Automation Framework"
     description: "Framework for automating security testing and compliance validation"
     website: "https://saf.mitre.org"
     logo: "/img/logos/organizations/mitre-saf.png"
     type: "ffrdc"
-  
+
   - id: sophos
     name: "Sophos"
     description: "British security software and hardware company that develops products for network security"
     website: "https://www.sophos.com"
     logo: "/img/logos/organizations/sophos.png"
     type: "commercial"
-  
+
   - id: dsca
     name: "Defense Security Cooperation Agency"
     description: "U.S. agency responsible for providing financial and technical assistance to foreign partners and allies"
     website: "https://www.dsca.mil"
     logo: "/img/logos/organizations/dsca.jpg"
     type: "government"
-  
+
   - id: us-army-ecma
     name: "US Army Enterprise Content Management and Analysis"
     description: "Division responsible for content management and analysis within the U.S. Army"

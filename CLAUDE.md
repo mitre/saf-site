@@ -49,6 +49,35 @@ bd ready
 - BAD: Add `!important` overrides in custom.css
 - GOOD: Add Tailwind's `!` modifier in button/index.ts with comment explaining VitePress `.vp-doc a` conflict
 
+**MOBILE-FIRST RESPONSIVE DESIGN**
+
+All pages and components must be tested and optimized for mobile devices.
+
+- **Test all changes on mobile** - Use browser dev tools to test mobile viewport sizes (320px, 375px, 768px, 1024px+)
+- **Mobile-first CSS** - Write mobile styles first, add desktop enhancements with `@media (min-width: ...)`
+- **Responsive patterns to follow:**
+  - Grids: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` (stack on mobile)
+  - Flex: Use `flex-col` on mobile, `md:flex-row` on desktop
+  - Font sizes: Smaller base sizes, scale up on desktop
+  - Spacing: Reduced padding/margins on mobile
+  - Icons: Scale down on mobile (see framework pages: large icon on desktop, small inline icon on mobile)
+- **Common breakpoints:**
+  - Mobile: `< 640px`
+  - Tablet: `640px - 1023px` (use `md:` prefix)
+  - Desktop: `1024px+` (use `lg:` prefix)
+- **Test checklist:**
+  - [ ] Text is readable (not too small)
+  - [ ] Buttons/links are tappable (min 44px touch target)
+  - [ ] No horizontal scrolling
+  - [ ] Images/icons scale appropriately
+  - [ ] Navigation works on mobile
+  - [ ] Cards/grids stack properly
+
+**Tools for mobile testing:**
+- Browser DevTools responsive mode
+- `pnpm dev` and test on actual mobile device
+- VitePress dev server accessible on local network for device testing
+
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.

@@ -40,6 +40,19 @@ The script is **idempotent** - safe to run anytime (first-time setup, after `git
 ./scripts/setup.sh --help       # Show all options
 ```
 
+**What the setup script does:**
+- Installs pnpm dependencies (includes automatic git hook setup via husky)
+- Restores database from git-tracked export
+- Validates Pocketbase installation
+
+**Git hooks (automatic):**
+Git hooks are installed automatically via [husky](https://github.com/typicode/husky) when you run `pnpm install`. The pre-commit hook runs:
+- ESLint auto-fix on staged files
+- TypeScript type checking
+- Histoire story docs validation
+
+No additional setup required!
+
 ### Manual Setup
 
 If you prefer manual steps or need to troubleshoot:

@@ -17,14 +17,20 @@ const validateTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  title="Validate"
   description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
   :links="[
     { label: 'Browse Validation Profiles', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
-  <div class="flex items-center justify-center" style="min-height: 300px;">
+  <template #title>
+    <span class="framework-page-title">
+      <PillarIcon pillar="validate" :size="36" class="framework-mobile-icon" />
+      Validate
+    </span>
+  </template>
+
+  <div class="framework-desktop-icon">
     <PillarIcon pillar="validate" :size="280" />
   </div>
 </PageSection>
@@ -91,5 +97,36 @@ const validateTools = [
 }
 .VPDoc .content {
   max-width: none !important;
+}
+
+/* Framework page icon responsive behavior */
+.framework-page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Mobile: show small icon next to title */
+.framework-mobile-icon {
+  display: inline-block;
+}
+
+/* Mobile: hide large icon */
+.framework-desktop-icon {
+  display: none;
+}
+
+/* Desktop (1024px+): hide small icon, show large icon */
+@media (min-width: 1024px) {
+  .framework-mobile-icon {
+    display: none;
+  }
+
+  .framework-desktop-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
 }
 </style>

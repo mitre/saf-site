@@ -12,7 +12,7 @@ standards:
     type: Framework
     category: Financial/Industry
     version: "4.0"
-  
+
   - id: pa-dss
     name: Payment Application Data Security Standard (PA-DSS)
     description: Security requirements for payment application software developers that support PCI DSS compliance.

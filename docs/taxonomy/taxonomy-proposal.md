@@ -21,34 +21,34 @@ When users search for security profiles, they think:
 - **Operating System**
   - Linux (RHEL, Ubuntu, Photon OS, etc.)
   - Windows (Windows 10, Server 2012/2016/2019)
-  
+
 - **Database**
   - SQL Server (Windows-based)
   - MySQL (cross-platform)
   - PostgreSQL (cross-platform)
   - Oracle Database (cross-platform)
   - MongoDB (cross-platform)
-  
+
 - **Web Server**
   - Apache HTTP Server
   - NGINX
   - IIS (Windows)
-  
+
 - **Application Runtime**
   - Java (JRE)
   - Application Server (Tomcat, JBoss)
-  
+
 - **Container**
   - Docker
   - Kubernetes / K3s
-  
+
 - **Virtualization**
   - Hypervisor (VMware ESXi)
   - Management (vCenter, vSphere)
   - Virtual Machines
   - Networking (NSX)
   - Cloud Management (Aria, Cloud Foundation)
-  
+
 - **Cloud Service**
   - Compute/Infrastructure (AWS, GCP, Azure)
   - Storage (S3)
@@ -213,4 +213,3 @@ When users search for security profiles, they think:
 3. Do we need Profile Maintainer visible to users or just internal?
 4. Any other target types missing? (IoT, Mobile, Network Equipment?)
 5. Should "Best Practices" be in Standard dropdown or separate?
-

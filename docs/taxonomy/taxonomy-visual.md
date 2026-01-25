@@ -136,20 +136,20 @@
   "profile_id": "rhel-8-stig",
   "name": "Red Hat Enterprise Linux 8 STIG",
   "version": "1.0.0",
-  
+
   "target": {
     "type": "Operating System",
     "subtype": "Linux",
     "specific": "RHEL 8"
   },
-  
+
   "classification": {
     "standard": "STIG",
     "category": "Operating Systems",
     "os_family": "Linux",
     "vendor": "Red Hat"
   },
-  
+
   "profile_info": {
     "maintainer": "MITRE SAF",
     "technology": "InSpec",

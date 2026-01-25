@@ -7,7 +7,7 @@ technologies:
     logo: "/img/logos/tech/inspec.png"
     type: "validation"
     category: "Testing Framework"
-  
+
   - id: ansible
     name: "Ansible"
     description: "Open-source software provisioning, configuration management, and application-deployment tool"
@@ -15,7 +15,7 @@ technologies:
     logo: "/img/logos/tech/ansible.png"
     type: "hardening"
     category: "Configuration Management"
-  
+
   - id: terraform
     name: "Terraform"
     description: "Infrastructure as code tool that enables you to safely and predictably create, change, and improve infrastructure"
@@ -23,7 +23,7 @@ technologies:
     logo: "/img/logos/tech/terraform.png"
     type: "hardening"
     category: "Infrastructure as Code"
-  
+
   - id: chef
     name: "Chef"
     description: "Configuration management tool that uses a pure-Ruby, domain-specific language for system configuration"
@@ -31,7 +31,7 @@ technologies:
     logo: "/img/logos/tech/chef.svg"
     type: "hardening"
     category: "Configuration Management"
-  
+
   - id: puppet
     name: "Puppet"
     description: "Configuration management tool that defines infrastructure as code"
@@ -39,7 +39,7 @@ technologies:
     logo: "/img/logos/tech/puppet.png"
     type: "hardening"
     category: "Configuration Management"
-    
+
   - id: keycloak
     name: "Keycloak"
     description: "Open-source identity and access management solution for modern applications and services"
@@ -47,7 +47,7 @@ technologies:
     logo: "/img/logos/tech/keycloak.svg"
     type: "hardening"
     category: "Security Automation"
-    
+
   - id: kitchen
     name: "Test Kitchen"
     description: "Test harness tool to execute infrastructure code on one or more platforms in isolation"
@@ -55,7 +55,7 @@ technologies:
     logo: "/img/logos/tech/chef.svg"
     type: "validation"
     category: "Testing Framework"
-    
+
   - id: powershell
     name: "PowerShell"
     description: "Cross-platform task automation and configuration management framework from Microsoft"

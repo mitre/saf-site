@@ -38,7 +38,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "vue-tsc --noEmit",
     "ci:check": "pnpm typecheck && pnpm lint && pnpm test:run && pnpm story:docs:check",
-    "ci:security": "pnpm audit --audit-level=high"
+    "ci:security": "pnpm audit --audit-level=high",
+    "prepare": "husky"
   },
   "keywords": [
     "mitre",
@@ -53,6 +54,14 @@
   "engines": {
     "node": ">=22",
     "pnpm": ">=10"
+  },
+  "lint-staged": {
+    "*.{vue,ts,js,tsx,jsx}": [
+      "eslint --fix"
+    ],
+    "*.story.vue": [
+      "pnpm story:docs:check"
+    ]
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",
@@ -73,6 +82,8 @@
     "glob": "^13.0.0",
     "happy-dom": "^20.1.0",
     "histoire": "1.0.0-beta.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "lucide-vue-next": "^0.562.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
