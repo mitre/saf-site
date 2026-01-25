@@ -23,7 +23,17 @@ export default defineConfig({
 
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Framework', link: '/framework/' },
+      {
+        text: 'Framework',
+        items: [
+          { text: 'Overview', link: '/framework/' },
+          { text: 'Plan', link: '/framework/plan' },
+          { text: 'Harden', link: '/framework/harden' },
+          { text: 'Validate', link: '/framework/validate' },
+          { text: 'Normalize', link: '/framework/normalize' },
+          { text: 'Visualize', link: '/framework/visualize' },
+        ],
+      },
       { text: 'Apps', link: '/apps/' },
       { text: 'Content', link: '/content/' },
       { text: 'Docs', link: '/docs/' },
