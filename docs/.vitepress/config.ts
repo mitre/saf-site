@@ -14,6 +14,10 @@ export default defineConfig({
   title: 'MITRE SAF',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
 
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/icons/saf-logo.svg' }],
+  ],
+
   themeConfig: {
     logo: '/img/logos/mitre-saf.png',
 
