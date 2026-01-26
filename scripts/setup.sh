@@ -31,6 +31,7 @@ readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 readonly DATABASE_DIR="$PROJECT_ROOT/docs/.vitepress/database"
 readonly DB_PATH="$DATABASE_DIR/drizzle.db"
 readonly DIFFABLE_DIR="$DATABASE_DIR/diffable"
+readonly LEGACY_POCKETBASE_DIR="$PROJECT_ROOT/.pocketbase"
 
 # -----------------------------------------------------------------------------
 # Colors and Output
@@ -90,6 +91,7 @@ WHAT IT DOES:
     1. Checks prerequisites (Node.js, pnpm)
     2. Installs/updates Node dependencies
     3. Restores database from diffable (only if missing, unless --force)
+    4. Cleans up legacy .pocketbase/ directory (if present)
 
 IDEMPOTENT:
     Safe to run multiple times. Will not overwrite your local database
@@ -330,6 +332,56 @@ restore_database() {
     ok "Database restored ($db_size bytes)"
 }
 
+cleanup_legacy_pocketbase() {
+    echo -e "${BOLD}Legacy Cleanup${NC}"
+    echo ""
+
+    if [ ! -d "$LEGACY_POCKETBASE_DIR" ]; then
+        ok "No legacy .pocketbase/ directory"
+        echo ""
+        return
+    fi
+
+    # Calculate size of legacy directory
+    local legacy_size
+    legacy_size=$(du -sh "$LEGACY_POCKETBASE_DIR" 2>/dev/null | cut -f1 || echo "unknown")
+
+    warn "Legacy .pocketbase/ directory found ($legacy_size)"
+    info "This project now uses docs/.vitepress/database/"
+    info "The .pocketbase/ directory is no longer needed"
+
+    if [ "$CHECK_MODE" = true ]; then
+        check_only "Would remove .pocketbase/ directory"
+        echo ""
+        return
+    fi
+
+    if [ "$DRY_RUN" = true ]; then
+        dry "Would remove .pocketbase/ directory ($legacy_size)"
+        echo ""
+        return
+    fi
+
+    # In --force or --yes mode, clean up automatically
+    if [ "$FORCE" = true ] || [ "$YES" = true ]; then
+        info "Removing .pocketbase/ (--force or --yes specified)..."
+        rm -rf "$LEGACY_POCKETBASE_DIR"
+        ok "Removed legacy .pocketbase/ directory"
+        echo ""
+        return
+    fi
+
+    # Interactive mode - ask user
+    if confirm "    Remove .pocketbase/ directory?"; then
+        rm -rf "$LEGACY_POCKETBASE_DIR"
+        ok "Removed legacy .pocketbase/ directory"
+    else
+        skip "Keeping .pocketbase/ (you can delete it manually later)"
+    fi
+
+    echo ""
+}
+
 print_summary() {
     if [ "$CHECK_MODE" = true ]; then
         echo "=========================================="
@@ -378,6 +430,7 @@ main() {
     check_prerequisites
     setup_dependencies
     setup_database
+    cleanup_legacy_pocketbase
     print_summary
 }
 
