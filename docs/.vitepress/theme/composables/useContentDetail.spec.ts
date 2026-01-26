@@ -11,19 +11,19 @@ function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
     description: 'A test profile for testing',
     version: '1.0.0',
     status: 'active',
-    content_type: 'validation',
-    target_name: 'Test Target',
-    target_slug: 'test-target',
-    standard_name: 'Test Standard',
-    standard_short_name: 'TEST',
-    standard_slug: 'test-standard',
-    technology_name: 'Test Tech',
-    technology_slug: 'test-tech',
-    vendor_name: 'Test Vendor',
-    vendor_slug: 'test-vendor',
-    maintainer_name: 'Test Maintainer',
-    maintainer_slug: 'test-maintainer',
-    github_url: 'https://github.com/test/repo',
+    contentType: 'validation',
+    targetName: 'Test Target',
+    targetSlug: 'test-target',
+    standardName: 'Test Standard',
+    standardShortName: 'TEST',
+    standardSlug: 'test-standard',
+    technologyName: 'Test Tech',
+    technologySlug: 'test-tech',
+    vendorName: 'Test Vendor',
+    vendorSlug: 'test-vendor',
+    maintainerName: 'Test Maintainer',
+    maintainerSlug: 'test-maintainer',
+    githubUrl: 'https://github.com/test/repo',
     ...overrides,
   }
 }
@@ -32,8 +32,8 @@ describe('useContentDetail', () => {
   describe('formattedBenchmarkVersion', () => {
     it('formats STIG version as V{major}R{minor}', () => {
       const content = createContentItem({
-        benchmark_version: '2.2.0',
-        standard_name: 'DISA STIG',
+        benchmarkVersion: '2.2.0',
+        standardName: 'DISA STIG',
       })
       const { formattedBenchmarkVersion } = useContentDetail(content)
       expect(formattedBenchmarkVersion.value).toBe('V2R2')
@@ -41,8 +41,8 @@ describe('useContentDetail', () => {
 
     it('handles STIG with case-insensitive matching', () => {
       const content = createContentItem({
-        benchmark_version: '1.5.3',
-        standard_name: 'Security Technical Implementation Guide (STIG)',
+        benchmarkVersion: '1.5.3',
+        standardName: 'Security Technical Implementation Guide (STIG)',
       })
       const { formattedBenchmarkVersion } = useContentDetail(content)
       expect(formattedBenchmarkVersion.value).toBe('V1R5')
@@ -50,18 +50,18 @@ describe('useContentDetail', () => {
 
     it('formats CIS version as semver with v prefix', () => {
       const content = createContentItem({
-        benchmark_version: '2.0.0',
-        standard_name: 'CIS Benchmark',
+        benchmarkVersion: '2.0.0',
+        standardName: 'CIS Benchmark',
       })
       const { formattedBenchmarkVersion } = useContentDetail(content)
       expect(formattedBenchmarkVersion.value).toBe('v2.0.0')
     })
 
-    it('uses standard_short_name as fallback for STIG detection', () => {
+    it('uses standardShortName as fallback for STIG detection', () => {
       const content = createContentItem({
-        benchmark_version: '3.1.0',
-        standard_name: '',
-        standard_short_name: 'STIG',
+        benchmarkVersion: '3.1.0',
+        standardName: '',
+        standardShortName: 'STIG',
       })
       const { formattedBenchmarkVersion } = useContentDetail(content)
       expect(formattedBenchmarkVersion.value).toBe('V3R1')
@@ -69,7 +69,7 @@ describe('useContentDetail', () => {
 
     it('returns empty string when no benchmark version', () => {
       const content = createContentItem({
-        benchmark_version: '',
+        benchmarkVersion: '',
       })
       const { formattedBenchmarkVersion } = useContentDetail(content)
       expect(formattedBenchmarkVersion.value).toBe('')
@@ -93,9 +93,9 @@ describe('useContentDetail', () => {
   describe('benchmarkLabel', () => {
     it('combines standard short name with formatted version', () => {
       const content = createContentItem({
-        benchmark_version: '2.2.0',
-        standard_name: 'DISA STIG',
-        standard_short_name: 'STIG',
+        benchmarkVersion: '2.2.0',
+        standardName: 'DISA STIG',
+        standardShortName: 'STIG',
       })
       const { benchmarkLabel } = useContentDetail(content)
       expect(benchmarkLabel.value).toBe('STIG V2R2')
@@ -103,16 +103,16 @@ describe('useContentDetail', () => {
 
     it('uses "Benchmark" as fallback when no short name', () => {
       const content = createContentItem({
-        benchmark_version: '1.0.0',
-        standard_name: 'CIS',
-        standard_short_name: '',
+        benchmarkVersion: '1.0.0',
+        standardName: 'CIS',
+        standardShortName: '',
       })
       const { benchmarkLabel } = useContentDetail(content)
       expect(benchmarkLabel.value).toBe('Benchmark v1.0.0')
     })
 
     it('returns empty string when no benchmark version', () => {
-      const content = createContentItem({ benchmark_version: '' })
+      const content = createContentItem({ benchmarkVersion: '' })
       const { benchmarkLabel } = useContentDetail(content)
       expect(benchmarkLabel.value).toBe('')
     })
@@ -120,14 +120,14 @@ describe('useContentDetail', () => {
 
   describe('isValidation / isHardening', () => {
     it('identifies validation profiles', () => {
-      const content = createContentItem({ content_type: 'validation' })
+      const content = createContentItem({ contentType: 'validation' })
       const { isValidation, isHardening } = useContentDetail(content)
       expect(isValidation.value).toBe(true)
       expect(isHardening.value).toBe(false)
     })
 
     it('identifies hardening profiles', () => {
-      const content = createContentItem({ content_type: 'hardening' })
+      const content = createContentItem({ contentType: 'hardening' })
       const { isValidation, isHardening } = useContentDetail(content)
       expect(isValidation.value).toBe(false)
       expect(isHardening.value).toBe(true)
@@ -137,7 +137,7 @@ describe('useContentDetail', () => {
   describe('actionUrls', () => {
     it('includes GitHub URLs when available', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8-stig',
+        githubUrl: 'https://github.com/mitre/rhel8-stig',
       })
       const { actionUrls } = useContentDetail(content)
 
@@ -156,8 +156,8 @@ describe('useContentDetail', () => {
 
     it('always shows GitHub and README links', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/test/repo',
-        documentation_url: '',
+        githubUrl: 'https://github.com/test/repo',
+        documentationUrl: '',
       })
       const { actionUrls } = useContentDetail(content)
 
@@ -169,10 +169,10 @@ describe('useContentDetail', () => {
       expect(actionUrls.value[1].url).toBe('https://github.com/test/repo#readme')
     })
 
-    it('adds Documentation link when documentation_url exists', () => {
+    it('adds Documentation link when documentationUrl exists', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/test/repo',
-        documentation_url: 'https://docs.example.com',
+        githubUrl: 'https://github.com/test/repo',
+        documentationUrl: 'https://docs.example.com',
       })
       const { actionUrls } = useContentDetail(content)
 
@@ -188,7 +188,7 @@ describe('useContentDetail', () => {
 
     it('returns empty array when no GitHub URL', () => {
       const content = createContentItem({
-        github_url: '',
+        githubUrl: '',
       })
       const { actionUrls } = useContentDetail(content)
       expect(actionUrls.value).toHaveLength(0)
@@ -196,9 +196,9 @@ describe('useContentDetail', () => {
 
     it('adds reference URL with standard short name when available', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/test/repo',
-        reference_url: 'https://public.cyber.mil/stigs/',
-        standard_short_name: 'STIG',
+        githubUrl: 'https://github.com/test/repo',
+        referenceUrl: 'https://public.cyber.mil/stigs/',
+        standardShortName: 'STIG',
       })
       const { actionUrls } = useContentDetail(content)
 
@@ -210,9 +210,9 @@ describe('useContentDetail', () => {
 
     it('uses generic label when no standard short name', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/test/repo',
-        reference_url: 'https://example.com/standard',
-        standard_short_name: '',
+        githubUrl: 'https://github.com/test/repo',
+        referenceUrl: 'https://example.com/standard',
+        standardShortName: '',
       })
       const { actionUrls } = useContentDetail(content)
 
@@ -224,11 +224,11 @@ describe('useContentDetail', () => {
   describe('featureCards', () => {
     it('includes all available metadata fields', () => {
       const content = createContentItem({
-        target_name: 'Red Hat Enterprise Linux 8',
-        standard_name: 'DISA STIG',
-        technology_name: 'InSpec',
-        vendor_name: 'Red Hat',
-        maintainer_name: 'MITRE SAF Team',
+        targetName: 'Red Hat Enterprise Linux 8',
+        standardName: 'DISA STIG',
+        technologyName: 'InSpec',
+        vendorName: 'Red Hat',
+        maintainerName: 'MITRE SAF Team',
       })
       const { featureCards } = useContentDetail(content)
 
@@ -244,8 +244,8 @@ describe('useContentDetail', () => {
 
     it('includes STIG ID for validation profiles', () => {
       const content = createContentItem({
-        content_type: 'validation',
-        stig_id: 'RHEL-08-010010',
+        contentType: 'validation',
+        stigId: 'RHEL-08-010010',
       })
       const { featureCards } = useContentDetail(content)
 
@@ -256,8 +256,8 @@ describe('useContentDetail', () => {
 
     it('excludes STIG ID for hardening profiles', () => {
       const content = createContentItem({
-        content_type: 'hardening',
-        stig_id: 'RHEL-08-010010',
+        contentType: 'hardening',
+        stigId: 'RHEL-08-010010',
       })
       const { featureCards } = useContentDetail(content)
 
@@ -267,11 +267,11 @@ describe('useContentDetail', () => {
 
     it('excludes cards for empty fields', () => {
       const content = createContentItem({
-        target_name: 'Test Target',
-        standard_name: '',
-        technology_name: '',
-        vendor_name: '',
-        maintainer_name: '',
+        targetName: 'Test Target',
+        standardName: '',
+        technologyName: '',
+        vendorName: '',
+        maintainerName: '',
       })
       const { featureCards } = useContentDetail(content)
 
@@ -283,8 +283,8 @@ describe('useContentDetail', () => {
   describe('quickStart', () => {
     it('interpolates {github} variable', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8',
-        quick_start_template: 'git clone {github}',
+        githubUrl: 'https://github.com/mitre/rhel8',
+        quickStartTemplate: 'git clone {github}',
       })
       const { quickStart } = useContentDetail(content)
       expect(quickStart.value).toBe('git clone https://github.com/mitre/rhel8')
@@ -293,7 +293,7 @@ describe('useContentDetail', () => {
     it('interpolates {slug} variable', () => {
       const content = createContentItem({
         slug: 'rhel8-stig',
-        quick_start_template: 'cd {slug}',
+        quickStartTemplate: 'cd {slug}',
       })
       const { quickStart } = useContentDetail(content)
       expect(quickStart.value).toBe('cd rhel8-stig')
@@ -301,8 +301,8 @@ describe('useContentDetail', () => {
 
     it('interpolates {vendor_slug} variable', () => {
       const content = createContentItem({
-        vendor_slug: 'mitre',
-        quick_start_template: 'ansible-galaxy install {vendor_slug}.role',
+        vendorSlug: 'mitre',
+        quickStartTemplate: 'ansible-galaxy install {vendor_slug}.role',
       })
       const { quickStart } = useContentDetail(content)
       expect(quickStart.value).toBe('ansible-galaxy install mitre.role')
@@ -310,16 +310,16 @@ describe('useContentDetail', () => {
 
     it('interpolates multiple variables', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/test',
+        githubUrl: 'https://github.com/mitre/test',
         slug: 'test-profile',
-        quick_start_template: 'git clone {github}\ncd {slug}',
+        quickStartTemplate: 'git clone {github}\ncd {slug}',
       })
       const { quickStart } = useContentDetail(content)
       expect(quickStart.value).toBe('git clone https://github.com/mitre/test\ncd test-profile')
     })
 
     it('returns empty string when no template', () => {
-      const content = createContentItem({ quick_start_template: '' })
+      const content = createContentItem({ quickStartTemplate: '' })
       const { quickStart } = useContentDetail(content)
       expect(quickStart.value).toBe('')
     })
@@ -328,14 +328,14 @@ describe('useContentDetail', () => {
   describe('prerequisites', () => {
     it('returns prerequisites template as-is', () => {
       const content = createContentItem({
-        prerequisites_template: '- InSpec 5.x\n- SSH access',
+        prerequisitesTemplate: '- InSpec 5.x\n- SSH access',
       })
       const { prerequisites } = useContentDetail(content)
       expect(prerequisites.value).toBe('- InSpec 5.x\n- SSH access')
     })
 
     it('returns empty string when no template', () => {
-      const content = createContentItem({ prerequisites_template: '' })
+      const content = createContentItem({ prerequisitesTemplate: '' })
       const { prerequisites } = useContentDetail(content)
       expect(prerequisites.value).toBe('')
     })
@@ -344,36 +344,36 @@ describe('useContentDetail', () => {
   describe('content availability flags', () => {
     it('hasQuickStart is true when template exists', () => {
       const content = createContentItem({
-        quick_start_template: 'some content',
+        quickStartTemplate: 'some content',
       })
       const { hasQuickStart } = useContentDetail(content)
       expect(hasQuickStart.value).toBe(true)
     })
 
     it('hasQuickStart is false when template is empty', () => {
-      const content = createContentItem({ quick_start_template: '' })
+      const content = createContentItem({ quickStartTemplate: '' })
       const { hasQuickStart } = useContentDetail(content)
       expect(hasQuickStart.value).toBe(false)
     })
 
     it('hasPrerequisites is true when template exists', () => {
       const content = createContentItem({
-        prerequisites_template: '- Requirement 1',
+        prerequisitesTemplate: '- Requirement 1',
       })
       const { hasPrerequisites } = useContentDetail(content)
       expect(hasPrerequisites.value).toBe(true)
     })
 
-    it('hasReadme is true when readme_markdown exists', () => {
+    it('hasReadme is true when readmeMarkdown exists', () => {
       const content = createContentItem({
-        readme_markdown: '# README content',
+        readmeMarkdown: '# README content',
       })
       const { hasReadme } = useContentDetail(content)
       expect(hasReadme.value).toBe(true)
     })
 
-    it('hasReadme is false when readme_markdown is empty', () => {
-      const content = createContentItem({ readme_markdown: '' })
+    it('hasReadme is false when readmeMarkdown is empty', () => {
+      const content = createContentItem({ readmeMarkdown: '' })
       const { hasReadme } = useContentDetail(content)
       expect(hasReadme.value).toBe(false)
     })

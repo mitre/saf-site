@@ -18,65 +18,65 @@ const sampleContent = [
     slug: 'rhel8-stig',
     name: 'Red Hat Enterprise Linux 8 STIG',
     description: 'InSpec profile for RHEL 8 STIG compliance validation',
-    content_type: 'validation' as const,
+    contentType: 'validation' as const,
     status: 'active',
-    target_name: 'Red Hat Enterprise Linux 8',
-    technology_name: 'InSpec',
-    vendor_name: 'MITRE',
-    standard_name: 'DISA STIG',
-    standard_short_name: 'STIG',
+    targetName: 'Red Hat Enterprise Linux 8',
+    technologyName: 'InSpec',
+    vendorName: 'MITRE',
+    standardName: 'DISA STIG',
+    standardShortName: 'STIG',
   },
   {
     id: '2',
     slug: 'rhel8-ansible',
     name: 'Red Hat Enterprise Linux 8 Ansible Hardening',
     description: 'Ansible playbook for RHEL 8 security hardening',
-    content_type: 'hardening' as const,
+    contentType: 'hardening' as const,
     status: 'active',
-    target_name: 'Red Hat Enterprise Linux 8',
-    technology_name: 'Ansible',
-    vendor_name: 'MITRE',
-    standard_name: 'DISA STIG',
-    standard_short_name: 'STIG',
+    targetName: 'Red Hat Enterprise Linux 8',
+    technologyName: 'Ansible',
+    vendorName: 'MITRE',
+    standardName: 'DISA STIG',
+    standardShortName: 'STIG',
   },
   {
     id: '3',
     slug: 'mysql-cis',
     name: 'MySQL 8.0 CIS Benchmark',
     description: 'InSpec profile for MySQL CIS compliance',
-    content_type: 'validation' as const,
+    contentType: 'validation' as const,
     status: 'active',
-    target_name: 'MySQL 8.0',
-    technology_name: 'InSpec',
-    vendor_name: 'CIS',
-    standard_name: 'CIS Benchmark',
-    standard_short_name: 'CIS',
+    targetName: 'MySQL 8.0',
+    technologyName: 'InSpec',
+    vendorName: 'CIS',
+    standardName: 'CIS Benchmark',
+    standardShortName: 'CIS',
   },
   {
     id: '4',
     slug: 'windows-stig',
     name: 'Windows Server 2019 STIG',
     description: 'Chef cookbook for Windows Server hardening',
-    content_type: 'hardening' as const,
+    contentType: 'hardening' as const,
     status: 'beta',
-    target_name: 'Windows Server 2019',
-    technology_name: 'Chef',
-    vendor_name: 'MITRE',
-    standard_name: 'DISA STIG',
-    standard_short_name: 'STIG',
+    targetName: 'Windows Server 2019',
+    technologyName: 'Chef',
+    vendorName: 'MITRE',
+    standardName: 'DISA STIG',
+    standardShortName: 'STIG',
   },
   {
     id: '5',
     slug: 'ubuntu-stig',
     name: 'Ubuntu 20.04 STIG',
     description: 'InSpec profile for Ubuntu STIG validation',
-    content_type: 'validation' as const,
+    contentType: 'validation' as const,
     status: 'active',
-    target_name: 'Ubuntu 20.04',
-    technology_name: 'InSpec',
-    vendor_name: 'MITRE',
-    standard_name: 'DISA STIG',
-    standard_short_name: 'STIG',
+    targetName: 'Ubuntu 20.04',
+    technologyName: 'InSpec',
+    vendorName: 'MITRE',
+    standardName: 'DISA STIG',
+    standardShortName: 'STIG',
   },
 ]
 
@@ -105,23 +105,23 @@ const ContentBrowseWrapper = defineComponent({
 
       if (selectedPillar.value !== 'all') {
         const contentType = selectedPillar.value === 'validate' ? 'validation' : 'hardening'
-        result = result.filter(item => item.content_type === contentType)
+        result = result.filter(item => item.contentType === contentType)
       }
 
       if (selectedTarget.value !== 'all') {
-        result = result.filter(item => item.target_name === selectedTarget.value)
+        result = result.filter(item => item.targetName === selectedTarget.value)
       }
 
       if (selectedTech.value !== 'all') {
-        result = result.filter(item => item.technology_name === selectedTech.value)
+        result = result.filter(item => item.technologyName === selectedTech.value)
       }
 
       if (selectedVendor.value !== 'all') {
-        result = result.filter(item => item.vendor_name === selectedVendor.value)
+        result = result.filter(item => item.vendorName === selectedVendor.value)
       }
 
       if (selectedStandard.value !== 'all') {
-        result = result.filter(item => item.standard_name === selectedStandard.value)
+        result = result.filter(item => item.standardName === selectedStandard.value)
       }
 
       if (searchQuery.value) {

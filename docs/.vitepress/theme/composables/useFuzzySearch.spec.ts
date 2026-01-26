@@ -8,37 +8,37 @@ const sampleItems = [
     id: '1',
     name: 'Red Hat Enterprise Linux 8 STIG',
     description: 'InSpec profile for RHEL 8',
-    target_name: 'Red Hat Enterprise Linux 8',
-    standard_name: 'DISA STIG',
-    technology_name: 'InSpec',
-    vendor_name: 'MITRE',
+    targetName: 'Red Hat Enterprise Linux 8',
+    standardName: 'DISA STIG',
+    technologyName: 'InSpec',
+    vendorName: 'MITRE',
   },
   {
     id: '2',
     name: 'MySQL 8.0 CIS Benchmark',
     description: 'Ansible playbook for MySQL hardening',
-    target_name: 'MySQL 8.0',
-    standard_name: 'CIS Benchmark',
-    technology_name: 'Ansible',
-    vendor_name: 'CIS',
+    targetName: 'MySQL 8.0',
+    standardName: 'CIS Benchmark',
+    technologyName: 'Ansible',
+    vendorName: 'CIS',
   },
   {
     id: '3',
     name: 'Windows Server 2019 STIG',
     description: 'Chef cookbook for Windows security',
-    target_name: 'Windows Server 2019',
-    standard_name: 'DISA STIG',
-    technology_name: 'Chef',
-    vendor_name: 'MITRE',
+    targetName: 'Windows Server 2019',
+    standardName: 'DISA STIG',
+    technologyName: 'Chef',
+    vendorName: 'MITRE',
   },
   {
     id: '4',
     name: 'Amazon Linux 2 Security Profile',
     description: 'AWS-focused security validation',
-    target_name: 'Amazon Linux 2',
-    standard_name: 'AWS Best Practices',
-    technology_name: 'InSpec',
-    vendor_name: 'AWS',
+    targetName: 'Amazon Linux 2',
+    standardName: 'AWS Best Practices',
+    technologyName: 'InSpec',
+    vendorName: 'AWS',
   },
 ]
 
@@ -94,7 +94,7 @@ describe('useFuzzySearch', () => {
       const result = useFuzzySearch(sampleItems, query)
 
       expect(result.value.length).toBeGreaterThan(0)
-      expect(result.value[0].target_name).toBe('MySQL 8.0')
+      expect(result.value[0].targetName).toBe('MySQL 8.0')
     })
 
     it('matches partial words like "wind" for Windows', () => {
@@ -110,7 +110,7 @@ describe('useFuzzySearch', () => {
       const result = useFuzzySearch(sampleItems, query)
 
       expect(result.value.length).toBeGreaterThan(0)
-      const allInSpec = result.value.every(item => item.technology_name === 'InSpec')
+      const allInSpec = result.value.every(item => item.technologyName === 'InSpec')
       expect(allInSpec).toBe(true)
     })
 
@@ -119,7 +119,7 @@ describe('useFuzzySearch', () => {
       const result = useFuzzySearch(sampleItems, query)
 
       expect(result.value.length).toBeGreaterThanOrEqual(2)
-      const allStig = result.value.every(item => item.standard_name?.includes('STIG'))
+      const allStig = result.value.every(item => item.standardName?.includes('STIG'))
       expect(allStig).toBe(true)
     })
   })

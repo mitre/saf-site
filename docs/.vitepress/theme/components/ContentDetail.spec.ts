@@ -12,20 +12,20 @@ function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
     description: 'A test profile for testing',
     version: '1.0.0',
     status: 'active',
-    content_type: 'validation',
-    target_name: 'Test Target',
-    target_slug: 'test-target',
-    standard_name: 'DISA STIG',
-    standard_short_name: 'STIG',
-    standard_slug: 'stig',
-    technology_name: 'InSpec',
-    technology_slug: 'inspec',
-    vendor_name: 'Test Vendor',
-    vendor_slug: 'test-vendor',
-    maintainer_name: 'Test Maintainer',
-    maintainer_slug: 'test-maintainer',
-    github_url: 'https://github.com/test/repo',
-    benchmark_version: '2.2.0',
+    contentType: 'validation',
+    targetName: 'Test Target',
+    targetSlug: 'test-target',
+    standardName: 'DISA STIG',
+    standardShortName: 'STIG',
+    standardSlug: 'stig',
+    technologyName: 'InSpec',
+    technologySlug: 'inspec',
+    vendorName: 'Test Vendor',
+    vendorSlug: 'test-vendor',
+    maintainerName: 'Test Maintainer',
+    maintainerSlug: 'test-maintainer',
+    githubUrl: 'https://github.com/test/repo',
+    benchmarkVersion: '2.2.0',
     ...overrides,
   }
 }
@@ -80,9 +80,9 @@ describe('contentDetail', () => {
   describe('benchmark version formatting', () => {
     it('displays STIG version in V{major}R{minor} format', () => {
       const content = createContentItem({
-        benchmark_version: '2.2.0',
-        standard_name: 'DISA STIG',
-        standard_short_name: 'STIG',
+        benchmarkVersion: '2.2.0',
+        standardName: 'DISA STIG',
+        standardShortName: 'STIG',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -93,9 +93,9 @@ describe('contentDetail', () => {
 
     it('displays CIS version in semver format', () => {
       const content = createContentItem({
-        benchmark_version: '2.0.0',
-        standard_name: 'CIS Benchmark',
-        standard_short_name: 'CIS',
+        benchmarkVersion: '2.0.0',
+        standardName: 'CIS Benchmark',
+        standardShortName: 'CIS',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -103,11 +103,11 @@ describe('contentDetail', () => {
       expect(standardValue).toBe('CIS v2.0.0')
     })
 
-    it('shows standard without version when benchmark_version not provided', () => {
+    it('shows standard without version when benchmarkVersion not provided', () => {
       const content = createContentItem({
-        benchmark_version: '',
-        standard_name: 'DISA STIG',
-        standard_short_name: 'STIG',
+        benchmarkVersion: '',
+        standardName: 'DISA STIG',
+        standardShortName: 'STIG',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -137,7 +137,7 @@ describe('contentDetail', () => {
 
   describe('breadcrumb navigation', () => {
     it('links to /content/ for validation profiles', () => {
-      const content = createContentItem({ content_type: 'validation' })
+      const content = createContentItem({ contentType: 'validation' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       const breadcrumbLink = wrapper.find('.breadcrumb a')
@@ -146,7 +146,7 @@ describe('contentDetail', () => {
     })
 
     it('links to /content/ for hardening profiles', () => {
-      const content = createContentItem({ content_type: 'hardening' })
+      const content = createContentItem({ contentType: 'hardening' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       const breadcrumbLink = wrapper.find('.breadcrumb a')
@@ -165,7 +165,7 @@ describe('contentDetail', () => {
   describe('action buttons', () => {
     it('renders GitHub link as primary action', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8-stig',
+        githubUrl: 'https://github.com/mitre/rhel8-stig',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -177,7 +177,7 @@ describe('contentDetail', () => {
 
     it('renders README link as secondary action', () => {
       const content = createContentItem({
-        github_url: 'https://github.com/mitre/rhel8-stig',
+        githubUrl: 'https://github.com/mitre/rhel8-stig',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -188,7 +188,7 @@ describe('contentDetail', () => {
     })
 
     it('hides actions section when no URLs', () => {
-      const content = createContentItem({ github_url: '' })
+      const content = createContentItem({ githubUrl: '' })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       // ActionButtons component won't render anything
@@ -199,10 +199,10 @@ describe('contentDetail', () => {
   describe('metadata items', () => {
     it('renders metadata items for available metadata', () => {
       const content = createContentItem({
-        target_name: 'RHEL 8',
-        standard_name: 'DISA STIG',
-        standard_short_name: 'STIG',
-        technology_name: 'InSpec',
+        targetName: 'RHEL 8',
+        standardName: 'DISA STIG',
+        standardShortName: 'STIG',
+        technologyName: 'InSpec',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -217,7 +217,7 @@ describe('contentDetail', () => {
 
     it('includes vendor metadata when provided', () => {
       const content = createContentItem({
-        vendor_name: 'MITRE',
+        vendorName: 'MITRE',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -226,7 +226,7 @@ describe('contentDetail', () => {
 
     it('includes maintainer metadata when provided', () => {
       const content = createContentItem({
-        maintainer_name: 'SAF Team',
+        maintainerName: 'SAF Team',
       })
       const wrapper = mount(ContentDetail, { props: { content } })
 
@@ -236,14 +236,14 @@ describe('contentDetail', () => {
 
   describe('control count', () => {
     it('displays control count when provided', () => {
-      const content = createContentItem({ control_count: 247 })
+      const content = createContentItem({ controlCount: 247 })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       expect(getMetadataValue(wrapper, 'Controls')).toBe('247')
     })
 
     it('hides control count when zero', () => {
-      const content = createContentItem({ control_count: 0 })
+      const content = createContentItem({ controlCount: 0 })
       const wrapper = mount(ContentDetail, { props: { content } })
 
       const controlsItem = findMetadataByLabel(wrapper, 'Controls')
