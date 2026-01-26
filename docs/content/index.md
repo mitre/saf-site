@@ -5,15 +5,12 @@ aside: false
 ---
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import { data } from '../.vitepress/loaders/content.data'
 import { inBrowser } from 'vitepress'
-import { createFuzzyMatcher } from '../.vitepress/theme/composables/useFuzzySearch'
+import { useContentFiltering } from '../.vitepress/theme/composables/useContentFiltering'
 
 const allItems = data.items
-
-// Create fuzzy matcher for search (handles "redhat" → "Red Hat" etc.)
-const fuzzyMatch = createFuzzyMatcher(allItems)
 
 // Read URL query params (only in browser)
 function getUrlParam(name) {
@@ -30,6 +27,16 @@ const selectedVendor = ref(getUrlParam('vendor') || 'all')
 const selectedStandard = ref(getUrlParam('standard') || 'all')
 const searchQuery = ref(getUrlParam('search') || '')
 
+// Use filtering composable
+const { filteredItems, validationCount, hardeningCount } = useContentFiltering(allItems, {
+  pillar: selectedPillar,
+  target: selectedTarget,
+  technology: selectedTech,
+  vendor: selectedVendor,
+  standard: selectedStandard,
+  search: searchQuery,
+})
+
 // Clear all filters and URL params
 function clearAllFilters() {
   selectedPillar.value = 'all'
@@ -43,50 +50,6 @@ function clearAllFilters() {
     window.history.replaceState({}, '', window.location.pathname)
   }
 }
-
-// Computed filtered items
-const filteredItems = computed(() => {
-  let result = allItems
-
-  // Filter by pillar (content_type)
-  if (selectedPillar.value !== 'all') {
-    const contentType = selectedPillar.value === 'validate' ? 'validation' : 'hardening'
-    result = result.filter(item => item.content_type === contentType)
-  }
-
-  // Filter by target (what the content secures)
-  if (selectedTarget.value !== 'all') {
-    result = result.filter(item => item.target_name === selectedTarget.value)
-  }
-
-  // Filter by technology (InSpec, Ansible, etc.)
-  if (selectedTech.value !== 'all') {
-    result = result.filter(item => item.technology_name === selectedTech.value)
-  }
-
-  // Filter by vendor (who made it)
-  if (selectedVendor.value !== 'all') {
-    result = result.filter(item => item.vendor_name === selectedVendor.value)
-  }
-
-  // Filter by standard (STIG, CIS, etc.)
-  if (selectedStandard.value !== 'all') {
-    result = result.filter(item => item.standard_name === selectedStandard.value)
-  }
-
-  // Filter by search query using fuzzy matching
-  // Handles variations like "redhat" → "Red Hat", "rhel" → "RHEL 8"
-  if (searchQuery.value) {
-    const matchingItems = fuzzyMatch(searchQuery.value)
-    result = result.filter(item => matchingItems.has(item))
-  }
-
-  return result
-})
-
-// Stats for header
-const validationCount = computed(() => allItems.filter(i => i.content_type === 'validation').length)
-const hardeningCount = computed(() => allItems.filter(i => i.content_type === 'hardening').length)
 </script>
 
 # Content Library

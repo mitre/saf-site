@@ -11,11 +11,11 @@ export interface ContentItem {
   slug: string
   name: string
   description?: string
-  content_type: 'validation' | 'hardening'
-  target_name?: string
-  standard_name?: string
-  standard_short_name?: string
-  technology_name?: string
+  contentType: 'validation' | 'hardening'
+  targetName?: string
+  standardName?: string
+  standardShortName?: string
+  technologyName?: string
   version?: string
   status?: string
 }
@@ -24,9 +24,9 @@ const props = defineProps<{
   content: ContentItem
 }>()
 
-// Map content_type to pillar
+// Map contentType to pillar
 const pillar = computed<PillarType>(() => {
-  return props.content.content_type === 'validation' ? 'validate' : 'harden'
+  return props.content.contentType === 'validation' ? 'validate' : 'harden'
 })
 
 // Generate URL based on content type
@@ -53,10 +53,10 @@ const contentUrl = computed(() => {
               {{ content.status }}
             </Badge>
             <Badge
-              v-if="content.standard_short_name || content.standard_name"
+              v-if="content.standardShortName || content.standardName"
               class="text-[0.625rem] px-2 py-0.5"
             >
-              {{ content.standard_short_name || content.standard_name }}
+              {{ content.standardShortName || content.standardName }}
             </Badge>
           </div>
         </div>
@@ -69,15 +69,15 @@ const contentUrl = computed(() => {
       </CardContent>
 
       <CardFooter class="px-6 py-3 border-t border-border/50 text-xs text-muted-foreground mt-auto">
-        <span class="font-medium">{{ content.technology_name }}</span>
+        <span class="font-medium">{{ content.technologyName }}</span>
         <div class="flex items-center gap-1.5 ml-auto">
           <span v-if="content.version" class="font-mono text-[0.6875rem]">v{{ content.version }}</span>
           <Badge
-            v-if="content.target_name"
+            v-if="content.targetName"
             variant="outline"
             class="text-[0.625rem] px-2 py-0.5 max-w-36 truncate"
           >
-            {{ content.target_name }}
+            {{ content.targetName }}
           </Badge>
         </div>
       </CardFooter>

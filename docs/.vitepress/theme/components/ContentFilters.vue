@@ -8,12 +8,12 @@ import FilterSelect from './FilterSelect.vue'
 
 interface ContentItem {
   id: string
-  content_type: 'validation' | 'hardening'
-  target_name?: string
-  technology_name?: string
-  vendor_name?: string
-  standard_name?: string
-  standard_short_name?: string
+  contentType: 'validation' | 'hardening'
+  targetName?: string
+  technologyName?: string
+  vendorName?: string
+  standardName?: string
+  standardShortName?: string
 }
 
 const props = defineProps<{
@@ -52,9 +52,9 @@ const pillarOptions: FilterOption[] = [
 
 // Dynamic filter options using composable
 const itemsRef = toRef(props, 'items')
-const targets = useUniqueValues(itemsRef, 'target_name')
-const technologies = useUniqueValues(itemsRef, 'technology_name')
-const vendors = useUniqueValues(itemsRef, 'vendor_name')
+const targets = useUniqueValues(itemsRef, 'targetName')
+const technologies = useUniqueValues(itemsRef, 'technologyName')
+const vendors = useUniqueValues(itemsRef, 'vendorName')
 const standards = useStandardOptions(itemsRef)
 
 // Transform standards to FilterOption format

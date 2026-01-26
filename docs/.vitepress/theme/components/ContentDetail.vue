@@ -65,8 +65,8 @@ interface RelatedContentItem {
   slug: string
   name: string
   description: string
-  content_type: 'validation' | 'hardening'
-  technology_name: string
+  contentType: 'validation' | 'hardening'
+  technologyName: string
 }
 
 // Use composable for all logic
@@ -91,11 +91,11 @@ onMounted(async () => {
     prerequisitesHighlighted.value = await renderMarkdownWithShiki(prerequisites.value)
   }
   if (hasReadme.value) {
-    readmeHighlighted.value = await renderMarkdownWithShiki(props.content.readme_markdown || '')
+    readmeHighlighted.value = await renderMarkdownWithShiki(props.content.readmeMarkdown || '')
   }
 })
 
-// Map content_type to pillar
+// Map contentType to pillar
 const pillar = computed<PillarType>(() => {
   return isValidation.value ? 'validate' : 'harden'
 })
@@ -113,22 +113,22 @@ const heroActions = computed<ActionItem[]>(() => {
 const metadataItems = computed(() => {
   // Determine standard display value (benchmark label or short name)
   const standardValue = benchmarkLabel.value
-    || props.content.standard_short_name
-    || props.content.standard_name
+    || props.content.standardShortName
+    || props.content.standardName
 
   return buildMetadataItems(
-    createMetadataItem('Target', props.content.target_name, { filterParam: 'target' }),
+    createMetadataItem('Target', props.content.targetName, { filterParam: 'target' }),
     createMetadataItem('Standard', standardValue, {
-      href: props.content.standard_name
-        ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
+      href: props.content.standardName
+        ? `/content/?standard=${encodeURIComponent(props.content.standardName)}`
         : undefined,
     }),
-    createMetadataItem('Tech', props.content.technology_name, { filterParam: 'technology' }),
+    createMetadataItem('Tech', props.content.technologyName, { filterParam: 'technology' }),
     createMetadataItem('Status', props.content.status),
     createMetadataItem('Profile', formattedProfileVersion.value),
-    createMetadataItem('Controls', props.content.control_count),
-    createMetadataItem('Vendor', props.content.vendor_name, { filterParam: 'vendor' }),
-    createMetadataItem('Maintainer', props.content.maintainer_name),
+    createMetadataItem('Controls', props.content.controlCount),
+    createMetadataItem('Vendor', props.content.vendorName, { filterParam: 'vendor' }),
+    createMetadataItem('Maintainer', props.content.maintainerName),
   )
 })
 
@@ -184,7 +184,7 @@ const relatedContent = computed(() => props.relatedContent || [])
         Related Content
       </h2>
       <p class="related-description">
-        Other security content for {{ content.target_name }}
+        Other security content for {{ content.targetName }}
       </p>
       <div class="related-grid">
         <a
@@ -196,14 +196,14 @@ const relatedContent = computed(() => props.relatedContent || [])
           <div class="related-card-header">
             <span class="related-card-name">{{ related.name }}</span>
             <PillarBadge
-              :pillar="related.content_type === 'validation' ? 'validate' : 'harden'"
+              :pillar="related.contentType === 'validation' ? 'validate' : 'harden'"
               size="sm"
             />
           </div>
           <p class="related-card-description">{{ related.description }}</p>
           <div class="related-card-footer">
-            <BrandIcon :name="related.technology_name" :size="16" />
-            <span class="related-card-tech">{{ related.technology_name }}</span>
+            <BrandIcon :name="related.technologyName" :size="16" />
+            <span class="related-card-tech">{{ related.technologyName }}</span>
           </div>
         </a>
       </div>
