@@ -2,7 +2,7 @@
 
 Documentation and resource hub for the MITRE Security Automation Framework (SAF).
 
-Built with [VitePress](https://vitepress.dev/) and [Pocketbase](https://pocketbase.io/).
+Built with [VitePress](https://vitepress.dev/) and [Drizzle ORM](https://orm.drizzle.team/).
 
 ## Prerequisites
 
@@ -71,30 +71,7 @@ pnpm db:load
 
 This creates `data.db` from the version-controlled `diffable/` directory.
 
-### 4. Clear Migrations (First-Time Only)
-
-The diffable export includes the complete schema, so migrations are not needed. Clear them to avoid conflicts:
-
-```bash
-rm -rf .pocketbase/pb_migrations/*
-```
-
-> **Note:** Migrations are auto-generated during development. They're only needed if you're iterating on the schema, not for running the existing database.
-
-### 5. Start Pocketbase
-
-```bash
-cd .pocketbase && ./pocketbase serve
-```
-
-Leave this terminal running. Pocketbase serves at:
-- **API**: http://localhost:8090
-- **Admin UI**: http://localhost:8090/_/
-- **Login**: `admin@localhost.com` / `testpassword123`
-
-### 6. Start the Dev Server
-
-In a new terminal:
+### 4. Start the Dev Server
 
 ```bash
 pnpm dev
@@ -102,15 +79,15 @@ pnpm dev
 
 Site runs at http://localhost:5173
 
+> **Note:** No separate database server needed - Drizzle queries SQLite directly.
+
 ## Quick Start (Returning Developers)
 
 ```bash
-# Start Pocketbase (in background)
-cd .pocketbase && ./pocketbase serve &
-
-# Start dev server
 pnpm dev
 ```
+
+That's it - no separate server needed.
 
 ## Commands
 
@@ -121,7 +98,7 @@ pnpm dev
 | `pnpm dev` | Start development server |
 | `pnpm build` | Build for production |
 | `pnpm preview` | Preview production build |
-| `pnpm reload-data` | Reload data loaders (after Pocketbase edits) |
+| `pnpm reload-data` | Reload data loaders (after database changes) |
 
 ### Setup & Database
 
@@ -208,29 +185,6 @@ pnpm cli db validate
 
 See [cli/README.md](cli/README.md) for full CLI documentation.
 
-### pb-cli (Pocketbase CLI)
-
-Optional CLI for advanced database operations. Requires [pb-cli](https://github.com/skeeeon/pb-cli).
-
-| Command | Description |
-|---------|-------------|
-| `pnpm pb:setup` | Configure pb-cli for this project (recommended) |
-| `pnpm db:backup` | Create a binary backup |
-| `pnpm db:backup:list` | List available backups |
-| `pnpm db:backup:download <name>` | Download a backup file |
-| `pnpm db:backup:restore <name>` | Restore from a backup |
-
-**First-time setup:**
-```bash
-# Install pb-cli (Go required)
-go install github.com/skeeeon/pb-cli/cmd/pb@latest
-
-# Configure for this project (auto-configures all 33 collections)
-pnpm pb:setup
-```
-
-The setup script creates a `saf-site` context with all collections from the database. Run it anytime to sync pb-cli with the current schema.
-
 ### Testing
 
 | Command | Description |
@@ -282,51 +236,44 @@ This project uses [Beads](https://github.com/steveyegge/beads) for task tracking
 ### Daily Development
 
 ```bash
-# Terminal 1: Start Pocketbase
-cd .pocketbase && ./pocketbase serve
-
-# Terminal 2: Start dev server
 pnpm dev
 ```
 
-Site available at http://localhost:5173
+Site available at http://localhost:5173 - no separate database server needed.
 
 ### After `git pull` (Sync Changes from Team)
 
 ```bash
 # Run setup to restore any database changes
 pnpm dev:setup
-
-# Restart Pocketbase if it was running
-cd .pocketbase && ./pocketbase serve
 ```
 
 ### Adding/Editing Content
 
-1. **Open Pocketbase Admin**: http://localhost:8090/_/
-2. **Login**: `admin@localhost.com` / `testpassword123`
-3. **Navigate to collection** (e.g., content, organizations, standards)
-4. **Edit or add records** - FK fields show searchable dropdowns
-5. **Refresh dev server**: `pnpm reload-data`
-6. **Export for git**: `pnpm db:export`
-7. **Commit**: `git add .pocketbase/pb_data/diffable/ && git commit`
+Use the CLI to manage content:
 
-### Adding New Content (Validation Profile or Hardening Content)
+```bash
+# Add new content (interactive)
+pnpm cli content add https://github.com/mitre/some-repo
 
-1. Open Pocketbase Admin → **content** collection
-2. Click **New record**
-3. Fill required fields:
-   - `name`: Display name (e.g., "RHEL 9 STIG")
-   - `slug`: URL-friendly ID (e.g., "rhel-9-stig")
-   - `content_type`: Select "validation" or "hardening"
-   - `description`: Brief description
-   - `github`: GitHub repository URL
-   - `vendor`: Select from dropdown (MITRE, etc.)
-   - `standard`: Select from dropdown (DISA STIG, CIS, etc.)
-   - `target`: Select from dropdown (RHEL 9, etc.)
-   - `technology`: Select from dropdown (InSpec, Ansible, etc.)
-4. Save → Export → Commit
-5. **Optional**: Run `pnpm db:populate` to fetch README from GitHub
+# Add with options (non-interactive)
+pnpm cli content add https://github.com/mitre/some-repo \
+  --type validation \
+  --vendor MITRE \
+  --standard "DISA STIG" \
+  --yes
+
+# List content
+pnpm cli content list
+
+# Show content details
+pnpm cli content show <id>
+```
+
+After changes:
+1. **Refresh dev server**: `pnpm reload-data`
+2. **Export for git**: `pnpm db:export`
+3. **Commit**: `git add docs/.vitepress/database/diffable/ && git commit`
 
 ### Running Tests Before Committing
 
@@ -344,9 +291,6 @@ pnpm test
 ### Building for Production
 
 ```bash
-# Ensure Pocketbase is running
-cd .pocketbase && ./pocketbase serve &
-
 # Build static site
 pnpm build
 
@@ -354,7 +298,7 @@ pnpm build
 pnpm preview
 ```
 
-Output is in `docs/.vitepress/dist/`
+Output is in `docs/.vitepress/dist/` - no server needed, Drizzle queries SQLite directly.
 
 ### Creating a New Component
 
@@ -447,7 +391,7 @@ import ComponentName from './ComponentName.vue'
 ### Troubleshooting: Data Not Updating
 
 ```bash
-# After editing in Pocketbase, refresh the dev server
+# After database changes, refresh the dev server
 pnpm reload-data
 ```
 
@@ -458,16 +402,6 @@ pnpm reload-data
 pnpm dev:setup:force
 ```
 
-### Troubleshooting: Pocketbase Won't Start
-
-```bash
-# Clear migrations (common fix)
-rm -rf .pocketbase/pb_migrations/*
-
-# Try again
-cd .pocketbase && ./pocketbase serve
-```
-
 ## Project Structure
 
 ```
@@ -476,9 +410,12 @@ docs/
 │   ├── config.ts              # VitePress configuration
 │   ├── database/
 │   │   ├── schema.ts          # Drizzle schema (source of truth)
-│   │   └── schema.zod.ts      # drizzle-zod generated validation
+│   │   ├── schema.zod.ts      # drizzle-zod generated validation
+│   │   ├── db.ts              # Shared Drizzle database instance
+│   │   ├── drizzle.db         # SQLite database (gitignored)
+│   │   └── diffable/          # Git-tracked NDJSON export
 │   ├── loaders/
-│   │   └── profiles.data.ts   # Build-time Pocketbase queries
+│   │   └── content.data.ts    # Build-time Drizzle queries
 │   └── theme/
 │       ├── components/        # Vue components
 │       │   ├── ui/            # shadcn-vue components
@@ -495,50 +432,46 @@ docs/
 
 scripts/
 ├── setup.sh                   # Idempotent project setup
-├── setup-pb-cli.sh            # Configure pb-cli for this project
 ├── fetch-readmes.ts           # Populate content from GitHub
 ├── export-db.sh               # Export database to diffable/
 ├── inject-story-docs.ts       # Generate component docs for Histoire
 └── inject-story-docs.spec.ts  # Tests for doc generation
 
-.pocketbase/
-├── pocketbase                 # Pocketbase binary (macOS ARM64)
-├── pb_data/
-│   ├── data.db                # SQLite database (gitignored)
-│   └── diffable/              # Git-tracked NDJSON export
-└── pb_migrations/             # Auto-generated (gitignored)
+cli/                           # SAF Site CLI (content management)
+├── src/                       # CLI source code
+└── README.md                  # CLI documentation
 ```
 
 ## Content Management
 
-Content is managed in Pocketbase and queried at build time via data loaders.
+Content is stored in SQLite and queried at build time via Drizzle ORM data loaders.
 
-### Starting Pocketbase
+### Database Tables
 
-```bash
-cd .pocketbase && ./pocketbase serve
-```
-
-- Admin UI: http://localhost:8090/_/
-- Default login: `admin@localhost.com` / `testpassword123`
-
-### Collections
-
-| Collection | Purpose |
-|------------|---------|
-| `content` | Validation profiles and hardening content (82 records) |
+| Table | Purpose |
+|-------|---------|
+| `content` | Validation profiles and hardening content |
 | `standards` | Compliance frameworks (STIG, CIS, etc.) |
 | `technologies` | InSpec, Ansible, Chef, Terraform, etc. |
 | `targets` | What gets secured (RHEL 8, MySQL, etc.) |
 | `organizations` | MITRE, DISA, CIS, vendors |
 | `tags` | Categorization tags |
 
-### Editing Content
+### Managing Content via CLI
 
-1. Start Pocketbase
-2. Open admin UI at http://localhost:8090/_/
-3. Edit collections (content, standards, technologies, etc.)
-4. Run `pnpm reload-data` to refresh dev server
+```bash
+# List all content
+pnpm cli content list
+
+# Add new content
+pnpm cli content add https://github.com/mitre/some-repo
+
+# Show content details
+pnpm cli content show <id>
+
+# Check database status
+pnpm cli db status
+```
 
 ### Populating Content from GitHub
 
@@ -557,7 +490,7 @@ pnpm db:populate:refs
 The database is exported to git-friendly NDJSON format:
 
 ```bash
-# Export (after editing in Pocketbase)
+# Export (after changes)
 pnpm db:export
 
 # Import (after cloning/pulling - handled by setup script)
@@ -568,12 +501,12 @@ pnpm db:load
 
 ### Development Flow
 ```
-Edit in Pocketbase UI → pnpm reload-data → Dev server refreshes
+Edit via CLI → pnpm reload-data → Dev server refreshes
 ```
 
 ### Build Flow
 ```
-Pocketbase API → Data Loaders → Composables → Vue Components → Static HTML
+SQLite (Drizzle) → Data Loaders → Composables → Vue Components → Static HTML
 ```
 
 ### Testing
@@ -604,8 +537,7 @@ Test files are colocated with source:
 | UI Framework | Vue 3.5 |
 | Components | Reka UI (shadcn-vue) |
 | Styling | Tailwind CSS 4 |
-| Content Database | Pocketbase 0.36 |
-| Schema Definition | Drizzle ORM |
+| Database | SQLite (via Drizzle ORM) |
 | Testing | Vitest 4 |
 | Component Stories | Histoire 1.0 (beta) |
 | Linting | ESLint 9 + @antfu/eslint-config |
@@ -620,45 +552,22 @@ Build output (`docs/.vitepress/dist/`) can be deployed to any static hosting:
 - Vercel
 - Cloudflare Pages
 
-**Note:** Pocketbase must be running during `pnpm build` to query content.
+No external services required - SQLite database is queried directly during build.
 
 ## Troubleshooting
 
-### Migration Errors on Startup
-
-```
-Error: Failed to apply migration ... due to existing relation references
-```
-
-**Fix:** Clear the migrations folder - they're not needed with a restored database:
-```bash
-rm -rf .pocketbase/pb_migrations/*
-```
-
-### Pocketbase Binary Not Working (Wrong Platform)
-
-The included binary is for macOS ARM64 (Apple Silicon). For other platforms:
-
-1. Download from [pocketbase.io/docs](https://pocketbase.io/docs/)
-2. Replace `.pocketbase/pocketbase` with your platform's binary
-3. Make executable: `chmod +x .pocketbase/pocketbase`
-
-### Dev Server Can't Connect to Pocketbase
-
-Ensure Pocketbase is running before starting the dev server:
-```bash
-# Check if running
-curl http://localhost:8090/api/health
-
-# If not, start it
-cd .pocketbase && ./pocketbase serve
-```
-
 ### Data Changes Not Appearing
 
-VitePress data loaders run at build time. After editing in Pocketbase:
+VitePress data loaders cache at build time. After database changes:
 ```bash
 pnpm reload-data
+```
+
+### Database Out of Sync
+
+Force restore from git:
+```bash
+pnpm dev:setup:force
 ```
 
 ### Database Commands Not Working

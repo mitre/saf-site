@@ -24,7 +24,7 @@ bd ready
 
 **Key Cards (Hub & Spoke Pattern):**
 - **HUB:** `saf-site-ga0` - Architecture overview, tech stack, key directories
-- **SPOKE:** `saf-site-35u` - Database & Pocketbase workflow details
+- **SPOKE:** `saf-site-35u` - Database & Drizzle workflow details
 
 **Related Documentation:**
 - [README.md](README.md) - Setup, commands, workflows
@@ -51,7 +51,7 @@ bd ready
 
 ## Project Overview
 
-MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
+MITRE SAF documentation site built with VitePress. Static site with content stored in SQLite, queried at build time via Drizzle ORM.
 
 **Tech Stack:**
 - VitePress 2.0.0-alpha.15 (static site generator)
@@ -59,7 +59,7 @@ MITRE SAF documentation site built with VitePress. Static site with content mana
 - Tailwind CSS 4 (utility-first styling)
 - shadcn-vue (component library)
 - Reka UI (headless primitives, via shadcn-vue)
-- Pocketbase 0.36 (content database)
+- Drizzle ORM + SQLite (content database)
 - Vitest 4 (testing)
 - pnpm 10.x (package manager)
 - TypeScript
@@ -70,11 +70,10 @@ MITRE SAF documentation site built with VitePress. Static site with content mana
 # Setup (first-time or after git pull)
 pnpm dev:setup
 
-# Development
-cd .pocketbase && ./pocketbase serve  # Terminal 1
-pnpm dev                               # Terminal 2
+# Development (single terminal - no server needed)
+pnpm dev
 
-# After editing in Pocketbase
+# After database changes
 pnpm db:export                         # Export to git
 pnpm reload-data                       # Refresh dev server
 
@@ -90,9 +89,7 @@ pnpm story:docs    # Generate docs from component JSDoc
 
 **URLs:**
 - Dev site: http://localhost:5173
-- Pocketbase Admin: http://localhost:8090/_/
 - Histoire: http://localhost:6006/
-- Login: `admin@localhost.com` / `testpassword123`
 
 ## Architecture
 
@@ -100,8 +97,8 @@ pnpm story:docs    # Generate docs from component JSDoc
 ┌─────────────────────────────────────────────────────────────────┐
 │                        BUILD TIME                                │
 ├─────────────────────────────────────────────────────────────────┤
-│  Pocketbase API  →  Data Loaders  →  VitePress  →  Static HTML  │
-│  (localhost:8090)   (*.data.ts)      (build)       (dist/)      │
+│  SQLite (Drizzle)  →  Data Loaders  →  VitePress  →  Static HTML│
+│  (drizzle.db)         (*.data.ts)      (build)       (dist/)    │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -114,8 +111,8 @@ pnpm story:docs    # Generate docs from component JSDoc
 ┌─────────────────────────────────────────────────────────────────┐
 │                        VERSION CONTROL                           │
 ├─────────────────────────────────────────────────────────────────┤
-│  Pocketbase UI  →  data.db  →  sqlite-diffable  →  diffable/   │
-│  (edit here)       (local)     (export)            (git tracked)│
+│  CLI edits    →  drizzle.db  →  sqlite-diffable  →  diffable/  │
+│  (pnpm cli)      (local)        (export)            (git tracked)│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -129,9 +126,11 @@ docs/
 │   │   ├── schema.ts             # Drizzle schema (source of truth)
 │   │   ├── schema.zod.ts         # drizzle-zod generated validation
 │   │   ├── validation.ts         # Convention-aware validators
-│   │   └── schemas.ts            # Pocketbase API response schemas
+│   │   ├── db.ts                 # Shared Drizzle database instance
+│   │   ├── drizzle.db            # SQLite database (gitignored)
+│   │   └── diffable/             # Git-tracked NDJSON export
 │   ├── loaders/
-│   │   └── profiles.data.ts      # Build-time Pocketbase queries
+│   │   └── content.data.ts       # Build-time Drizzle queries
 │   └── theme/
 │       ├── index.ts              # Theme setup, component registration
 │       ├── custom.css            # MITRE branding
@@ -141,26 +140,24 @@ docs/
 │       │   │   ├── button/
 │       │   │   ├── card/
 │       │   │   └── input/
-│       │   ├── ProfileCard.vue
-│       │   ├── ProfileFilters.vue
+│       │   ├── ContentCard.vue
+│       │   ├── ContentFilters.vue
 │       │   ├── ContentDetail.vue
 │       │   └── *.spec.ts         # Component tests
 │       ├── lib/utils.ts          # cn() utility for class merging
 │       └── composables/          # Logic extraction
 │           ├── useContentDetail.ts
+│           ├── useContentFiltering.ts
 │           └── *.spec.ts         # Unit tests
 ├── index.md                      # Home page
-└── validate/
+└── content/
     ├── index.md                  # Browse page
     ├── [slug].md                 # Detail page template
     └── [slug].paths.ts           # Dynamic route generator
 
-.pocketbase/
-├── pocketbase                    # Binary (macOS ARM64)
-├── pb_data/
-│   ├── data.db                   # SQLite database (gitignored)
-│   └── diffable/                 # Git-tracked NDJSON export
-└── pb_migrations/                # Auto-generated (clear for fresh setup)
+cli/                              # SAF Site CLI
+├── src/                          # CLI source code
+└── README.md                     # CLI documentation
 
 scripts/
 ├── setup.sh                      # Idempotent setup script
@@ -172,22 +169,22 @@ scripts/
 
 ### Database Workflow
 
-1. **Edit content:** Pocketbase Admin UI (http://localhost:8090/_/)
+1. **Edit content:** CLI (`pnpm cli content add/list/show`)
 2. **Export to git:** `pnpm db:export`
-3. **Commit:** `git add .pocketbase/pb_data/diffable/ && git commit`
+3. **Commit:** `git add docs/.vitepress/database/diffable/ && git commit`
 4. **Others restore:** `pnpm dev:setup` (restores from diffable/)
 
-### Current Collections
+### Current Tables
 
 **Core Content:**
-| Collection | Records | Purpose |
+| Table | Records | Purpose |
 |------------|---------|---------|
 | content | 82 | Unified profiles (validation + hardening) |
 | content_tags | 117 | Content-tag junction |
 | content_relationships | 4 | Links between content items |
 
 **Reference Data:**
-| Collection | Records | Purpose |
+| Table | Records | Purpose |
 |------------|---------|---------|
 | organizations | 16 | MITRE, CIS, DISA, AWS, etc. |
 | standards | 18 | STIG, CIS Benchmark, etc. |
@@ -212,44 +209,31 @@ schema.ts (Drizzle)     →  schema.zod.ts (drizzle-zod)  →  CLI + VitePress
 - `schema.ts` - Drizzle table definitions (edit this to change schema)
 - `schema.zod.ts` - Generated Zod schemas with custom refinements
 - `validation.ts` - Convention-aware validation (imports from schema.zod.ts)
-- `schemas.ts` - Pocketbase API response schemas (separate concern)
+- `db.ts` - Shared Drizzle database instance
 
 **CLI imports:** `@schema/schema.zod.js` (path alias in tsconfig)
-
-### Pocketbase API Patterns
-
-```typescript
-// Query content with FK expansion
-const profiles = await pb.collection('content').getFullList({
-  filter: 'content_type = "validation"',
-  expand: 'target,standard,technology,vendor,maintainer',
-  sort: 'name'
-})
-
-// Access expanded relations
-profile.expand?.vendor?.name       // "MITRE"
-profile.expand?.standard?.name     // "DISA STIG"
-profile.expand?.target?.name       // "Red Hat Enterprise Linux 8"
-```
 
 ## Key Patterns
 
 ### Data Loaders (Build-Time)
 
 ```typescript
-// docs/.vitepress/loaders/profiles.data.ts
+// docs/.vitepress/loaders/content.data.ts
 import { defineLoader } from 'vitepress'
-import PocketBase from 'pocketbase'
+import { db } from '../database/db'
 
 export default defineLoader({
   async load() {
-    const pb = new PocketBase('http://localhost:8090')
-    await pb.collection('_superusers').authWithPassword(email, password)
-    const records = await pb.collection('content').getFullList({
-      filter: 'content_type = "validation"',
-      expand: 'target,standard,technology,vendor,maintainer'
+    const items = await db.query.content.findMany({
+      with: {
+        target: true,
+        standard: true,
+        technology: true,
+        vendor: true,
+        maintainer: true,
+      },
     })
-    return { profiles: records }
+    return { items }
   }
 })
 ```
@@ -257,15 +241,15 @@ export default defineLoader({
 ### Dynamic Routes
 
 ```typescript
-// docs/validate/[slug].paths.ts
+// docs/content/[slug].paths.ts
+import { db } from '../.vitepress/database/db'
+
 export default {
   async paths() {
-    const pb = new PocketBase('http://localhost:8090')
-    await pb.collection('_superusers').authWithPassword(email, password)
-    const records = await pb.collection('content').getFullList({
-      filter: 'content_type = "validation"'
+    const items = await db.query.content.findMany({
+      with: { target: true, standard: true, technology: true, vendor: true },
     })
-    return records.map(r => ({ params: { slug: r.slug, content: r } }))
+    return items.map(item => ({ params: { slug: item.slug, content: item } }))
   }
 }
 ```
@@ -342,11 +326,13 @@ This keeps component docs, props table, and examples in sync automatically. See 
 
 | Script | Purpose |
 |--------|---------|
-| `pnpm dev:setup` | Idempotent setup (deps, database, migrations) |
+| `pnpm dev:setup` | Idempotent setup (deps, database restore) |
 | `pnpm dev:setup:check` | Validate setup without changes |
 | `pnpm dev:setup:force` | Force fresh database restore |
-| `pnpm db:export` | Export Pocketbase to diffable/ |
+| `pnpm db:export` | Export database to diffable/ |
 | `pnpm reload-data` | Trigger data loader refresh |
+| `pnpm cli content list` | List all content records |
+| `pnpm cli content add <url>` | Add content from GitHub repo |
 
 ## Task Tracking
 
@@ -381,11 +367,6 @@ bd sync
 
 **Never run `bd sync` with uncommitted changes.** Commit everything first.
 
-### Pocketbase won't start (migration errors)
-```bash
-rm -rf .pocketbase/pb_migrations/*
-```
-
 ### Data changes not appearing
 ```bash
 pnpm reload-data
@@ -395,9 +376,6 @@ pnpm reload-data
 ```bash
 pnpm dev:setup  # Restores from diffable/
 ```
-
-### Wrong platform binary
-Download correct binary from https://pocketbase.io/docs/
 
 ## shadcn-vue + VitePress Theme Integration
 
@@ -530,15 +508,16 @@ import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
 </script>
 ```
 
-## Unified Content Library (Planned Feature)
+## Unified Content Library
 
-**Goal:** Replace separate `/validate/` and `/harden/` pages with unified `/content/` browse.
+The `/content/` route provides unified browsing for all content types (validation profiles, hardening content).
 
-**Design Decisions:**
+**Features:**
 - URL: `/content/`
 - Default: Show all content
+- Filtering: By pillar (validate/harden), target, technology, vendor, standard
+- Fuzzy search: Name, description, target, standard fields
 - Sort: By name
-- Related content: Cross-link on detail pages
 
 **SAF Pillars (Color-Coded Badges):**
 
@@ -546,14 +525,9 @@ import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
 |--------|----------|-------------|----------|
 | Validate | `blue-500` | `Shield` | InSpec profiles |
 | Harden | `green-500` | `Hammer` | Ansible, Chef, Terraform |
-| Plan | `purple-500` | `ClipboardList` | Vulcan, guidance |
-| Normalize | `orange-500` | `RefreshCw` | CLI converters |
-| Visualize | `cyan-500` | `BarChart3` | Heimdall, reports |
 
-**Implementation Tasks:**
-1. Create PillarBadge component
-2. Generalize ProfileCard → ContentCard
-3. Generalize ProfileFilters → ContentFilters (add Pillar filter)
-4. Create `/content/` route (replaces `/validate/`)
-5. Update data loader to fetch all content types
-6. Add related content section to detail pages
+**Key Components:**
+- `ContentCard.vue` - Card display with pillar badge
+- `ContentFilters.vue` - Filter dropdowns + search
+- `ContentDetail.vue` - Detail page layout
+- `useContentFiltering.ts` - Reusable filtering composable
