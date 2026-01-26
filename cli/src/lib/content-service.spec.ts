@@ -6,7 +6,7 @@
 
 import type { ContentFKNames, RepoData } from './content-service.js'
 import type { InspecProfile, RepoInfo } from './github.js'
-import type { FkMaps } from './pocketbase.js'
+import type { FkMaps } from './drizzle.js'
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   buildContentFromRepo,

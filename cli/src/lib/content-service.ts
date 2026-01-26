@@ -1,16 +1,39 @@
 /**
- * Content Service (Phase 2.3)
+ * Content Service (Phase 2.3 → 4.3)
  *
- * Bridges GitHub repository data and Pocketbase content records.
+ * Business logic for content operations.
  * Handles building content records, resolving FKs, and diffing changes.
+ *
+ * Note: This module is database-agnostic. It works with types and pure functions.
+ * Data access is provided by drizzle.ts (SQLite) or pocketbase.ts (legacy).
  */
 
+import type { ContentInsert } from '@schema/schema.zod.js'
 import type { InspecProfile, RepoInfo } from './github.js'
-import type { CreateContentInput, FkMaps } from './pocketbase.js'
 import { extractControlCount, generateSlug } from './github.js'
 
 // ============================================================================
-// TYPES
+// CONTENT TYPES - Single source of truth: schema.zod.ts
+// ============================================================================
+
+// Re-export from schema.zod.ts for convenience
+export type { ContentInsert } from '@schema/schema.zod.js'
+
+/**
+ * Input type for creating content - uses schema-generated type
+ */
+export type CreateContentInput = ContentInsert
+
+/**
+ * Input type for updating content - partial of schema-generated type
+ */
+export type UpdateContentInput = Partial<ContentInsert>
+
+// Re-export FkMaps from drizzle.ts (single source of truth)
+export type { FkMaps } from './drizzle.js'
+
+// ============================================================================
+// REPO DATA TYPES
 // ============================================================================
 
 /**
