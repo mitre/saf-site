@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { execSync } from 'node:child_process'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { DrizzleDatabase } from './drizzle.js'
+import type { FkMaps } from './content-service.js'
 import {
   createRecord,
   deleteRecord,
@@ -18,6 +19,7 @@ import {
   getRecord,
   getTableNames,
   listRecords,
+  loadFkMaps,
   updateRecord,
 } from './drizzle.js'
 
@@ -30,9 +32,9 @@ describe('Drizzle Data Layer', () => {
     it('returns a working database connection', () => {
       const db = getDrizzle(DRIZZLE_DB_PATH)
       expect(db).toBeDefined()
-      // Verify we can query
-      const result = db.prepare('SELECT COUNT(*) as count FROM content').all() as Array<{ count: number }>
-      expect(result[0].count).toBeGreaterThan(0)
+      // Verify we can query using listRecords
+      const records = listRecords(db, 'content', { limit: 1 })
+      expect(records.length).toBeGreaterThan(0)
     })
 
     it('throws if database does not exist', () => {
@@ -74,12 +76,12 @@ describe('Drizzle Data Layer', () => {
 
     it('filters records with where clause', () => {
       const records = listRecords(db, 'content', {
-        where: { content_type: 'validation' },
+        where: { contentType: 'validation' },
       })
 
       expect(records.length).toBeGreaterThan(0)
       for (const record of records) {
-        expect(record.content_type).toBe('validation')
+        expect(record.contentType).toBe('validation')
       }
     })
 
@@ -96,7 +98,7 @@ describe('Drizzle Data Layer', () => {
       })
 
       expect(records.length).toBeGreaterThan(1)
-      // Verify sorted alphabetically
+      // Verify sorted alphabetically (case-insensitive due to COLLATE NOCASE)
       for (let i = 1; i < records.length; i++) {
         expect(records[i].name.localeCompare(records[i - 1].name)).toBeGreaterThanOrEqual(0)
       }
@@ -222,7 +224,7 @@ describe('Drizzle Data Layer', () => {
           id: 'test-content',
           name: 'Test Content',
           slug: 'test-content',
-          content_type: 'validation',
+          contentType: 'validation',
           target: 'nonexistent-target-id',
         })).toThrow(/FOREIGN KEY constraint/i)
       })
@@ -322,6 +324,74 @@ describe('Drizzle Data Layer', () => {
         // This should fail if FK constraints are enforced
         expect(() => deleteRecord(db, 'categories', 'test-category')).toThrow(/FOREIGN KEY constraint/i)
       })
+    })
+  })
+
+  // ============================================================================
+  // LOAD FK MAPS (Phase 4.3 - replaces Pocketbase loadFkMaps)
+  // ============================================================================
+
+  describe('loadFkMaps', () => {
+    let db: DrizzleDatabase
+    let fkMaps: FkMaps
+
+    beforeEach(() => {
+      db = getDrizzle(DRIZZLE_DB_PATH)
+      fkMaps = loadFkMaps(db)
+    })
+
+    it('loads all 8 FK lookup maps', () => {
+      expect(fkMaps.organizations).toBeInstanceOf(Map)
+      expect(fkMaps.teams).toBeInstanceOf(Map)
+      expect(fkMaps.standards).toBeInstanceOf(Map)
+      expect(fkMaps.technologies).toBeInstanceOf(Map)
+      expect(fkMaps.targets).toBeInstanceOf(Map)
+      expect(fkMaps.categories).toBeInstanceOf(Map)
+      expect(fkMaps.capabilities).toBeInstanceOf(Map)
+      expect(fkMaps.tags).toBeInstanceOf(Map)
+    })
+
+    it('maps have data from the database', () => {
+      // Organizations should have data
+      expect(fkMaps.organizations.size).toBeGreaterThan(0)
+
+      // Targets should have data
+      expect(fkMaps.targets.size).toBeGreaterThan(0)
+    })
+
+    it('maps lowercase names to IDs', () => {
+      // Get an organization from the database
+      const orgs = listRecords(db, 'organizations', { limit: 1 })
+      expect(orgs.length).toBe(1)
+
+      const orgName = orgs[0].name.toLowerCase()
+      const orgId = orgs[0].id
+
+      // The map should have this organization
+      expect(fkMaps.organizations.get(orgName)).toBe(orgId)
+    })
+
+    it('resolves names case-insensitively', () => {
+      // Get an organization
+      const orgs = listRecords(db, 'organizations', { limit: 1 })
+      expect(orgs.length).toBe(1)
+
+      const orgName = orgs[0].name
+      const orgId = orgs[0].id
+
+      // Should resolve with lowercase key
+      expect(fkMaps.organizations.get(orgName.toLowerCase())).toBe(orgId)
+    })
+
+    it('returns undefined for unknown names', () => {
+      expect(fkMaps.organizations.get('nonexistent-org-xyz')).toBeUndefined()
+      expect(fkMaps.targets.get('nonexistent-target-xyz')).toBeUndefined()
+    })
+
+    it('works with known MITRE organization', () => {
+      // MITRE should be in the database
+      const mitreId = fkMaps.organizations.get('the mitre corporation')
+      expect(mitreId).toBeDefined()
     })
   })
 })
