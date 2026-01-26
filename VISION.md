@@ -1,41 +1,37 @@
 # SAF Site Vision
 
-## What This Is
+## What We're Building
 
-The **MITRE SAF Site** is a documentation and catalog site for the Security Automation Framework ecosystem. It showcases:
+A **self-maintaining documentation site** for the MITRE SAF ecosystem. Content includes:
+- Validation profiles (InSpec baselines for RHEL, Windows, AWS, etc.)
+- Hardening content (Ansible, Chef, Terraform automation)
+- Tools (SAF CLI, Heimdall, Vulcan)
+- Training and media (courses, videos, presentations)
 
-- **Validation profiles** - InSpec profiles for RHEL, Windows, AWS, databases, etc.
-- **Hardening content** - Ansible, Chef, Terraform for automated remediation
-- **Tools** - SAF CLI, Heimdall, Vulcan
-- **Training** - Courses, tutorials, conference talks
-- **Media** - Videos, presentations, documentation
+## The Problem
 
-## The Problem We're Solving
-
-Currently, keeping the site updated requires manual work:
-- Someone notices a new SAF CLI release → manually updates the site
-- A new profile is published → manually adds it
-- README changes → manually syncs description
-- Version bumps → manual updates everywhere
+Keeping the site current requires manual work:
+- New SAF CLI release → someone manually updates the site
+- New profile published → someone manually adds it
+- README changes upstream → someone manually syncs it
 
 This doesn't scale. Content gets stale. Manual work is error-prone.
 
-## The Solution: Self-Maintaining Site
+## The Solution
 
-```
-UPSTREAM EVENT                              RESULT
-──────────────                              ──────
-SAF CLI v1.5.0 released     ──┐
-                              │
-New profile published       ──┼──► GitHub Action ──► CLI ──► PR ──► Review ──► Merge ──► Site Updated
-                              │
-README updated              ──┘
-Community contributes       ──┘
-```
+**One CLI that serves everyone:**
 
-**Zero manual intervention for routine updates.**
+| User | Mode | Example |
+|------|------|---------|
+| Developer | Interactive TUI | `pnpm cli content add` → guided wizard |
+| CI/CD | Non-interactive | `pnpm cli content add <url> --yes --json` |
+| Community | Either | Same commands, their choice |
 
-## The Four Pillars
+**Same CLI. Same capabilities. Different interaction modes.**
+
+A human can do anything CI/CD can do. CI/CD can do anything a human can do.
+
+## The Four Components
 
 ### 1. Database (SQLite + Drizzle)
 
@@ -43,57 +39,51 @@ Single source of truth for all content metadata.
 
 - **35 tables**: content, organizations, tools, targets, standards, etc.
 - **SQL-level FK constraints**: data integrity enforced by database
-- **Git-tracked**: `diffable/` directory contains NDJSON export, every change is reviewable
-- **Schema-driven**: Drizzle schema is the source of truth, generates Zod validation
+- **Git-tracked**: `diffable/` directory, every change is reviewable
+- **Schema-driven**: Drizzle schema → Zod validation → CLI
 
-### 2. CLI (Schema-Driven CRUD)
+### 2. CLI (One Interface, Two Modes)
 
-The interface for humans AND automation.
-
-**For Developers:**
-```bash
-pnpm cli content add https://github.com/mitre/rhel-9-stig-baseline
-# Interactive TUI guides through fields, pre-fills from GitHub/inspec.yml
-```
-
-**For CI/CD:**
-```bash
-pnpm cli content add https://github.com/mitre/rhel-9-stig-baseline \
-  --type validation --vendor MITRE --yes --json
-# Non-interactive, structured output, proper exit codes
-```
-
-**Generic CRUD for any table:**
+**Generic commands** - work with ANY table:
 ```bash
 pnpm cli table list organizations --json
-pnpm cli table add tools --data '{"name":"New Tool"}'
+pnpm cli table add targets --data '{"name":"RHEL 9"}'
+pnpm cli table show content abc123
 ```
+
+**Domain commands** - business logic for specific workflows:
+```bash
+# Human: interactive wizard
+pnpm cli content add
+# → Prompts for URL, fetches GitHub, parses inspec.yml, guides through fields
+
+# CI/CD: all params via flags
+pnpm cli content add https://github.com/mitre/rhel-9-stig-baseline \
+  --type validation --target "RHEL 9" --yes --json
+```
+
+**Same result either way.**
 
 ### 3. Website (VitePress Static Site)
 
-Documentation site built from the database.
-
-- **Build-time queries**: VitePress data loaders query SQLite during build
-- **Static output**: No runtime database, pure HTML/JS
-- **Vue 3 + shadcn-vue**: Modern component library
-- **Browse/filter content**: By type, target, standard, organization
+- Queries SQLite at build time
+- Outputs static HTML (no runtime database)
+- Vue 3 + shadcn-vue components
+- Browse/filter content by type, target, standard, organization
 
 ### 4. CI/CD (GitHub Actions)
 
-Automation that keeps content current.
+Automation that keeps content current:
 
-**Triggers:**
-- Upstream release (SAF CLI, profiles)
-- Scheduled checks
-- Repository dispatch from other repos
+```
+SAF CLI release     ──┐
+Profile release     ──┼──► GitHub Action ──► CLI commands ──► PR
+Community PR        ──┘
+```
 
-**Actions:**
-- Run CLI commands to add/update content
-- Validate data integrity
-- Create PR with changes
-- Include changelog in PR description
+The Action runs the SAME CLI commands a human would run.
 
-## How The Pieces Connect
+## How It All Connects
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -133,30 +123,67 @@ Automation that keeps content current.
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Current Progress
+## CLI Architecture
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| 1. DRY Foundation | ✅ DONE | fk-utils, field-mapping utilities |
-| 2. db-diffable | ✅ DONE | Export/import with FK ordering, formats |
-| 3. Database Migration | ✅ DONE | SQLite + Drizzle, data migrated |
-| 4. CLI CRUD | 🔄 IN PROGRESS | Generic table commands, service layer |
-| 5. Loaders | BLOCKED | Update VitePress to query Drizzle |
-| 6. Automation | BLOCKED | Release management CLI commands |
-| 7. CI/CD | BLOCKED | GitHub Actions workflows |
+### Generic Commands (table.ts)
+
+Pure CRUD wrapper - no business logic:
+
+```
+table.ts (Commander - thin)
+    │
+    ├── table.cli.ts (formatting)
+    │   └── formatTableList(), formatTableRecord()
+    │
+    └── drizzle.ts (data layer)
+        └── listRecords(), getRecord(), createRecord(), etc.
+```
+
+### Domain Commands (content.ts)
+
+Business logic for content workflows:
+
+```
+content.ts (Commander - thin)
+    │
+    ├── content.cli.ts (parsing/formatting)
+    │   └── parseAddArgs(), formatAddResult()
+    │
+    ├── content.logic.ts (orchestration)
+    │   └── prepareContentAdd(), prepareContentUpdate()
+    │
+    ├── content-service.ts (business logic)
+    │   └── buildContentFromRepo(), resolveContentFKs()
+    │
+    ├── github.ts (external integration)
+    │   └── fetchRepoInfo(), fetchInspecYml()
+    │
+    └── drizzle.ts (data layer)
+```
+
+### Interactive vs Non-Interactive
+
+Same commands, different input source:
+
+| Mode | Flags | Behavior |
+|------|-------|----------|
+| Interactive | (none) | @clack/prompts TUI, guided wizard |
+| Non-interactive | `--yes --json` | All params via flags, structured output |
+
+Detection: `isNonInteractive()` checks for `--yes`, `--json`, or `--quiet`
 
 ## Success Criteria
 
-1. **New SAF CLI release** → Site updated within hours, no human action
-2. **New profile published** → Automatically added with metadata from inspec.yml
-3. **Community contribution** → CLI validates, PR created for review
-4. **README changes** → Synced automatically on schedule
-5. **Zero stale content** → Everything tracks upstream sources
+1. **Developer adds profile** → Works via TUI or flags
+2. **CI/CD adds profile** → Same command with `--yes --json`
+3. **Upstream release** → Action creates PR automatically
+4. **Community contribution** → CLI validates, PR for review
+5. **Zero stale content** → Automation keeps everything current
 
 ## Why This Matters
 
-- **Scales**: Handles growth without more manual work
-- **Accurate**: Always reflects current state of ecosystem
-- **Auditable**: Every change is a git commit with context
-- **Community-friendly**: Easy contribution path
-- **Maintainable**: Developers focus on features, not data entry
+- **One interface** for humans and automation
+- **Scales** without more manual work
+- **Auditable** - every change is a git commit
+- **Community-friendly** - easy contribution path
+- **Maintainable** - developers focus on features, not data entry
