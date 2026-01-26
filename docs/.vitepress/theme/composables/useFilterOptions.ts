@@ -39,10 +39,10 @@ export interface StandardOption {
  * Extract unique standards with both full and short names
  * Used when display name differs from filter value (e.g., "DISA STIG" displays as "STIG")
  *
- * @param items - Reactive array of items with standard_name and standard_short_name fields
+ * @param items - Reactive array of items with standardName and standardShortName fields
  * @returns Sorted array of standard options
  */
-export function useStandardOptions<T extends { standard_name?: string, standard_short_name?: string }>(
+export function useStandardOptions<T extends { standardName?: string, standardShortName?: string }>(
   items: Ref<T[]> | T[],
 ): ComputedRef<StandardOption[]> {
   return computed(() => {
@@ -50,10 +50,10 @@ export function useStandardOptions<T extends { standard_name?: string, standard_
     const standardsMap = new Map<string, string>()
 
     itemsArray.forEach((item) => {
-      if (item.standard_name) {
+      if (item.standardName) {
         standardsMap.set(
-          item.standard_name,
-          item.standard_short_name || item.standard_name,
+          item.standardName,
+          item.standardShortName || item.standardName,
         )
       }
     })

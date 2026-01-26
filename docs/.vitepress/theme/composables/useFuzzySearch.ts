@@ -18,10 +18,10 @@ const DEFAULT_FUSE_OPTIONS: IFuseOptions<unknown> = {
   keys: [
     { name: 'name', weight: 2 },
     { name: 'description', weight: 1 },
-    { name: 'target_name', weight: 1.5 },
-    { name: 'standard_name', weight: 1 },
-    { name: 'technology_name', weight: 1 },
-    { name: 'vendor_name', weight: 1 },
+    { name: 'targetName', weight: 1.5 },
+    { name: 'standardName', weight: 1 },
+    { name: 'technologyName', weight: 1 },
+    { name: 'vendorName', weight: 1 },
   ],
 }
 

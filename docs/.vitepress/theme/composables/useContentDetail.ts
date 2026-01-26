@@ -2,52 +2,53 @@ import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
 /**
- * Content item from Pocketbase (validation or hardening profile)
+ * Content item from database (validation or hardening profile)
+ * Uses camelCase field names (JS/TS convention)
  */
 export interface ContentItem {
   id: string
   slug: string
   name: string
   description: string
-  long_description?: string
+  longDescription?: string
   version: string
   status: string
-  content_type: 'validation' | 'hardening'
+  contentType: 'validation' | 'hardening'
   // Target
-  target_name: string
-  target_slug: string
+  targetName: string
+  targetSlug: string
   // Standard
-  standard_name: string
-  standard_short_name: string
-  standard_slug: string
+  standardName: string
+  standardShortName: string
+  standardSlug: string
   // Technology
-  technology_name: string
-  technology_slug: string
-  technology_logo?: string
+  technologyName: string
+  technologySlug: string
+  technologyLogo?: string
   // Vendor
-  vendor_name: string
-  vendor_slug: string
-  vendor_logo?: string
+  vendorName: string
+  vendorSlug: string
+  vendorLogo?: string
   // Maintainer
-  maintainer_name: string
-  maintainer_slug: string
-  maintainer_logo?: string
+  maintainerName: string
+  maintainerSlug: string
+  maintainerLogo?: string
   // Links
-  github_url: string
-  documentation_url?: string
-  reference_url?: string
+  githubUrl: string
+  documentationUrl?: string
+  referenceUrl?: string
   // README content
-  readme_url?: string
-  readme_markdown?: string
+  readmeUrl?: string
+  readmeMarkdown?: string
   // Technology templates
-  quick_start_template?: string
-  prerequisites_template?: string
+  quickStartTemplate?: string
+  prerequisitesTemplate?: string
   // Domain-specific (validation)
-  control_count?: number
-  stig_id?: string
-  benchmark_version?: string
+  controlCount?: number
+  stigId?: string
+  benchmarkVersion?: string
   license?: string
-  release_date?: string
+  releaseDate?: string
 }
 
 export interface ContentDetailReturn {
@@ -112,16 +113,17 @@ function formatBenchmarkVersion(version: string, standardName: string): string {
 
 /**
  * Interpolate template variables with content values
- * Supported variables: {github}, {slug}, {vendor_slug}, {name}
+ * Supported variables: {github}, {slug}, {vendorSlug}, {name}
  */
 function interpolateTemplate(template: string, content: ContentItem): string {
   if (!template)
     return ''
 
   return template
-    .replace(/\{github\}/g, content.github_url || '')
+    .replace(/\{github\}/g, content.githubUrl || '')
     .replace(/\{slug\}/g, content.slug || '')
-    .replace(/\{vendor_slug\}/g, content.vendor_slug || '')
+    .replace(/\{vendor_slug\}/g, content.vendorSlug || '') // Keep legacy template var
+    .replace(/\{vendorSlug\}/g, content.vendorSlug || '')
     .replace(/\{name\}/g, content.name || '')
 }
 
@@ -130,13 +132,13 @@ function interpolateTemplate(template: string, content: ContentItem): string {
  * Extracts formatting, URLs, and display configuration from component
  */
 export function useContentDetail(content: ContentItem): ContentDetailReturn {
-  const isValidation = computed(() => content.content_type === 'validation')
-  const isHardening = computed(() => content.content_type === 'hardening')
+  const isValidation = computed(() => content.contentType === 'validation')
+  const isHardening = computed(() => content.contentType === 'hardening')
 
   const formattedBenchmarkVersion = computed(() => {
     return formatBenchmarkVersion(
-      content.benchmark_version || '',
-      content.standard_name || content.standard_short_name,
+      content.benchmarkVersion || '',
+      content.standardName || content.standardShortName,
     )
   })
 
@@ -148,45 +150,45 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     const version = formattedBenchmarkVersion.value
     if (!version)
       return ''
-    const standard = content.standard_short_name || 'Benchmark'
+    const standard = content.standardShortName || 'Benchmark'
     return `${standard} ${version}`
   })
 
   const actionUrls = computed<ActionUrl[]>(() => {
     const urls: ActionUrl[] = []
 
-    if (content.github_url) {
+    if (content.githubUrl) {
       // Always show GitHub
       urls.push({
         label: 'View on GitHub',
-        url: content.github_url,
+        url: content.githubUrl,
         primary: true,
       })
 
       // Always show README
       urls.push({
         label: 'View README',
-        url: `${content.github_url}#readme`,
+        url: `${content.githubUrl}#readme`,
         primary: false,
       })
     }
 
     // Additionally show Documentation if custom docs URL exists
-    if (content.documentation_url) {
+    if (content.documentationUrl) {
       urls.push({
         label: 'Documentation',
-        url: content.documentation_url,
+        url: content.documentationUrl,
         primary: false,
       })
     }
 
     // Show reference URL (STIG, CIS benchmark, etc.)
-    if (content.reference_url) {
+    if (content.referenceUrl) {
       urls.push({
-        label: content.standard_short_name
-          ? `${content.standard_short_name} Reference`
+        label: content.standardShortName
+          ? `${content.standardShortName} Reference`
           : 'Standard Reference',
-        url: content.reference_url,
+        url: content.referenceUrl,
         primary: false,
       })
     }
@@ -202,29 +204,29 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
   const featureCards = computed<FeatureCard[]>(() => {
     const cards: FeatureCard[] = []
 
-    if (content.target_name) {
-      cards.push({ icon: '🎯', title: 'Target', value: content.target_name })
+    if (content.targetName) {
+      cards.push({ icon: '🎯', title: 'Target', value: content.targetName })
     }
 
-    if (content.standard_name) {
-      cards.push({ icon: '📋', title: 'Standard', value: content.standard_name })
+    if (content.standardName) {
+      cards.push({ icon: '📋', title: 'Standard', value: content.standardName })
     }
 
-    if (content.technology_name) {
-      cards.push({ icon: '⚙️', title: 'Technology', value: content.technology_name })
+    if (content.technologyName) {
+      cards.push({ icon: '⚙️', title: 'Technology', value: content.technologyName })
     }
 
-    if (content.vendor_name) {
-      cards.push({ icon: '🏢', title: 'Vendor', value: content.vendor_name })
+    if (content.vendorName) {
+      cards.push({ icon: '🏢', title: 'Vendor', value: content.vendorName })
     }
 
-    if (content.maintainer_name) {
-      cards.push({ icon: '👤', title: 'Maintainer', value: content.maintainer_name })
+    if (content.maintainerName) {
+      cards.push({ icon: '👤', title: 'Maintainer', value: content.maintainerName })
     }
 
     // Validation-specific
-    if (isValidation.value && content.stig_id) {
-      cards.push({ icon: '📊', title: 'STIG ID', value: content.stig_id })
+    if (isValidation.value && content.stigId) {
+      cards.push({ icon: '📊', title: 'STIG ID', value: content.stigId })
     }
 
     return cards
@@ -232,16 +234,16 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
 
   // Template interpolation
   const quickStart = computed(() => {
-    return interpolateTemplate(content.quick_start_template || '', content)
+    return interpolateTemplate(content.quickStartTemplate || '', content)
   })
 
   const prerequisites = computed(() => {
-    return content.prerequisites_template || ''
+    return content.prerequisitesTemplate || ''
   })
 
-  const hasQuickStart = computed(() => Boolean(content.quick_start_template))
-  const hasPrerequisites = computed(() => Boolean(content.prerequisites_template))
-  const hasReadme = computed(() => Boolean(content.readme_markdown))
+  const hasQuickStart = computed(() => Boolean(content.quickStartTemplate))
+  const hasPrerequisites = computed(() => Boolean(content.prerequisitesTemplate))
+  const hasReadme = computed(() => Boolean(content.readmeMarkdown))
 
   return {
     formattedBenchmarkVersion,
