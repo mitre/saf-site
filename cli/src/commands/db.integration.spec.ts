@@ -1,31 +1,27 @@
 /**
  * Database Command Integration Tests
  *
- * Tests the db commands against the test Pocketbase instance.
- * Uses the test Pocketbase managed by global setup (port 8091).
+ * Tests the db commands against the Drizzle SQLite database.
  */
 
+import { existsSync } from 'node:fs'
 import { auditSlug } from '@schema/validation.js'
 import { describe, expect, it } from 'vitest'
-import { checkConnection, getPocketBase, loadFkMaps } from '../lib/pocketbase.js'
-
-// Test Pocketbase configuration (managed by global setup)
-const _TEST_PB_URL = process.env.PB_URL || 'http://127.0.0.1:8091'
+import { getDefaultDbPath, getDrizzle, getRecord, listRecords, loadFkMaps } from '../lib/drizzle.js'
 
 // ============================================================================
 // CONNECTION TESTS
 // ============================================================================
 
 describe('db status - connection', () => {
-  it('checkConnection returns true when Pocketbase is running', async () => {
-    const isConnected = await checkConnection()
-    expect(isConnected).toBe(true)
+  it('database file exists', () => {
+    const dbPath = getDefaultDbPath()
+    expect(existsSync(dbPath)).toBe(true)
   })
 
-  it('getPocketBase returns authenticated client', async () => {
-    const pb = await getPocketBase()
-    expect(pb).toBeDefined()
-    expect(pb.authStore.isValid).toBe(true)
+  it('getDrizzle returns working database connection', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    expect(db).toBeDefined()
   })
 })
 
@@ -34,16 +30,16 @@ describe('db status - connection', () => {
 // ============================================================================
 
 describe('db status - collection stats', () => {
-  it('can query content collection', async () => {
-    const pb = await getPocketBase()
-    const result = await pb.collection('content').getList(1, 1)
+  it('can query content table', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const result = listRecords(db, 'content')
 
-    expect(result.totalItems).toBeGreaterThan(0)
+    expect(result.length).toBeGreaterThan(0)
   })
 
-  it('can query all expected collections', async () => {
-    const pb = await getPocketBase()
-    const collections = [
+  it('can query all expected tables', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const tables = [
       'content',
       'organizations',
       'standards',
@@ -54,9 +50,9 @@ describe('db status - collection stats', () => {
       'tools',
     ]
 
-    for (const collection of collections) {
-      const result = await pb.collection(collection).getList(1, 1)
-      expect(result.totalItems).toBeGreaterThanOrEqual(0)
+    for (const table of tables) {
+      const result = listRecords(db, table)
+      expect(result.length).toBeGreaterThanOrEqual(0)
     }
   })
 })
@@ -66,8 +62,9 @@ describe('db status - collection stats', () => {
 // ============================================================================
 
 describe('db lookups - FK maps', () => {
-  it('loadFkMaps returns all expected maps', async () => {
-    const maps = await loadFkMaps()
+  it('loadFkMaps returns all expected maps', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     expect(maps.organizations).toBeDefined()
     expect(maps.standards).toBeDefined()
@@ -76,8 +73,9 @@ describe('db lookups - FK maps', () => {
     expect(maps.teams).toBeDefined()
   })
 
-  it('organizations map contains expected entries', async () => {
-    const maps = await loadFkMaps()
+  it('organizations map contains expected entries', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     // Should have MITRE
     const hasKey = Array.from(maps.organizations.keys()).some(
@@ -86,8 +84,9 @@ describe('db lookups - FK maps', () => {
     expect(hasKey).toBe(true)
   })
 
-  it('standards map contains expected entries', async () => {
-    const maps = await loadFkMaps()
+  it('standards map contains expected entries', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     // Should have STIG or CIS
     const keys = Array.from(maps.standards.keys()).map(k => k.toLowerCase())
@@ -95,8 +94,9 @@ describe('db lookups - FK maps', () => {
     expect(hasExpected).toBe(true)
   })
 
-  it('technologies map contains expected entries', async () => {
-    const maps = await loadFkMaps()
+  it('technologies map contains expected entries', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     // Should have InSpec or Ansible
     const keys = Array.from(maps.technologies.keys()).map(k => k.toLowerCase())
@@ -104,8 +104,9 @@ describe('db lookups - FK maps', () => {
     expect(hasExpected).toBe(true)
   })
 
-  it('targets map contains expected entries', async () => {
-    const maps = await loadFkMaps()
+  it('targets map contains expected entries', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     // Should have RHEL or Windows
     const keys = Array.from(maps.targets.keys()).map(k => k.toLowerCase())
@@ -113,8 +114,9 @@ describe('db lookups - FK maps', () => {
     expect(hasExpected).toBe(true)
   })
 
-  it('maps have ID values', async () => {
-    const maps = await loadFkMaps()
+  it('maps have ID values', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const maps = loadFkMaps(db)
 
     // Check that values are IDs (non-empty strings)
     for (const [_name, id] of maps.organizations.entries()) {
@@ -129,43 +131,44 @@ describe('db lookups - FK maps', () => {
 // ============================================================================
 
 describe('db validate - content records', () => {
-  it('all content records have required fields', async () => {
-    const pb = await getPocketBase()
-    const content = await pb.collection('content').getFullList()
+  it('all content records have required fields', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const content = listRecords(db, 'content')
 
     for (const record of content) {
       expect(record.name, `Record ${record.id} missing name`).toBeTruthy()
       expect(record.slug, `Record ${record.id} missing slug`).toBeTruthy()
-      expect(record.content_type, `Record ${record.id} missing content_type`).toBeTruthy()
+      expect(record.contentType, `Record ${record.id} missing contentType`).toBeTruthy()
     }
   })
 
-  it('content FK references are valid', async () => {
-    const pb = await getPocketBase()
+  it('content FK references are valid', () => {
+    const db = getDrizzle(getDefaultDbPath())
 
-    // Get a sample of content with FKs
-    const content = await pb.collection('content').getList(1, 10, {
-      filter: 'target != "" || standard != ""',
-    })
+    // Get content with FKs
+    const content = listRecords(db, 'content') as Array<{ id: string, target?: string, standard?: string }>
 
-    for (const record of content.items) {
+    // Check first 10 records with FKs
+    const withFks = content.filter(r => r.target || r.standard).slice(0, 10)
+
+    for (const record of withFks) {
       // If target is set, it should be resolvable
       if (record.target) {
-        const target = await pb.collection('targets').getOne(record.target).catch(() => null)
+        const target = getRecord(db, 'targets', record.target)
         expect(target, `Record ${record.id} has invalid target ${record.target}`).toBeTruthy()
       }
 
       // If standard is set, it should be resolvable
       if (record.standard) {
-        const standard = await pb.collection('standards').getOne(record.standard).catch(() => null)
+        const standard = getRecord(db, 'standards', record.standard)
         expect(standard, `Record ${record.id} has invalid standard ${record.standard}`).toBeTruthy()
       }
     }
   })
 
-  it('tools have required fields', async () => {
-    const pb = await getPocketBase()
-    const tools = await pb.collection('tools').getFullList()
+  it('tools have required fields', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const tools = listRecords(db, 'tools')
 
     for (const tool of tools) {
       expect(tool.name, `Tool ${tool.id} missing name`).toBeTruthy()
@@ -207,9 +210,9 @@ describe('db audit - slug conventions', () => {
     expect(result.issues.some(i => i.includes('win'))).toBe(true)
   })
 
-  it('database has some non-compliant slugs', async () => {
-    const pb = await getPocketBase()
-    const content = await pb.collection('content').getFullList()
+  it('database has some non-compliant slugs', () => {
+    const db = getDrizzle(getDefaultDbPath())
+    const content = listRecords(db, 'content') as Array<{ slug: string, name: string }>
 
     let nonCompliant = 0
     for (const record of content) {
