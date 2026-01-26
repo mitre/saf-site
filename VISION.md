@@ -172,6 +172,18 @@ Same commands, different input source:
 
 Detection: `isNonInteractive()` checks for `--yes`, `--json`, or `--quiet`
 
+## Current Progress
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| 1. DRY Foundation | ✅ DONE | fk-utils, field-mapping utilities |
+| 2. db-diffable | ✅ DONE | Export/import with FK ordering, formats |
+| 3. Database Migration | ✅ DONE | SQLite + Drizzle, data migrated |
+| 4. CLI CRUD | 🔄 IN PROGRESS | Generic table commands, service layer |
+| 5. Loaders | BLOCKED | Update VitePress to query Drizzle |
+| 6. Automation | BLOCKED | Release management CLI commands |
+| 7. CI/CD | BLOCKED | GitHub Actions workflows |
+
 ## Success Criteria
 
 1. **Developer adds profile** → Works via TUI or flags
