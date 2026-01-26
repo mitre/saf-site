@@ -3,16 +3,19 @@
 ## Quick Start
 
 ```bash
-# 1. Read this file and WORKSTREAM.md
-cat RECOVERY.md
-cat WORKSTREAM.md
+# 1. Understand the project
+cat VISION.md              # WHY: Self-maintaining SAF site via CI/CD automation
+cat WORKSTREAM.md          # HOW: The technical phases and current progress
 
-# 2. Check task status
+# 2. Understand this session's context
+cat RECOVERY.md            # Current task details and what went wrong
+
+# 3. Check task status
 bd show saf-site-gf9
 
-# 3. Verify tests pass
-pnpm test:run           # VitePress: 432
-cd cli && pnpm test:run # CLI: ~514
+# 4. Verify tests pass
+pnpm test:run              # VitePress: 432
+cd cli && pnpm test:run    # CLI: ~514
 ```
 
 ---

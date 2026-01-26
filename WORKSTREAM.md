@@ -1,7 +1,10 @@
 # SAF Site Work Stream
 
+> **Read VISION.md first** - It explains WHY we're building this and how all the pieces connect.
+
 **Epic:** saf-site-tdi - Automated Content Pipeline
-**Decision:** SQLite + Drizzle + Domain CLI (No Pocketbase, No NocoDB, No lazysql)
+**Goal:** Self-maintaining site where upstream releases auto-trigger content updates via CI/CD
+**Stack:** SQLite + Drizzle + CLI + VitePress + GitHub Actions
 **Branch:** feature/drizzle-pocketbase-sync
 **Last Updated:** 2026-01-25
 
@@ -10,12 +13,13 @@
 ## QUICK RECOVERY (After Compact/New Session)
 
 ```bash
-# 1. Read this file first
-cat WORKSTREAM.md
+# 1. Read the vision and workstream
+cat VISION.md              # WHY we're building this
+cat WORKSTREAM.md          # HOW we're building it
+cat RECOVERY.md            # Current session context
 
 # 2. Check current progress
-bd ready                    # What's ready to work on
-bd show saf-site-gf9        # Next task: CLI CRUD
+bd show saf-site-gf9       # Current task: CLI CRUD
 
 # 3. Verify tests pass
 pnpm test:run               # Should be 432 tests
