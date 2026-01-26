@@ -6,7 +6,7 @@
  */
 
 import type { InspecProfile, RepoInfo } from '../lib/github.js'
-import type { FkMaps } from '../lib/pocketbase.js'
+import type { FkMaps } from '../lib/drizzle.js'
 import type { PrepareAddInput, PrepareUpdateInput, ServiceDeps } from './content.logic.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {

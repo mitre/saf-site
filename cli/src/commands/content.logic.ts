@@ -5,9 +5,8 @@
  * No I/O - all side effects are passed as dependencies.
  */
 
-import type { ContentDiff, ContentFKNames, RepoData } from '../lib/content-service.js'
+import type { ContentDiff, ContentFKNames, CreateContentInput, FkMaps, RepoData, UpdateContentInput } from '../lib/content-service.js'
 import type { InspecProfile, RepoInfo } from '../lib/github.js'
-import type { CreateContentInput, FkMaps, UpdateContentInput } from '../lib/pocketbase.js'
 import { validateSlug } from '@schema/validation.js'
 import {
   buildContentFromRepo,
