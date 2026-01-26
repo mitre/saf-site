@@ -1,7 +1,9 @@
 /**
- * Pocketbase Client Wrapper
+ * Pocketbase Client Wrapper (LEGACY - being replaced by drizzle.ts)
  *
- * Provides authenticated access to the Pocketbase API
+ * Provides authenticated access to the Pocketbase API.
+ * Note: New code should use drizzle.ts for data access.
+ * Types are now defined in content-service.ts and re-exported here.
  */
 
 import type { RecordModel } from 'pocketbase'
@@ -20,6 +22,16 @@ import {
   slugSchema,
   statusSchema,
 } from '@schema/schema.zod.js'
+
+// Import types from content-service.ts for internal use
+import type {
+  CreateContentInput,
+  FkMaps,
+  UpdateContentInput,
+} from './content-service.js'
+
+// Re-export types for backward compatibility
+export type { CreateContentInput, FkMaps, UpdateContentInput }
 
 // Default credentials for local development
 const DEFAULT_URL = 'http://localhost:8090'
@@ -68,21 +80,7 @@ export async function checkConnection(): Promise<boolean> {
   }
 }
 
-/**
- * FK Resolution Maps
- *
- * These help resolve human-readable names to Pocketbase IDs
- */
-export interface FkMaps {
-  organizations: Map<string, string> // name -> id
-  teams: Map<string, string>
-  standards: Map<string, string>
-  technologies: Map<string, string>
-  targets: Map<string, string>
-  categories: Map<string, string>
-  capabilities: Map<string, string>
-  tags: Map<string, string>
-}
+// FkMaps type is now in content-service.ts
 
 /**
  * Create a lowercase name → ID map from records
@@ -143,69 +141,9 @@ export function resolveFK(maps: FkMaps, collection: keyof FkMaps, name: string):
 }
 
 // ============================================================================
-// CRUD OPERATIONS (Phase 2.2)
+// CRUD OPERATIONS (Phase 2.2 - LEGACY)
+// Note: CreateContentInput and UpdateContentInput are now in content-service.ts
 // ============================================================================
-
-/**
- * Input type for creating content (camelCase from CLI)
- */
-export interface CreateContentInput {
-  name: string
-  slug: string
-  contentType: 'validation' | 'hardening'
-  description?: string
-  longDescription?: string
-  version?: string
-  status?: 'active' | 'beta' | 'deprecated' | 'draft'
-  github?: string
-  documentationUrl?: string
-  referenceUrl?: string
-  readmeUrl?: string
-  readmeMarkdown?: string
-  controlCount?: number
-  stigId?: string
-  benchmarkVersion?: string
-  automationLevel?: 'full' | 'partial' | 'manual'
-  isFeatured?: boolean
-  featuredOrder?: number
-  license?: string
-  // FK references (as IDs)
-  target?: string
-  standard?: string
-  technology?: string
-  vendor?: string
-  maintainer?: string
-}
-
-/**
- * Input type for updating content (all fields optional)
- */
-export interface UpdateContentInput {
-  name?: string
-  slug?: string
-  contentType?: 'validation' | 'hardening'
-  description?: string
-  longDescription?: string
-  version?: string
-  status?: 'active' | 'beta' | 'deprecated' | 'draft'
-  github?: string
-  documentationUrl?: string
-  referenceUrl?: string
-  readmeUrl?: string
-  readmeMarkdown?: string
-  controlCount?: number
-  stigId?: string
-  benchmarkVersion?: string
-  automationLevel?: 'full' | 'partial' | 'manual'
-  isFeatured?: boolean
-  featuredOrder?: number
-  license?: string
-  target?: string
-  standard?: string
-  technology?: string
-  vendor?: string
-  maintainer?: string
-}
 
 /**
  * Options for listing content
