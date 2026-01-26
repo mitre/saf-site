@@ -1,44 +1,46 @@
-import type { PBContent } from '../.vitepress/theme/lib/pocketbase-types'
-import {
-  extractFK,
-  extractMaintainerFK,
-  extractOrgFK,
-  extractStandardFK,
-  extractTechnologyFK,
-  initPocketBase,
-} from '../.vitepress/lib/loader-utils'
+/**
+ * Content Detail Page Paths Generator
+ *
+ * Generates dynamic routes for all content items (validation + hardening).
+ * Uses Drizzle relational queries for automatic FK expansion.
+ */
 
-// Simplified related content item
+import { db } from '../.vitepress/database/db'
+
+// Simplified related content item (camelCase)
 interface RelatedContent {
   id: string
   slug: string
   name: string
   description: string
-  content_type: 'validation' | 'hardening'
-  technology_name: string
+  contentType: 'validation' | 'hardening'
+  technologyName: string
 }
 
 export default {
   async paths() {
     try {
-      const pb = await initPocketBase()
-
-      // Query ALL content with FK expansion (no filter - both validation and hardening)
-      // Include maintainer.organization to get org logo as fallback for teams without logos
-      const records = await pb.collection('content').getFullList<PBContent>({
-        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
-        sort: 'name',
+      // Use Drizzle relational query with automatic FK expansion
+      const records = await db.query.content.findMany({
+        with: {
+          target: true,
+          standard: true,
+          technology: true,
+          vendor: true,
+          maintainer: {
+            with: {
+              organization: true, // For logo fallback
+            },
+          },
+        },
+        orderBy: (content, { asc }) => [asc(content.name)],
       })
 
       console.log(`✓ Generating ${records.length} content detail pages`)
 
       return records.map((record) => {
-        // Extract FK data using shared utilities
-        const target = extractFK(record.expand, 'target')
-        const standard = extractStandardFK(record.expand)
-        const technology = extractTechnologyFK(record.expand)
-        const vendor = extractOrgFK(record.expand, 'vendor')
-        const maintainer = extractMaintainerFK(record.expand)
+        // Get maintainer logo with organization fallback
+        const maintainerLogo = record.maintainer?.logo || record.maintainer?.organization?.logo
 
         // Find related content (same target, different content_type)
         const relatedContent: RelatedContent[] = records
@@ -52,60 +54,60 @@ export default {
             slug: r.slug,
             name: r.name,
             description: r.description || '',
-            content_type: r.content_type,
-            technology_name: r.expand?.technology?.name || '',
+            contentType: r.contentType as 'validation' | 'hardening',
+            technologyName: r.technology?.name || '',
           }))
 
         return {
           params: {
             slug: record.slug,
-            // Pass all content data to the template
+            // Pass all content data to the template (camelCase)
             content: {
               id: record.id,
               slug: record.slug,
               name: record.name,
               description: record.description || '',
-              long_description: record.long_description || '',
+              longDescription: record.longDescription || '',
               version: record.version || '',
               status: record.status || 'active',
-              content_type: record.content_type,
+              contentType: record.contentType,
               // Target
-              target_name: target.name || '',
-              target_slug: target.slug || '',
+              targetName: record.target?.name || '',
+              targetSlug: record.target?.slug || '',
               // Standard
-              standard_name: standard.name || '',
-              standard_short_name: standard.short_name || '',
-              standard_slug: standard.slug || '',
+              standardName: record.standard?.name || '',
+              standardShortName: record.standard?.shortName || '',
+              standardSlug: record.standard?.slug || '',
               // Technology
-              technology_name: technology.name || '',
-              technology_slug: technology.slug || '',
-              technology_logo: technology.logo || '',
+              technologyName: record.technology?.name || '',
+              technologySlug: record.technology?.slug || '',
+              technologyLogo: record.technology?.logo || '',
               // Vendor
-              vendor_name: vendor.name || '',
-              vendor_slug: vendor.slug || '',
-              vendor_logo: vendor.logo || '',
+              vendorName: record.vendor?.name || '',
+              vendorSlug: record.vendor?.slug || '',
+              vendorLogo: record.vendor?.logo || '',
               // Maintainer
-              maintainer_name: maintainer.name || '',
-              maintainer_slug: maintainer.slug || '',
-              maintainer_logo: maintainer.logo || '',
+              maintainerName: record.maintainer?.name || '',
+              maintainerSlug: record.maintainer?.slug || '',
+              maintainerLogo: maintainerLogo || '',
               // Links
-              github_url: record.github || '',
-              documentation_url: record.documentation_url || '',
-              reference_url: record.reference_url || '',
+              githubUrl: record.github || '',
+              documentationUrl: record.documentationUrl || '',
+              referenceUrl: record.referenceUrl || '',
               // README content
-              readme_url: record.readme_url || '',
-              readme_markdown: record.readme_markdown || '',
+              readmeUrl: record.readmeUrl || '',
+              readmeMarkdown: record.readmeMarkdown || '',
               // Technology templates
-              quick_start_template: technology.quick_start_template || '',
-              prerequisites_template: technology.prerequisites_template || '',
+              quickStartTemplate: record.technology?.quickStartTemplate || '',
+              prerequisitesTemplate: record.technology?.prerequisitesTemplate || '',
               // Domain-specific
-              control_count: record.control_count || 0,
-              stig_id: record.stig_id || '',
-              benchmark_version: record.benchmark_version || '',
+              controlCount: record.controlCount || 0,
+              stigId: record.stigId || '',
+              benchmarkVersion: record.benchmarkVersion || '',
               license: record.license || '',
-              release_date: record.release_date || '',
+              releaseDate: record.releaseDate || '',
             },
-            // Related content for cross-linking
+            // Related content for cross-linking (camelCase)
             relatedContent,
           },
         }
