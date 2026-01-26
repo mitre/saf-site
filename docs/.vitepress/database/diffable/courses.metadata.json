@@ -1,0 +1,28 @@
+{
+    "name": "courses",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "long_description",
+        "course_type",
+        "level",
+        "status",
+        "organization",
+        "website",
+        "registration_url",
+        "materials_url",
+        "logo",
+        "duration_minutes",
+        "is_free",
+        "price_usd",
+        "target_audience",
+        "registration_active",
+        "is_featured",
+        "featured_order",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `courses` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`description` text,\n\t`long_description` text,\n\t`course_type` text,\n\t`level` text,\n\t`status` text DEFAULT 'active',\n\t`organization` text,\n\t`website` text,\n\t`registration_url` text,\n\t`materials_url` text,\n\t`logo` text,\n\t`duration_minutes` integer,\n\t`is_free` integer DEFAULT true,\n\t`price_usd` integer,\n\t`target_audience` text,\n\t`registration_active` integer DEFAULT false,\n\t`is_featured` integer DEFAULT false,\n\t`featured_order` integer,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

@@ -1,0 +1,17 @@
+{
+    "name": "content_releases",
+    "columns": [
+        "id",
+        "content_id",
+        "slug",
+        "version",
+        "release_date",
+        "release_notes",
+        "stig_version",
+        "srg_version",
+        "is_latest",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `content_releases` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`content_id` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`version` text NOT NULL,\n\t`release_date` integer,\n\t`release_notes` text,\n\t`stig_version` text,\n\t`srg_version` text,\n\t`is_latest` integer DEFAULT false,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`content_id`) REFERENCES `content`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

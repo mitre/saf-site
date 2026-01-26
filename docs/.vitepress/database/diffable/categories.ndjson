@@ -1,0 +1,7 @@
+{"id":"fdu6276ch9am6s1","name":"Operating System","slug":"os","description":"Desktop and server operating systems","icon":"i-heroicons-computer-desktop","sort_order":0,"created_at":null,"updated_at":null}
+{"id":"9k5h99qox759p18","name":"Database","slug":"database","description":"Relational and NoSQL databases","icon":"i-heroicons-circle-stack","sort_order":1,"created_at":null,"updated_at":null}
+{"id":"j535aqkac59e695","name":"Container","slug":"container","description":"Container platforms and orchestration","icon":"i-heroicons-cube","sort_order":2,"created_at":null,"updated_at":null}
+{"id":"ilj7tw790du24ss","name":"Cloud","slug":"cloud","description":"Cloud platforms and services","icon":"i-heroicons-cloud","sort_order":3,"created_at":null,"updated_at":null}
+{"id":"sf2v1k791gc22wi","name":"Network","slug":"network","description":"Network devices and infrastructure","icon":"i-heroicons-globe-alt","sort_order":4,"created_at":null,"updated_at":null}
+{"id":"c5x43li812f9107","name":"Application","slug":"application","description":"Application servers and middleware","icon":"i-heroicons-window","sort_order":5,"created_at":null,"updated_at":null}
+{"id":"3337707146w91k4","name":"Web Server","slug":"web-server","description":"Web servers and reverse proxies","icon":"i-heroicons-server","sort_order":6,"created_at":null,"updated_at":null}

@@ -1,0 +1,15 @@
+{
+    "name": "tags",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "display_name",
+        "description",
+        "tag_category",
+        "badge_color",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `tags` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`display_name` text,\n\t`description` text,\n\t`tag_category` text,\n\t`badge_color` text,\n\t`created_at` integer,\n\t`updated_at` integer\n)"
+}

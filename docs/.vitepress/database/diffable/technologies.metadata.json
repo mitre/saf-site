@@ -1,0 +1,19 @@
+{
+    "name": "technologies",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "website",
+        "logo",
+        "github",
+        "organization",
+        "documentation_url",
+        "quick_start_template",
+        "prerequisites_template",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `technologies` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`description` text,\n\t`website` text,\n\t`logo` text,\n\t`github` text,\n\t`organization` text,\n\t`documentation_url` text,\n\t`quick_start_template` text,\n\t`prerequisites_template` text,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

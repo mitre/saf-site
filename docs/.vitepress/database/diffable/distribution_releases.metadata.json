@@ -1,0 +1,19 @@
+{
+    "name": "distribution_releases",
+    "columns": [
+        "id",
+        "distribution_id",
+        "slug",
+        "version",
+        "release_date",
+        "release_notes",
+        "registry_url",
+        "download_url",
+        "sha256",
+        "digest",
+        "is_latest",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `distribution_releases` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`distribution_id` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`version` text NOT NULL,\n\t`release_date` integer,\n\t`release_notes` text,\n\t`registry_url` text,\n\t`download_url` text,\n\t`sha256` text,\n\t`digest` text,\n\t`is_latest` integer DEFAULT false,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`distribution_id`) REFERENCES `distributions`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

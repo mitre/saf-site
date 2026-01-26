@@ -1,0 +1,21 @@
+{
+    "name": "course_sessions",
+    "columns": [
+        "id",
+        "title",
+        "course",
+        "start_date",
+        "end_date",
+        "timezone",
+        "location_type",
+        "location",
+        "meeting_url",
+        "instructor",
+        "max_attendees",
+        "recording_url",
+        "status",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `course_sessions` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`title` text,\n\t`course` text NOT NULL,\n\t`start_date` integer NOT NULL,\n\t`end_date` integer,\n\t`timezone` text,\n\t`location_type` text,\n\t`location` text,\n\t`meeting_url` text,\n\t`instructor` text,\n\t`max_attendees` integer,\n\t`recording_url` text,\n\t`status` text DEFAULT 'scheduled',\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`course`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

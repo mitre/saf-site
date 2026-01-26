@@ -1,0 +1,8 @@
+{
+    "name": "tool_tags",
+    "columns": [
+        "tool_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `tool_tags` (\n\t`tool_id` text NOT NULL,\n\t`tag_id` text NOT NULL,\n\tPRIMARY KEY(`tool_id`, `tag_id`),\n\tFOREIGN KEY (`tool_id`) REFERENCES `tools`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

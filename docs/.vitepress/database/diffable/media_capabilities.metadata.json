@@ -1,0 +1,8 @@
+{
+    "name": "media_capabilities",
+    "columns": [
+        "media_id",
+        "capability_id"
+    ],
+    "schema": "CREATE TABLE `media_capabilities` (\n\t`media_id` text NOT NULL,\n\t`capability_id` text NOT NULL,\n\tPRIMARY KEY(`media_id`, `capability_id`),\n\tFOREIGN KEY (`media_id`) REFERENCES `media`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`capability_id`) REFERENCES `capabilities`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

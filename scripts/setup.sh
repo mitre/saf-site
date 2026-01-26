@@ -28,10 +28,9 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-readonly POCKETBASE_DIR="$PROJECT_ROOT/.pocketbase"
-readonly DB_PATH="$POCKETBASE_DIR/pb_data/data.db"
-readonly DIFFABLE_DIR="$POCKETBASE_DIR/pb_data/diffable"
-readonly MIGRATIONS_DIR="$POCKETBASE_DIR/pb_migrations"
+readonly DATABASE_DIR="$PROJECT_ROOT/docs/.vitepress/database"
+readonly DB_PATH="$DATABASE_DIR/drizzle.db"
+readonly DIFFABLE_DIR="$DATABASE_DIR/diffable"
 
 # -----------------------------------------------------------------------------
 # Colors and Output
@@ -88,11 +87,9 @@ EXAMPLES:
     ./scripts/setup.sh --force -y   # CI/CD: non-interactive fresh setup
 
 WHAT IT DOES:
-    1. Checks prerequisites (Node.js, pnpm, sqlite-diffable)
+    1. Checks prerequisites (Node.js, pnpm)
     2. Installs/updates Node dependencies
     3. Restores database from diffable (only if missing, unless --force)
-    4. Clears Pocketbase migrations (prevents startup errors)
-    5. Validates Pocketbase binary
 
 IDEMPOTENT:
     Safe to run multiple times. Will not overwrite your local database
@@ -215,17 +212,6 @@ check_prerequisites() {
         fi
     fi
 
-    # pb-cli (optional - for advanced database operations)
-    if command_exists pb; then
-        local pb_version
-        pb_version=$(pb --version 2>/dev/null | head -1 || echo "unknown")
-        ok "pb-cli $pb_version"
-    else
-        skip "pb-cli not found (optional)"
-        echo "    Install: go install github.com/skeeeon/pb-cli/cmd/pb@latest"
-        echo "    Enables: backup, CRUD operations, advanced DB management"
-    fi
-
     echo ""
 
     if [ $missing -eq 1 ]; then
@@ -282,12 +268,12 @@ setup_database() {
         db_modified=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$DB_PATH" 2>/dev/null || stat -c "%y" "$DB_PATH" 2>/dev/null | cut -d. -f1)
 
         if [ "$FORCE" = true ]; then
-            warn "Existing data.db ($db_size, modified $db_modified)"
+            warn "Existing drizzle.db ($db_size, modified $db_modified)"
 
             if [ "$CHECK_MODE" = true ]; then
                 check_only "Would restore database (--force specified)"
             elif [ "$DRY_RUN" = true ]; then
-                dry "Would delete data.db and restore from diffable/"
+                dry "Would delete drizzle.db and restore from diffable/"
             else
                 if confirm "    Overwrite with fresh restore?"; then
                     restore_database
@@ -296,16 +282,16 @@ setup_database() {
                 fi
             fi
         else
-            ok "Database exists: data.db ($db_size)"
+            ok "Database exists: drizzle.db ($db_size)"
             skip "Use --force to restore from diffable/"
         fi
     else
-        warn "No data.db found - needs restore"
+        warn "No drizzle.db found - needs restore"
 
         if [ "$CHECK_MODE" = true ]; then
             error "Database missing - run setup without --check"
         elif [ "$DRY_RUN" = true ]; then
-            dry "Would run: sqlite-diffable load data.db diffable/"
+            dry "Would run: db-diffable.ts load drizzle.db diffable/"
         else
             restore_database
         fi
@@ -344,158 +330,6 @@ restore_database() {
     ok "Database restored ($db_size bytes)"
 }
 
-setup_migrations() {
-    echo -e "${BOLD}Migrations${NC}"
-    echo ""
-
-    if [ ! -d "$MIGRATIONS_DIR" ]; then
-        ok "No migrations directory (OK)"
-        echo ""
-        return
-    fi
-
-    local migration_count
-    migration_count=$(find "$MIGRATIONS_DIR" -name "*.js" 2>/dev/null | wc -l | tr -d ' ')
-
-    if [ "$migration_count" -eq 0 ]; then
-        ok "Migrations directory clean"
-    else
-        warn "Found $migration_count migration files"
-        echo "    These can cause startup errors with a restored database"
-
-        if [ "$CHECK_MODE" = true ]; then
-            check_only "Would clear migrations"
-        elif [ "$DRY_RUN" = true ]; then
-            dry "Would remove $MIGRATIONS_DIR/*.js"
-        else
-            rm -f "$MIGRATIONS_DIR"/*.js
-            ok "Migrations cleared"
-        fi
-    fi
-
-    echo ""
-}
-
-check_pocketbase() {
-    echo -e "${BOLD}Pocketbase${NC}"
-    echo ""
-
-    local pb_binary="$POCKETBASE_DIR/pocketbase"
-    local pb_version="0.36.0"
-
-    # Detect platform
-    local os arch pb_os pb_arch
-    os="$(uname -s)"
-    arch="$(uname -m)"
-
-    case "$os" in
-        Darwin) pb_os="darwin" ;;
-        Linux)  pb_os="linux" ;;
-        MINGW*|MSYS*|CYGWIN*) pb_os="windows" ;;
-        *)
-            error "Unsupported OS: $os"
-            exit 1
-            ;;
-    esac
-
-    case "$arch" in
-        x86_64|amd64) pb_arch="amd64" ;;
-        arm64|aarch64) pb_arch="arm64" ;;
-        *)
-            error "Unsupported architecture: $arch"
-            exit 1
-            ;;
-    esac
-
-    local platform="${pb_os}_${pb_arch}"
-    info "Platform: $platform"
-
-    # Check if binary exists and works
-    local need_download=false
-    if [ ! -f "$pb_binary" ]; then
-        warn "Pocketbase binary not found"
-        need_download=true
-    elif [ ! -x "$pb_binary" ]; then
-        chmod +x "$pb_binary" 2>/dev/null || true
-    fi
-
-    # Try to run it to verify it's the right platform
-    if [ "$need_download" = false ] && [ -f "$pb_binary" ]; then
-        if ! "$pb_binary" --version &>/dev/null; then
-            warn "Pocketbase binary exists but won't run (wrong platform?)"
-            need_download=true
-        fi
-    fi
-
-    # Download if needed
-    if [ "$need_download" = true ]; then
-        if [ "$CHECK_MODE" = true ]; then
-            check_only "Would download Pocketbase $pb_version for $platform"
-        elif [ "$DRY_RUN" = true ]; then
-            dry "Would download Pocketbase $pb_version for $platform"
-        else
-            download_pocketbase "$pb_version" "$platform"
-        fi
-    else
-        local current_version
-        current_version=$("$pb_binary" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-        ok "Pocketbase $current_version ready"
-    fi
-
-    echo ""
-}
-
-download_pocketbase() {
-    local version="$1"
-    local platform="$2"
-    local ext="zip"
-    local download_url="https://github.com/pocketbase/pocketbase/releases/download/v${version}/pocketbase_${version}_${platform}.${ext}"
-
-    info "Downloading Pocketbase $version for $platform..."
-
-    # Create directory if needed
-    mkdir -p "$POCKETBASE_DIR"
-
-    # Download
-    local tmp_file="/tmp/pocketbase_${version}_${platform}.${ext}"
-    if command -v curl &>/dev/null; then
-        curl -fsSL "$download_url" -o "$tmp_file" || {
-            error "Failed to download Pocketbase"
-            echo "    URL: $download_url"
-            exit 1
-        }
-    elif command -v wget &>/dev/null; then
-        wget -q "$download_url" -O "$tmp_file" || {
-            error "Failed to download Pocketbase"
-            echo "    URL: $download_url"
-            exit 1
-        }
-    else
-        error "Neither curl nor wget found"
-        exit 1
-    fi
-
-    # Extract
-    info "Extracting..."
-    if command -v unzip &>/dev/null; then
-        unzip -o -q "$tmp_file" -d "$POCKETBASE_DIR" pocketbase || {
-            error "Failed to extract Pocketbase"
-            exit 1
-        }
-    else
-        error "unzip not found - please install it"
-        exit 1
-    fi
-
-    # Cleanup
-    rm -f "$tmp_file"
-
-    # Make executable
-    chmod +x "$POCKETBASE_DIR/pocketbase"
-
-    ok "Pocketbase $version installed"
-}
-
 print_summary() {
     if [ "$CHECK_MODE" = true ]; then
         echo "=========================================="
@@ -519,15 +353,15 @@ print_summary() {
     echo ""
     echo "To start development:"
     echo ""
-    echo -e "  ${BOLD}1.${NC} Start Pocketbase (terminal 1):"
-    echo "     cd .pocketbase && ./pocketbase serve"
+    echo "  pnpm dev"
     echo ""
-    echo -e "  ${BOLD}2.${NC} Start dev server (terminal 2):"
-    echo "     pnpm dev"
+    echo "  Site: http://localhost:5173"
     echo ""
-    echo "  Site:            http://localhost:5173"
-    echo "  Pocketbase UI:   http://localhost:8090/_/"
-    echo "  Login:           admin@localhost.com / testpassword123"
+    echo "Database management:"
+    echo ""
+    echo "  pnpm cli db status    # Check database status"
+    echo "  pnpm cli content list # List content records"
+    echo "  pnpm db:export        # Export to diffable/"
     echo ""
 }
 
@@ -544,8 +378,6 @@ main() {
     check_prerequisites
     setup_dependencies
     setup_database
-    setup_migrations
-    check_pocketbase
     print_summary
 }
 

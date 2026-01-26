@@ -1,0 +1,8 @@
+{
+    "name": "content_tags",
+    "columns": [
+        "content_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `content_tags` (\n\t`content_id` text NOT NULL,\n\t`tag_id` text NOT NULL,\n\tPRIMARY KEY(`content_id`, `tag_id`),\n\tFOREIGN KEY (`content_id`) REFERENCES `content`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

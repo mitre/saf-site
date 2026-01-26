@@ -1,0 +1,27 @@
+{
+    "name": "tools",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "long_description",
+        "version",
+        "tool_type",
+        "status",
+        "organization",
+        "technology",
+        "website",
+        "github",
+        "documentation_url",
+        "logo",
+        "screenshot",
+        "screenshots",
+        "is_featured",
+        "featured_order",
+        "license",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `tools` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`description` text,\n\t`long_description` text,\n\t`version` text,\n\t`tool_type` text,\n\t`status` text DEFAULT 'active',\n\t`organization` text,\n\t`technology` text,\n\t`website` text,\n\t`github` text,\n\t`documentation_url` text,\n\t`logo` text,\n\t`screenshot` text,\n\t`screenshots` text,\n\t`is_featured` integer DEFAULT false,\n\t`featured_order` integer,\n\t`license` text,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`tool_type`) REFERENCES `tool_types`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`technology`) REFERENCES `technologies`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

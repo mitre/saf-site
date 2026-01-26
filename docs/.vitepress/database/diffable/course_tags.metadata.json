@@ -1,0 +1,8 @@
+{
+    "name": "course_tags",
+    "columns": [
+        "course_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `course_tags` (\n\t`course_id` text NOT NULL,\n\t`tag_id` text NOT NULL,\n\tPRIMARY KEY(`course_id`, `tag_id`),\n\tFOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

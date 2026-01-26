@@ -1,0 +1,27 @@
+{"id":"5njj088tz1plry1","name":"MySQL 5.7","slug":"mysql-57","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"5h9k1451jticfap","name":"Docker","slug":"docker","description":null,"category":"j535aqkac59e695","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"58er47o0lz6im6b","name":"Amazon Web Services","slug":"aws","description":null,"category":"ilj7tw790du24ss","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"1xtk45m192m32f5","name":"Google Cloud Platform","slug":"gcp","description":null,"category":"ilj7tw790du24ss","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"d2936gxe09g32d9","name":"Apache Tomcat","slug":"tomcat","description":null,"category":"c5x43li812f9107","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"74z89r8ids9453r","name":"Kubernetes","slug":"kubernetes","description":null,"category":"j535aqkac59e695","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"r8vam72sfr15qsk","name":"Oracle Database 19","slug":"oracle-db-19","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"tx165mrfvu19288","name":"Red Hat Enterprise Linux ","slug":"rhel-","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"2z05t1nup63uzj8","name":"Microsoft Azure","slug":"azure","description":null,"category":"ilj7tw790du24ss","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"j23235pj795q6wy","name":"Apache HTTP Server","slug":"apache-httpd","description":null,"category":"3337707146w91k4","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"n6784zwkwug826b","name":"NGINX","slug":"nginx","description":null,"category":"3337707146w91k4","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"k4jq7z1n38nz935","name":"Red Hat Enterprise Linux 7","slug":"rhel-7","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"ip8t5p06ma8ew52","name":"Windows 2012","slug":"windows-2012","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"67t17ban72r8054","name":"Windows 2016","slug":"windows-2016","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"ebjhzn7xgbh87cy","name":"Windows 2019","slug":"windows-2019","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"51v069ar6e44i16","name":"Ubuntu 16.04","slug":"ubuntu-1604","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"1tq173t96ct6b3v","name":"Ubuntu 20.04","slug":"ubuntu-2004","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"0bae7acc0j960py","name":"Windows 10","slug":"windows-10","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"dyjg13cz0zdyw2g","name":"Red Hat Enterprise Linux 6","slug":"rhel-6","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"ivvnq5012a4xr9x","name":"Microsoft IIS","slug":"iis","description":null,"category":"3337707146w91k4","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"wp5712287jrpv7p","name":"PostgreSQL 9","slug":"postgresql-9","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"v09obbar8up1bes","name":"Oracle Database 12","slug":"oracle-db-12","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"0180va0bb089n16","name":"MongoDB ","slug":"mongodb-","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"z2e22tw8d73djh3","name":"Red Hat Enterprise Linux 8","slug":"rhel-8","description":null,"category":"fdu6276ch9am6s1","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"939wzk8o6nm57u7","name":"MySQL 8.0","slug":"mysql-80","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"0pnx0zac728p4hq","name":"PostgreSQL 10","slug":"postgresql-10","description":null,"category":"9k5h99qox759p18","vendor":null,"website":null,"logo":null,"created_at":null,"updated_at":null}
+{"id":"4l0hjd16ao3ms1p","name":"Red Hat Enterprise Linux 9","slug":"rhel-9","description":"Red Hat Enterprise Linux 9 operating system","category":"fdu6276ch9am6s1","vendor":null,"website":"https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux","logo":null,"created_at":null,"updated_at":null}

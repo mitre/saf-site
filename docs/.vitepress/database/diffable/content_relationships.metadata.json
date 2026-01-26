@@ -1,0 +1,9 @@
+{
+    "name": "content_relationships",
+    "columns": [
+        "content_id",
+        "related_content_id",
+        "relationship_type"
+    ],
+    "schema": "CREATE TABLE `content_relationships` (\n\t`content_id` text NOT NULL,\n\t`related_content_id` text NOT NULL,\n\t`relationship_type` text NOT NULL,\n\tPRIMARY KEY(`content_id`, `related_content_id`),\n\tFOREIGN KEY (`content_id`) REFERENCES `content`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`related_content_id`) REFERENCES `content`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

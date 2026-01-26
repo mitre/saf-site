@@ -1,0 +1,8 @@
+{
+    "name": "course_capabilities",
+    "columns": [
+        "course_id",
+        "capability_id"
+    ],
+    "schema": "CREATE TABLE `course_capabilities` (\n\t`course_id` text NOT NULL,\n\t`capability_id` text NOT NULL,\n\tPRIMARY KEY(`course_id`, `capability_id`),\n\tFOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`capability_id`) REFERENCES `capabilities`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

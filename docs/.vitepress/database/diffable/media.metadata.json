@@ -1,0 +1,24 @@
+{
+    "name": "media",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "media_type",
+        "author",
+        "organization",
+        "published_at",
+        "url",
+        "file",
+        "file_size",
+        "thumbnail",
+        "event_name",
+        "event_date",
+        "is_featured",
+        "featured_order",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `media` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`description` text,\n\t`media_type` text NOT NULL,\n\t`author` text,\n\t`organization` text,\n\t`published_at` integer,\n\t`url` text,\n\t`file` text,\n\t`file_size` integer,\n\t`thumbnail` text,\n\t`event_name` text,\n\t`event_date` integer,\n\t`is_featured` integer DEFAULT false,\n\t`featured_order` integer,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`media_type`) REFERENCES `media_types`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`organization`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

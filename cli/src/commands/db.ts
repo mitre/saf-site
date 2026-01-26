@@ -89,7 +89,7 @@ dbCommand
 
     try {
       execSync('pnpm db:export', { stdio: 'pipe' })
-      s.stop(pc.green('Database exported to .pocketbase/pb_data/diffable/'))
+      s.stop(pc.green('Database exported to docs/.vitepress/database/diffable/'))
     }
     catch (error) {
       s.stop(pc.red('Export failed'))

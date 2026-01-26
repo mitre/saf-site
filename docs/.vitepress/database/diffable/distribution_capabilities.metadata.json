@@ -1,0 +1,8 @@
+{
+    "name": "distribution_capabilities",
+    "columns": [
+        "distribution_id",
+        "capability_id"
+    ],
+    "schema": "CREATE TABLE `distribution_capabilities` (\n\t`distribution_id` text NOT NULL,\n\t`capability_id` text NOT NULL,\n\tPRIMARY KEY(`distribution_id`, `capability_id`),\n\tFOREIGN KEY (`distribution_id`) REFERENCES `distributions`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`capability_id`) REFERENCES `capabilities`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

@@ -1,0 +1,14 @@
+{
+    "name": "tool_types",
+    "columns": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "icon",
+        "sort_order",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `tool_types` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`slug` text NOT NULL,\n\t`description` text,\n\t`icon` text,\n\t`sort_order` integer DEFAULT 0,\n\t`created_at` integer,\n\t`updated_at` integer\n)"
+}

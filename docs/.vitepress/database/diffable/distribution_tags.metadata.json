@@ -1,0 +1,8 @@
+{
+    "name": "distribution_tags",
+    "columns": [
+        "distribution_id",
+        "tag_id"
+    ],
+    "schema": "CREATE TABLE `distribution_tags` (\n\t`distribution_id` text NOT NULL,\n\t`tag_id` text NOT NULL,\n\tPRIMARY KEY(`distribution_id`, `tag_id`),\n\tFOREIGN KEY (`distribution_id`) REFERENCES `distributions`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON UPDATE no action ON DELETE cascade\n)"
+}

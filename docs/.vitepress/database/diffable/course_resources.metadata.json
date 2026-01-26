@@ -1,0 +1,15 @@
+{
+    "name": "course_resources",
+    "columns": [
+        "id",
+        "title",
+        "description",
+        "url",
+        "course",
+        "resource_type",
+        "sort_order",
+        "created_at",
+        "updated_at"
+    ],
+    "schema": "CREATE TABLE `course_resources` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`title` text NOT NULL,\n\t`description` text,\n\t`url` text NOT NULL,\n\t`course` text NOT NULL,\n\t`resource_type` text NOT NULL,\n\t`sort_order` integer DEFAULT 0,\n\t`created_at` integer,\n\t`updated_at` integer,\n\tFOREIGN KEY (`course`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`resource_type`) REFERENCES `resource_types`(`id`) ON UPDATE no action ON DELETE no action\n)"
+}

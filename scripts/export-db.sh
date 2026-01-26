@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Export Pocketbase database to git-friendly format
+# Export database to git-friendly format
 #
-# Run this after making changes in Pocketbase to prepare for commit.
+# Run this after making changes to the database to prepare for commit.
 #
 # Usage:
 #   ./scripts/export-db.sh              Export database
@@ -18,8 +18,8 @@ set -euo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-readonly DB_PATH="$PROJECT_ROOT/.pocketbase/pb_data/data.db"
-readonly DIFFABLE_DIR="$PROJECT_ROOT/.pocketbase/pb_data/diffable"
+readonly DB_PATH="$PROJECT_ROOT/docs/.vitepress/database/drizzle.db"
+readonly DIFFABLE_DIR="$PROJECT_ROOT/docs/.vitepress/database/diffable"
 
 # -----------------------------------------------------------------------------
 # Colors
@@ -59,7 +59,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -h|--help)
             cat << 'EOF'
-Export Pocketbase database to git-friendly format
+Export database to git-friendly format
 
 USAGE:
     ./scripts/export-db.sh [OPTIONS]
@@ -70,10 +70,10 @@ OPTIONS:
     -h, --help      Show this help
 
 WORKFLOW:
-    1. Make changes in Pocketbase UI (http://localhost:8090/_/)
+    1. Make changes via CLI: pnpm cli content add/update
     2. Run: ./scripts/export-db.sh
-    3. Review changes: git diff .pocketbase/pb_data/diffable/
-    4. Commit: git add .pocketbase/pb_data/diffable/ && git commit
+    3. Review changes: git diff docs/.vitepress/database/diffable/
+    4. Commit: git add docs/.vitepress/database/diffable/ && git commit
 
 EOF
             exit 0
@@ -114,7 +114,7 @@ if [ ! -f "$DB_PATH" ]; then
 fi
 
 DB_SIZE=$(ls -lh "$DB_PATH" | awk '{print $5}')
-ok "Database found: data.db ($DB_SIZE)"
+ok "Database found: drizzle.db ($DB_SIZE)"
 
 # Count current tables
 CURRENT_TABLES=$(find "$DIFFABLE_DIR" -name "*.ndjson" 2>/dev/null | wc -l | tr -d ' ')
@@ -145,7 +145,7 @@ if [ "$SHOW_DIFF" = true ] && [ "$DRY_RUN" = false ]; then
     echo "  Git Diff"
     echo "=========================================="
     echo ""
-    git -C "$PROJECT_ROOT" diff --stat .pocketbase/pb_data/diffable/ || true
+    git -C "$PROJECT_ROOT" diff --stat docs/.vitepress/database/diffable/ || true
     echo ""
 fi
 
@@ -161,8 +161,8 @@ echo ""
 
 if [ "$DRY_RUN" = false ]; then
     echo "Next steps:"
-    echo "  1. Review:  git diff .pocketbase/pb_data/diffable/"
-    echo "  2. Stage:   git add .pocketbase/pb_data/diffable/"
+    echo "  1. Review:  git diff docs/.vitepress/database/diffable/"
+    echo "  2. Stage:   git add docs/.vitepress/database/diffable/"
     echo "  3. Commit:  git commit -m 'Update content data'"
     echo ""
 fi
