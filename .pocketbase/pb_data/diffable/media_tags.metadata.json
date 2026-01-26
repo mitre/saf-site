@@ -1,9 +1,0 @@
-{
-    "name": "media_tags",
-    "columns": [
-        "id",
-        "media",
-        "tag"
-    ],
-    "schema": "CREATE TABLE \"media_tags\" (`id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `media` TEXT DEFAULT '' NOT NULL, `tag` TEXT DEFAULT '' NOT NULL)"
-}

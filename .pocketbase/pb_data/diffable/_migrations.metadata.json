@@ -1,8 +1,0 @@
-{
-    "name": "_migrations",
-    "columns": [
-        "file",
-        "applied"
-    ],
-    "schema": "CREATE TABLE `_migrations` (file VARCHAR(255) PRIMARY KEY NOT NULL, applied INTEGER NOT NULL)"
-}
