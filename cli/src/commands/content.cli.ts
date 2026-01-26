@@ -6,8 +6,7 @@
  */
 
 import type { OutputFormat } from '../lib/cli-utils.js'
-import type { ContentFKNames } from '../lib/content-service.js'
-import type { UpdateContentInput } from '../lib/pocketbase.js'
+import type { ContentFKNames, UpdateContentInput } from '../lib/content-service.js'
 import type { PrepareAddInput, PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
 import Table from 'cli-table3'
 import pc from 'picocolors'
@@ -319,9 +318,9 @@ export function formatListResult(
     table.push([
       record.id.substring(0, 10),
       (record.name || '').substring(0, 33),
-      record.content_type || '-',
+      record.contentType || '-',
       record.expand?.target?.name?.substring(0, 18) || '-',
-      record.expand?.standard?.short_name || '-',
+      record.expand?.standard?.shortName || '-',
       record.version || '-',
     ])
   }

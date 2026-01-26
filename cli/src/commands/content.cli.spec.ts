@@ -355,22 +355,22 @@ describe('formatListResult', () => {
       id: 'content-1',
       name: 'RHEL 9 STIG',
       slug: 'rhel-9-stig',
-      content_type: 'validation',
+      contentType: 'validation',
       version: '1.0.0',
       expand: {
         target: { name: 'RHEL 9' },
-        standard: { short_name: 'STIG' },
+        standard: { shortName: 'STIG' },
       },
     },
     {
       id: 'content-2',
       name: 'Ubuntu 22.04 CIS',
       slug: 'ubuntu-22-04-cis',
-      content_type: 'validation',
+      contentType: 'validation',
       version: '2.0.0',
       expand: {
         target: { name: 'Ubuntu 22.04' },
-        standard: { short_name: 'CIS' },
+        standard: { shortName: 'CIS' },
       },
     },
   ]
