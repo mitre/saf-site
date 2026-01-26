@@ -7,7 +7,7 @@
  */
 
 import type { RepoInfo } from '../lib/github.js'
-import type { FkMaps } from '../lib/pocketbase.js'
+import type { FkMaps } from '../lib/drizzle.js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   fetchInspecYml,
@@ -17,20 +17,24 @@ import {
 } from '../lib/github.js'
 // Import after mocking
 import {
-  createContent,
-  getPocketBase,
-  listContent,
+  createRecord,
+  getDrizzle,
+  getDefaultDbPath,
+  listRecords,
   loadFkMaps,
-} from '../lib/pocketbase.js'
+} from '../lib/drizzle.js'
 
-// Mock pocketbase module
-vi.mock('../lib/pocketbase.js', () => ({
-  getPocketBase: vi.fn(),
+// Mock drizzle module
+vi.mock('../lib/drizzle.js', () => ({
+  getDrizzle: vi.fn(),
+  getDefaultDbPath: vi.fn(() => '/mock/path/drizzle.db'),
   loadFkMaps: vi.fn(),
-  createContent: vi.fn(),
-  updateContent: vi.fn(),
-  listContent: vi.fn(),
-  getContentBySlug: vi.fn(),
+  loadFkNameMaps: vi.fn(),
+  createRecord: vi.fn(),
+  updateRecord: vi.fn(),
+  getRecord: vi.fn(),
+  listRecords: vi.fn(),
+  expandRecord: vi.fn((r: any) => r),
 }))
 
 // Mock github module
@@ -142,9 +146,9 @@ describe('content Add Command Integration', () => {
       vi.mocked(fetchRepoInfo).mockResolvedValue(mockRepoInfo)
       vi.mocked(fetchInspecYml).mockResolvedValue(mockInspecProfile)
       vi.mocked(fetchReadme).mockResolvedValue('# README\n\n| Benchmark | 256 |')
-      vi.mocked(loadFkMaps).mockResolvedValue(mockFkMaps)
-      vi.mocked(createContent).mockResolvedValue(mockCreatedRecord as any)
-      vi.mocked(getPocketBase).mockResolvedValue({} as any)
+      vi.mocked(loadFkMaps).mockReturnValue(mockFkMaps)
+      vi.mocked(createRecord).mockReturnValue(mockCreatedRecord as any)
+      vi.mocked(getDrizzle).mockReturnValue({} as any)
     })
 
     it('prepares and creates content from GitHub URL', async () => {
@@ -394,31 +398,32 @@ describe('content List Command Integration', () => {
     vi.clearAllMocks()
   })
 
-  it('passes filter options to listContent service', async () => {
+  it('passes filter options to listRecords service', async () => {
     const mockRecords = [
-      { id: 'c1', name: 'Profile 1', content_type: 'validation' },
-      { id: 'c2', name: 'Profile 2', content_type: 'validation' },
+      { id: 'c1', name: 'Profile 1', contentType: 'validation' },
+      { id: 'c2', name: 'Profile 2', contentType: 'validation' },
     ]
 
-    vi.mocked(listContent).mockResolvedValue(mockRecords as any)
+    vi.mocked(listRecords).mockReturnValue(mockRecords as any)
 
-    // Call listContent directly to test integration
-    const result = await listContent(
+    // Call listRecords directly to test integration
+    const result = listRecords(
+      {} as any, // mock db
+      'content',
       {
-        contentType: 'validation',
-        status: 'active',
-        expand: ['target', 'standard'],
-        sort: '-created',
+        where: { contentType: 'validation', status: 'active' },
+        orderBy: 'name',
       },
-      {} as any, // mock pb client
     )
 
-    expect(listContent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        contentType: 'validation',
-        status: 'active',
-      }),
+    expect(listRecords).toHaveBeenCalledWith(
       expect.anything(),
+      'content',
+      expect.objectContaining({
+        where: expect.objectContaining({
+          contentType: 'validation',
+        }),
+      }),
     )
     expect(result).toHaveLength(2)
   })

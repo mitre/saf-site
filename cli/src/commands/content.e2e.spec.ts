@@ -300,7 +300,7 @@ describe('content CLI E2E - Live', () => {
       expect(exitCode).toBe(0)
       const parsed = JSON.parse(stdout)
       for (const record of parsed) {
-        expect(record.content_type).toBe('validation')
+        expect(record.contentType).toBe('validation')
       }
     })
 
@@ -465,7 +465,7 @@ describe('content CLI E2E - Live Database Operations', () => {
       const record = JSON.parse(stdout)
       expect(record.id).toBe(testRecordId)
       expect(record.slug).toBe(testSlug)
-      expect(record.content_type).toBe('validation')
+      expect(record.contentType).toBe('validation')
     })
   })
 
