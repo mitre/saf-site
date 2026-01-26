@@ -1,15 +1,12 @@
 /**
- * Tests for Generic Table Commands (saf-site-gf9 Step 2)
+ * Table Commands E2E Smoke Tests (saf-site-gf9 Step 2)
  *
- * TDD: These tests define the expected behavior for generic CRUD commands
- * that work with any table in the Drizzle schema.
+ * Minimal E2E tests to verify CLI → Drizzle integration.
+ * Detailed tests are in:
+ *   - table.cli.spec.ts (formatting - 21 unit tests)
+ *   - drizzle.spec.ts (data layer - 21 unit tests)
  *
- * Commands:
- *   pnpm cli table list <table> [--filter key=value] [--json]
- *   pnpm cli table show <table> <id> [--json]
- *   pnpm cli table add <table> [--json]
- *   pnpm cli table update <table> <id> [--json]
- *   pnpm cli table delete <table> <id> [--yes]
+ * These smoke tests verify the full stack works end-to-end.
  */
 
 import { execSync } from 'node:child_process'
@@ -34,67 +31,19 @@ function cli(args: string): { stdout: string, stderr: string, exitCode: number }
   }
 }
 
-describe('table list', () => {
-  it('lists records from a valid table', () => {
-    const result = cli('table list organizations --json')
+describe('table commands (E2E smoke tests)', () => {
+  it('list: returns records from database', () => {
+    const result = cli('table list organizations --limit 1 --json')
 
     expect(result.exitCode).toBe(0)
     const records = JSON.parse(result.stdout)
     expect(Array.isArray(records)).toBe(true)
-    expect(records.length).toBeGreaterThan(0)
+    expect(records.length).toBe(1)
     expect(records[0]).toHaveProperty('id')
     expect(records[0]).toHaveProperty('name')
   })
 
-  it('filters records with --filter', () => {
-    const result = cli('table list content --filter content_type=validation --json')
-
-    expect(result.exitCode).toBe(0)
-    const records = JSON.parse(result.stdout)
-    expect(Array.isArray(records)).toBe(true)
-    for (const record of records) {
-      expect(record.content_type).toBe('validation')
-    }
-  })
-
-  it('limits results with --limit', () => {
-    const result = cli('table list content --limit 5 --json')
-
-    expect(result.exitCode).toBe(0)
-    const records = JSON.parse(result.stdout)
-    expect(records.length).toBeLessThanOrEqual(5)
-  })
-
-  it('sorts results with --sort', () => {
-    const result = cli('table list organizations --sort name --json')
-
-    expect(result.exitCode).toBe(0)
-    const records = JSON.parse(result.stdout)
-    expect(records.length).toBeGreaterThan(1)
-    // Verify sorted alphabetically
-    for (let i = 1; i < records.length; i++) {
-      expect(records[i].name.localeCompare(records[i - 1].name)).toBeGreaterThanOrEqual(0)
-    }
-  })
-
-  it('returns error for invalid table', () => {
-    const result = cli('table list nonexistent_table --json')
-
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toMatch(/unknown table/i)
-  })
-
-  it('outputs text format by default', () => {
-    const result = cli('table list organizations')
-
-    expect(result.exitCode).toBe(0)
-    // Text format should have table-like output, not JSON
-    expect(() => JSON.parse(result.stdout)).toThrow()
-  })
-})
-
-describe('table show', () => {
-  it('shows a record by ID', () => {
+  it('show: returns single record by ID', () => {
     // First get a valid ID
     const listResult = cli('table list organizations --limit 1 --json')
     const records = JSON.parse(listResult.stdout)
@@ -105,119 +54,37 @@ describe('table show', () => {
     expect(result.exitCode).toBe(0)
     const record = JSON.parse(result.stdout)
     expect(record.id).toBe(id)
-    expect(record).toHaveProperty('name')
   })
 
-  it('returns error for non-existent ID', () => {
-    const result = cli('table show organizations nonexistent-id-12345 --json')
+  it('CRUD round-trip: add → show → update → delete', { timeout: 30000 }, () => {
+    const id = `smoke-test-${Date.now()}`
 
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toMatch(/not found/i)
-  })
+    // ADD
+    const addInput = JSON.stringify({ id, name: 'Smoke Test Org', slug: id })
+    const addResult = cli(`table add organizations --json --data '${addInput}'`)
+    expect(addResult.exitCode).toBe(0)
+    const created = JSON.parse(addResult.stdout)
+    expect(created.name).toBe('Smoke Test Org')
 
-  it('returns error for invalid table', () => {
-    const result = cli('table show nonexistent_table some-id --json')
-
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toMatch(/unknown table/i)
-  })
-})
-
-describe('table add', () => {
-  it('adds a record with JSON input', () => {
-    const input = JSON.stringify({
-      id: `test-org-${Date.now()}`,
-      name: 'Test Organization',
-      slug: `test-org-${Date.now()}`,
-    })
-
-    const result = cli(`table add organizations --json --data '${input}'`)
-
-    expect(result.exitCode).toBe(0)
-    const record = JSON.parse(result.stdout)
-    expect(record).toHaveProperty('id')
-    expect(record.name).toBe('Test Organization')
-  })
-
-  it('returns error for missing required fields', () => {
-    const input = JSON.stringify({ description: 'No name provided' })
-
-    const result = cli(`table add organizations --json --data '${input}'`)
-
-    expect(result.exitCode).toBe(1)
-  })
-
-  it('returns error for invalid table', () => {
-    const result = cli(`table add nonexistent_table --json --data '{}'`)
-
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toMatch(/unknown table/i)
-  })
-})
-
-describe('table update', () => {
-  it('updates a record', () => {
-    // First create a record to update
-    const id = `update-test-${Date.now()}`
-    const createInput = JSON.stringify({
-      id,
-      name: 'Original Name',
-      slug: id,
-    })
-    const createResult = cli(`table add organizations --json --data '${createInput}'`)
-    expect(createResult.exitCode).toBe(0)
-
-    // Update it using the same ID
-    const updateInput = JSON.stringify({ name: 'Updated Name' })
-    const result = cli(`table update organizations ${id} --json --data '${updateInput}'`)
-
-    expect(result.exitCode).toBe(0)
-    const updated = JSON.parse(result.stdout)
-    expect(updated.name).toBe('Updated Name')
-  })
-
-  it('returns error for non-existent ID', () => {
-    const input = JSON.stringify({ name: 'New Name' })
-
-    const result = cli(`table update organizations nonexistent-id --json --data '${input}'`)
-
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toMatch(/not found/i)
-  })
-})
-
-describe('table delete', () => {
-  it('deletes a record with --yes flag', () => {
-    // First create a record to delete
-    const id = `delete-test-${Date.now()}`
-    const createInput = JSON.stringify({
-      id,
-      name: 'To Be Deleted',
-      slug: id,
-    })
-    cli(`table add organizations --json --data '${createInput}'`)
-
-    // Delete it
-    const result = cli(`table delete organizations ${id} --yes`)
-
-    expect(result.exitCode).toBe(0)
-
-    // Verify it's gone
+    // SHOW
     const showResult = cli(`table show organizations ${id} --json`)
-    expect(showResult.exitCode).toBe(1)
-  })
+    expect(showResult.exitCode).toBe(0)
+    const fetched = JSON.parse(showResult.stdout)
+    expect(fetched.id).toBe(id)
 
-  it('returns error for non-existent ID', () => {
-    const result = cli('table delete organizations nonexistent-id --yes')
+    // UPDATE
+    const updateInput = JSON.stringify({ name: 'Updated Smoke Test' })
+    const updateResult = cli(`table update organizations ${id} --json --data '${updateInput}'`)
+    expect(updateResult.exitCode).toBe(0)
+    const updated = JSON.parse(updateResult.stdout)
+    expect(updated.name).toBe('Updated Smoke Test')
 
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/not found/i)
-  })
+    // DELETE
+    const deleteResult = cli(`table delete organizations ${id} --yes`)
+    expect(deleteResult.exitCode).toBe(0)
 
-  it('requires --yes flag for non-interactive delete', () => {
-    const result = cli('table delete organizations some-id')
-
-    // Should fail or prompt without --yes
-    expect(result.exitCode).toBe(1)
+    // VERIFY DELETED
+    const verifyResult = cli(`table show organizations ${id} --json`)
+    expect(verifyResult.exitCode).toBe(1)
   })
 })

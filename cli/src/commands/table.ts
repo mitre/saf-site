@@ -26,6 +26,7 @@ import {
   updateRecord,
 } from '../lib/drizzle.js'
 import { exitWithError, getOutputFormat } from '../lib/cli-utils.js'
+import { formatTableList, formatTableRecord } from './table.cli.js'
 
 // Database path
 function getDbPath(): string {
@@ -78,12 +79,7 @@ tableCommand
         limit: options.limit ? Number.parseInt(options.limit, 10) : undefined,
       })
 
-      if (format === 'json') {
-        console.log(JSON.stringify(records, null, 2))
-      }
-      else {
-        formatTable(records, table)
-      }
+      console.log(formatTableList(records, table, format))
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to list records', format)
@@ -114,12 +110,7 @@ tableCommand
         exitWithError(`Record not found: ${id}`, format)
       }
 
-      if (format === 'json') {
-        console.log(JSON.stringify(record, null, 2))
-      }
-      else {
-        formatRecord(record, table)
-      }
+      console.log(formatTableRecord(record, table, format))
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to show record', format)
@@ -160,13 +151,10 @@ tableCommand
       const db = getDrizzle(getDbPath())
       const record = createRecord(db, table, data)
 
-      if (format === 'json') {
-        console.log(JSON.stringify(record, null, 2))
-      }
-      else {
+      if (format === 'text') {
         console.log(pc.green(`Created record: ${record.id}`))
-        formatRecord(record, table)
       }
+      console.log(formatTableRecord(record, table, format))
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to create record', format)
@@ -211,13 +199,10 @@ tableCommand
         exitWithError(`Record not found: ${id}`, format)
       }
 
-      if (format === 'json') {
-        console.log(JSON.stringify(record, null, 2))
-      }
-      else {
+      if (format === 'text') {
         console.log(pc.green(`Updated record: ${id}`))
-        formatRecord(record!, table)
       }
+      console.log(formatTableRecord(record!, table, format))
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : 'Failed to update record', format)
@@ -271,48 +256,4 @@ tableCommand
  */
 function collect(value: string, previous: string[]): string[] {
   return previous.concat([value])
-}
-
-/**
- * Format records as a text table
- */
-function formatTable(records: Record<string, unknown>[], table: string): void {
-  if (records.length === 0) {
-    console.log(pc.dim('No records found'))
-    return
-  }
-
-  console.log(pc.bold(`\n${table} (${records.length} records)`))
-  console.log(pc.dim('─'.repeat(60)))
-
-  // Get columns to display (first few important ones)
-  const allKeys = Object.keys(records[0])
-  const displayKeys = allKeys.slice(0, 5) // Show first 5 columns
-
-  // Header
-  console.log(displayKeys.map(k => k.padEnd(15)).join(' '))
-  console.log(pc.dim('─'.repeat(60)))
-
-  // Rows
-  for (const record of records) {
-    const values = displayKeys.map((key) => {
-      const value = record[key]
-      const str = value === null || value === undefined ? '-' : String(value)
-      return str.slice(0, 14).padEnd(15)
-    })
-    console.log(values.join(' '))
-  }
-}
-
-/**
- * Format a single record
- */
-function formatRecord(record: Record<string, unknown>, table: string): void {
-  console.log(pc.bold(`\n${table}`))
-  console.log(pc.dim('─'.repeat(40)))
-
-  for (const [key, value] of Object.entries(record)) {
-    const displayValue = value === null || value === undefined ? pc.dim('-') : String(value)
-    console.log(`${pc.cyan(key.padEnd(20))} ${displayValue}`)
-  }
 }
