@@ -9,7 +9,9 @@
         "name",
         "organization",
         "slug",
-        "website"
+        "website",
+        "quick_start_template",
+        "prerequisites_template"
     ],
-    "schema": "CREATE TABLE \"technologies\" (`description` TEXT DEFAULT '' NOT NULL, `documentation_url` TEXT DEFAULT '' NOT NULL, `github` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `organization` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL)"
+    "schema": "CREATE TABLE \"technologies\" (`description` TEXT DEFAULT '' NOT NULL, `documentation_url` TEXT DEFAULT '' NOT NULL, `github` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `logo` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `organization` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `website` TEXT DEFAULT '' NOT NULL, \"quick_start_template\" TEXT DEFAULT '' NOT NULL, \"prerequisites_template\" TEXT DEFAULT '' NOT NULL)"
 }

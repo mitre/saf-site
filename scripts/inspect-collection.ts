@@ -12,7 +12,8 @@ async function inspectCollections() {
       console.log(`\n${collection.name}:`)
       console.log(JSON.stringify(collection, null, 2))
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error:', error)
   }
 }

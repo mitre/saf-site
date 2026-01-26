@@ -7,6 +7,6 @@ export default defineConfig({
   dbCredentials: {
     // SQLite database for local editing via libsql
     // Clean git diffs via sqlite-diffable
-    url: 'file:.data/saf.db'
-  }
+    url: 'file:.data/saf.db',
+  },
 })

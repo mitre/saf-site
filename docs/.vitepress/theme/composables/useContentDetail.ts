@@ -1,4 +1,5 @@
-import { computed, type ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 
 /**
  * Content item from Pocketbase (validation or hardening profile)
@@ -26,12 +27,21 @@ export interface ContentItem {
   // Vendor
   vendor_name: string
   vendor_slug: string
+  vendor_logo?: string
   // Maintainer
   maintainer_name: string
   maintainer_slug: string
+  maintainer_logo?: string
   // Links
   github_url: string
   documentation_url?: string
+  reference_url?: string
+  // README content
+  readme_url?: string
+  readme_markdown?: string
+  // Technology templates
+  quick_start_template?: string
+  prerequisites_template?: string
   // Domain-specific (validation)
   control_count?: number
   stig_id?: string
@@ -55,6 +65,16 @@ export interface ContentDetailReturn {
   isValidation: ComputedRef<boolean>
   /** Whether this is a hardening profile */
   isHardening: ComputedRef<boolean>
+  /** Interpolated quick start template */
+  quickStart: ComputedRef<string>
+  /** Interpolated prerequisites template */
+  prerequisites: ComputedRef<string>
+  /** Whether quick start content is available */
+  hasQuickStart: ComputedRef<boolean>
+  /** Whether prerequisites content is available */
+  hasPrerequisites: ComputedRef<boolean>
+  /** Whether README content is available */
+  hasReadme: ComputedRef<boolean>
 }
 
 export interface ActionUrl {
@@ -75,7 +95,8 @@ export interface FeatureCard {
  * CIS/Others: 2.0.0 → v2.0.0 (keep semver)
  */
 function formatBenchmarkVersion(version: string, standardName: string): string {
-  if (!version) return ''
+  if (!version)
+    return ''
 
   // STIG uses V{major}R{minor} format
   if (standardName?.toLowerCase().includes('stig')) {
@@ -90,6 +111,21 @@ function formatBenchmarkVersion(version: string, standardName: string): string {
 }
 
 /**
+ * Interpolate template variables with content values
+ * Supported variables: {github}, {slug}, {vendor_slug}, {name}
+ */
+function interpolateTemplate(template: string, content: ContentItem): string {
+  if (!template)
+    return ''
+
+  return template
+    .replace(/\{github\}/g, content.github_url || '')
+    .replace(/\{slug\}/g, content.slug || '')
+    .replace(/\{vendor_slug\}/g, content.vendor_slug || '')
+    .replace(/\{name\}/g, content.name || '')
+}
+
+/**
  * Composable for content detail page logic
  * Extracts formatting, URLs, and display configuration from component
  */
@@ -100,7 +136,7 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
   const formattedBenchmarkVersion = computed(() => {
     return formatBenchmarkVersion(
       content.benchmark_version || '',
-      content.standard_name || content.standard_short_name
+      content.standard_name || content.standard_short_name,
     )
   })
 
@@ -110,7 +146,8 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
 
   const benchmarkLabel = computed(() => {
     const version = formattedBenchmarkVersion.value
-    if (!version) return ''
+    if (!version)
+      return ''
     const standard = content.standard_short_name || 'Benchmark'
     return `${standard} ${version}`
   })
@@ -123,14 +160,14 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       urls.push({
         label: 'View on GitHub',
         url: content.github_url,
-        primary: true
+        primary: true,
       })
 
       // Always show README
       urls.push({
         label: 'View README',
         url: `${content.github_url}#readme`,
-        primary: false
+        primary: false,
       })
     }
 
@@ -139,7 +176,18 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       urls.push({
         label: 'Documentation',
         url: content.documentation_url,
-        primary: false
+        primary: false,
+      })
+    }
+
+    // Show reference URL (STIG, CIS benchmark, etc.)
+    if (content.reference_url) {
+      urls.push({
+        label: content.standard_short_name
+          ? `${content.standard_short_name} Reference`
+          : 'Standard Reference',
+        url: content.reference_url,
+        primary: false,
       })
     }
 
@@ -182,6 +230,19 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     return cards
   })
 
+  // Template interpolation
+  const quickStart = computed(() => {
+    return interpolateTemplate(content.quick_start_template || '', content)
+  })
+
+  const prerequisites = computed(() => {
+    return content.prerequisites_template || ''
+  })
+
+  const hasQuickStart = computed(() => Boolean(content.quick_start_template))
+  const hasPrerequisites = computed(() => Boolean(content.prerequisites_template))
+  const hasReadme = computed(() => Boolean(content.readme_markdown))
+
   return {
     formattedBenchmarkVersion,
     formattedProfileVersion,
@@ -189,6 +250,11 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     actionUrls,
     featureCards,
     isValidation,
-    isHardening
+    isHardening,
+    quickStart,
+    prerequisites,
+    hasQuickStart,
+    hasPrerequisites,
+    hasReadme,
   }
 }

@@ -1,0 +1,298 @@
+# CLAUDE.md - Component Development Guide
+
+This file helps AI assistants understand the component architecture, patterns, and reference sources for the SAF Site VitePress project.
+
+## Architecture Overview
+
+```
+docs/.vitepress/theme/components/
+├── ui/                    # shadcn-vue primitives (Button, Card, Badge, etc.)
+├── icons/                 # Custom SVG icon components
+│   ├── pillars/          # SAF pillar icons (Validate, Harden, etc.)
+│   ├── tools/            # Tool icons (Heimdall, SAF CLI)
+│   └── BrandIcon.vue     # Dynamic brand icon resolver
+├── logos/                 # Logo rendering system
+│   └── LogoItemRenderer.vue
+├── LogoGrid.vue          # Grid display for logos
+├── LogoMarquee.vue       # Animated scrolling logos
+├── PageSection.vue       # Two-column layout sections
+├── ContentCard.vue       # Content browse cards
+├── PillarBadge.vue       # SAF pillar indicator badges
+└── ...
+```
+
+## Reference Sources
+
+### Primary Design Reference: Nuxt UI
+- **URL**: https://ui.nuxt.com/
+- **GitHub**: https://github.com/nuxt/ui
+- **Use for**: Component API design, prop naming, slot patterns
+- **Key patterns**:
+  - Props interfaces with JSDoc
+  - Variant-based styling
+  - Composable slot structure
+
+### Implementation Reference: shadcn-vue
+- **URL**: https://www.shadcn-vue.com/
+- **GitHub**: https://github.com/radix-vue/shadcn-vue
+- **Use for**: Actual component implementation
+- **Key patterns**:
+  - Reka UI primitives for accessibility
+  - CVA (class-variance-authority) for variants
+  - Tailwind CSS for styling
+
+### Headless Primitives: Reka UI
+- **URL**: https://reka-ui.com/
+- **GitHub**: https://github.com/unovue/reka-ui
+- **Use for**: Accessible headless components
+- **Components**: Dialog, Select, Popover, Tabs, etc.
+
+### Styling: Tailwind CSS 4
+- **URL**: https://tailwindcss.com/docs
+- **Use for**: All component styling
+- **Key files**:
+  - `docs/.vitepress/theme/custom.css` - Theme integration
+  - `tailwind.config.ts` - Configuration
+
+## Component Patterns
+
+### Props Interface Pattern
+```typescript
+export interface ComponentNameProps {
+  /** Brief description of prop */
+  propName: PropType
+  /** Optional prop with union type */
+  variant?: 'default' | 'outline' | 'ghost'
+}
+
+const props = withDefaults(defineProps<ComponentNameProps>(), {
+  variant: 'default'
+})
+```
+
+### Variant Styling with CVA
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority'
+
+const componentVariants = cva(
+  'base-classes here',
+  {
+    variants: {
+      variant: {
+        default: 'variant-default-classes',
+        outline: 'variant-outline-classes',
+      },
+      size: {
+        sm: 'size-sm-classes',
+        lg: 'size-lg-classes',
+      }
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'sm'
+    }
+  }
+)
+
+export type ComponentVariants = VariantProps<typeof componentVariants>
+```
+
+### Slot Pattern
+```vue
+<template>
+  <div>
+    <slot name="header" />
+    <slot />  <!-- default slot -->
+    <slot name="footer" />
+  </div>
+</template>
+```
+
+## Documentation Pattern
+
+We use automated JSDoc extraction. See `STYLE-GUIDE.md` for full details.
+
+### Quick Reference
+```vue
+<script setup lang="ts">
+/**
+ * @component ComponentName - Brief description.
+ * Additional context about usage.
+ *
+ * @example Basic usage
+ * <ComponentName :prop="value" />
+ *
+ * @example With variant
+ * <ComponentName variant="outline" />
+ */
+export interface ComponentNameProps { ... }
+</script>
+```
+
+### Generate Docs
+```bash
+pnpm story:docs    # Regenerate all story docs
+```
+
+## Testing Patterns
+
+### Test File Location
+Tests are colocated with source files:
+```
+ComponentName.vue
+ComponentName.story.vue
+ComponentName.spec.ts
+```
+
+### Test Structure
+```typescript
+import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils'
+import ComponentName from './ComponentName.vue'
+
+describe('ComponentName', () => {
+  it('renders with default props', () => {
+    const wrapper = mount(ComponentName, {
+      props: { items: [] }
+    })
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  it('applies variant classes', () => {
+    const wrapper = mount(ComponentName, {
+      props: { variant: 'outline' }
+    })
+    expect(wrapper.classes()).toContain('variant-outline-class')
+  })
+})
+```
+
+### Run Tests
+```bash
+pnpm test:run                           # All tests
+pnpm vitest run ComponentName.spec.ts   # Single file
+```
+
+## Histoire Stories
+
+### Story File Structure
+```vue
+<script setup lang="ts">
+import ComponentName from './ComponentName.vue'
+
+const testData = [...]
+</script>
+
+<template>
+  <Story title="Category/ComponentName">
+    <Variant title="Default">
+      <ComponentName :items="testData" />
+    </Variant>
+    <Variant title="Variant Name">
+      <ComponentName :items="testData" variant="outline" />
+    </Variant>
+  </Story>
+</template>
+<!-- <docs> block auto-generated by pnpm story:docs -->
+```
+
+### Story Categories
+| Category | Purpose |
+|----------|---------|
+| `Display/` | Visual display components (LogoGrid, PillarBadge) |
+| `Layout/` | Page structure components (PageSection) |
+| `Content/` | Content-specific components (ContentCard) |
+| `shadcn-vue/` | UI primitives (Button, Card, Badge) |
+
+### Run Histoire
+```bash
+pnpm story:dev     # Development server on :6006
+pnpm story:build   # Build static stories
+```
+
+## Icon System
+
+### Brand Icons (SimpleIcons)
+```vue
+<BrandIcon name="aws" :size="32" />
+<BrandIcon name="github" :size="32" />
+```
+- Uses `vue3-simple-icons` for brand logos
+- Falls back to text if icon not found
+
+### Pillar Icons
+```vue
+<PillarIcon pillar="validate" :size="24" />
+<ValidateIcon :size="24" />
+```
+- Custom SVG icons for SAF pillars
+- Consistent design language
+
+### Lucide Icons (UI)
+```vue
+<script setup>
+import { Shield, Hammer, BarChart } from 'lucide-vue-next'
+</script>
+```
+- Use for UI icons (actions, indicators)
+- Consistent stroke width and sizing
+
+## Logo System
+
+### LogoItem Interface
+```typescript
+interface LogoItem {
+  name: string           // Display name & SimpleIcons lookup
+  href?: string          // Optional link
+  icon?: Component       // Override icon component
+  iconName?: string      // Override SimpleIcons name
+}
+```
+
+### Logo Resolution Order
+1. Custom `icon` component if provided
+2. `iconName` lookup in SimpleIcons
+3. `name` lookup in SimpleIcons
+4. Fallback to initials
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `STYLE-GUIDE.md` | Documentation patterns |
+| `CLAUDE.md` | This file - AI context |
+| `lib/utils.ts` | `cn()` utility for class merging |
+| `index.ts` files | Barrel exports for directories |
+
+## Common Tasks
+
+### Create New Component
+1. Create `ComponentName.vue` with JSDoc
+2. Create `ComponentName.story.vue` with variants
+3. Run `pnpm story:docs` to generate docs
+4. Create `ComponentName.spec.ts` for tests
+5. Export from appropriate `index.ts`
+
+### Add shadcn-vue Component
+```bash
+pnpm dlx shadcn-vue@latest add <component-name>
+```
+Components install to `ui/<component-name>/`
+
+### Update Existing Component
+1. Modify component code
+2. Update JSDoc if props changed
+3. Run `pnpm story:docs`
+4. Update/add story variants
+5. Update tests if behavior changed
+
+## Upstream Documentation Links
+
+- [Nuxt UI Components](https://ui.nuxt.com/components)
+- [shadcn-vue Components](https://www.shadcn-vue.com/docs/components)
+- [Reka UI Primitives](https://reka-ui.com/docs/overview/introduction)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Lucide Icons](https://lucide.dev/icons/)
+- [Simple Icons](https://simpleicons.org/)
+- [Histoire Docs](https://histoire.dev/guide/)
+- [VitePress](https://vitepress.dev/)

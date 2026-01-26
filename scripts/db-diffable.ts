@@ -17,9 +17,9 @@
  * https://github.com/simonw/sqlite-diffable
  */
 
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, rmSync, statSync } from 'fs'
-import { join } from 'path'
 
 export interface TableMetadata {
   name: string
@@ -55,7 +55,7 @@ function toJsonValue(value: unknown): unknown {
   return value
 }
 
-export function dump(dbPath: string, outDir: string, options: { quiet?: boolean; exclude?: string[]; tables?: string[] } = {}): number {
+export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
   const excludeSet = new Set(options.exclude || [])
   const tablesSet = options.tables ? new Set(options.tables) : null
@@ -80,7 +80,7 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean;
         CASE WHEN name LIKE '\\_%' ESCAPE '\\' THEN 0 ELSE 1 END,
         name
     `)
-    .all() as { name: string; sql: string }[]
+    .all() as { name: string, sql: string }[]
 
   log(`Exporting ${allTables.length} tables to ${outDir}/`)
 
@@ -110,7 +110,7 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean;
       pk: number
     }[]
 
-    const columnNames = columns.map((c) => c.name)
+    const columnNames = columns.map(c => c.name)
 
     // Write metadata
     const metadata: TableMetadata = {
@@ -118,12 +118,12 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean;
       columns: columnNames,
       schema: table.sql,
     }
-    writeFileSync(join(outDir, `${table.name}.metadata.json`), JSON.stringify(metadata, null, 4) + '\n')
+    writeFileSync(join(outDir, `${table.name}.metadata.json`), `${JSON.stringify(metadata, null, 4)}\n`)
 
     // Write data as NDJSON (convert non-JSON types before serializing)
     const rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
     const ndjsonLines = rows.map((row) => {
-      const values = columnNames.map((col) => toJsonValue(row[col]))
+      const values = columnNames.map(col => toJsonValue(row[col]))
       return JSON.stringify(values)
     })
     writeFileSync(join(outDir, `${table.name}.ndjson`), ndjsonLines.join('\n') + (ndjsonLines.length ? '\n' : ''))
@@ -137,7 +137,7 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean;
   return 0
 }
 
-export function load(dbPath: string, srcDir: string, options: { replace?: boolean; quiet?: boolean } = {}): number {
+export function load(dbPath: string, srcDir: string, options: { replace?: boolean, quiet?: boolean } = {}): number {
   const log = options.quiet ? () => {} : console.log
 
   if (!existsSync(srcDir)) {
@@ -157,7 +157,7 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
 
   // Find all metadata files
   const metadataFiles = readdirSync(srcDir)
-    .filter((f) => f.endsWith('.metadata.json'))
+    .filter(f => f.endsWith('.metadata.json'))
     .sort()
 
   log(`Restoring ${metadataFiles.length} tables from ${srcDir}/`)
@@ -177,7 +177,8 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
     if (options.replace) {
       try {
         db.exec(`DROP TABLE IF EXISTS "${metadata.name}"`)
-      } catch {
+      }
+      catch {
         // Ignore errors
       }
     }
@@ -185,7 +186,8 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
     // Create table using original schema
     try {
       db.exec(metadata.schema)
-    } catch (err) {
+    }
+    catch (err) {
       const msg = (err as Error).message
       if (msg.includes('already exists')) {
         console.error(`Error: Table ${metadata.name} already exists. Use --replace to overwrite.`)
@@ -221,7 +223,7 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
 
     const lines = content.split('\n')
     const placeholders = metadata.columns.map(() => '?').join(', ')
-    const columnList = metadata.columns.map((c) => `"${c}"`).join(', ')
+    const columnList = metadata.columns.map(c => `"${c}"`).join(', ')
     const insert = db.prepare(`INSERT INTO "${metadata.name}" (${columnList}) VALUES (${placeholders})`)
 
     const insertMany = db.transaction((rows: unknown[][]) => {
@@ -230,7 +232,7 @@ export function load(dbPath: string, srcDir: string, options: { replace?: boolea
       }
     })
 
-    const rows = lines.map((line) => JSON.parse(line) as unknown[])
+    const rows = lines.map(line => JSON.parse(line) as unknown[])
     insertMany(rows)
 
     log(`  ${metadata.name}: ${rows.length} rows`)
@@ -295,7 +297,8 @@ export function objects(ndjsonPath: string, options: { asArray?: boolean } = {})
 
   if (options.asArray) {
     console.log(JSON.stringify(objects, null, 2))
-  } else {
+  }
+  else {
     objects.forEach((obj) => {
       console.log(JSON.stringify(obj))
     })
@@ -350,7 +353,8 @@ Examples:
       if (args[i] === '--exclude' && args[i + 1]) {
         excludeArgs.push(args[i + 1])
         i += 2
-      } else {
+      }
+      else {
         i++
       }
     }
@@ -359,7 +363,8 @@ Examples:
       process.exit(1)
     }
     exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined })
-  } else if (command === 'load') {
+  }
+  else if (command === 'load') {
     const dbPath = args[1]
     const dirPath = args[2]
     const hasReplace = args.slice(3).includes('--replace')
@@ -368,7 +373,8 @@ Examples:
       process.exit(1)
     }
     exitCode = load(dbPath, dirPath, { replace: hasReplace })
-  } else if (command === 'objects') {
+  }
+  else if (command === 'objects') {
     const ndjsonPath = args[1]
     const hasArray = args.slice(2).includes('--array')
     if (!ndjsonPath) {
@@ -376,7 +382,8 @@ Examples:
       process.exit(1)
     }
     exitCode = objects(ndjsonPath, { asArray: hasArray })
-  } else {
+  }
+  else {
     console.error(`Unknown command: ${command}. Use 'dump', 'load', or 'objects'.`)
     exitCode = 1
   }

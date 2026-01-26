@@ -12,7 +12,7 @@ standards:
     type: Configuration
     category: Government/Defense
     version: "Quarterly"
-  
+
   - id: srg
     name: Security Requirements Guides (SRGs)
     description: Generalized security requirements for a technology type that can be applied to all vendor solutions before creating technology-specific STIGs.
@@ -20,7 +20,7 @@ standards:
     type: Framework
     category: Government/Defense
     version: "Various"
-    
+
   - id: disa-cci
     name: DISA Control Correlation Identifier (CCI)
     description: Control correlation identifiers that provide a standard mapping between various security controls (e.g., NIST 800-53) and security requirements in implementation guidance documents like STIGs.

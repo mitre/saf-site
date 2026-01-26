@@ -2,16 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Note:** This project's CLAUDE.md is version-controlled and should be committed with changes. Update it as architectural decisions are made.
+
 ## Context Restoration (Start Here After Compact/New Session)
 
 This project uses **beads** for task tracking and context preservation. After a `/compact` or starting a new session:
 
 ```bash
 # 1. Load architecture overview (READ FIRST)
-bd show saf-site-vitepress-ga0
+bd show saf-site-ga0
 
 # 2. Load database workflow reference
-bd show saf-site-vitepress-35u
+bd show saf-site-35u
 
 # 3. Check for session recovery card
 bd list --status=open | grep -i recovery
@@ -21,21 +23,67 @@ bd ready
 ```
 
 **Key Cards (Hub & Spoke Pattern):**
-- **HUB:** `saf-site-vitepress-ga0` - Architecture overview, tech stack, key directories
-- **SPOKE:** `saf-site-vitepress-35u` - Database & Pocketbase workflow details
+- **HUB:** `saf-site-ga0` - Architecture overview, tech stack, key directories
+- **SPOKE:** `saf-site-35u` - Database & Pocketbase workflow details
 
 **Related Documentation:**
 - [README.md](README.md) - Setup, commands, workflows
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow, PR process
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
 - [AGENT.md](AGENT.md) - AI agent-specific guidance
+- [Components CLAUDE.md](docs/.vitepress/theme/components/CLAUDE.md) - Component patterns, testing, Histoire stories
+- [Components STYLE-GUIDE.md](docs/.vitepress/theme/components/STYLE-GUIDE.md) - Documentation conventions
+
+## Critical Development Principles
+
+**NEVER USE HACKS. ALWAYS FIX ROOT CAUSE.**
+
+- When encountering bugs, CSS conflicts, or unexpected behavior: investigate and fix the actual cause
+- Do not use `!important` hacks, inline style overrides, or workarounds that mask problems
+- If a fix requires `!important`, it belongs in the component definition with a comment explaining WHY (e.g., framework conflict), not in a separate CSS file
+- Understand the cascade, specificity, and architecture before proposing solutions
+- Quick fixes create technical debt - take the time to understand and fix properly
+- Document architectural decisions so future sessions understand the reasoning
+
+**Example - VitePress + shadcn-vue conflict:**
+- BAD: Add `!important` overrides in custom.css
+- GOOD: Add Tailwind's `!` modifier in button/index.ts with comment explaining VitePress `.vp-doc a` conflict
+
+**MOBILE-FIRST RESPONSIVE DESIGN**
+
+All pages and components must be tested and optimized for mobile devices.
+
+- **Test all changes on mobile** - Use browser dev tools to test mobile viewport sizes (320px, 375px, 768px, 1024px+)
+- **Mobile-first CSS** - Write mobile styles first, add desktop enhancements with `@media (min-width: ...)`
+- **Responsive patterns to follow:**
+  - Grids: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` (stack on mobile)
+  - Flex: Use `flex-col` on mobile, `md:flex-row` on desktop
+  - Font sizes: Smaller base sizes, scale up on desktop
+  - Spacing: Reduced padding/margins on mobile
+  - Icons: Scale down on mobile (see framework pages: large icon on desktop, small inline icon on mobile)
+- **Common breakpoints:**
+  - Mobile: `< 640px`
+  - Tablet: `640px - 1023px` (use `md:` prefix)
+  - Desktop: `1024px+` (use `lg:` prefix)
+- **Test checklist:**
+  - [ ] Text is readable (not too small)
+  - [ ] Buttons/links are tappable (min 44px touch target)
+  - [ ] No horizontal scrolling
+  - [ ] Images/icons scale appropriately
+  - [ ] Navigation works on mobile
+  - [ ] Cards/grids stack properly
+
+**Tools for mobile testing:**
+- Browser DevTools responsive mode
+- `pnpm dev` and test on actual mobile device
+- VitePress dev server accessible on local network for device testing
 
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
 
 **Tech Stack:**
-- VitePress 1.6.4 (static site generator)
+- VitePress 2.0.0-alpha.15 (static site generator)
 - Vue 3.5 with Composition API
 - Tailwind CSS 4 (utility-first styling)
 - shadcn-vue (component library)
@@ -59,13 +107,20 @@ pnpm dev                               # Terminal 2
 pnpm db:export                         # Export to git
 pnpm reload-data                       # Refresh dev server
 
-# Testing
-pnpm test:run
+# Testing & Linting
+pnpm test:run                          # Run tests
+pnpm lint:fix                          # Auto-fix code style (ESLint)
+pnpm ci:check                          # Full CI check (typecheck + lint + test + docs)
+
+# Component development (Histoire)
+pnpm story:dev     # Start Histoire on :6006
+pnpm story:docs    # Generate docs from component JSDoc
 ```
 
 **URLs:**
 - Dev site: http://localhost:5173
 - Pocketbase Admin: http://localhost:8090/_/
+- Histoire: http://localhost:6006/
 - Login: `admin@localhost.com` / `testpassword123`
 
 ## Architecture
@@ -265,6 +320,33 @@ pnpm test:coverage   # With coverage
 pnpm test            # Watch mode
 ```
 
+## Component Documentation (DRY Pattern)
+
+Component documentation is auto-generated from JSDoc comments to maintain a single source of truth:
+
+1. **Write JSDoc in component:** Use `@component` tag with description and `@example` tags
+2. **Create story file:** `ComponentName.story.vue` with variants
+3. **Run doc generator:** `pnpm story:docs` injects `<docs>` block into story file
+4. **View in Histoire:** Documentation appears in docs panel
+
+**Example:**
+```vue
+<script setup lang="ts">
+/**
+ * @component LogoGrid - Display logos in responsive grid.
+ *
+ * @example Basic
+ * <LogoGrid :items="partners" />
+ */
+export interface LogoGridProps {
+  /** Array of logo items */
+  items: LogoItem[]
+}
+</script>
+```
+
+This keeps component docs, props table, and examples in sync automatically. See `docs/.vitepress/theme/components/STYLE-GUIDE.md` for full conventions.
+
 ## Scripts Reference
 
 | Script | Purpose |
@@ -275,13 +357,18 @@ pnpm test            # Watch mode
 | `pnpm db:export` | Export Pocketbase to diffable/ |
 | `pnpm reload-data` | Trigger data loader refresh |
 
-## Beads Task Tracking
+## Task Tracking
+
+This project uses **beads** for task management. Tasks are stored in `.beads/` and sync with git.
 
 ```bash
 bd ready                    # See available work
 bd list --status=open       # All open tasks
 bd show <id>                # Task details
+bd sync                     # Sync with remote (commit all changes first)
 ```
+
+**Note:** `bd sync` performs a `git pull` internally, so commit all modified files before running it.
 
 ## Common Issues
 
@@ -396,6 +483,7 @@ import { Badge } from '@/components/ui/badge'
 | Button | `ui/button` | Actions, links |
 | Card | `ui/card` | Content containers |
 | Input | `ui/input` | Form text inputs |
+| Select | `ui/select` | Dropdown selects (filters) |
 
 ### Adding New Theme Colors
 
@@ -433,3 +521,48 @@ This means you can use Tailwind hover classes normally (`hover:border-primary`, 
 - Logic in composables, presentation in components
 - Tests colocated with source files
 - Path alias `@/` maps to `docs/.vitepress/theme/`
+- ESLint auto-formatting with `@antfu/eslint-config` (opinionated style, run `pnpm lint:fix` before commits)
+
+## Icon Libraries
+
+Two icon libraries for different purposes:
+
+| Library | Purpose | Import |
+|---------|---------|--------|
+| `lucide-vue-next` | UI icons (actions, pillar badges) | `import { Shield } from 'lucide-vue-next'` |
+| `vue3-simple-icons` | Brand logos (Ansible, AWS, etc.) | `import { AnsibleIcon } from 'vue3-simple-icons'` |
+
+```vue
+<script setup>
+import { Shield, Hammer } from 'lucide-vue-next'
+import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
+</script>
+```
+
+## Unified Content Library (Planned Feature)
+
+**Goal:** Replace separate `/validate/` and `/harden/` pages with unified `/content/` browse.
+
+**Design Decisions:**
+- URL: `/content/`
+- Default: Show all content
+- Sort: By name
+- Related content: Cross-link on detail pages
+
+**SAF Pillars (Color-Coded Badges):**
+
+| Pillar | Tailwind | Lucide Icon | Use Case |
+|--------|----------|-------------|----------|
+| Validate | `blue-500` | `Shield` | InSpec profiles |
+| Harden | `green-500` | `Hammer` | Ansible, Chef, Terraform |
+| Plan | `purple-500` | `ClipboardList` | Vulcan, guidance |
+| Normalize | `orange-500` | `RefreshCw` | CLI converters |
+| Visualize | `cyan-500` | `BarChart3` | Heimdall, reports |
+
+**Implementation Tasks:**
+1. Create PillarBadge component
+2. Generalize ProfileCard → ContentCard
+3. Generalize ProfileFilters → ContentFilters (add Pillar filter)
+4. Create `/content/` route (replaces `/validate/`)
+5. Update data loader to fetch all content types
+6. Add related content section to detail pages

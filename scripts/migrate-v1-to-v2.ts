@@ -10,10 +10,10 @@
  * Run with: npx tsx scripts/migrate-v1-to-v2.ts
  */
 
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import PocketBase from 'pocketbase'
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -30,7 +30,7 @@ const idMaps: Record<string, Record<string, string>> = {
   standards: {},
   technologies: {},
   tools: {},
-  content: {},  // profiles + hardening_profiles → content
+  content: {}, // profiles + hardening_profiles → content
 }
 
 async function main() {
@@ -66,14 +66,14 @@ async function main() {
   await migrateContentTags()
   await migrateContentRelationships()
 
-  console.log('\n' + '='.repeat(70))
+  console.log(`\n${'='.repeat(70)}`)
   console.log('MIGRATION COMPLETE')
   console.log('='.repeat(70))
 
   // Save ID mappings for reference
   fs.writeFileSync(
     path.join(EXPORT_DIR, 'id-mappings.json'),
-    JSON.stringify(idMaps, null, 2)
+    JSON.stringify(idMaps, null, 2),
   )
   console.log('\n✓ ID mappings saved to scripts/v1-export/id-mappings.json')
 }
@@ -94,17 +94,19 @@ async function migrateCapabilities() {
         description: item.description || '',
         icon: item.icon || '',
         color: item.color || '',
-        sort_order: item.sort_order || 0
+        sort_order: item.sort_order || 0,
       })
       idMaps.capabilities[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400 && error.response?.data?.slug) {
         // Duplicate slug - try to find existing
         const existing = await pb.collection('v2_capabilities').getFirstListItem(`slug="${slugify(item.name)}"`)
         idMaps.capabilities[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -123,16 +125,18 @@ async function migrateOrganizations() {
         description: item.description || '',
         website: item.website || '',
         logo: item.logo || '',
-        org_type: mapOrgType(item.org_type || item.type)
+        org_type: mapOrgType(item.org_type || item.type),
       })
       idMaps.organizations[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('v2_organizations').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.organizations[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -160,20 +164,23 @@ async function migrateTags() {
         display_name: item.display_name || formatTagName(tagName),
         description: item.description || '',
         tag_category: mapTagCategory(item.category || item.tag_category),
-        badge_color: item.badge_color || item.color || ''
+        badge_color: item.badge_color || item.color || '',
       })
       idMaps.tags[item.id] = v2Record.id
       console.log(`  ✓ ${tagName}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('v2_tags').getFirstListItem(`slug="${tagSlug}"`)
           idMaps.tags[item.id] = existing.id
           console.log(`  ℹ️ ${tagName} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${tagName}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${tagName}: ${error.message}`)
       }
     }
@@ -203,16 +210,18 @@ async function migrateTeams() {
         slug: item.slug || slugify(item.name),
         description: item.description || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        website: item.website || ''
+        website: item.website || '',
       })
       idMaps.teams[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('v2_teams').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.teams[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -232,16 +241,18 @@ async function migrateStandards() {
         website: item.website || '',
         logo: item.logo || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        standard_type: mapStandardType(item.standard_type || item.type)
+        standard_type: mapStandardType(item.standard_type || item.type),
       })
       idMaps.standards[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('v2_standards').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.standards[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -262,16 +273,18 @@ async function migrateTechnologies() {
         logo: item.logo || '',
         github: item.github || '',
         organization: item.organization ? idMaps.organizations[item.organization] : '',
-        documentation_url: item.documentation_url || ''
+        documentation_url: item.documentation_url || '',
       })
       idMaps.technologies[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('v2_technologies').getFirstListItem(`slug="${item.slug || slugify(item.name)}"`)
         idMaps.technologies[item.id] = existing.id
         console.log(`  ℹ️ ${item.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
       }
     }
@@ -304,16 +317,18 @@ async function createCategories() {
         slug: cat.slug,
         description: cat.description,
         icon: cat.icon,
-        sort_order: CATEGORIES.indexOf(cat)
+        sort_order: CATEGORIES.indexOf(cat),
       })
       categoryIds[cat.slug] = record.id
       console.log(`  ✓ ${cat.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         const existing = await pb.collection('v2_categories').getFirstListItem(`slug="${cat.slug}"`)
         categoryIds[cat.slug] = existing.id
         console.log(`  ℹ️ ${cat.name} (already exists)`)
-      } else {
+      }
+      else {
         console.error(`  ✗ ${cat.name}: ${error.message}`)
       }
     }
@@ -447,9 +462,9 @@ async function createTargets() {
         // Find vendor org ID if specified
         let vendorId = ''
         if (targetInfo.vendor) {
-          const vendorOrg = await pb.collection('v2_organizations').getFirstListItem(`slug="${targetInfo.vendor}"`)
-            .catch(() => null)
-          if (vendorOrg) vendorId = vendorOrg.id
+          const vendorOrg = await pb.collection('v2_organizations').getFirstListItem(`slug="${targetInfo.vendor}"`).catch(() => null)
+          if (vendorOrg)
+            vendorId = vendorOrg.id
         }
 
         const record = await pb.collection('v2_targets').create({
@@ -459,16 +474,18 @@ async function createTargets() {
           category: categoryIds[targetInfo.category] || '',
           vendor: vendorId,
           website: '',
-          logo: ''
+          logo: '',
         })
         targetIds[targetInfo.slug] = record.id
         console.log(`  ✓ ${targetInfo.name}`)
-      } catch (error: any) {
+      }
+      catch (error: any) {
         if (error.status === 400) {
           const existing = await pb.collection('v2_targets').getFirstListItem(`slug="${targetInfo.slug}"`)
           targetIds[targetInfo.slug] = existing.id
           console.log(`  ℹ️ ${targetInfo.name} (already exists)`)
-        } else {
+        }
+        else {
           console.error(`  ✗ ${targetInfo.name}: ${error.message}`)
         }
       }
@@ -503,7 +520,7 @@ async function migrateTools() {
       screenshots: item.screenshots || [],
       is_featured: item.is_featured || false,
       featured_order: item.featured_order || 0,
-      license: item.license || ''
+      license: item.license || '',
     }
 
     // Only add FK fields if they have valid mapped IDs
@@ -518,7 +535,8 @@ async function migrateTools() {
       const v2Record = await pb.collection('v2_tools').create(record)
       idMaps.tools[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       console.error(`  ✗ ${item.name}: ${error.message}`)
       if (error.response) {
         console.error(`      Response: ${JSON.stringify(error.response)}`)
@@ -528,7 +546,8 @@ async function migrateTools() {
           const existing = await pb.collection('v2_tools').getFirstListItem(`slug="${toolSlug}"`)
           idMaps.tools[item.id] = existing.id
           console.log(`      → Found existing with slug`)
-        } catch {
+        }
+        catch {
           // ignore
         }
       }
@@ -568,11 +587,12 @@ async function migrateProfiles() {
         benchmark_version: item.standard_version || item.benchmark_version || '',
         is_featured: item.is_featured || false,
         featured_order: item.featured_order || 0,
-        license: item.license || ''
+        license: item.license || '',
       }
 
       // Only add FK fields if they have valid mapped IDs
-      if (targetId) contentRecord.target = targetId
+      if (targetId)
+        contentRecord.target = targetId
       if (item.standard && idMaps.standards[item.standard]) {
         contentRecord.standard = idMaps.standards[item.standard]
       }
@@ -589,16 +609,19 @@ async function migrateProfiles() {
       const v2Record = await pb.collection('v2_content').create(contentRecord)
       idMaps.content[item.id] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('v2_content').getFirstListItem(`slug="${profileSlug}"`)
           idMaps.content[item.id] = existing.id
           console.log(`  ℹ️ ${item.name} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${item.name}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
         if (error.response?.data) {
           console.error(`      Details: ${JSON.stringify(error.response.data)}`)
@@ -621,10 +644,13 @@ async function migrateHardeningProfiles() {
       const targetId = targetInfo ? targetIds[targetInfo.slug] : ''
 
       // Map difficulty to automation_level
-      const automationLevel = item.difficulty === 'easy' ? 'full'
-        : item.difficulty === 'medium' ? 'partial'
-        : item.difficulty === 'hard' ? 'manual'
-        : mapAutomationLevel(item.automation_level)
+      const automationLevel = item.difficulty === 'easy'
+        ? 'full'
+        : item.difficulty === 'medium'
+          ? 'partial'
+          : item.difficulty === 'hard'
+            ? 'manual'
+            : mapAutomationLevel(item.automation_level)
 
       // Build record with optional FK fields
       const hardeningRecord: Record<string, any> = {
@@ -640,11 +666,12 @@ async function migrateHardeningProfiles() {
         automation_level: automationLevel,
         is_featured: item.is_featured || false,
         featured_order: item.featured_order || 0,
-        license: item.license || ''
+        license: item.license || '',
       }
 
       // Only add FK fields if they have valid mapped IDs
-      if (targetId) hardeningRecord.target = targetId
+      if (targetId)
+        hardeningRecord.target = targetId
       if (item.standard && idMaps.standards[item.standard]) {
         hardeningRecord.standard = idMaps.standards[item.standard]
       }
@@ -662,16 +689,19 @@ async function migrateHardeningProfiles() {
       // Use special prefix to distinguish hardening profile IDs
       idMaps.content[`h_${item.id}`] = v2Record.id
       console.log(`  ✓ ${item.name}`)
-    } catch (error: any) {
+    }
+    catch (error: any) {
       if (error.status === 400) {
         try {
           const existing = await pb.collection('v2_content').getFirstListItem(`slug="${hardeningSlug}"`)
           idMaps.content[`h_${item.id}`] = existing.id
           console.log(`  ℹ️ ${item.name} (already exists)`)
-        } catch {
+        }
+        catch {
           console.error(`  ✗ ${item.name}: ${error.message}`)
         }
-      } else {
+      }
+      else {
         console.error(`  ✗ ${item.name}: ${error.message}`)
         if (error.response?.data) {
           console.error(`      Details: ${JSON.stringify(error.response.data)}`)
@@ -699,13 +729,15 @@ async function migrateContentTags() {
       try {
         await pb.collection('v2_content_tags').create({
           content: contentId,
-          tag: tagId
+          tag: tagId,
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -722,13 +754,15 @@ async function migrateContentTags() {
       try {
         await pb.collection('v2_content_tags').create({
           content: contentId,
-          tag: tagId
+          tag: tagId,
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -750,13 +784,15 @@ async function migrateContentRelationships() {
         await pb.collection('v2_content_relationships').create({
           content: validationId,
           related_content: hardeningId,
-          relationship_type: 'hardens'
+          relationship_type: 'hardens',
         })
         count++
-      } catch {
+      }
+      catch {
         // Ignore duplicates
       }
-    } else {
+    }
+    else {
       skipped++
     }
   }
@@ -778,57 +814,58 @@ function slugify(text: string): string {
 
 function mapOrgType(type: string | undefined): string {
   const map: Record<string, string> = {
-    'vendor': 'vendor',
-    'government': 'government',
-    'community': 'community',
-    'standards': 'standards_body',
-    'standards_body': 'standards_body'
+    vendor: 'vendor',
+    government: 'government',
+    community: 'community',
+    standards: 'standards_body',
+    standards_body: 'standards_body',
   }
   return map[type || ''] || ''
 }
 
 function mapTagCategory(category: string | undefined): string {
   const map: Record<string, string> = {
-    'platform': 'platform',
-    'compliance': 'compliance',
-    'feature': 'feature',
-    'technology': 'technology',
-    'other': 'other'
+    platform: 'platform',
+    compliance: 'compliance',
+    feature: 'feature',
+    technology: 'technology',
+    other: 'other',
   }
   return map[category || ''] || 'other'
 }
 
 function mapStandardType(type: string | undefined): string {
   const map: Record<string, string> = {
-    'regulatory': 'regulatory',
-    'industry': 'industry',
-    'government': 'government',
-    'vendor': 'vendor'
+    regulatory: 'regulatory',
+    industry: 'industry',
+    government: 'government',
+    vendor: 'vendor',
   }
   return map[type || ''] || ''
 }
 
 function mapStatus(status: string | undefined): string {
   const map: Record<string, string> = {
-    'active': 'active',
-    'beta': 'beta',
-    'deprecated': 'deprecated',
-    'draft': 'draft'
+    active: 'active',
+    beta: 'beta',
+    deprecated: 'deprecated',
+    draft: 'draft',
   }
   return map[status || ''] || 'active'
 }
 
 function mapAutomationLevel(level: string | undefined): string {
   const map: Record<string, string> = {
-    'full': 'full',
-    'partial': 'partial',
-    'manual': 'manual'
+    full: 'full',
+    partial: 'partial',
+    manual: 'manual',
   }
   return map[level || ''] || ''
 }
 
 function normalizeUrl(url: string | undefined): string {
-  if (!url) return ''
+  if (!url)
+    return ''
 
   // Convert relative URLs to absolute (using saf.mitre.org as base)
   if (url.startsWith('/')) {
@@ -845,11 +882,12 @@ function normalizeUrl(url: string | undefined): string {
 }
 
 function normalizeVersion(version: string | undefined): string {
-  if (!version) return ''
+  if (!version)
+    return ''
 
   // Strip leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
   // The display layer (Vue components) adds the "v" prefix for presentation
-  return version.replace(/^[vV]/, '')
+  return version.replace(/^v/i, '')
 }
 
 main().catch(console.error)

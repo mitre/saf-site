@@ -29,13 +29,15 @@ async function deleteAllCollections() {
       try {
         await pb.collections.delete(collection.id)
         console.log(`✓ ${collection.name} deleted`)
-      } catch (error: any) {
+      }
+      catch (error: any) {
         console.log(`⚠️  Skipping ${collection.name}: ${error.message}`)
       }
     }
 
     console.log('\n✅ All collections deleted!')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('❌ Error:', error)
     process.exit(1)
   }

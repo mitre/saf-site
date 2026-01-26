@@ -8,7 +8,7 @@
 ### 2. Category Overuse
 **Problem:** 50/78 profiles using generic "Platform Security" category - needs specificity
 
-### 3. Vendor Inconsistency  
+### 3. Vendor Inconsistency
 **Problem:** Windows/VMware profiles showing wrong vendor
 
 ---
@@ -166,4 +166,3 @@ Use Pocketbase Admin UI to manually update each profile for accuracy
 5. **Standardize Categories**:
    - Replace generic "Platform Security" with specific categories
    - Use consistent naming (plural vs singular)
-

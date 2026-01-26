@@ -40,9 +40,9 @@ async function main() {
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
     { name: 'color', type: 'text', options: { max: 50 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Categories
@@ -51,9 +51,9 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Organizations
@@ -63,10 +63,10 @@ async function main() {
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
-    { name: 'org_type', type: 'select', values: ['vendor', 'government', 'community', 'standards_body'] }
+    { name: 'org_type', type: 'select', values: ['vendor', 'government', 'community', 'standards_body'] },
   ], {
     unique: ['slug'],
-    regular: ['org_type']
+    regular: ['org_type'],
   })
 
   // Tags
@@ -76,10 +76,10 @@ async function main() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'tag_category', type: 'select', values: ['platform', 'compliance', 'feature', 'technology', 'other'] },
-    { name: 'badge_color', type: 'text', options: { max: 50 } }
+    { name: 'badge_color', type: 'text', options: { max: 50 } },
   ], {
     unique: ['name', 'slug'],
-    regular: ['tag_category']
+    regular: ['tag_category'],
   })
 
   // Tool Types
@@ -88,9 +88,9 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Distribution Types
@@ -100,9 +100,9 @@ async function main() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Registries
@@ -112,9 +112,9 @@ async function main() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'website', type: 'url' },
-    { name: 'logo', type: 'text' }
+    { name: 'logo', type: 'text' },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Resource Types (for course learning resources)
@@ -124,9 +124,9 @@ async function main() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // Media Types (for SAF media library)
@@ -136,9 +136,9 @@ async function main() {
     { name: 'display_name', type: 'text', options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'icon', type: 'text', options: { max: 100 } },
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    unique: ['name', 'slug']
+    unique: ['name', 'slug'],
   })
 
   // ========================================================================
@@ -151,10 +151,10 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'website', type: 'url' }
+    { name: 'website', type: 'url' },
   ], {
     unique: ['slug'],
-    regular: ['organization']
+    regular: ['organization'],
   })
 
   // Standards (depends on organizations)
@@ -166,10 +166,10 @@ async function main() {
     { name: 'website', type: 'url' },
     { name: 'logo', type: 'text' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'standard_type', type: 'select', values: ['regulatory', 'industry', 'government', 'vendor'] }
+    { name: 'standard_type', type: 'select', values: ['regulatory', 'industry', 'government', 'vendor'] },
   ], {
     unique: ['slug'],
-    regular: ['organization', 'standard_type']
+    regular: ['organization', 'standard_type'],
   })
 
   // Technologies (depends on organizations)
@@ -181,10 +181,10 @@ async function main() {
     { name: 'logo', type: 'text' },
     { name: 'github', type: 'url' },
     { name: 'organization', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
-    { name: 'documentation_url', type: 'url' }
+    { name: 'documentation_url', type: 'url' },
   ], {
     unique: ['slug'],
-    regular: ['organization']
+    regular: ['organization'],
   })
 
   // Targets (depends on categories, organizations)
@@ -195,10 +195,10 @@ async function main() {
     { name: 'category', type: 'relation', collectionId: collectionIds.categories, maxSelect: 1 },
     { name: 'vendor', type: 'relation', collectionId: collectionIds.organizations, maxSelect: 1 },
     { name: 'website', type: 'url' },
-    { name: 'logo', type: 'text' }
+    { name: 'logo', type: 'text' },
   ], {
     unique: ['slug'],
-    regular: ['category', 'vendor']
+    regular: ['category', 'vendor'],
   })
 
   // ========================================================================
@@ -211,7 +211,7 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 150 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'content_type', type: 'select', required: true, values: ['validation', 'hardening'] },
@@ -243,10 +243,10 @@ async function main() {
     // Metadata
     { name: 'license', type: 'text', options: { max: 100 } },
     { name: 'release_date', type: 'date' },
-    { name: 'deprecated_at', type: 'date' }
+    { name: 'deprecated_at', type: 'date' },
   ], {
     unique: ['slug'],
-    regular: ['content_type', 'status', 'target', 'standard', 'technology', 'vendor', 'maintainer', 'is_featured']
+    regular: ['content_type', 'status', 'target', 'standard', 'technology', 'vendor', 'maintainer', 'is_featured'],
   })
 
   // Tools
@@ -255,7 +255,7 @@ async function main() {
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
     { name: 'long_description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'tool_type', type: 'relation', collectionId: collectionIds.tool_types, maxSelect: 1 },
@@ -280,10 +280,10 @@ async function main() {
     { name: 'featured_order', type: 'number', options: { min: 0 } },
 
     // Metadata
-    { name: 'license', type: 'text', options: { max: 100 } }
+    { name: 'license', type: 'text', options: { max: 100 } },
   ], {
     unique: ['slug'],
-    regular: ['tool_type', 'status', 'organization', 'technology', 'is_featured']
+    regular: ['tool_type', 'status', 'organization', 'technology', 'is_featured'],
   })
 
   // Distributions
@@ -291,7 +291,7 @@ async function main() {
     { name: 'name', type: 'text', required: true, options: { max: 200 } },
     { name: 'slug', type: 'text', required: true, options: { max: 100 } },
     { name: 'description', type: 'text' },
-    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } },  // No "v" prefix - frontend adds it
+    { name: 'version', type: 'text', options: { max: 50, pattern: '^[0-9].*$' } }, // No "v" prefix - frontend adds it
 
     // Classification
     { name: 'status', type: 'select', values: ['active', 'beta', 'deprecated', 'draft'] },
@@ -310,10 +310,10 @@ async function main() {
     { name: 'install_command', type: 'text' },
 
     // Metadata
-    { name: 'license', type: 'text', options: { max: 100 } }
+    { name: 'license', type: 'text', options: { max: 100 } },
   ], {
     unique: ['slug'],
-    regular: ['status', 'tool', 'distribution_type', 'registry']
+    regular: ['status', 'tool', 'distribution_type', 'registry'],
   })
 
   // Courses (training classes and educational content)
@@ -350,10 +350,10 @@ async function main() {
 
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
-    { name: 'featured_order', type: 'number', options: { min: 0 } }
+    { name: 'featured_order', type: 'number', options: { min: 0 } },
   ], {
     unique: ['slug'],
-    regular: ['course_type', 'level', 'status', 'organization', 'is_featured']
+    regular: ['course_type', 'level', 'status', 'organization', 'is_featured'],
   })
 
   // Course Resources (learning materials for courses)
@@ -367,14 +367,14 @@ async function main() {
     { name: 'resource_type', type: 'relation', required: true, collectionId: collectionIds.resource_types, maxSelect: 1 },
 
     // Display
-    { name: 'sort_order', type: 'number', options: { min: 0 } }
+    { name: 'sort_order', type: 'number', options: { min: 0 } },
   ], {
-    regular: ['course', 'resource_type']
+    regular: ['course', 'resource_type'],
   })
 
   // Course Sessions (scheduled training dates - past and future)
   collectionIds.course_sessions = await createCollection('v2_course_sessions', [
-    { name: 'title', type: 'text', options: { max: 200 } },  // Optional override like "Spring 2026 Cohort"
+    { name: 'title', type: 'text', options: { max: 200 } }, // Optional override like "Spring 2026 Cohort"
 
     // Foreign Keys
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
@@ -386,7 +386,7 @@ async function main() {
 
     // Location
     { name: 'location_type', type: 'select', values: ['virtual', 'in_person', 'hybrid'] },
-    { name: 'location', type: 'text' },  // Room/venue or video platform
+    { name: 'location', type: 'text' }, // Room/venue or video platform
     { name: 'meeting_url', type: 'url' },
 
     // Capacity
@@ -397,9 +397,9 @@ async function main() {
     { name: 'recording_url', type: 'url' },
 
     // Status
-    { name: 'status', type: 'select', values: ['scheduled', 'in_progress', 'completed', 'cancelled'] }
+    { name: 'status', type: 'select', values: ['scheduled', 'in_progress', 'completed', 'cancelled'] },
   ], {
-    regular: ['course', 'start_date', 'status', 'location_type']
+    regular: ['course', 'start_date', 'status', 'location_type'],
   })
 
   // Media (SAF media library - presentations, PDFs, videos, etc.)
@@ -417,17 +417,17 @@ async function main() {
     { name: 'published_at', type: 'date' },
 
     // Content - URL or File (one or both)
-    { name: 'url', type: 'url' },                          // External link (YouTube, SlideShare, etc.)
-    { name: 'file', type: 'file', options: {              // Binary upload (PDF, PPT, etc.)
+    { name: 'url', type: 'url' }, // External link (YouTube, SlideShare, etc.)
+    { name: 'file', type: 'file', options: { // Binary upload (PDF, PPT, etc.)
       maxSelect: 1,
-      maxSize: 52428800  // 50MB
-    }},
+      maxSize: 52428800, // 50MB
+    } },
     { name: 'file_size', type: 'number', options: { min: 0 } },
     { name: 'thumbnail', type: 'file', options: {
       maxSelect: 1,
-      maxSize: 2097152,  // 2MB
-      mimeTypes: ['image/jpeg', 'image/png', 'image/webp']
-    }},
+      maxSize: 2097152, // 2MB
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    } },
 
     // Event context (optional - for conference talks, webinars)
     { name: 'event_name', type: 'text', options: { max: 200 } },
@@ -435,10 +435,10 @@ async function main() {
 
     // Featured/Curation
     { name: 'is_featured', type: 'bool' },
-    { name: 'featured_order', type: 'number', options: { min: 0 } }
+    { name: 'featured_order', type: 'number', options: { min: 0 } },
   ], {
     unique: ['slug'],
-    regular: ['media_type', 'organization', 'published_at', 'is_featured']
+    regular: ['media_type', 'organization', 'published_at', 'is_featured'],
   })
 
   // Releases (version history - polymorphic)
@@ -459,11 +459,11 @@ async function main() {
     { name: 'sha256', type: 'text', options: { max: 64 } },
 
     // Status
-    { name: 'is_latest', type: 'bool' }
+    { name: 'is_latest', type: 'bool' },
   ], {
     unique: ['slug'],
     regular: ['entity_type', 'entity_id', 'is_latest'],
-    composite: [['entity_type', 'entity_id', 'is_latest']]  // For "get latest" queries
+    composite: [['entity_type', 'entity_id', 'is_latest']], // For "get latest" queries
   })
 
   // ========================================================================
@@ -473,105 +473,105 @@ async function main() {
   // Content ↔ Capabilities
   await createCollection('v2_content_capabilities', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['content', 'capability']
+    regular: ['content', 'capability'],
   })
 
   // Content ↔ Tags
   await createCollection('v2_content_tags', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['content', 'tag']
+    regular: ['content', 'tag'],
   })
 
   // Content ↔ Content (relationships)
   await createCollection('v2_content_relationships', [
     { name: 'content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
     { name: 'related_content', type: 'relation', required: true, collectionId: collectionIds.content, maxSelect: 1, cascadeDelete: true },
-    { name: 'relationship_type', type: 'select', required: true, values: ['validates', 'hardens', 'complements'] }
+    { name: 'relationship_type', type: 'select', required: true, values: ['validates', 'hardens', 'complements'] },
   ], {
-    regular: ['content', 'related_content', 'relationship_type']
+    regular: ['content', 'related_content', 'relationship_type'],
   })
 
   // Tools ↔ Capabilities
   await createCollection('v2_tool_capabilities', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['tool', 'capability']
+    regular: ['tool', 'capability'],
   })
 
   // Tools ↔ Tags
   await createCollection('v2_tool_tags', [
     { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['tool', 'tag']
+    regular: ['tool', 'tag'],
   })
 
   // Distributions ↔ Capabilities
   await createCollection('v2_distribution_capabilities', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['distribution', 'capability']
+    regular: ['distribution', 'capability'],
   })
 
   // Distributions ↔ Tags
   await createCollection('v2_distribution_tags', [
     { name: 'distribution', type: 'relation', required: true, collectionId: collectionIds.distributions, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['distribution', 'tag']
+    regular: ['distribution', 'tag'],
   })
 
   // Courses ↔ Capabilities
   await createCollection('v2_course_capabilities', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'capability']
+    regular: ['course', 'capability'],
   })
 
   // Courses ↔ Tools
   await createCollection('v2_course_tools', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true }
+    { name: 'tool', type: 'relation', required: true, collectionId: collectionIds.tools, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'tool']
+    regular: ['course', 'tool'],
   })
 
   // Courses ↔ Tags
   await createCollection('v2_course_tags', [
     { name: 'course', type: 'relation', required: true, collectionId: collectionIds.courses, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['course', 'tag']
+    regular: ['course', 'tag'],
   })
 
   // Media ↔ Capabilities
   await createCollection('v2_media_capabilities', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
-    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true }
+    { name: 'capability', type: 'relation', required: true, collectionId: collectionIds.capabilities, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['media', 'capability']
+    regular: ['media', 'capability'],
   })
 
   // Media ↔ Tags
   await createCollection('v2_media_tags', [
     { name: 'media', type: 'relation', required: true, collectionId: collectionIds.media, maxSelect: 1, cascadeDelete: true },
-    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true }
+    { name: 'tag', type: 'relation', required: true, collectionId: collectionIds.tags, maxSelect: 1, cascadeDelete: true },
   ], {
-    regular: ['media', 'tag']
+    regular: ['media', 'tag'],
   })
 
   // ========================================================================
   // SUMMARY
   // ========================================================================
 
-  console.log('\n' + '='.repeat(70))
+  console.log(`\n${'='.repeat(70)}`)
   console.log('SUMMARY - All collections prefixed with v2_')
   console.log('='.repeat(70))
   console.log('\nLookup Tables (no dependencies):')
@@ -634,15 +634,15 @@ async function main() {
 
 // Helper function to create a collection with proper indexes
 interface IndexConfig {
-  unique?: string[]       // Fields that need UNIQUE indexes
-  regular?: string[]      // Fields that need regular indexes (FKs, filters)
-  composite?: string[][]  // Composite indexes (array of field arrays)
+  unique?: string[] // Fields that need UNIQUE indexes
+  regular?: string[] // Fields that need regular indexes (FKs, filters)
+  composite?: string[][] // Composite indexes (array of field arrays)
 }
 
 async function createCollection(
   name: string,
   fields: any[],
-  indexConfig?: IndexConfig
+  indexConfig?: IndexConfig,
 ): Promise<string> {
   try {
     // Check if collection exists
@@ -682,7 +682,7 @@ async function createCollection(
       name,
       type: 'base',
       fields,
-      indexes
+      indexes,
     })
 
     console.log(`  ✓ Created ${name} (ID: ${collection.id})`)
@@ -690,7 +690,8 @@ async function createCollection(
       console.log(`      ${indexes.length} indexes created`)
     }
     return collection.id
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.error(`  ✗ Failed to create ${name}:`, error.message)
     if (error.response?.data) {
       console.error(`      Details:`, JSON.stringify(error.response.data, null, 2))

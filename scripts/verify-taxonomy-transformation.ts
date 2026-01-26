@@ -12,7 +12,8 @@ const pb = new PocketBase('http://127.0.0.1:8090')
 try {
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
   console.log('✓ Authenticated as admin\n')
-} catch (e) {
+}
+catch (e) {
   console.error('❌ Authentication failed:', e)
   process.exit(1)
 }
@@ -39,7 +40,7 @@ console.log(`  profile_maintainer: ${withMaintainer}/${allProfiles.length} (${((
 // Target Type distribution
 console.log('\nTarget Type Distribution:')
 const targetTypes = new Map<string, number>()
-allProfiles.forEach(p => {
+allProfiles.forEach((p) => {
   if (p.target_type) {
     targetTypes.set(p.target_type, (targetTypes.get(p.target_type) || 0) + 1)
   }
@@ -53,7 +54,7 @@ Array.from(targetTypes.entries())
 // OS Family distribution
 console.log('\nOS Family Distribution:')
 const osFamilies = new Map<string, number>()
-allProfiles.forEach(p => {
+allProfiles.forEach((p) => {
   if (p.os_family) {
     osFamilies.set(p.os_family, (osFamilies.get(p.os_family) || 0) + 1)
   }
@@ -73,11 +74,12 @@ const samples = [
   profiles.find(p => p.name.includes('Windows 2019')),
   profiles.find(p => p.name.includes('VMware ESXi')),
   profiles.find(p => p.name.includes('MySQL')),
-  profiles.find(p => p.name.includes('AWS CIS'))
+  profiles.find(p => p.name.includes('AWS CIS')),
 ].filter(Boolean)
 
-samples.forEach(profile => {
-  if (!profile) return
+samples.forEach((profile) => {
+  if (!profile)
+    return
   console.log(`\n${profile.name}`)
   console.log(`  Target Type:        ${profile.target_type || 'N/A'}`)
   console.log(`  Target Subtype:     ${profile.target_subtype || 'N/A'}`)
@@ -87,9 +89,10 @@ samples.forEach(profile => {
   console.log(`  Profile Maintainer: ${profile.profile_maintainer || 'N/A'}`)
 })
 
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 if (withTargetType === allProfiles.length && withOsFamily === allProfiles.length) {
   console.log('✓ Transformation complete! All profiles have new taxonomy fields.')
-} else {
+}
+else {
   console.log('⚠️  Some profiles missing taxonomy fields. Check transformation rules.')
 }

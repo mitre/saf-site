@@ -16,14 +16,14 @@ teams:
         role: "Developer"
       - name: "Will Dower"
         role: "Developer"
-  
+
   - id: disa-stig
     name: "DISA STIG Team"
     description: "Team responsible for developing and maintaining Security Technical Implementation Guides"
     organization: "disa"
     website: "https://public.cyber.mil/stigs/"
     logo: "/img/logos/teams/disa-stig.png"
-    
+
   - id: inspec-community
     name: "InSpec Community"
     description: "Open source community contributing to the InSpec security testing framework"
@@ -31,7 +31,7 @@ teams:
     website: "https://community.chef.io/tools/chef-inspec"
     github: "https://github.com/inspec/inspec"
     logo: "/img/logos/teams/inspec-community.png"
-    
+
   - id: cis-benchmarks
     name: "CIS Benchmarks Team"
     description: "Team responsible for creating and maintaining CIS Benchmarks for secure configuration"

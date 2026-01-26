@@ -28,8 +28,8 @@ async function createCollections() {
       fields: [
         { name: 'description', type: 'text', required: false },
         { name: 'category', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, max: 50 }
-      ]
+        { name: 'status', type: 'text', required: true, max: 50 },
+      ],
     })
 
     // 2. Organizations
@@ -42,8 +42,8 @@ async function createCollections() {
         { name: 'description', type: 'text', required: false },
         { name: 'website', type: 'url', required: false },
         { name: 'logo', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 3. Teams (without relation initially)
@@ -54,8 +54,8 @@ async function createCollections() {
       schema: [
         { name: 'name', type: 'text', required: true },
         { name: 'description', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 4. Technologies
@@ -70,8 +70,8 @@ async function createCollections() {
         { name: 'logo', type: 'text', required: false },
         { name: 'category', type: 'text', required: false },
         { name: 'type', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 5. Standards
@@ -88,8 +88,8 @@ async function createCollections() {
         { name: 'vendor', type: 'text', required: false },
         { name: 'version', type: 'text', required: false },
         { name: 'logo', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 6. Validation Profiles (without relations)
@@ -109,8 +109,8 @@ async function createCollections() {
         { name: 'short_description', type: 'text', required: false },
         { name: 'requirements', type: 'text', required: false },
         { name: 'category', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 7. Hardening Profiles (without relations)
@@ -131,8 +131,8 @@ async function createCollections() {
         { name: 'requirements', type: 'text', required: false },
         { name: 'category', type: 'text', required: false },
         { name: 'difficulty', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 8. Tools (without relations)
@@ -148,8 +148,8 @@ async function createCollections() {
         { name: 'logo', type: 'text', required: false },
         { name: 'github', type: 'url', required: false },
         { name: 'category', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     // 9. Capabilities
@@ -161,8 +161,8 @@ async function createCollections() {
         { name: 'name', type: 'text', required: true },
         { name: 'description', type: 'text', required: false },
         { name: 'category', type: 'text', required: false },
-        { name: 'status', type: 'text', required: true, options: { max: 50 } }
-      ]
+        { name: 'status', type: 'text', required: true, options: { max: 50 } },
+      ],
     })
 
     console.log('\n✅ Phase 1 complete! All base collections created.')
@@ -180,7 +180,8 @@ async function createCollections() {
     console.log('  - tools.technology → technologies')
     console.log('  - tools.organization → organizations')
     console.log('\nRefresh your admin UI at http://localhost:8090/_/')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('❌ Error:', error)
     process.exit(1)
   }

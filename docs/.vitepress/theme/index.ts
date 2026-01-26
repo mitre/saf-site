@@ -1,18 +1,42 @@
+import type { EnhanceAppContext } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import './custom.css'
-import ProfileCard from './components/ProfileCard.vue'
-import ProfileFilters from './components/ProfileFilters.vue'
+// Content library components
+import ContentCard from './components/ContentCard.vue'
+
 import ContentDetail from './components/ContentDetail.vue'
-// Legacy alias - ProfileDetail now uses ContentDetail
-import ProfileDetail from './components/ProfileDetail.vue'
+import ContentFilters from './components/ContentFilters.vue'
+import FeatureItem from './components/FeatureItem.vue'
+import FeatureList from './components/FeatureList.vue'
+
+// Logo display components
+import LogoGrid from './components/LogoGrid.vue'
+import LogoMarquee from './components/LogoMarquee.vue'
+
+// Page layout components
+import PageSection from './components/PageSection.vue'
+import PillarBadge from './components/PillarBadge.vue'
+import Placeholder from './components/Placeholder.vue'
+import Skeleton from './components/Skeleton.vue'
+import './custom.css'
 
 export default {
   extends: DefaultTheme,
-  enhanceApp({ app }) {
-    app.component('ProfileCard', ProfileCard)
-    app.component('ProfileFilters', ProfileFilters)
+  enhanceApp({ app }: EnhanceAppContext) {
+    // Content library
+    app.component('ContentCard', ContentCard)
+    app.component('ContentFilters', ContentFilters)
     app.component('ContentDetail', ContentDetail)
-    // Keep ProfileDetail for backwards compatibility
-    app.component('ProfileDetail', ProfileDetail)
-  }
+    app.component('PillarBadge', PillarBadge)
+
+    // Logo display
+    app.component('LogoGrid', LogoGrid)
+    app.component('LogoMarquee', LogoMarquee)
+
+    // Page layout
+    app.component('PageSection', PageSection)
+    app.component('FeatureItem', FeatureItem)
+    app.component('FeatureList', FeatureList)
+    app.component('Skeleton', Skeleton)
+    app.component('Placeholder', Placeholder)
+  },
 }

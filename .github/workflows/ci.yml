@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]  # CI on merge to main
+  pull_request:       # CI on all PRs (single run per update)
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test:run
+
+      - name: Story docs check
+        run: pnpm story:docs:check
+
+  cli-check:
+    name: CLI - Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Pocketbase
+        uses: ./.github/actions/setup-pocketbase
+
+      - name: CLI Typecheck
+        run: pnpm --filter @saf-site/cli typecheck
+
+      - name: CLI Lint
+        run: pnpm --filter @saf-site/cli lint:check
+
+      - name: CLI Test
+        run: pnpm --filter @saf-site/cli test:run

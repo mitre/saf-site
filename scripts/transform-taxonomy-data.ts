@@ -14,7 +14,8 @@ const pb = new PocketBase('http://127.0.0.1:8090')
 try {
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
   console.log('✓ Authenticated as admin\n')
-} catch (e) {
+}
+catch (e) {
   console.error('❌ Authentication failed:', e)
   process.exit(1)
 }
@@ -39,7 +40,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Ubuntu (16\.04|18\.04|20\.04)/i,
@@ -48,7 +49,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'Canonical',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /VMware Photon OS/i,
@@ -57,7 +58,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Linux',
     category: 'Operating Systems',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
 
   // Operating Systems - Windows
@@ -68,7 +69,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Windows',
     category: 'Operating Systems',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Cloud Databases - AWS RDS (MUST come before generic DB rules)
@@ -79,7 +80,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Databases - SQL Server
@@ -90,7 +91,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Windows',
     category: 'Databases',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Databases - MySQL
@@ -101,7 +102,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Databases - PostgreSQL
@@ -112,7 +113,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Databases - Oracle
@@ -123,7 +124,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Databases - MongoDB
@@ -134,7 +135,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Databases',
     vendor: 'MongoDB',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Web Servers
@@ -145,7 +146,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Web Infrastructure',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /NGINX/i,
@@ -154,7 +155,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Web Infrastructure',
     vendor: 'Open Source',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /IIS/i,
@@ -163,7 +164,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Windows',
     category: 'Web Infrastructure',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Application Servers
@@ -174,7 +175,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Apache Software Foundation',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /JBoss/i,
@@ -183,7 +184,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Runtime Environments
@@ -194,7 +195,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Application Platforms',
     vendor: 'Oracle',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Containers - Docker
@@ -205,7 +206,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'Docker',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Containers - Kubernetes
@@ -216,7 +217,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'CNCF',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /Kubernetes/i,
@@ -225,7 +226,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'CNCF',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /K3s/i,
@@ -234,7 +235,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cross-Platform',
     category: 'Container Platforms',
     vendor: 'SUSE',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Virtualization - VMware (order matters - most specific first)
@@ -245,7 +246,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware ESXi/i,
@@ -254,7 +255,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware vSphere/i,
@@ -263,7 +264,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware VCSA|vCenter/i,
@@ -272,7 +273,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware NSX/i,
@@ -281,7 +282,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware (Aria|Cloud Foundation|Cloud Director)/i,
@@ -290,7 +291,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware Horizon/i,
@@ -299,7 +300,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Virtualization',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
   {
     pattern: /VMware Identity Manager/i,
@@ -308,7 +309,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'N/A',
     category: 'Security & Identity',
     vendor: 'VMware',
-    profile_maintainer: 'VMware'
+    profile_maintainer: 'VMware',
   },
 
   // Cloud Services - AWS (order matters)
@@ -319,7 +320,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
   {
     pattern: /AWS CIS/i,
@@ -328,7 +329,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'AWS',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Cloud Services - GCP
@@ -339,7 +340,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Google',
-    profile_maintainer: 'Google'
+    profile_maintainer: 'Google',
   },
   {
     pattern: /GKE/i,
@@ -348,7 +349,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Google',
-    profile_maintainer: 'Google'
+    profile_maintainer: 'Google',
   },
 
   // Cloud Services - Azure
@@ -359,7 +360,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Cloud Infrastructure',
     vendor: 'Microsoft',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // DevSecOps
@@ -370,7 +371,7 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Cloud-Native',
     category: 'Security & Identity',
     vendor: 'GitHub',
-    profile_maintainer: 'MITRE SAF'
+    profile_maintainer: 'MITRE SAF',
   },
 
   // Security Tools
@@ -381,8 +382,8 @@ const transformationRules: TransformationRule[] = [
     os_family: 'Linux',
     category: 'Security & Identity',
     vendor: 'Red Hat',
-    profile_maintainer: 'MITRE SAF'
-  }
+    profile_maintainer: 'MITRE SAF',
+  },
 ]
 
 async function transformCollection(collectionName: string) {
@@ -397,7 +398,7 @@ async function transformCollection(collectionName: string) {
 
   for (const record of records) {
     // Find first matching rule
-    const rule = transformationRules.find(r => {
+    const rule = transformationRules.find((r) => {
       if (typeof r.pattern === 'string') {
         return record.name.includes(r.pattern)
       }
@@ -412,11 +413,12 @@ async function transformCollection(collectionName: string) {
         os_family: rule.os_family,
         category: rule.category,
         vendor: rule.vendor || record.vendor,
-        profile_maintainer: rule.profile_maintainer || 'MITRE SAF'
+        profile_maintainer: rule.profile_maintainer || 'MITRE SAF',
       })
       matched++
       console.log(`✓ ${record.name}`)
-    } else {
+    }
+    else {
       // No match found
       unmatched++
       unmatchedRecords.push({
@@ -424,13 +426,13 @@ async function transformCollection(collectionName: string) {
         name: record.name,
         current_platform: record.platform,
         current_category: record.category,
-        current_vendor: record.vendor
+        current_vendor: record.vendor,
       })
       console.log(`⚠️  ${record.name} (no match)`)
     }
   }
 
-  console.log('\n' + '='.repeat(60))
+  console.log(`\n${'='.repeat(60)}`)
   console.log(`Summary for ${collectionName}:`)
   console.log(`  Total records:  ${records.length}`)
   console.log(`  Matched:        ${matched} (${((matched / records.length) * 100).toFixed(1)}%)`)
@@ -438,7 +440,7 @@ async function transformCollection(collectionName: string) {
 
   if (unmatchedRecords.length > 0) {
     console.log('\n⚠️  Unmatched records (require manual review):')
-    unmatchedRecords.forEach(r => {
+    unmatchedRecords.forEach((r) => {
       console.log(`    - ${r.name}`)
       console.log(`      Platform: ${r.current_platform}, Category: ${r.current_category}`)
     })
@@ -448,7 +450,7 @@ async function transformCollection(collectionName: string) {
     total: records.length,
     matched,
     unmatched,
-    unmatchedRecords
+    unmatchedRecords,
   }
 }
 
@@ -461,7 +463,7 @@ const profilesResult = await transformCollection('profiles')
 const hardeningResult = await transformCollection('hardening_profiles')
 
 // Final summary
-console.log('\n' + '='.repeat(60))
+console.log(`\n${'='.repeat(60)}`)
 console.log('FINAL SUMMARY')
 console.log('='.repeat(60))
 console.log(`\nValidation Profiles:`)
@@ -485,7 +487,8 @@ console.log(`  Unmatched:      ${totalUnmatched} (${((totalUnmatched / totalReco
 if (totalUnmatched > 0) {
   console.log(`\n⚠️  ${totalUnmatched} records need manual review.`)
   console.log('Next: Review unmatched profiles and add transformation rules or update manually.')
-} else {
+}
+else {
   console.log('\n✓ All profiles transformed successfully!')
   console.log('Next: Phase 3 - Verification and export')
 }

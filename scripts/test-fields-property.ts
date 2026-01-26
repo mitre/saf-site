@@ -10,13 +10,14 @@ try {
     name: 'test_fields',
     type: 'base',
     fields: [
-      { name: 'title', type: 'text', required: true }
-    ]
+      { name: 'title', type: 'text', required: true },
+    ],
   })
   console.log('✓ SUCCESS with fields property')
   console.log(`  Collection ID: ${testColl.id}`)
   console.log(`  Fields:`, testColl.fields)
   await pb.collections.delete(testColl.id)
-} catch (e: any) {
+}
+catch (e: any) {
   console.log('✗ FAILED:', e.message)
 }

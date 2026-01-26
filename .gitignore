@@ -38,10 +38,13 @@ Thumbs.db
 .pocketbase/pb_data/types.d.ts
 
 # Claude Code / Beads
-.claude
+# Track .claude/settings.json (project config) but ignore personal settings
+.claude/settings.local.json
 .beads/.bdui
 .beads/recovery-context.md
 .playwright-mcp/
+RECOVERY-PROMPT*.md
+SESSION*.md
 
 # Test coverage
 coverage/

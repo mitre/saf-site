@@ -85,7 +85,7 @@
 | Database | SQLite (via Pocketbase) |
 | API | Pocketbase REST API |
 | Version Control | sqlite-diffable (NDJSON exports) |
-| Static Site | VitePress 1.6.4 |
+| Static Site | VitePress 2.0.0-alpha.15 |
 | UI Framework | Vue 3.5 |
 | Components | Reka UI 2.7.0 |
 | Testing | Vitest 4 |

@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { dump, load, type TableMetadata } from './db-diffable'
+import type { TableMetadata } from './db-diffable'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import Database from 'better-sqlite3'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
-import { join } from 'path'
-import { tmpdir } from 'os'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { dump, load } from './db-diffable'
 
 /**
  * Test suite for db-diffable.ts
@@ -254,7 +255,7 @@ describe('db-diffable', () => {
       writeFileSync(join(diffableDir, 'one_table.metadata.json'), JSON.stringify(metadata, null, 4))
       writeFileSync(
         join(diffableDir, 'one_table.ndjson'),
-        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n'
+        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n',
       )
 
       const result = load(dbPath, diffableDir, { quiet: true })
@@ -262,7 +263,7 @@ describe('db-diffable', () => {
 
       // Verify database content (matches Python test assertions)
       const db = new Database(dbPath, { readonly: true })
-      const rows = db.prepare('SELECT * FROM one_table ORDER BY id').all() as { id: number; name: string }[]
+      const rows = db.prepare('SELECT * FROM one_table ORDER BY id').all() as { id: number, name: string }[]
       expect(rows).toEqual([
         { id: 1, name: 'Stacey' },
         { id: 2, name: 'Tilda' },
@@ -281,7 +282,7 @@ describe('db-diffable', () => {
           name: 'one_table',
           columns: ['id', 'name'],
           schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'one_table.ndjson'), '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n')
 
@@ -292,7 +293,7 @@ describe('db-diffable', () => {
           name: 'second_table',
           columns: ['id', 'name'],
           schema: 'CREATE TABLE second_table (id INTEGER PRIMARY KEY, name TEXT)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'second_table.ndjson'), '[1,"Cleo"]\n')
 
@@ -302,7 +303,7 @@ describe('db-diffable', () => {
       const db = new Database(dbPath, { readonly: true })
 
       // Verify table names
-      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as { name: string }[]
+      const tables = db.prepare('SELECT name FROM sqlite_master WHERE type=\'table\' ORDER BY name').all() as { name: string }[]
       const tableNames = tables.map(t => t.name)
       expect(tableNames).toContain('one_table')
       expect(tableNames).toContain('second_table')
@@ -330,7 +331,7 @@ describe('db-diffable', () => {
           name: 'one_table',
           columns: ['id', 'name'],
           schema: 'CREATE TABLE one_table (id INTEGER PRIMARY KEY, name TEXT)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'one_table.ndjson'), '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n')
 
@@ -370,7 +371,7 @@ describe('db-diffable', () => {
           name: 'empty',
           columns: ['id', 'name'],
           schema: 'CREATE TABLE empty (id INTEGER PRIMARY KEY, name TEXT)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'empty.ndjson'), '')
 
@@ -392,18 +393,18 @@ describe('db-diffable', () => {
           name: 'nullable',
           columns: ['id', 'name', 'value'],
           schema: 'CREATE TABLE nullable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)',
-        })
+        }),
       )
       writeFileSync(
         join(diffableDir, 'nullable.ndjson'),
-        '[1,"has value",100]\n[2,null,null]\n[3,"only name",null]\n'
+        '[1,"has value",100]\n[2,null,null]\n[3,"only name",null]\n',
       )
 
       const result = load(dbPath, diffableDir, { quiet: true })
       expect(result).toBe(0)
 
       const db = new Database(dbPath, { readonly: true })
-      const rows = db.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number; name: string | null; value: number | null }[]
+      const rows = db.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number, name: string | null, value: number | null }[]
       expect(rows[0]).toEqual({ id: 1, name: 'has value', value: 100 })
       expect(rows[1]).toEqual({ id: 2, name: null, value: null })
       expect(rows[2]).toEqual({ id: 3, name: 'only name', value: null })
@@ -420,7 +421,7 @@ describe('db-diffable', () => {
           name: 'data',
           columns: ['id'],
           schema: 'CREATE TABLE data (id INTEGER PRIMARY KEY)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'data.ndjson'), '[1]\n')
 
@@ -431,7 +432,7 @@ describe('db-diffable', () => {
           name: 'sqlite_stat1',
           columns: ['tbl', 'idx', 'stat'],
           schema: 'CREATE TABLE sqlite_stat1 (tbl TEXT, idx TEXT, stat TEXT)',
-        })
+        }),
       )
       writeFileSync(join(diffableDir, 'sqlite_stat1.ndjson'), '["data",null,"1"]\n')
 
@@ -439,7 +440,7 @@ describe('db-diffable', () => {
       expect(result).toBe(0)
 
       const db = new Database(dbPath, { readonly: true })
-      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
+      const tables = db.prepare('SELECT name FROM sqlite_master WHERE type=\'table\'').all() as { name: string }[]
       const tableNames = tables.map(t => t.name)
       expect(tableNames).toContain('data')
       expect(tableNames).not.toContain('sqlite_stat1')
@@ -498,7 +499,7 @@ describe('db-diffable', () => {
       load(newDbPath, diffableDir, { quiet: true })
 
       const restored = new Database(newDbPath, { readonly: true })
-      const rows = restored.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number; name: string | null; value: number | null }[]
+      const rows = restored.prepare('SELECT * FROM nullable ORDER BY id').all() as { id: number, name: string | null, value: number | null }[]
 
       expect(rows[0]).toEqual({ id: 1, name: 'has value', value: 100 })
       expect(rows[1]).toEqual({ id: 2, name: null, value: null })
@@ -523,7 +524,7 @@ describe('db-diffable', () => {
       load(newDbPath, diffableDir, { quiet: true })
 
       const restored = new Database(newDbPath, { readonly: true })
-      const rows = restored.prepare('SELECT * FROM special ORDER BY id').all() as { id: number; data: string }[]
+      const rows = restored.prepare('SELECT * FROM special ORDER BY id').all() as { id: number, data: string }[]
 
       expect(rows[0].data).toBe('line1\nline2')
       expect(rows[1].data).toBe('quote"test')
@@ -548,7 +549,7 @@ describe('db-diffable', () => {
       load(newDbPath, diffableDir, { quiet: true })
 
       const restored = new Database(newDbPath, { readonly: true })
-      const rows = restored.prepare('SELECT * FROM numbers ORDER BY id').all() as { id: number; n: number; f: number }[]
+      const rows = restored.prepare('SELECT * FROM numbers ORDER BY id').all() as { id: number, n: number, f: number }[]
 
       expect(rows[0].n).toBe(9007199254740991)
       expect(rows[0].f).toBeCloseTo(3.141592653589793, 10)
@@ -576,7 +577,7 @@ describe('db-diffable', () => {
 
       const restored = new Database(newDbPath, { readonly: true })
       for (let i = 0; i < 10; i++) {
-        const row = restored.prepare(`SELECT * FROM table_${i}`).get() as { id: number; value: string }
+        const row = restored.prepare(`SELECT * FROM table_${i}`).get() as { id: number, value: string }
         expect(row.value).toBe(`value_${i}`)
       }
       restored.close()
@@ -649,7 +650,7 @@ describe('db-diffable', () => {
       load(newDbPath, diffableDir, { quiet: true })
 
       const restored = new Database(newDbPath, { readonly: true })
-      const row = restored.prepare('SELECT * FROM long_text').get() as { id: number; data: string }
+      const row = restored.prepare('SELECT * FROM long_text').get() as { id: number, data: string }
       expect(row.data.length).toBe(100000)
       expect(row.data).toBe(longText)
       restored.close()
@@ -712,7 +713,7 @@ describe('db-diffable', () => {
       writeFileSync(join(diffableDir, 'one_table.metadata.json'), JSON.stringify(metadata, null, 4))
       writeFileSync(
         join(diffableDir, 'one_table.ndjson'),
-        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n'
+        '[1,"Stacey"]\n[2,"Tilda"]\n[3,"Bartek"]\n',
       )
     })
 
@@ -778,7 +779,7 @@ describe('db-diffable', () => {
       writeFileSync(join(diffableDir, 'empty.ndjson'), '')
       writeFileSync(
         join(diffableDir, 'empty.metadata.json'),
-        JSON.stringify({ name: 'empty', columns: ['id'], schema: 'CREATE TABLE empty (id INTEGER)' })
+        JSON.stringify({ name: 'empty', columns: ['id'], schema: 'CREATE TABLE empty (id INTEGER)' }),
       )
 
       const originalLog = console.log
