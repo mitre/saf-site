@@ -1,15 +1,24 @@
 /**
  * Database Management Commands
  *
- * Commands for exporting, validating, and managing the database
+ * Commands for exporting, validating, and managing the database.
+ * Uses Drizzle ORM for direct SQLite access (no server required).
  */
 
 import { execSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import * as p from '@clack/prompts'
 import { auditSlug } from '@schema/validation.js'
 import { Command } from 'commander'
 import pc from 'picocolors'
-import { checkConnection, getPocketBase, loadFkMaps } from '../lib/pocketbase.js'
+import {
+  getDefaultDbPath,
+  getDrizzle,
+  getRecord,
+  getTableNames,
+  listRecords,
+  loadFkMaps,
+} from '../lib/drizzle.js'
 
 export const dbCommand = new Command('db')
   .description('Database management commands')
@@ -22,15 +31,17 @@ dbCommand
   .description('Check database connection and status')
   .action(async () => {
     const s = p.spinner()
-    s.start('Checking Pocketbase connection...')
+    s.start('Checking database...')
 
-    const isConnected = await checkConnection()
+    const dbPath = getDefaultDbPath()
+    const dbExists = existsSync(dbPath)
 
-    if (isConnected) {
-      s.stop(pc.green('Pocketbase is running'))
+    if (dbExists) {
+      s.stop(pc.green('Database found'))
+      console.log(pc.dim(`  Path: ${dbPath}`))
 
       // Get collection stats
-      const pb = await getPocketBase()
+      const db = getDrizzle(dbPath)
       const collections = [
         'content',
         'organizations',
@@ -42,22 +53,27 @@ dbCommand
         'tools',
       ]
 
-      console.log(pc.bold('\nCollection Statistics:'))
+      console.log(pc.bold('\nTable Statistics:'))
       console.log(pc.dim('─'.repeat(40)))
 
       for (const collection of collections) {
         try {
-          const result = await pb.collection(collection).getList(1, 1)
-          console.log(`${collection.padEnd(20)} ${pc.cyan(result.totalItems.toString())} records`)
+          const records = listRecords(db, collection)
+          console.log(`${collection.padEnd(20)} ${pc.cyan(records.length.toString())} records`)
         }
         catch {
           console.log(`${collection.padEnd(20)} ${pc.red('error')}`)
         }
       }
+
+      // Show all available tables
+      const allTables = getTableNames()
+      console.log(pc.dim(`\n${allTables.length} tables in schema`))
     }
     else {
-      s.stop(pc.red('Pocketbase is not running'))
-      console.log(pc.dim('\nStart with: cd .pocketbase && ./pocketbase serve'))
+      s.stop(pc.red('Database not found'))
+      console.log(pc.dim(`  Expected: ${dbPath}`))
+      console.log(pc.dim('\nRun: pnpm dev:setup'))
     }
   })
 
@@ -95,16 +111,16 @@ dbCommand
     const s = p.spinner()
     s.start('Loading database...')
 
-    const pb = await getPocketBase()
+    const db = getDrizzle(getDefaultDbPath())
     const issues: string[] = []
 
     // Load FK maps (available for future validation logic)
-    const _fkMaps = await loadFkMaps()
+    const _fkMaps = loadFkMaps(db)
     s.stop('Database loaded')
 
     // Validate content records
     s.start('Validating content records...')
-    const content = await pb.collection('content').getFullList()
+    const content = listRecords(db, 'content')
 
     for (const record of content) {
       // Check required fields
@@ -114,17 +130,17 @@ dbCommand
       if (!record.slug) {
         issues.push(`Content ${record.id}: missing slug`)
       }
-      if (!record.content_type) {
-        issues.push(`Content ${record.id}: missing content_type`)
+      if (!record.contentType) {
+        issues.push(`Content ${record.id}: missing contentType`)
       }
 
       // Check FK references exist
-      const fkValidations = await Promise.all([
-        validateFK(pb, record.id, record.target, 'targets', 'target'),
-        validateFK(pb, record.id, record.standard, 'standards', 'standard'),
-        validateFK(pb, record.id, record.technology, 'technologies', 'technology'),
-        validateFK(pb, record.id, record.vendor, 'organizations', 'vendor'),
-      ])
+      const fkValidations = [
+        validateFK(db, record.id as string, record.target as string | undefined, 'targets', 'target'),
+        validateFK(db, record.id as string, record.standard as string | undefined, 'standards', 'standard'),
+        validateFK(db, record.id as string, record.technology as string | undefined, 'technologies', 'technology'),
+        validateFK(db, record.id as string, record.vendor as string | undefined, 'organizations', 'vendor'),
+      ]
 
       // Collect any validation errors
       for (const error of fkValidations) {
@@ -136,12 +152,12 @@ dbCommand
 
     // Validate tools
     s.start('Validating tools...')
-    const tools = await pb.collection('tools').getFullList()
+    const tools = listRecords(db, 'tools')
     for (const record of tools) {
       if (!record.name) {
         issues.push(`Tool ${record.id}: missing name`)
       }
-      if (record.organization && !await recordExists(pb, 'organizations', record.organization)) {
+      if (record.organization && !recordExists(db, 'organizations', record.organization as string)) {
         issues.push(`Tool ${record.id}: invalid organization reference`)
       }
     }
@@ -169,7 +185,8 @@ dbCommand
   .description('Show available FK lookup values')
   .argument('[collection]', 'Collection to show (organizations, standards, etc.)')
   .action(async (collection) => {
-    const fkMaps = await loadFkMaps()
+    const db = getDrizzle(getDefaultDbPath())
+    const fkMaps = loadFkMaps(db)
 
     const collections = collection
       ? [collection as keyof typeof fkMaps]
@@ -205,8 +222,8 @@ dbCommand
     const s = p.spinner()
     s.start('Loading content records...')
 
-    const pb = await getPocketBase()
-    const content = await pb.collection('content').getFullList()
+    const db = getDrizzle(getDefaultDbPath())
+    const content = listRecords(db, 'content')
 
     s.stop(`Loaded ${content.length} content records`)
 
@@ -271,33 +288,28 @@ dbCommand
 /**
  * Helper: Check if a record exists
  */
-async function recordExists(
-  pb: Awaited<ReturnType<typeof getPocketBase>>,
+function recordExists(
+  db: ReturnType<typeof getDrizzle>,
   collection: string,
   id: string,
-): Promise<boolean> {
-  try {
-    await pb.collection(collection).getOne(id)
-    return true
-  }
-  catch {
-    return false
-  }
+): boolean {
+  const record = getRecord(db, collection, id)
+  return record !== null
 }
 
 /**
  * Helper: Validate a FK reference and return an error message if invalid
  */
-async function validateFK(
-  pb: Awaited<ReturnType<typeof getPocketBase>>,
+function validateFK(
+  db: ReturnType<typeof getDrizzle>,
   recordId: string,
   fkValue: string | undefined | null,
   collection: string,
   fieldName: string,
-): Promise<string | null> {
+): string | null {
   if (!fkValue)
     return null
-  if (!await recordExists(pb, collection, fkValue)) {
+  if (!recordExists(db, collection, fkValue)) {
     return `Content ${recordId}: invalid ${fieldName} reference "${fkValue}"`
   }
   return null

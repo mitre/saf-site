@@ -107,11 +107,11 @@ describe('db CLI - help', () => {
 // ============================================================================
 
 describe('db CLI - status', () => {
-  it('shows Pocketbase is running', async () => {
+  it('shows database is found', async () => {
     const { stdout, exitCode } = await runCli(['db', 'status'])
 
     expect(exitCode).toBe(0)
-    expect(stdout).toContain('Pocketbase is running')
+    expect(stdout).toContain('Database found')
   })
 
   it('shows collection statistics', async () => {
