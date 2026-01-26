@@ -7,122 +7,110 @@
 cat RECOVERY.md
 cat WORKSTREAM.md
 
-# 2. Verify drizzle.db exists
-ls -la docs/.vitepress/database/drizzle.db  # Should be ~1.3MB
+# 2. Check task status
+bd show saf-site-gf9
 
 # 3. Verify tests pass
-pnpm test:run           # Should be 432
-cd cli && pnpm test:run # Should be 497 (plus new table tests)
-
-# 4. Check task status
-bd show saf-site-gf9
+pnpm test:run           # VitePress: 432
+cd cli && pnpm test:run # CLI: ~514
 ```
 
 ---
 
 ## Current Task: saf-site-gf9 (CLI CRUD)
 
-**Status:** Step 2 IN PROGRESS - Generic table commands
+**Status:** Step 2 NEEDS REWORK - Tests are wrong pattern
 
-### Architecture (AGREED - Option A Service Layer)
+### Architecture (AGREED - Must Follow This Pattern)
 
 ```
 ┌─────────────────────────────────────┐
-│           CLI Layer                 │  table.ts, content.ts, db.ts
-│   (argument parsing, output)        │
+│           CLI Layer                 │  table.ts, content.ts
+│   (Commander actions - THIN)        │
 ├─────────────────────────────────────┤
-│        Service Layer                │  content-service.ts (domain logic)
-│   (validation, GitHub, FK by name)  │  Generic commands SKIP this layer
+│        CLI Utilities                │  table.cli.ts, content.cli.ts
+│   (parsing, formatting - TESTABLE)  │  ← Unit tests go HERE
 ├─────────────────────────────────────┤
-│        Data Layer                   │  drizzle.ts (generic CRUD)
-│   (listRecords, createRecord, etc)  │
+│        Logic Layer                  │  content.logic.ts
+│   (business logic - pure functions) │  ← Unit tests go HERE
+├─────────────────────────────────────┤
+│        Service Layer                │  content-service.ts
+│   (GitHub, FK resolution)           │
+├─────────────────────────────────────┤
+│        Data Layer                   │  drizzle.ts
+│   (generic CRUD)                    │  ← Unit tests go HERE (DONE)
 └─────────────────────────────────────┘
 ```
 
-**Key insight:** Generic table commands are THIN wrappers around drizzle.ts (no service layer). Domain commands (content.ts) use the service layer for business logic.
+**Key Pattern from content commands:**
+- `content.ts` - Commander orchestration (thin)
+- `content.cli.ts` - parseAddArgs(), formatAddResult() (unit testable)
+- `content.logic.ts` - prepareContentAdd() (unit testable)
+- `content-service.ts` - buildContentFromRepo() (unit testable)
 
-### Step Progress
+### What Exists
 
-| Step | Description | Status |
-|------|-------------|--------|
-| 1 | Data layer (drizzle.ts) | ✅ DONE (21 tests) |
-| 2 | Generic table commands (table.ts) | 🔄 IN PROGRESS |
-| 3 | Service layer (content-service.ts) | - |
-| 4 | Migrate domain commands | - |
-| 5 | Delete pocketbase.ts | - |
+| File | Status | Issue |
+|------|--------|-------|
+| `cli/src/lib/drizzle.ts` | ✅ DONE | 21 unit tests, imports directly |
+| `cli/src/lib/drizzle.spec.ts` | ✅ DONE | Correct pattern - unit tests |
+| `cli/src/commands/table.ts` | NEEDS REFACTOR | Should extract formatting to table.cli.ts |
+| `cli/src/commands/table.spec.ts` | ❌ WRONG PATTERN | 17 E2E tests (spawns CLI), should be unit tests |
 
----
+### What Went Wrong
 
-## Step 2: Generic Table Commands
+1. **Wrote E2E tests instead of unit tests** - table.spec.ts spawns `execSync('npx tsx ...')` for every test. This is slow (~1s/test) and tests the wrong thing.
 
-### What Was Created
+2. **Didn't follow existing pattern** - content.cli.ts shows the right approach: extract formatting functions, test them directly with imports.
 
-1. **`cli/src/commands/table.spec.ts`** - 17 TDD tests (RED phase)
-2. **`cli/src/commands/table.ts`** - Implementation (GREEN phase in progress)
-3. **`cli/src/index.ts`** - Updated to register tableCommand
+3. **No table.cli.ts** - Should have created this with:
+   - `formatTableList(records, format)`
+   - `formatTableRecord(record, format)`
+   - Unit tests that import these directly
 
-### Commands Being Implemented
+### Correct Approach for table Commands
 
-```bash
-pnpm cli table list <table> [--filter key=value] [--json]
-pnpm cli table show <table> <id> [--json]
-pnpm cli table add <table> --data <json> [--json]
-pnpm cli table update <table> <id> --data <json> [--json]
-pnpm cli table delete <table> <id> [--yes]
+```
+table.ts (thin Commander wrapper)
+    │
+    ├── table.cli.ts (formatting - NEW)
+    │       - formatTableList()
+    │       - formatTableRecord()
+    │       └── table.cli.spec.ts (unit tests - import directly)
+    │
+    └── drizzle.ts (data layer - EXISTS)
+            - listRecords()
+            - getRecord()
+            └── drizzle.spec.ts (unit tests - EXISTS)
 ```
 
-### Current Issue
+### Step 2 Rework Needed
 
-Tests are failing because:
-1. The tests use `execSync('pnpm cli ...')`
-2. Need to verify CLI is accessible from test context
-3. May need to run from correct directory or use different invocation
-
-### Next Steps to Complete Step 2
-
-1. Fix test invocation (may need to use `tsx src/index.ts` instead of `pnpm cli`)
-2. Run tests, verify they pass
-3. Verify all existing tests still pass (497 CLI tests)
-4. Commit when GREEN
+1. Create `table.cli.ts` with formatting functions extracted from table.ts
+2. Create `table.cli.spec.ts` with unit tests (import directly, no CLI spawning)
+3. Reduce `table.spec.ts` to 2-3 E2E smoke tests only
+4. Follow content.cli.ts pattern exactly
 
 ---
 
-## Files Modified This Session
+## TUI vs Non-Interactive
 
-| File | Change |
-|------|--------|
-| `cli/src/lib/drizzle.ts` | Created - generic CRUD layer |
-| `cli/src/lib/drizzle.spec.ts` | Created - 21 tests |
-| `cli/src/commands/table.ts` | Created - generic table commands |
-| `cli/src/commands/table.spec.ts` | Created - 17 TDD tests |
-| `cli/src/index.ts` | Added tableCommand registration |
-| `WORKSTREAM.md` | Updated with architecture and step order |
+**Library:** `@clack/prompts` for interactive TUI
 
----
+**Pattern:**
+- Non-interactive: All params via flags, `--json` output, `--yes` for destructive ops
+- Interactive: Prompts when params missing, spinners, confirmations
 
-## Key Decisions Made
-
-1. **Option A (Service Layer)** is the correct architecture - more testable, isolated
-2. **Generic commands skip service layer** - they're pure CRUD wrappers
-3. **Domain commands use service layer** - for business logic (GitHub, validation)
-4. **Order matters**: Generic table commands BEFORE migrating domain commands
-5. **TDD is mandatory** - don't move on until tests pass
+**Current:** table.ts is non-interactive only. TUI can be added later after non-interactive is solid.
 
 ---
 
 ## Test Counts
 
-| Suite | Count | Command |
-|-------|-------|---------|
+| Suite | Expected | Command |
+|-------|----------|---------|
 | VitePress | 432 | `pnpm test:run` |
-| CLI | 497 + 17 new | `cd cli && pnpm test:run` |
-
----
-
-## Git Commits This Session
-
-1. `f006190` - feat(cli): add Drizzle data layer for generic CRUD operations
-2. `9080567` - docs: update WORKSTREAM.md with corrected CLI CRUD plan
+| CLI | ~514 | `cd cli && pnpm test:run` |
 
 ---
 
@@ -133,24 +121,41 @@ Read RECOVERY.md and WORKSTREAM.md.
 
 CONTEXT:
 - Task: saf-site-gf9 (CLI CRUD)
-- Step 2 IN PROGRESS: Generic table commands
-- Created table.ts and table.spec.ts (17 tests)
-- Tests currently failing - need to fix test invocation
+- Step 2 NEEDS REWORK: table.spec.ts uses wrong pattern (E2E instead of unit)
+- drizzle.ts and drizzle.spec.ts are CORRECT (unit tests)
 
-ARCHITECTURE (Option A - Service Layer):
-- CLI Layer: table.ts (generic), content.ts (domain)
-- Service Layer: content-service.ts (domain logic only)
-- Data Layer: drizzle.ts (generic CRUD) ✅ DONE
+ARCHITECTURE TO FOLLOW (from content commands):
+- content.ts → content.cli.ts → content.logic.ts → services → data
+- table.ts → table.cli.ts (NEW) → drizzle.ts
 
-NEXT:
-1. Fix table.spec.ts test invocation
-2. Run tests until GREEN
-3. Verify all 497+ CLI tests pass
-4. Commit Step 2
-5. Then Step 3: Service layer
+REWORK NEEDED:
+1. Create table.cli.ts with formatting functions
+2. Create table.cli.spec.ts with unit tests (import directly)
+3. Reduce table.spec.ts to 2-3 E2E smoke tests
+4. Follow content.cli.ts pattern exactly
+
+REFERENCE FILES:
+- cli/src/commands/content.cli.ts - CORRECT pattern for CLI layer
+- cli/src/commands/content.cli.spec.ts - CORRECT pattern for unit tests
+- cli/src/lib/drizzle.ts - CORRECT data layer
+- cli/src/lib/drizzle.spec.ts - CORRECT unit tests
 
 DO NOT:
-- Skip TDD steps
-- Move on until tests pass
-- Add unnecessary abstractions
+- Write E2E tests that spawn CLI processes for unit testing
+- Skip the table.cli.ts extraction
+- Take shortcuts that ignore the established pattern
 ```
+
+---
+
+## Key Files Reference
+
+| File | Purpose | Pattern |
+|------|---------|---------|
+| `cli/src/commands/content.cli.ts` | CLI formatting layer | FOLLOW THIS |
+| `cli/src/commands/content.cli.spec.ts` | Unit tests for CLI layer | FOLLOW THIS |
+| `cli/src/commands/content.logic.ts` | Business logic layer | FOLLOW THIS |
+| `cli/src/lib/drizzle.ts` | Data layer | DONE |
+| `cli/src/lib/drizzle.spec.ts` | Data layer unit tests | DONE |
+| `cli/SPEC.md` | CLI specification | Reference |
+| `cli/ROADMAP.md` | Development roadmap | Reference |

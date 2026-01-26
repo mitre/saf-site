@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest'
 // Helper to run CLI commands
 function cli(args: string): { stdout: string, stderr: string, exitCode: number } {
   try {
-    const stdout = execSync(`pnpm cli ${args}`, {
+    const stdout = execSync(`npx tsx src/index.ts ${args}`, {
       cwd: process.cwd(),
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -81,7 +81,7 @@ describe('table list', () => {
     const result = cli('table list nonexistent_table --json')
 
     expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/unknown table/i)
+    expect(result.stdout).toMatch(/unknown table/i)
   })
 
   it('outputs text format by default', () => {
@@ -112,14 +112,14 @@ describe('table show', () => {
     const result = cli('table show organizations nonexistent-id-12345 --json')
 
     expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/not found/i)
+    expect(result.stdout).toMatch(/not found/i)
   })
 
   it('returns error for invalid table', () => {
     const result = cli('table show nonexistent_table some-id --json')
 
     expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/unknown table/i)
+    expect(result.stdout).toMatch(/unknown table/i)
   })
 })
 
@@ -151,27 +151,29 @@ describe('table add', () => {
     const result = cli(`table add nonexistent_table --json --data '{}'`)
 
     expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/unknown table/i)
+    expect(result.stdout).toMatch(/unknown table/i)
   })
 })
 
 describe('table update', () => {
   it('updates a record', () => {
     // First create a record to update
+    const id = `update-test-${Date.now()}`
     const createInput = JSON.stringify({
-      id: `update-test-${Date.now()}`,
+      id,
       name: 'Original Name',
-      slug: `update-test-${Date.now()}`,
+      slug: id,
     })
-    cli(`table add organizations --json --data '${createInput}'`)
+    const createResult = cli(`table add organizations --json --data '${createInput}'`)
+    expect(createResult.exitCode).toBe(0)
 
-    // Update it
+    // Update it using the same ID
     const updateInput = JSON.stringify({ name: 'Updated Name' })
-    const result = cli(`table update organizations update-test-${Date.now()} --json --data '${updateInput}'`)
+    const result = cli(`table update organizations ${id} --json --data '${updateInput}'`)
 
-    // Note: This test may fail due to timing - the ID includes Date.now()
-    // In real implementation, we'd capture the created ID
     expect(result.exitCode).toBe(0)
+    const updated = JSON.parse(result.stdout)
+    expect(updated.name).toBe('Updated Name')
   })
 
   it('returns error for non-existent ID', () => {
@@ -180,7 +182,7 @@ describe('table update', () => {
     const result = cli(`table update organizations nonexistent-id --json --data '${input}'`)
 
     expect(result.exitCode).toBe(1)
-    expect(result.stderr).toMatch(/not found/i)
+    expect(result.stdout).toMatch(/not found/i)
   })
 })
 
