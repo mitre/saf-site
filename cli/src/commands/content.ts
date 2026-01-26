@@ -5,7 +5,7 @@
  * Supports both non-interactive (CI/scripting) and interactive (TUI) modes.
  */
 
-import type { FkMaps } from '../lib/pocketbase.js'
+import type { FkMaps } from '../lib/drizzle.js'
 import type { ServiceDeps } from './content.logic.js'
 import * as p from '@clack/prompts'
 import { Command } from 'commander'
@@ -17,6 +17,17 @@ import {
   isNonInteractive,
 } from '../lib/cli-utils.js'
 import {
+  createRecord,
+  expandRecord,
+  getDefaultDbPath,
+  getDrizzle,
+  getRecord,
+  listRecords,
+  loadFkMaps,
+  loadFkNameMaps,
+  updateRecord,
+} from '../lib/drizzle.js'
+import {
   extractControlCount,
   fetchInspecYml,
   fetchReadme,
@@ -24,13 +35,6 @@ import {
   generateSlug,
   parseGitHubUrl,
 } from '../lib/github.js'
-import {
-  createContent,
-  getPocketBase,
-  listContent,
-  loadFkMaps,
-  updateContent,
-} from '../lib/pocketbase.js'
 import {
   formatAddResult,
   formatListResult,
@@ -73,22 +77,32 @@ contentCommand
   .action(async (options) => {
     const format = getOutputFormat(options)
     try {
-      const pb = await getPocketBase()
+      const db = getDrizzle(getDefaultDbPath())
 
-      const records = await listContent({
-        contentType: options.type,
-        status: options.status,
-        expand: ['target', 'standard', 'technology', 'vendor'],
-        sort: 'name', // Sort alphabetically (content collection has no created/updated fields)
-      }, pb)
+      // Build where conditions
+      const where: Record<string, unknown> = {}
+      if (options.type)
+        where.contentType = options.type
+      if (options.status)
+        where.status = options.status
+
+      const records = listRecords(db, 'content', {
+        where: Object.keys(where).length > 0 ? where : undefined,
+        orderBy: 'name',
+        order: 'asc',
+      })
+
+      // Load FK name maps and expand records
+      const nameMaps = loadFkNameMaps(db)
+      const expandedRecords = records.map(r => expandRecord(r, nameMaps))
 
       // Limit results
-      const limited = records.slice(0, Number.parseInt(options.limit))
+      const limited = expandedRecords.slice(0, Number.parseInt(options.limit))
 
       console.log(formatListResult(limited, format))
 
       if (format === 'text') {
-        console.log(pc.dim(`\nShowing ${limited.length} of ${records.length} records`))
+        console.log(pc.dim(`\nShowing ${limited.length} of ${expandedRecords.length} records`))
       }
     }
     catch (error) {
@@ -108,11 +122,17 @@ contentCommand
     const format = getOutputFormat(options)
 
     try {
-      const pb = await getPocketBase()
+      const db = getDrizzle(getDefaultDbPath())
 
-      const record = await pb.collection('content').getOne(id, {
-        expand: 'target,standard,technology,vendor,maintainer',
-      })
+      const rawRecord = getRecord(db, 'content', id)
+      if (!rawRecord) {
+        exitWithError(`Content not found: ${id}`, format)
+        return
+      }
+
+      // Expand FK fields
+      const nameMaps = loadFkNameMaps(db)
+      const record = expandRecord(rawRecord, nameMaps)
 
       if (format === 'json') {
         console.log(JSON.stringify(record, null, 2))
@@ -125,7 +145,7 @@ contentCommand
       const details = [
         ['ID', record.id],
         ['Slug', record.slug],
-        ['Type', record.content_type],
+        ['Type', record.contentType],
         ['Status', record.status],
         ['Version', record.version || '-'],
         ['Target', record.expand?.target?.name || '-'],
@@ -133,7 +153,7 @@ contentCommand
         ['Technology', record.expand?.technology?.name || '-'],
         ['Vendor', record.expand?.vendor?.name || '-'],
         ['Maintainer', record.expand?.maintainer?.name || '-'],
-        ['Controls', record.control_count || '-'],
+        ['Controls', record.controlCount || '-'],
         ['GitHub', record.github || '-'],
         ['License', record.license || '-'],
       ]
@@ -214,7 +234,8 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
   }
 
   // Load FK maps for resolution
-  const fkMaps = await loadFkMaps()
+  const db = getDrizzle(getDefaultDbPath())
+  const fkMaps = loadFkMaps(db)
 
   // Prepare content
   const result = await prepareContentAdd(args, fkMaps, serviceDeps)
@@ -233,8 +254,7 @@ async function addNonInteractive(url: string, options: Record<string, any>) {
 
   // Create the record
   try {
-    const pb = await getPocketBase()
-    const record = await createContent(result.content!, pb)
+    const record = createRecord(db, 'content', result.content!)
 
     // Output combined result (preparation + creation)
     if (format === 'json') {
@@ -327,7 +347,8 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
 
   // Load FK maps for lookups
   s.start('Loading database lookups...')
-  const fkMaps = await loadFkMaps()
+  const db = getDrizzle(getDefaultDbPath())
+  const fkMaps = loadFkMaps(db)
   s.stop('Database lookups loaded')
 
   // Display fetched info
@@ -439,22 +460,21 @@ async function addInteractive(urlArg: string | undefined, options: Record<string
   s.start('Creating content record...')
 
   try {
-    const pb = await getPocketBase()
-    const record = await pb.collection('content').create({
+    const record = createRecord(db, 'content', {
       name,
       slug,
       description,
-      content_type: contentType,
+      contentType: contentType as string,
       status: 'active',
       version: version || null,
       target: target || undefined,
       standard: standard || undefined,
       technology: technology || undefined,
       vendor: vendor || undefined,
-      control_count: controlCount,
+      controlCount,
       github: repoInfo.htmlUrl,
-      readme_url: `https://raw.githubusercontent.com/${parsed.owner}/${parsed.repo}/${repoInfo.defaultBranch}/README.md`,
-      readme_markdown: readme,
+      readmeUrl: `https://raw.githubusercontent.com/${parsed.owner}/${parsed.repo}/${repoInfo.defaultBranch}/README.md`,
+      readmeMarkdown: readme,
       license: repoInfo.license || inspecProfile?.license,
     })
 
@@ -489,10 +509,14 @@ contentCommand
     const format = getOutputFormat(options)
 
     try {
-      const pb = await getPocketBase()
+      const db = getDrizzle(getDefaultDbPath())
 
       // Get existing record
-      const existing = await pb.collection('content').getOne(id)
+      const existing = getRecord(db, 'content', id)
+      if (!existing) {
+        exitWithError(`Content not found: ${id}`, format)
+        return
+      }
 
       // Parse update args
       const args = parseUpdateArgs({
@@ -507,7 +531,7 @@ contentCommand
 
       // Handle sync-readme
       if (options.syncReadme && existing.github) {
-        const parsed = parseGitHubUrl(existing.github)
+        const parsed = parseGitHubUrl(existing.github as string)
         if (parsed) {
           const readme = await fetchReadme(parsed.owner, parsed.repo)
           if (readme) {
@@ -565,10 +589,10 @@ contentCommand
       }
 
       // Apply update
-      const updated = await updateContent(id, result.updates || {}, pb)
+      const updated = updateRecord(db, 'content', id, result.updates || {})
 
       if (format === 'json') {
-        console.log(JSON.stringify({ success: true, id: updated.id, hasChanges: true }, null, 2))
+        console.log(JSON.stringify({ success: true, id: updated?.id, hasChanges: true }, null, 2))
       }
       else if (format === 'quiet') {
         console.log(id)
