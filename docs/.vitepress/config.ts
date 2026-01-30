@@ -38,7 +38,15 @@ export default defineConfig({
           { text: 'Visualize', link: '/framework/visualize' },
         ],
       },
-      { text: 'Apps', link: '/apps/' },
+      {
+        text: 'Apps',
+        items: [
+          { text: 'Overview', link: '/apps/' },
+          { text: 'Heimdall', link: '/apps/heimdall' },
+          { text: 'SAF CLI', link: '/apps/saf-cli' },
+          { text: 'Vulcan', link: '/apps/vulcan' },
+        ],
+      },
       { text: 'Content', link: '/content/' },
       { text: 'Docs', link: '/docs/' },
       { text: 'Demo', link: '/test-index' },
@@ -55,6 +63,17 @@ export default defineConfig({
             { text: 'Validate', link: '/framework/validate' },
             { text: 'Normalize', link: '/framework/normalize' },
             { text: 'Visualize', link: '/framework/visualize' },
+          ],
+        },
+      ],
+      '/apps/': [
+        {
+          text: 'Apps',
+          link: '/apps/',
+          items: [
+            { text: 'Heimdall', link: '/apps/heimdall' },
+            { text: 'SAF CLI', link: '/apps/saf-cli' },
+            { text: 'Vulcan', link: '/apps/vulcan' },
           ],
         },
       ],

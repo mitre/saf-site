@@ -5,41 +5,78 @@ aside: false
 ---
 
 <script setup>
-import { Shield, Eye, Terminal, FileCode, PenTool } from 'lucide-vue-next'
+import { Eye, Terminal, PenTool, BookText } from 'lucide-vue-next'
+import BrandIcon from '../.vitepress/theme/components/icons/BrandIcon.vue'
 
 const apps = [
   {
-    icon: Eye,
+    icon: 'heimdall',
     name: 'Heimdall',
     description: 'Security data visualization and analysis platform. View compliance dashboards, compare results, and generate reports.',
     href: '/apps/heimdall',
-    repo: 'https://github.com/mitre/heimdall2',
-    demo: 'https://heimdall-demo.mitre.org'
+    links: [
+      { label: 'View Details', href: '/apps/heimdall' },
+      { label: 'Try Demo', href: 'https://heimdall-demo.mitre.org' },
+      { label: 'GitHub', href: 'https://github.com/mitre/heimdall2' }
+    ]
   },
   {
-    icon: Terminal,
+    icon: 'saf',
     name: 'SAF CLI',
     description: 'Command-line tool for security automation. Convert security tool outputs to HDF, generate InSpec profiles, and more.',
     href: '/apps/saf-cli',
-    repo: 'https://github.com/mitre/saf',
-    docs: 'https://saf-cli.mitre.org'
+    links: [
+      { label: 'View Details', href: '/apps/saf-cli' },
+      { label: 'Documentation', href: 'https://saf-cli.mitre.org' },
+      { label: 'GitHub', href: 'https://github.com/mitre/saf' }
+    ]
   },
   {
-    icon: PenTool,
+    icon: 'saf',
     name: 'Vulcan',
     description: 'Security guidance authoring tool. Create and edit security requirements documents that serve as the foundation for automation.',
     href: '/apps/vulcan',
-    repo: 'https://github.com/mitre/vulcan',
-    demo: 'https://vulcan-demo.mitre.org'
+    links: [
+      { label: 'View Details', href: '/apps/vulcan' },
+      { label: 'Try Demo', href: 'https://vulcan-demo.mitre.org' },
+      { label: 'GitHub', href: 'https://github.com/mitre/vulcan' }
+    ]
   },
   {
-    icon: Shield,
-    name: 'InSpec',
-    description: 'Open-source testing framework for infrastructure. Write compliance-as-code profiles to validate security controls.',
-    href: 'https://www.inspec.io',
-    repo: 'https://github.com/inspec/inspec',
-    docs: 'https://docs.chef.io/inspec/',
-    external: true
+    icon: 'content',
+    name: 'Security Automation Content',
+    description: 'Browse security validation profiles and hardening content for various platforms and compliance frameworks.',
+    href: '/content/',
+    links: [
+      { label: 'Browse Content', href: '/content/' }
+    ]
+  }
+]
+
+const gettingStarted = [
+  {
+    title: 'New to Security Automation?',
+    description: 'Start by validating your systems with existing InSpec profiles, then visualize the results in Heimdall.',
+    links: [
+      { label: 'Browse Security Profiles', href: '/content/' },
+      { label: 'Learn About Heimdall', href: '/apps/heimdall' }
+    ]
+  },
+  {
+    title: 'Already Running Security Scans?',
+    description: 'Use SAF CLI to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.',
+    links: [
+      { label: 'Learn About SAF CLI', href: '/apps/saf-cli' },
+      { label: 'Normalization Guide', href: '/framework/normalize' }
+    ]
+  },
+  {
+    title: 'Creating Custom Requirements?',
+    description: 'Use Vulcan to author security guidance documents, then generate InSpec profiles from your requirements.',
+    links: [
+      { label: 'Learn About Vulcan', href: '/apps/vulcan' },
+      { label: 'Planning Guide', href: '/framework/plan' }
+    ]
   }
 ]
 </script>
@@ -58,31 +95,17 @@ const apps = [
   title="Complete Security Automation Toolkit"
 >
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <a
-      v-for="app in apps"
-      :key="app.name"
-      :href="app.href"
-      :target="app.external ? '_blank' : undefined"
-      :rel="app.external ? 'noopener noreferrer' : undefined"
-      class="app-card block p-6 bg-card rounded-lg border border-border hover:border-[--vp-c-brand-1] hover:shadow-lg transition-all"
-    >
-      <div class="flex items-start gap-4 mb-4">
-        <component :is="app.icon" class="text-[--vp-c-brand-1] flex-shrink-0" :size="32" />
-        <div>
-          <h3 class="text-xl font-semibold text-[--vp-c-text-1] mb-2">{{ app.name }}</h3>
-          <p class="text-sm text-[--vp-c-text-2]">{{ app.description }}</p>
-        </div>
+    <a v-for="app in apps" :key="app.name" :href="app.href" class="app-card">
+      <div class="card-header">
+        <BrandIcon v-if="app.icon !== 'content'" :name="app.icon" :size="32" />
+        <BookText v-else :size="32" class="text-[--vp-c-brand-1]" />
+        <h3>{{ app.name }}</h3>
       </div>
-      <div class="flex flex-wrap gap-3 text-sm">
-        <span v-if="app.demo" class="text-[--vp-c-brand-1]">
-          Try Demo →
-        </span>
-        <span v-if="app.repo" class="text-[--vp-c-brand-1]">
-          GitHub →
-        </span>
-        <span v-if="app.docs" class="text-[--vp-c-brand-1]">
-          Documentation →
-        </span>
+      <p class="card-description">{{ app.description }}</p>
+      <div class="card-links">
+        <a v-for="link in app.links" :key="link.label" :href="link.href" @click.stop>
+          {{ link.label }} →
+        </a>
       </div>
     </a>
   </div>
@@ -95,30 +118,13 @@ const apps = [
   description="Jump in at any phase of the security automation lifecycle based on your current needs and maturity level."
 >
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="getting-started-card p-6 bg-card rounded-lg border border-border">
-      <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-3">New to Security Automation?</h3>
-      <p class="text-sm text-[--vp-c-text-2] mb-4">Start by validating your systems with existing InSpec profiles, then visualize the results in Heimdall.</p>
-      <div class="flex flex-col gap-2 text-sm">
-        <a href="/content/" class="text-[--vp-c-brand-1] hover:underline">Browse Security Profiles →</a>
-        <a href="/apps/heimdall" class="text-[--vp-c-brand-1] hover:underline">Learn About Heimdall →</a>
-      </div>
-    </div>
-
-    <div class="getting-started-card p-6 bg-card rounded-lg border border-border">
-      <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-3">Already Running Security Scans?</h3>
-      <p class="text-sm text-[--vp-c-text-2] mb-4">Use SAF CLI to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.</p>
-      <div class="flex flex-col gap-2 text-sm">
-        <a href="/apps/saf-cli" class="text-[--vp-c-brand-1] hover:underline">Learn About SAF CLI →</a>
-        <a href="/framework/normalize" class="text-[--vp-c-brand-1] hover:underline">Normalization Guide →</a>
-      </div>
-    </div>
-
-    <div class="getting-started-card p-6 bg-card rounded-lg border border-border">
-      <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-3">Creating Custom Requirements?</h3>
-      <p class="text-sm text-[--vp-c-text-2] mb-4">Use Vulcan to author security guidance documents, then generate InSpec profiles from your requirements.</p>
-      <div class="flex flex-col gap-2 text-sm">
-        <a href="/apps/vulcan" class="text-[--vp-c-brand-1] hover:underline">Learn About Vulcan →</a>
-        <a href="/framework/plan" class="text-[--vp-c-brand-1] hover:underline">Planning Guide →</a>
+    <div v-for="item in gettingStarted" :key="item.title" class="getting-started-card">
+      <h3 class="card-title">{{ item.title }}</h3>
+      <p class="card-description">{{ item.description }}</p>
+      <div class="card-links">
+        <a v-for="link in item.links" :key="link.label" :href="link.href">
+          {{ link.label }} →
+        </a>
       </div>
     </div>
   </div>
@@ -132,12 +138,67 @@ const apps = [
   max-width: none !important;
 }
 
-.app-card {
+.app-card,
+.getting-started-card {
+  display: block;
+  padding: 1.5rem;
+  background: var(--vp-c-bg);
+  border-radius: 0.5rem;
+  border: 1px solid var(--vp-c-divider);
   text-decoration: none !important;
+  transition: border-color 0.2s ease;
+}
+
+.app-card {
+  cursor: pointer;
 }
 
 .app-card:hover {
-  text-decoration: none !important;
+  border-color: var(--vp-c-brand-1);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-header h3,
+.card-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-text-1) !important;
+  line-height: 1 !important;
+}
+
+.card-title {
+  margin-bottom: 0.75rem !important;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2) !important;
+  margin: 0 0 1rem 0;
+}
+
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.card-links a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.card-links a:hover {
+  text-decoration: underline;
 }
 
 /* Lighten cards in dark mode for better contrast */
