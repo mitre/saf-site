@@ -5,11 +5,25 @@ aside: false
 ---
 
 <script setup>
-import { BarChart3, Database, GitBranch, Download } from 'lucide-vue-next'
+import { Github, BookOpen } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import BrandIcon from '../.vitepress/theme/components/icons/BrandIcon.vue'
+import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const deploymentOptions = [
   {
+    name: 'Heimdall Server',
+    icon: 'heimdall',
+    description: 'Full-featured server application with database backend. Store results centrally, enable team collaboration, track compliance over time, and integrate with CI/CD pipelines. Ideal for enterprise security teams.',
+    links: [
+      { label: 'Try Demo', href: 'https://heimdall-demo.mitre.org' },
+      { label: 'View Source', href: 'https://github.com/mitre/heimdall2' },
+      { label: 'Documentation', href: 'https://github.com/mitre/heimdall2/wiki' }
+    ]
+  },
+  {
     name: 'Heimdall Lite',
+    icon: 'heimdall',
     description: 'Client-side visualization tool that runs entirely in your browser. No server required - upload HDF files directly for instant visualization. Perfect for individual security analysts or quick compliance checks.',
     links: [
       { label: 'Try Heimdall Lite', href: 'https://heimdall-lite.mitre.org' },
@@ -17,12 +31,21 @@ const deploymentOptions = [
     ]
   },
   {
-    name: 'Heimdall Server',
-    description: 'Full-featured server application with database backend. Store results centrally, enable team collaboration, track compliance over time, and integrate with CI/CD pipelines. Ideal for enterprise security teams.',
+    name: 'Container Deployment',
+    icon: 'docker',
+    description: 'Deploy Heimdall as a containerized application using Docker or Kubernetes. Use our Helm chart for simplified Kubernetes deployment, or pull the Docker image directly from DockerHub for container orchestration.',
     links: [
-      { label: 'Try Demo', href: 'https://heimdall-demo.mitre.org' },
-      { label: 'View Source', href: 'https://github.com/mitre/heimdall2' },
-      { label: 'Documentation', href: 'https://github.com/mitre/heimdall2/wiki' }
+      { label: 'DockerHub', href: 'https://hub.docker.com/r/mitre/heimdall2' },
+      { label: 'Helm Chart', href: 'https://github.com/mitre/heimdall-helm' }
+    ]
+  },
+  {
+    name: 'NPM Package',
+    icon: 'npm',
+    description: 'Install Heimdall Lite as an NPM package for integration into your Node.js workflows or local development environment. Ideal for developers who want to embed Heimdall visualization capabilities into their own applications.',
+    links: [
+      { label: 'NPM Package', href: 'https://www.npmjs.com/package/@mitre/heimdall-lite' },
+      { label: 'View Source', href: 'https://github.com/mitre/heimdall-lite' }
     ]
   }
 ]
@@ -37,11 +60,6 @@ const resources = [
     title: 'Documentation',
     description: 'Installation guides, API documentation, and usage examples.',
     href: 'https://github.com/mitre/heimdall2/wiki'
-  },
-  {
-    title: 'Try the Demo',
-    description: 'Explore Heimdall\'s features with sample security validation data.',
-    href: 'https://heimdall-demo.mitre.org'
   }
 ]
 </script>
@@ -49,83 +67,86 @@ const resources = [
 <PageSection
   orientation="vertical"
   headline="SAF Apps"
-  title="Heimdall"
   description="Heimdall is MITRE SAF's security data visualization and analysis platform. Upload security validation results in Heimdall Data Format (HDF), view interactive compliance dashboards, compare results across systems and time periods, and generate comprehensive reports for stakeholders."
-  :links="[
-    { label: 'Try Demo', href: 'https://heimdall-demo.mitre.org', variant: 'default', external: true },
-    { label: 'View on GitHub', href: 'https://github.com/mitre/heimdall2', variant: 'outline', external: true }
-  ]"
-/>
-
-<PageSection
-  variant="muted"
-  orientation="vertical"
-  headline="Capabilities"
-  title="Comprehensive Security Visualization"
-  description="Heimdall transforms complex security data into actionable insights through interactive dashboards, detailed reports, and powerful comparison tools."
 >
-  <FeatureList
-    :items="[
-      {
-        icon: BarChart3,
-        title: 'Interactive Dashboards',
-        description: 'Visualize security compliance across your entire infrastructure. View pass/fail statistics, severity breakdowns, and control family compliance at a glance. Filter and drill down to focus on specific systems, frameworks, or time periods.'
-      },
-      {
-        icon: Database,
-        title: 'Centralized Data Storage',
-        description: 'Store all security validation results in a centralized database. Track compliance history over time, compare baseline results against current scans, and maintain a complete audit trail of security testing activities.'
-      },
-      {
-        icon: GitBranch,
-        title: 'Comparison & Trending',
-        description: 'Compare security results between systems, time periods, or validation runs. Identify improvements and regressions, track remediation progress, and demonstrate continuous improvement to stakeholders and auditors.'
-      },
-      {
-        icon: Download,
-        title: 'Report Generation',
-        description: 'Export comprehensive reports in multiple formats. Generate PDF reports for executives, CSV exports for analysis, or compliance evidence packages for auditors. Share results with stakeholders in the format they need.'
-      }
-    ]"
-    gap="lg"
-  />
+  <template #title>
+    <span class="flex items-center gap-3">
+      <BrandIcon name="heimdall" :size="40" />
+      Heimdall
+    </span>
+  </template>
+
+  <template #links>
+    <div class="button-grid">
+      <Button as="a" href="https://heimdall-demo.mitre.org" target="_blank" rel="noopener noreferrer" variant="default" size="lg">
+        Try Heimdall Demo
+      </Button>
+      <Button as="a" href="https://heimdall-lite.mitre.org" target="_blank" rel="noopener noreferrer" variant="default" size="lg">
+        Try Heimdall Lite
+      </Button>
+      <Button as="a" href="https://github.com/mitre/heimdall2" target="_blank" rel="noopener noreferrer" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <Github :size="20" />
+        View on GitHub
+      </Button>
+      <Button as="a" href="https://github.com/mitre/heimdall2/wiki" target="_blank" rel="noopener noreferrer" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <BookOpen :size="20" />
+        Documentation
+      </Button>
+      <Button as="a" href="https://hub.docker.com/r/mitre/heimdall2" target="_blank" rel="noopener noreferrer" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <BrandIcon name="docker" :size="20" />
+        DockerHub
+      </Button>
+      <Button as="a" href="https://www.npmjs.com/package/@mitre/heimdall-lite" target="_blank" rel="noopener noreferrer" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <BrandIcon name="npm" :size="20" />
+        NPM Package
+      </Button>
+      <Button as="a" href="https://github.com/mitre/heimdall-helm" target="_blank" rel="noopener noreferrer" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <BrandIcon name="helm" :size="20" />
+        Helm Chart
+      </Button>
+      <Button as="a" href="/framework/visualize" variant="outline" size="lg" class="flex items-center gap-2 no-underline">
+        <PillarIcon pillar="visualize" :size="20" />
+        Visualize
+      </Button>
+    </div>
+  </template>
 </PageSection>
 
 <!-- TODO: Add screenshot section - Dashboard View -->
 <PageSection
   orientation="horizontal"
   headline="Dashboard View"
-  title="Compliance at a Glance"
-  description="The Heimdall dashboard provides an immediate view of security posture across your infrastructure. View overall compliance percentages, see which systems need attention, and drill down into specific failures for detailed remediation guidance."
+  title="Visualize Your Security Posture"
+  description="Load data into Heimdall for easy sorting, filtering, and summarizing of your security results. Focus on information relevant to security assessments."
 >
   <div class="screenshot-placeholder">
     <p class="text-sm text-[--vp-c-text-2]">Screenshot: Heimdall dashboard showing overall compliance statistics</p>
   </div>
 </PageSection>
 
-<!-- TODO: Add screenshot section - Detailed Results -->
+<!-- TODO: Add screenshot section - Aggregate Data -->
 <PageSection
   variant="muted"
   orientation="horizontal"
   :reverse="true"
-  headline="Detailed Analysis"
-  title="Drill Down Into Failures"
-  description="Click into any failed control to see detailed information including the test code, actual vs. expected results, and remediation guidance. Export specific control failures to share with development teams for quick resolution."
+  headline="Data Aggregation"
+  title="Aggregate Your Security Data"
+  description="Heimdall automatically converts input security data into a common format (Heimdall Data Format). Unite all of your security scan output under a single pane of glass. Export your aggregated data into a multitude of common formats supporting assessments."
 >
   <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Detailed control failure view with remediation information</p>
+    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Heimdall aggregating data from multiple sources</p>
   </div>
 </PageSection>
 
-<!-- TODO: Add screenshot section - Comparison View -->
+<!-- TODO: Add screenshot section - Deep Dive -->
 <PageSection
   orientation="horizontal"
-  headline="Comparison Tools"
-  title="Track Changes Over Time"
-  description="Compare validation results between different time periods, systems, or baseline runs. Quickly identify which controls have improved, which have regressed, and what new issues have been introduced since the last scan."
+  headline="Detailed Analysis"
+  title="Deep Dive Into Your Data"
+  description="Use Heimdall to examine each control in your test suite in detail. Determine root causes of failures and see the exact test code that led to each result."
 >
   <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Side-by-side comparison of two validation runs</p>
+    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Detailed control failure view with test code</p>
   </div>
 </PageSection>
 
@@ -134,11 +155,14 @@ const resources = [
   orientation="vertical"
   headline="Get Started"
   title="Deployment Options"
-  description="Choose the deployment option that works best for your organization's security and collaboration requirements."
+  description="Choose the deployment option that works best for your organization's security and collaboration requirements. Heimdall can be deployed as a full server application, a lightweight browser tool, a containerized service, or an NPM package."
 >
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div v-for="option in deploymentOptions" :key="option.name" class="deployment-card block p-6 bg-card rounded-lg border border-border">
-      <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-3">{{ option.name }}</h3>
+    <div v-for="option in deploymentOptions" :key="option.name" class="deployment-card">
+      <div class="card-header">
+        <BrandIcon :name="option.icon" :size="32" />
+        <h3>{{ option.name }}</h3>
+      </div>
       <p class="text-sm text-[--vp-c-text-2] mb-4">{{ option.description }}</p>
       <div class="flex flex-wrap gap-3">
         <a v-for="link in option.links" :key="link.label" :href="link.href" target="_blank" rel="noopener noreferrer" class="text-sm text-[--vp-c-brand-1] hover:underline">
@@ -154,10 +178,20 @@ const resources = [
   headline="Resources"
   title="Learn More About Heimdall"
 >
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <a v-for="resource in resources" :key="resource.title" :href="resource.href" target="_blank" rel="noopener noreferrer" class="resource-card block p-6 bg-card rounded-lg border border-border hover:border-[--vp-c-brand-1] transition-colors">
-      <h3 class="text-base font-semibold text-[--vp-c-text-1] mb-2">{{ resource.title }}</h3>
-      <p class="text-sm text-[--vp-c-text-2]">{{ resource.description }}</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a :href="resources[0].href" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="card-header">
+        <Github :size="32" />
+        <h3>{{ resources[0].title }}</h3>
+      </div>
+      <p class="card-description">{{ resources[0].description }}</p>
+    </a>
+    <a :href="resources[1].href" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="card-header">
+        <BookOpen :size="32" />
+        <h3>{{ resources[1].title }}</h3>
+      </div>
+      <p class="card-description">{{ resources[1].description }}</p>
     </a>
   </div>
 </PageSection>
@@ -168,6 +202,24 @@ const resources = [
 }
 .VPDoc .content {
   max-width: none !important;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.button-grid > * {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .button-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .screenshot-placeholder {
@@ -183,6 +235,45 @@ const resources = [
 
 .deployment-card,
 .resource-card {
+  display: block;
+  padding: 1.5rem;
+  background: var(--vp-c-bg);
+  border-radius: 0.5rem;
+  border: 1px solid var(--vp-c-divider);
+  text-decoration: none !important;
+  transition: border-color 0.2s ease;
+}
+
+.resource-card:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-header h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-text-1) !important;
+  line-height: 1 !important;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2) !important;
+  margin: 0 0 1rem 0;
+}
+
+/* Remove underlines from button links */
+.no-underline,
+.no-underline:hover {
   text-decoration: none !important;
 }
 
@@ -190,5 +281,10 @@ const resources = [
 .dark .deployment-card,
 .dark .resource-card {
   background-color: var(--vp-c-bg-soft) !important;
+}
+
+/* Clickable resource cards */
+.resource-card {
+  cursor: pointer;
 }
 </style>
