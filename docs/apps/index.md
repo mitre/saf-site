@@ -38,7 +38,7 @@ const apps = [
     href: '/apps/vulcan',
     links: [
       { label: 'View Details', href: '/apps/vulcan' },
-      { label: 'Try Demo', href: 'https://vulcan-demo.mitre.org' },
+      { label: 'Try Demo', href: 'https://vulcan.mitre.org' },
       { label: 'GitHub', href: 'https://github.com/mitre/vulcan' }
     ]
   },
