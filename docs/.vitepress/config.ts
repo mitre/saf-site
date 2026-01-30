@@ -13,6 +13,7 @@ export default defineConfig({
   },
   title: 'MITRE SAF',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
+  cleanUrls: true,
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/icons/saf-logo.svg' }],
@@ -43,8 +44,8 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/apps/' },
           { text: 'Heimdall', link: '/apps/heimdall' },
-          { text: 'SAF CLI', link: '/apps/saf-cli' },
           { text: 'Vulcan', link: '/apps/vulcan' },
+          { text: 'SAF CLI', link: '/apps/saf-cli' },
         ],
       },
       { text: 'Content', link: '/content/' },
@@ -72,8 +73,8 @@ export default defineConfig({
           link: '/apps/',
           items: [
             { text: 'Heimdall', link: '/apps/heimdall' },
-            { text: 'SAF CLI', link: '/apps/saf-cli' },
             { text: 'Vulcan', link: '/apps/vulcan' },
+            { text: 'SAF CLI', link: '/apps/saf-cli' },
           ],
         },
       ],
