@@ -1,5 +1,5 @@
 ---
-title: Validate - SAF Framework
+title: Validate
 layout: doc
 aside: false
 ---

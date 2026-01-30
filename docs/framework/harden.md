@@ -1,5 +1,5 @@
 ---
-title: Harden - SAF Framework
+title: Harden
 layout: doc
 aside: false
 ---

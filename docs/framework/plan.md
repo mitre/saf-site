@@ -1,5 +1,5 @@
 ---
-title: Plan - SAF Framework
+title: Plan
 layout: doc
 aside: false
 ---

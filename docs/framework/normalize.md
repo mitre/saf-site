@@ -1,11 +1,11 @@
 ---
-title: Normalize - SAF Framework
+title: Normalize
 layout: doc
 aside: false
 ---
 
 <script setup>
-import { RefreshCw, ArrowLeftRight, Database } from 'lucide-vue-next'
+import { RefreshCw, ArrowLeftRight, Database, GitCompare, TrendingUp, CheckCircle, Handshake, ListCheck } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const normalizeTools = [
@@ -66,20 +66,8 @@ const toolCategories = [
   orientation="vertical"
   headline="The Problem"
   title="Security Tool Data Fragmentation"
->
-  <template #description>
-    <p>Organizations use multiple security tools - vulnerability scanners, static code analyzers, compliance checkers, penetration testing tools, and more. Each tool produces results in its own proprietary format, making it nearly impossible to:</p>
-
-    <ul class="mt-4 space-y-2">
-      <li><strong>Compare results</strong> across different tools and timeframes</li>
-      <li><strong>Aggregate findings</strong> into a unified security dashboard</li>
-      <li><strong>Track remediation</strong> progress consistently across tools</li>
-      <li><strong>Demonstrate compliance</strong> using evidence from multiple sources</li>
-    </ul>
-
-    <p class="mt-4">Without normalization, security teams waste countless hours manually correlating data, building custom integrations, and maintaining fragile parsing scripts that break with every tool update.</p>
-  </template>
-</PageSection>
+  description="Proper secure software development has many facets. Organizations need to cover all the bases - vulnerability scanning, static and dynamic code analysis (SAST/DAST), configuration management and validation, Software Bill of Materials (SBOM) generation, penetration testing, and more. While today's vibrant cybersecurity tooling landscape gives solutions to each of these problems, each tool tends to produce results in its own proprietary format. Without normalization, security teams waste countless hours manually correlating data, building custom integrations, and maintaining fragile parsing scripts that break with every tool update."
+/>
 
 <PageSection
   orientation="vertical"
@@ -103,6 +91,31 @@ const toolCategories = [
         icon: Database,
         title: 'Comprehensive Coverage',
         description: 'SAF CLI supports conversion from 20+ security tools including vulnerability scanners (Nessus, Tenable.io), code analyzers (SonarQube, Fortify), cloud security (AWS Config, Prowler), compliance tools (SCAP, Chef InSpec), and more.'
+      },
+      {
+        icon: GitCompare,
+        title: 'Compare results',
+        description: 'Analyze security findings across different tools and timeframes. Track how your security posture changes over time and identify trends in vulnerabilities discovered by different scanning tools.'
+      },
+      {
+        icon: ListCheck,
+        title: 'Aggregate findings',
+        description: 'Consolidate security data from multiple sources into a unified security dashboard. View all vulnerabilities, compliance issues, and security findings in one place regardless of which tool discovered them.'
+      },
+      {
+        icon: TrendingUp,
+        title: 'Track remediation',
+        description: 'Monitor security issue resolution consistently across all tools. Measure progress on fixing vulnerabilities and demonstrate that security issues are being addressed in a timely manner.'
+      },
+      {
+        icon: CheckCircle,
+        title: 'Demonstrate compliance',
+        description: 'Prove compliance using evidence from multiple security testing sources. Show auditors and stakeholders comprehensive security validation results from your entire toolchain in a unified format.'
+      },
+      {
+        icon: Handshake,
+        title: 'Community Driven',
+        description: 'Have a data format you want HDF to support that you don\'t see on the list? Contact us about it, or take a look at our training class for converter development and contribute your own converter to the open-source project on GitHub!'
       }
     ]"
     gap="lg"
@@ -117,7 +130,7 @@ const toolCategories = [
   description="SAF CLI provides converters for a wide range of security tools across different categories. Each converter transforms the tool's native output format into HDF, enabling unified analysis in Heimdall."
 >
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div v-for="category in toolCategories" :key="category.title" class="block p-6 bg-card rounded-lg border border-border">
+    <div v-for="category in toolCategories" :key="category.title" class="tool-card block p-6 bg-card rounded-lg border border-border">
       <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-3">{{ category.title }}</h3>
       <ul class="space-y-2 text-sm text-[--vp-c-text-2] list-disc pl-4">
         <li v-for="tool in category.tools" :key="tool">{{ tool }}</li>
@@ -128,25 +141,22 @@ const toolCategories = [
   <div class="mt-8">
     <LogoMarquee
       :items="[
-        { name: 'Anchore' },
-        { name: 'AWS' },
-        { name: 'Burp Suite' },
-        { name: 'Fortify' },
-        { name: 'JFrog' },
-        { name: 'Tenable' },
-        { name: 'Snyk' },
-        { name: 'SonarQube' },
-        { name: 'Splunk' },
-        { name: 'Trivy' },
-        { name: 'OWASP' },
-        { name: 'Veracode' },
-        { name: 'Prisma' },
-        { name: 'Docker' },
-        { name: 'Kubernetes' }
+        { name: 'AWS', href: 'https://aws.amazon.com/', description: 'Amazon Web Services - Cloud computing platform' },
+        { name: 'Docker', href: 'https://www.docker.com/', description: 'Docker - Container platform' },
+        { name: 'InSpec', href: 'https://www.inspec.io/', description: 'Chef InSpec - Compliance and security testing framework' },
+        { name: 'JFrog', href: 'https://jfrog.com/', description: 'JFrog Xray - Universal artifact analysis' },
+        { name: 'Kubernetes', href: 'https://kubernetes.io/', description: 'Kubernetes - Container orchestration' },
+        { name: 'Nessus', href: 'https://www.tenable.com/products/nessus', description: 'Nessus - Vulnerability scanner' },
+        { name: 'OWASP', href: 'https://owasp.org/', description: 'OWASP - Open Web Application Security Project' },
+        { name: 'Prisma', href: 'https://www.paloaltonetworks.com/prisma/cloud', description: 'Prisma Cloud - Cloud security platform' },
+        { name: 'Snyk', href: 'https://snyk.io/', description: 'Snyk - Developer security platform' },
+        { name: 'SonarQube', href: 'https://www.sonarsource.com/products/sonarqube/', description: 'SonarQube - Code quality and security' },
+        { name: 'Splunk', href: 'https://www.splunk.com/', description: 'Splunk - Data analytics platform' },
+        { name: 'Trivy', href: 'https://trivy.dev/', description: 'Trivy - Container vulnerability scanner' }
       ]"
-      :size="40"
+      :size="80"
       :rows="1"
-      :duration="20"
+      :duration="30"
     />
   </div>
 </PageSection>
@@ -162,7 +172,7 @@ const toolCategories = [
       :items="[
         {
           title: 'SAF CLI Converters',
-          description: 'Convert security scan results from 20+ tools into Heimdall Data Format (HDF). Simple command-line interface: saf convert nessus2hdf -i scan.nessus -o results.json. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
+          description: 'Convert security scan results from 20+ tools into Heimdall Data Format (HDF) using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
           href: '/apps/'
         },
         {
@@ -215,5 +225,10 @@ const toolCategories = [
     justify-content: center;
     min-height: 300px;
   }
+}
+
+/* Lighten tool cards in dark mode for better contrast */
+.dark .tool-card {
+  background-color: var(--vp-c-bg-soft) !important;
 }
 </style>
