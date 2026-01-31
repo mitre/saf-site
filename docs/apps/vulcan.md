@@ -86,19 +86,17 @@ const resources = [
   </template>
 </PageSection>
 
-<!-- TODO: Add screenshot section - Editing Window -->
+<!-- Baseline Editing -->
 <PageSection
   orientation="horizontal"
   headline="Baseline Editing"
   title="Develop Baselines in a User-Friendly Editing Window"
   description="Construct your baselines in a simple but feature-rich editing view. Use Vulcan's sorting and filtering features to quickly search through your controls."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Vulcan editing interface with controls</p>
-  </div>
+  <img src="/screenshots/vulcan-editor.png" alt="Vulcan editing interface with controls" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Source Alignment -->
+<!-- Source Alignment -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -107,24 +105,20 @@ const resources = [
   title="Align Your Content Back To Source Guidance"
   description="Import your high-level requirements into Vulcan and use them as the direct template for your baseline content. Start with general guidance and tailor it to your component."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Vulcan aligning content to source guidance</p>
-  </div>
+  <img src="/screenshots/vulcan-alignment.png" alt="Vulcan aligning content to source guidance" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Collaboration -->
+<!-- Collaboration -->
 <PageSection
   orientation="horizontal"
   headline="Collaboration"
   title="Streamline Baseline Creation In A Collaborative Environment"
   description="Vulcan supports a distributed model of baseline development in which multiple authors collaborate to produce high-quality content. Use Vulcan's change control, peer review and role-based permissions to keep all of your authors working from the same sheet of music. Avoid the mental overhead of managing your document versions manually."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Vulcan collaborative features</p>
-  </div>
+  <img src="/screenshots/vulcan-collaboration.png" alt="Vulcan collaborative features" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - InSpec Integration -->
+<!-- InSpec Integration -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -133,9 +127,7 @@ const resources = [
   title="Develop Automated Tests For Your Content"
   description="Vulcan includes an InSpec testing framework integration to allow authors to write automated tests alongside their human-readable baselines. Vulcan pre-populates the tests with metadata from the original baselines to keep your test profiles tightly bound to the guidance from which they were written."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Vulcan InSpec test development</p>
-  </div>
+  <img src="/screenshots/vulcan-inspec.png" alt="Vulcan InSpec test development" class="screenshot" />
 </PageSection>
 
 <PageSection
@@ -274,5 +266,18 @@ const resources = [
 /* Clickable resource cards */
 .resource-card {
   cursor: pointer;
+}
+
+/* Screenshot images */
+.screenshot {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .screenshot {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

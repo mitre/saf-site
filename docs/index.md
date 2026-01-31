@@ -125,29 +125,29 @@ const toolset = [
 // Sponsors and partners using SAF (using static image placeholders)
 // Replace image paths with actual logo files in /public/img/partners/
 const sponsors = [
-  { name: 'Platform One', image: 'https://via.placeholder.com/150x150.png?text=P1' },
-  { name: 'Defense Security Cooperation Agency', image: 'https://via.placeholder.com/150x150.png?text=DSCA' },
-  { name: 'Defense Counterintelligence and Security Agency', image: 'https://via.placeholder.com/150x150.png?text=DCSA' },
-  { name: 'United States Air Force', image: 'https://via.placeholder.com/150x150.png?text=USAF' },
-  { name: 'Department of Defense CIO', image: 'https://via.placeholder.com/150x150.png?text=DoD' },
-  { name: 'Defense Information Systems Agency', image: 'https://via.placeholder.com/150x150.png?text=DISA' },
-  { name: 'United States Army Enterprise Cloud Management Agency', image: 'https://via.placeholder.com/150x150.png?text=Army' },
-  { name: 'Centers for Medicare & Medicaid Services', image: 'https://via.placeholder.com/150x150.png?text=CMS' },
-  { name: 'Center for Disease Control and Prevention', image: 'https://via.placeholder.com/150x150.png?text=CDC' },
-  { name: 'National Reconnaissance Office', image: 'https://via.placeholder.com/150x150.png?text=NRO' }
+  { name: 'Platform One', image: '/logos/sponsors/platform-one.png' },
+  { name: 'Defense Security Cooperation Agency', image: '/logos/sponsors/dsca.jpg' },
+  { name: 'Defense Counterintelligence and Security Agency', image: '/logos/sponsors/dcsa.png' },
+  { name: 'United States Air Force', image: '/logos/sponsors/usaf.svg' },
+  { name: 'Department of Defense CIO', image: '/logos/sponsors/dod.png' },
+  { name: 'Defense Information Systems Agency', image: '/logos/sponsors/disa.svg' },
+  { name: 'United States Army Enterprise Cloud Management Agency', image: '/logos/sponsors/army-ecma.png' },
+  { name: 'Centers for Medicare & Medicaid Services', image: '/logos/sponsors/cms.svg' },
+  { name: 'Center for Disease Control and Prevention', image: '/logos/sponsors/cdc.svg' },
+  { name: 'National Reconnaissance Office', image: '/logos/sponsors/nro.png' }
 ]
 
 const vendors = [
-  { name: 'Progress Chef', image: 'https://via.placeholder.com/150x150.png?text=Chef' },
-  { name: 'VMware', image: 'https://via.placeholder.com/150x150.png?text=VMware' },
-  { name: 'Sophos', image: 'https://via.placeholder.com/150x150.png?text=Sophos' },
-  { name: 'Lockheed Martin', image: 'https://via.placeholder.com/150x150.png?text=LM' },
-  { name: 'Rancher Government Solutions', image: 'https://via.placeholder.com/150x150.png?text=RGS' },
-  { name: 'Google Cloud', image: 'https://via.placeholder.com/150x150.png?text=GCP' },
-  { name: 'GitHub', image: 'https://via.placeholder.com/150x150.png?text=GitHub' },
+  { name: 'Progress Chef', image: '/logos/vendors/chef.svg' },
+  { name: 'VMware', image: '/logos/vendors/vmware.png' },
+  { name: 'Sophos', image: '/logos/vendors/sophos.png' },
+  { name: 'Lockheed Martin', image: '/logos/vendors/lockheed-martin.png' },
+  { name: 'Rancher Government Solutions', image: '/logos/vendors/rgs.png' },
+  { name: 'Google Cloud', image: '/logos/vendors/google-cloud.png' },
+  { name: 'GitHub', image: '/logos/vendors/github.svg' },
   { name: 'Ansible', image: 'https://via.placeholder.com/150x150.png?text=Ansible' },
-  { name: 'CrunchyData', image: 'https://via.placeholder.com/150x150.png?text=Crunchy' },
-  { name: 'Elastic', image: 'https://via.placeholder.com/150x150.png?text=Elastic' }
+  { name: 'CrunchyData', image: '/logos/vendors/crunchy-data.png' },
+  { name: 'Elastic', image: '/logos/vendors/elastic.svg' }
 ]
 
 const userStories = [

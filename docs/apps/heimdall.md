@@ -112,19 +112,17 @@ const resources = [
   </template>
 </PageSection>
 
-<!-- TODO: Add screenshot section - Dashboard View -->
+<!-- Dashboard View -->
 <PageSection
   orientation="horizontal"
   headline="Dashboard View"
   title="Visualize Your Security Posture"
   description="Load data into Heimdall for easy sorting, filtering, and summarizing of your security results. Focus on information relevant to security assessments."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Heimdall dashboard showing overall compliance statistics</p>
-  </div>
+  <img src="/screenshots/heimdall-dashboard.png" alt="Heimdall dashboard showing overall compliance statistics" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Aggregate Data -->
+<!-- Data Aggregation -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -133,21 +131,17 @@ const resources = [
   title="Aggregate Your Security Data"
   description="Heimdall automatically converts input security data into a common format (Heimdall Data Format). Unite all of your security scan output under a single pane of glass. Export your aggregated data into a multitude of common formats supporting assessments."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Heimdall aggregating data from multiple sources</p>
-  </div>
+  <img src="/screenshots/heimdall-aggregate.png" alt="Heimdall aggregating data from multiple sources" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Deep Dive -->
+<!-- Detailed Analysis -->
 <PageSection
   orientation="horizontal"
   headline="Detailed Analysis"
   title="Deep Dive Into Your Data"
   description="Use Heimdall to examine each control in your test suite in detail. Determine root causes of failures and see the exact test code that led to each result."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: Detailed control failure view with test code</p>
-  </div>
+  <img src="/screenshots/heimdall-detail.png" alt="Detailed control failure view with test code" class="screenshot" />
 </PageSection>
 
 <PageSection
@@ -286,5 +280,18 @@ const resources = [
 /* Clickable resource cards */
 .resource-card {
   cursor: pointer;
+}
+
+/* Screenshot images */
+.screenshot {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .screenshot {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>

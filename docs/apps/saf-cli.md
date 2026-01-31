@@ -92,19 +92,17 @@ const resources = [
   </template>
 </PageSection>
 
-<!-- TODO: Add screenshot section - Convert Formats -->
+<!-- Data Normalization -->
 <PageSection
   orientation="horizontal"
   headline="Data Normalization"
   title="Convert between security data formats"
   description="Easily normalize reports from multiple scanning tools into OHDF, or convert OHDF to your desired data format."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI converting security data formats</p>
-  </div>
+  <img src="/diagrams/ohdf-conversion.svg" alt="SAF CLI converting security data to OHDF format" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Summarize Results -->
+<!-- Result Summary -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -113,24 +111,20 @@ const resources = [
   title="Summarize your test results"
   description="Point SAF CLI to an OHDF file and have it print summary data on control statuses."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI summarizing test results</p>
-  </div>
+  <img src="/screenshots/saf-summary.png" alt="SAF CLI summarizing test results" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Threshold Validation -->
+<!-- Threshold Validation -->
 <PageSection
   orientation="horizontal"
   headline="Threshold Validation"
   title="Check against thresholds"
   description="Validate your security data against a fine-grain threshold of compliance that you define for your environment. Useful for defining a go/no-go decision point in a CI/CD pipeline -- ensure that your pipeline will continue to execute if and only if your automated compliance testing passes!"
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI validating against thresholds</p>
-  </div>
+  <img src="/screenshots/saf-threshold.png" alt="SAF CLI validating against thresholds" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Profile Updates -->
+<!-- Profile Management -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -139,24 +133,20 @@ const resources = [
   title="Update InSpec profiles"
   description="SAF CLI's Delta feature updates the metadata of an InSpec profile against new versions of the baseline guidance the profile implements, and helps identify which controls need their test logic updated by a human being."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI updating InSpec profiles</p>
-  </div>
+  <img src="/diagrams/inspec-delta.svg" alt="SAF CLI delta feature updating InSpec profiles" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - Attestations -->
+<!-- Attestation Management -->
 <PageSection
   orientation="horizontal"
   headline="Attestation Management"
   title="Create attestations"
   description="SAF CLI allows you to write an attestation about the state of a manual control, and add it into your automated scanning results data. Add manual data to your automated workflows!"
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI creating attestations</p>
-  </div>
+  <img src="/diagrams/attestation.svg" alt="SAF CLI creating attestations for manual controls" class="screenshot" />
 </PageSection>
 
-<!-- TODO: Add screenshot section - eMASS Integration -->
+<!-- eMASS Integration -->
 <PageSection
   variant="muted"
   orientation="horizontal"
@@ -165,9 +155,7 @@ const resources = [
   title="Interface with eMASS"
   description="SAF CLI has functions for working with the eMASS API to update control statuses, provide reports to the eMASS server, query eMASS for data, and more. This allows you to interact with eMASS automatically within your pipelines."
 >
-  <div class="screenshot-placeholder">
-    <p class="text-sm text-[--vp-c-text-2]">Screenshot: SAF CLI interfacing with eMASS</p>
-  </div>
+  <img src="/diagrams/saf-cli-emass-diagram.svg" alt="SAF CLI interfacing with eMASS" class="screenshot" />
 </PageSection>
 
 <PageSection
@@ -251,6 +239,19 @@ const resources = [
   border: 2px dashed var(--vp-c-border);
   border-radius: 8px;
   padding: 2rem;
+}
+
+/* Screenshot images */
+.screenshot {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .screenshot {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .deployment-card,
