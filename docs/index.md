@@ -19,6 +19,7 @@ import { DollarSign, Github, Users, BookText } from 'lucide-vue-next'
 import PillarIcon from './.vitepress/theme/components/icons/PillarIcon.vue'
 import BrandIcon from './.vitepress/theme/components/icons/BrandIcon.vue'
 import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
+import LogoGrid from './.vitepress/theme/components/LogoGrid.vue'
 
 const pillars = [
   {
@@ -120,6 +121,34 @@ const toolset = [
     href: '/framework/normalize'
   }
 ]
+
+// Sponsors and partners using SAF (using static image placeholders)
+// Replace image paths with actual logo files in /public/img/partners/
+const sponsors = [
+  { name: 'Platform One', image: 'https://via.placeholder.com/150x150.png?text=P1' },
+  { name: 'Defense Security Cooperation Agency', image: 'https://via.placeholder.com/150x150.png?text=DSCA' },
+  { name: 'Defense Counterintelligence and Security Agency', image: 'https://via.placeholder.com/150x150.png?text=DCSA' },
+  { name: 'United States Air Force', image: 'https://via.placeholder.com/150x150.png?text=USAF' },
+  { name: 'Department of Defense CIO', image: 'https://via.placeholder.com/150x150.png?text=DoD' },
+  { name: 'Defense Information Systems Agency', image: 'https://via.placeholder.com/150x150.png?text=DISA' },
+  { name: 'United States Army Enterprise Cloud Management Agency', image: 'https://via.placeholder.com/150x150.png?text=Army' },
+  { name: 'Centers for Medicare & Medicaid Services', image: 'https://via.placeholder.com/150x150.png?text=CMS' },
+  { name: 'Center for Disease Control and Prevention', image: 'https://via.placeholder.com/150x150.png?text=CDC' },
+  { name: 'National Reconnaissance Office', image: 'https://via.placeholder.com/150x150.png?text=NRO' }
+]
+
+const vendors = [
+  { name: 'Progress Chef', image: 'https://via.placeholder.com/150x150.png?text=Chef' },
+  { name: 'VMware', image: 'https://via.placeholder.com/150x150.png?text=VMware' },
+  { name: 'Sophos', image: 'https://via.placeholder.com/150x150.png?text=Sophos' },
+  { name: 'Lockheed Martin', image: 'https://via.placeholder.com/150x150.png?text=LM' },
+  { name: 'Rancher Government Solutions', image: 'https://via.placeholder.com/150x150.png?text=RGS' },
+  { name: 'Google Cloud', image: 'https://via.placeholder.com/150x150.png?text=GCP' },
+  { name: 'GitHub', image: 'https://via.placeholder.com/150x150.png?text=GitHub' },
+  { name: 'Ansible', image: 'https://via.placeholder.com/150x150.png?text=Ansible' },
+  { name: 'CrunchyData', image: 'https://via.placeholder.com/150x150.png?text=Crunchy' },
+  { name: 'Elastic', image: 'https://via.placeholder.com/150x150.png?text=Elastic' }
+]
 </script>
 
 <PageSection
@@ -189,6 +218,18 @@ const toolset = [
 </PageSection>
 
 <PageSection
+  orientation="vertical"
+>
+  <template #title>
+    <span class="centered-title">Adopted by The Community</span>
+  </template>
+
+  <LogoGrid :items="sponsors" :columns="5" show-names variant="card" title="Sponsors" />
+
+  <LogoGrid :items="vendors" :columns="5" show-names variant="card" title="Vendors" class="partner-group-spacing" />
+</PageSection>
+
+<PageSection
   orientation="horizontal"
   :reverse="true"
   title="Ready to Automate Your Security?"
@@ -220,28 +261,6 @@ const toolset = [
   </div>
 </PageSection>
 
-## What is MITRE SAF?
-
-The Security Automation Framework (SAF) is a comprehensive suite of open source tools and techniques for security automation, compliance validation, and continuous monitoring.
-
-## Quick Start
-
-```bash
-# Install SAF CLI
-npm install -g @mitre/saf
-
-# Validate your system
-saf validate threshold -i results.json
-```
-
-## Community
-
-Join our community to learn more and contribute:
-
-- [GitHub Discussions](https://github.com/mitre/saf/discussions)
-- [Issue Tracker](https://github.com/mitre/saf/issues)
-- Email: saf@mitre.org
-
 <style>
 .VPDoc .container {
   max-width: 1400px !important;
@@ -250,14 +269,14 @@ Join our community to learn more and contribute:
   max-width: none !important;
 }
 
-/* Remove divider lines between sections on homepage only */
-.VPHome .page-section::before,
-.VPHome .page-section::after {
+/* Remove VitePress default h2 border on homepage */
+.VPHome .vp-doc h2,
+.VPHome .vp-doc h3 {
   border-top: none !important;
-  border-bottom: none !important;
+  padding-top: 0 !important;
 }
 
-/* Override any VitePress dividers on homepage */
+/* Remove any other dividers on homepage */
 .VPHome hr,
 .VPHome .divider {
   display: none !important;
@@ -467,5 +486,10 @@ Join our community to learn more and contribute:
 /* Lighten tool cards in dark mode */
 .dark .tool-card {
   background-color: var(--vp-c-bg-soft) !important;
+}
+
+/* Spacing between sponsor and vendor grids */
+.partner-group-spacing {
+  margin-top: 3rem;
 }
 </style>

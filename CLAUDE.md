@@ -78,6 +78,53 @@ All pages and components must be tested and optimized for mobile devices.
 - `pnpm dev` and test on actual mobile device
 - VitePress dev server accessible on local network for device testing
 
+## Vue in Markdown Best Practices
+
+**CRITICAL:** VitePress processes markdown files through markdown-it BEFORE Vue compilation. This causes specific issues when mixing HTML with Vue components.
+
+### The Raw HTML Problem
+
+**Root Cause:** When you wrap Vue components in HTML tags (`<div>`, `<section>`, `<h3>`, etc.), markdown-it treats everything inside those tags as raw HTML (not Vue). Vue components get passed through as literal text instead of being compiled.
+
+**❌ INCORRECT - Causes raw HTML to appear:**
+```vue
+<div class="wrapper">
+  <h3>Section Title</h3>
+  <VueComponent :prop="data" />
+</div>
+```
+
+**✅ CORRECT - Components render properly:**
+```vue
+<!-- Use component props for titles/sections -->
+<VueComponent :prop="data" title="Section Title" />
+
+<!-- Or use multiple components directly -->
+<VueComponent :prop="data1" />
+<VueComponent :prop="data2" />
+```
+
+**✅ CORRECT - For complex layouts, create a wrapper component:**
+```vue
+<!-- Create WrapperComponent.vue in components/ -->
+<WrapperComponent :data1="data1" :data2="data2" />
+```
+
+### VitePress Vue-in-Markdown Rules
+
+1. **Never wrap Vue components in HTML tags** - Use components directly in markdown
+2. **Use component props** - Pass titles, sections, etc. as props instead of separate HTML elements
+3. **PascalCase or hyphen-case** - Component names must use these to avoid `<p>` tag wrapping
+4. **Create wrapper components** - For complex layouts, make a new Vue component instead of using HTML divs
+5. **Use `<script setup>`** - Place directly in markdown after frontmatter (no `<template>` tag needed)
+6. **Import locally or register globally** - Import in markdown for one-off use, register in theme for frequent use
+
+### Reference
+
+- [VitePress: Using Vue in Markdown](https://vitepress.dev/guide/using-vue)
+- Markdown content IS the template (implicit `<template>` tag)
+- All Vue features work (Composition API, reactivity, computed, etc.)
+
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.

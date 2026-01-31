@@ -163,10 +163,10 @@ withDefaults(defineProps<LogoGridProps>(), {
   font-weight: 500;
   color: var(--vp-c-text-2);
   text-align: center;
-  max-width: 70px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 120px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 /* Compact variant */
@@ -222,7 +222,7 @@ withDefaults(defineProps<LogoGridProps>(), {
 
   .logo-name {
     font-size: 0.75rem;
-    max-width: 85px;
+    max-width: 140px;
   }
 
   .logo-grid--card .logo-item {
@@ -259,7 +259,7 @@ withDefaults(defineProps<LogoGridProps>(), {
   }
 
   .logo-name {
-    max-width: 100px;
+    max-width: 160px;
   }
 
   .logo-grid--compact .logo-grid-items {
