@@ -4,23 +4,26 @@ import DefaultTheme from 'vitepress/theme'
 import ContentCard from './components/ContentCard.vue'
 
 import ContentDetail from './components/ContentDetail.vue'
+
 import ContentFilters from './components/ContentFilters.vue'
 import FeatureItem from './components/FeatureItem.vue'
 import FeatureList from './components/FeatureList.vue'
-
 // Logo display components
 import LogoGrid from './components/LogoGrid.vue'
-import LogoMarquee from './components/LogoMarquee.vue'
 
+import LogoMarquee from './components/LogoMarquee.vue'
 // Page layout components
 import PageSection from './components/PageSection.vue'
+
 import PillarBadge from './components/PillarBadge.vue'
 import Placeholder from './components/Placeholder.vue'
 import Skeleton from './components/Skeleton.vue'
+import Layout from './Layout.vue'
 import './custom.css'
 
 export default {
   extends: DefaultTheme,
+  Layout,
   enhanceApp({ app }: EnhanceAppContext) {
     // Content library
     app.component('ContentCard', ContentCard)

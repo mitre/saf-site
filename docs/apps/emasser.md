@@ -57,7 +57,7 @@ const resources = [
 <PageSection
   orientation="vertical"
   headline="SAF Apps"
-  description="eMASS is MITRE SAF's tool for automating interactions with the Enterprise Mission Assurance Support Service (eMASS). Push security test data to eMASS instances, update compliance status, and keep eMASS synchronized with your DevSecOps pipeline."
+  description="eMASSer is MITRE SAF™'s tool for automating interactions with the Enterprise Mission Assurance Support Service (eMASS). Push security test data to eMASS instances, update compliance status, and keep eMASS synchronized with your DevSecOps pipeline."
 >
   <template #title>
     <span class="flex items-center gap-3">
@@ -104,7 +104,7 @@ const resources = [
   orientation="vertical"
   headline="eMASS Integration"
   title="Automate eMASS workflows"
-  description="MITRE SAF's eMASSer tool uses the Framework's eMASS client library to provide a simple interface at the command-line interface (CLI) to automate routine use cases for eMASS. It can be used by an operator to push locally saved data to a remote eMASS instance, or it can be added to the end of a DevSecOps pipeline to keep eMASS up-to-date with a system's most recent security test data. eMASSer is distributed as a Docker container and as a Ruby Gem, or directly from its GitHub page."
+  description="MITRE SAF™'s eMASSer tool uses the Framework's eMASS client library to provide a simple interface at the command-line interface (CLI) to automate routine use cases for eMASS. It can be used by an operator to push locally saved data to a remote eMASS instance, or it can be added to the end of a DevSecOps pipeline to keep eMASS up-to-date with a system's most recent security test data. eMASSer is distributed as a Docker container and as a Ruby Gem, or directly from its GitHub page."
 />
 
 <PageSection

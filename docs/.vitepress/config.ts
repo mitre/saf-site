@@ -11,7 +11,7 @@ export default defineConfig({
       },
     },
   },
-  title: 'MITRE SAF',
+  title: 'MITRE SAF™',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
   cleanUrls: true,
 
@@ -97,8 +97,8 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'Released under the Apache 2.0 License.',
-      copyright: 'Copyright © 2025 The MITRE Corporation',
+      message: 'MITRE Security Automation Framework (MITRE SAF) is a trademark of The MITRE Corporation. Released under the Apache 2.0 License.',
+      copyright: 'Copyright © 2026 The MITRE Corporation',
     },
   },
 })

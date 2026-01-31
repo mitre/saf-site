@@ -93,9 +93,9 @@ const gettingStarted = [
 
 <PageSection
   orientation="vertical"
-  headline="MITRE SAF"
+  headline="MITRE SAF™"
   title="Security Automation Tools"
-  description="The MITRE Security Automation Framework provides a comprehensive suite of open-source tools to support every phase of the security automation lifecycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
+  description="The MITRE Security Automation Framework™ provides a comprehensive suite of open-source tools to support every phase of the security automation lifecycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
 />
 
 <PageSection

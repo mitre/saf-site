@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: MITRE SAF
+  name: MITRE
   text: Security Automation Framework
   tagline: Open source security testing and compliance automation toolkit
   actions:
@@ -63,17 +63,17 @@ const values = [
   {
     icon: DollarSign,
     title: 'Free',
-    description: 'All MITRE SAF content is free to use under the Apache 2 license. The Framework is currently in use by government sponsors, vendors, and private sector companies, tailoring content for their own organizational requirements.'
+    description: 'All MITRE SAF™ content is free to use under the Apache 2 license. The Framework is currently in use by government sponsors, vendors, and private sector companies, tailoring content for their own organizational requirements.'
   },
   {
     icon: Github,
     title: 'Open Source',
-    description: 'MITRE SAF hosts all source code for tools and test profiles publicly on GitHub. Organizations are free to use the code or its capabilities however required.'
+    description: 'MITRE SAF™ hosts all source code for tools and test profiles publicly on GitHub. Organizations are free to use the code or its capabilities however required.'
   },
   {
     icon: Users,
     title: 'A Community',
-    description: 'All MITRE SAF content is generated and maintained by a robust security community of both MITRE and non-MITRE contributors; MITRE serves as the framework steward. Collaboration across the community multiplies the impact for all users.'
+    description: 'All MITRE SAF™ content is generated and maintained by a robust security community of both MITRE and non-MITRE contributors; MITRE serves as the framework steward. Collaboration across the community multiplies the impact for all users.'
   }
 ]
 
@@ -81,35 +81,35 @@ const toolset = [
   {
     name: 'SAF CLI',
     icon: 'saf',
-    description: 'The MITRE SAF Command Line Interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to HDF, generate InSpec profiles, and validate that security requirements have been met.',
+    description: 'The MITRE SAF™ Command Line Interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to HDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
     name: 'Heimdall',
     icon: 'heimdall',
-    description: 'Heimdall is MITRE SAF\'s visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
+    description: 'Heimdall is MITRE SAF™\'s visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
     name: 'Vulcan',
     icon: 'saf',
-    description: 'The MITRE SAF Vulcan application allows users to create security guidance utilizing the Security Requirements Guides. Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
+    description: 'The MITRE SAF™ Vulcan application allows users to create security guidance utilizing the Security Requirements Guides. Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
     pillars: ['plan'],
     href: '/apps/vulcan'
   },
   {
     name: 'Content Library',
     icon: 'content',
-    description: 'The MITRE SAF content library includes InSpec validation profiles and Chef, Ansible, and Puppet hardening content. These can be used as a starting point or as reference material for developing your organization\'s security controls and hardening baselines.',
+    description: 'The MITRE SAF™ content library includes InSpec validation profiles and Chef, Ansible, and Puppet hardening content. These can be used as a starting point or as reference material for developing your organization\'s security controls and hardening baselines.',
     pillars: ['harden', 'validate'],
     href: '/content/'
   },
   {
     name: 'eMASS',
     icon: 'saf',
-    description: 'eMASS integration with MITRE SAF provides automated workflows to support continuous monitoring and assessment workflows.',
+    description: 'eMASS integration with MITRE SAF™ provides automated workflows to support continuous monitoring and assessment workflows.',
     pillars: ['normalize'],
     href: '/apps/emasser'
   },
@@ -191,7 +191,7 @@ const getStartedCards = [
   variant="muted"
   orientation="vertical"
   title="Jump Start Your Security Journey"
-  description="MITRE SAF supports security processes at all stages of the software lifecycle, from planning secure system design to analyzing operational security data. All MITRE SAF tools can work in concert or standalone; adopt the parts of the Framework that make sense for your environment."
+  description="MITRE SAF™ supports security processes at all stages of the software lifecycle, from planning secure system design to analyzing operational security data. All MITRE SAF™ tools can work in concert or standalone; adopt the parts of the Framework that make sense for your environment."
 >
   <div class="pillar-grid">
     <a v-for="item in pillars" :key="item.pillar" :href="item.href" class="pillar-card">
@@ -209,7 +209,7 @@ const getStartedCards = [
   orientation="vertical"
 >
   <template #title>
-    <span class="centered-title">MITRE SAF Is</span>
+    <span class="centered-title">MITRE SAF™ Is</span>
   </template>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div v-for="value in values" :key="value.title" class="value-card">
@@ -227,10 +227,10 @@ const getStartedCards = [
   orientation="vertical"
 >
   <template #title>
-    <span class="centered-title">The MITRE SAF Open Source Toolset</span>
+    <span class="centered-title">The MITRE SAF™ Open Source Toolset</span>
   </template>
   <template #description>
-    <p class="centered-description">MITRE SAF is made up of a toolkit of utilities that support security automation. MITRE SAF is modularized into different functions so you can use whichever one makes sense for your favorite security tools. You can use MITRE SAF tools on their own or without a container.</p>
+    <p class="centered-description">MITRE SAF™ is made up of a toolkit of utilities that support security automation. MITRE SAF™ is modularized into different functions so you can use whichever one makes sense for your favorite security tools. You can use MITRE SAF™ tools on their own or without a container.</p>
   </template>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
