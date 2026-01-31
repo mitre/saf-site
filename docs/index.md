@@ -15,7 +15,7 @@ hero:
 ---
 
 <script setup>
-import { DollarSign, Github, Users, BookText } from 'lucide-vue-next'
+import { DollarSign, Github, Users, BookText, Layers, Package, Wrench } from 'lucide-vue-next'
 import PillarIcon from './.vitepress/theme/components/icons/PillarIcon.vue'
 import BrandIcon from './.vitepress/theme/components/icons/BrandIcon.vue'
 import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
@@ -149,6 +149,42 @@ const vendors = [
   { name: 'CrunchyData', image: 'https://via.placeholder.com/150x150.png?text=Crunchy' },
   { name: 'Elastic', image: 'https://via.placeholder.com/150x150.png?text=Elastic' }
 ]
+
+const userStories = [
+  {
+    question: '"How can I determine what security baseline I should measure against?"',
+    answer: 'Quality security automation content should be tied back to trusted human-readable security guidance, such as baseline documents published by government and industry (e.g., DISA STIGs). Before you can test your software automatically, know not only what you are testing, but why. If there are no existing published baseline guidance documents for your software component, you can research and author your own.'
+  },
+  {
+    question: '"How do I manage a diverse set of security data?"',
+    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the Heimdall Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
+  },
+  {
+    question: '"How do I provide sufficient evidence to authorize (or ATO) my system?"',
+    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. Heimdall and the SAF CLI can generate robust reports for your data to illustrate a positive security posture.'
+  }
+]
+
+const getStartedCards = [
+  {
+    icon: Layers,
+    title: 'View the Framework',
+    description: 'Explore the pillars of a solid security automation capability',
+    href: '/framework/'
+  },
+  {
+    icon: BookText,
+    title: 'Browse Security Content',
+    description: 'Find InSpec profiles and hardening guides',
+    href: '/content/'
+  },
+  {
+    icon: Wrench,
+    title: 'Explore SAF Tools',
+    description: 'Discover the applications that power security automation',
+    href: '/apps/'
+  }
+]
 </script>
 
 <PageSection
@@ -230,33 +266,33 @@ const vendors = [
 </PageSection>
 
 <PageSection
-  orientation="horizontal"
-  :reverse="true"
+  variant="dark"
+  orientation="vertical"
+>
+  <template #title>
+    <span class="centered-title">User Stories</span>
+  </template>
+
+  <div class="grid grid-cols-1 gap-6">
+    <div v-for="story in userStories" :key="story.question" class="user-story-card">
+      <div class="user-story-question">{{ story.question }}</div>
+      <div class="user-story-answer">{{ story.answer }}</div>
+    </div>
+  </div>
+</PageSection>
+
+<PageSection
+  orientation="vertical"
   title="Ready to Automate Your Security?"
   description="Explore the framework pillars to find the tools and content you need."
 >
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <a href="/framework/plan" class="block p-6 border border-[--vp-c-divider] rounded-lg hover:border-[--vp-c-brand-1] hover:shadow-md transition-all">
-      <div class="flex items-start gap-4">
-        <div class="shrink-0">
-          <PillarIcon pillar="plan" :size="48" />
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-2">Start with Planning</h3>
-          <p class="text-sm text-[--vp-c-text-2]">Identify security requirements for your systems</p>
-        </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <a v-for="card in getStartedCards" :key="card.title" :href="card.href" class="get-started-card">
+      <div class="card-header">
+        <component :is="card.icon" :size="32" />
+        <h3>{{ card.title }}</h3>
       </div>
-    </a>
-    <a href="/content/" class="block p-6 border border-[--vp-c-divider] rounded-lg hover:border-[--vp-c-brand-1] hover:shadow-md transition-all">
-      <div class="flex items-start gap-4">
-        <div class="shrink-0">
-          <PillarIcon pillar="validate" :size="48" />
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold text-[--vp-c-text-1] mb-2">Browse Security Content</h3>
-          <p class="text-sm text-[--vp-c-text-2]">Find InSpec profiles and hardening guides</p>
-        </div>
-      </div>
+      <p class="card-description">{{ card.description }}</p>
     </a>
   </div>
 </PageSection>
@@ -491,5 +527,88 @@ const vendors = [
 /* Spacing between sponsor and vendor grids */
 .partner-group-spacing {
   margin-top: 3rem;
+}
+
+/* User Stories Section */
+.user-story-card {
+  padding: 2rem;
+  background: var(--vp-c-bg);
+  border-radius: 0.5rem;
+  border: 1px solid var(--vp-c-divider);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Two-column layout on desktop */
+@media (min-width: 768px) {
+  .user-story-card {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+.user-story-question {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.user-story-answer {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+  margin: 0;
+}
+
+/* Lighten user story cards in dark mode */
+.dark .user-story-card {
+  background-color: var(--vp-c-bg-soft) !important;
+}
+
+/* Get Started Cards */
+.get-started-card {
+  display: block;
+  padding: 1.5rem;
+  background: var(--vp-c-bg);
+  border-radius: 0.5rem;
+  border: 1px solid var(--vp-c-divider);
+  text-decoration: none !important;
+  transition: border-color 0.2s ease;
+}
+
+.get-started-card:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.get-started-card .card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--vp-c-brand-1);
+}
+
+.get-started-card .card-header h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-text-1) !important;
+  line-height: 1 !important;
+}
+
+.get-started-card .card-description {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2) !important;
+  margin: 0;
+}
+
+/* Lighten get started cards in dark mode */
+.dark .get-started-card {
+  background-color: var(--vp-c-bg-soft) !important;
 }
 </style>
