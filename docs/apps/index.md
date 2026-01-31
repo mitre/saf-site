@@ -43,6 +43,16 @@ const apps = [
     ]
   },
   {
+    icon: 'saf',
+    name: 'eMASSer',
+    description: 'eMASS integration tool. Automate interactions with Enterprise Mission Assurance Support Service to keep compliance packages up to date.',
+    href: '/apps/emasser',
+    links: [
+      { label: 'View Details', href: '/apps/emasser' },
+      { label: 'GitHub', href: 'https://github.com/mitre/emass_client' }
+    ]
+  },
+  {
     icon: 'content',
     name: 'Security Automation Content',
     description: 'Browse security validation profiles and hardening content for various platforms and compliance frameworks.',
