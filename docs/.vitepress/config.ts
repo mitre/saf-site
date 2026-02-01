@@ -21,16 +21,20 @@ export default defineConfig({
       },
     },
   },
-  title: 'MITRE SAF(tm)',
+  title: 'MITRE SAF™',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
   cleanUrls: true,
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/icons/saf-logo.svg' }],
+    // Osano cookie consent (required by MITRE Privacy - must be first script)
+    ['script', { src: 'https://cmp.osano.com/AzyhULTdPkqmy4aDN/f0e8e901-3feb-47c4-bd04-96df98c75dab/osano.js' }],
+    // Hide Osano's default widget (we trigger via footer link instead)
+    ['style', {}, '.osano-cm-widget{display: none;}'],
   ],
 
   themeConfig: {
-    logo: '/img/logos/mitre-saf.png',
+    logo: '/icons/saf-logo.svg',
 
     search: {
       provider: 'local',
@@ -61,7 +65,8 @@ export default defineConfig({
       },
       { text: 'Content', link: '/content/' },
       { text: 'Docs', link: '/docs/' },
-      { text: 'Demo', link: '/test-index' },
+      // Demo page hidden in production
+      ...(process.env.NODE_ENV !== 'production' ? [{ text: 'Demo', link: '/test-index' }] : []),
     ],
 
     sidebar: {
@@ -106,9 +111,6 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/mitre/saf-site' },
     ],
 
-    footer: {
-      message: 'MITRE Security Automation Framework (MITRE SAF) is a trademark of The MITRE Corporation. Released under the Apache 2.0 License.',
-      copyright: 'Copyright © 2026 The MITRE Corporation',
-    },
+    // Footer is rendered in Layout.vue for customization
   },
 })
