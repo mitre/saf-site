@@ -167,3 +167,53 @@
 .htw-dark img[src*="/icons/mitre-m"] {
   filter: brightness(0) invert(1);
 }
+
+/* ==========================================================================
+   SmartScript - Smart Typography Transformations
+   Based on nuxt-smartscript approach with VitePress-specific tuning
+   ========================================================================== */
+
+:root {
+  /* Body text symbol sizing */
+  --ss-tm-font-size: 0.75em;
+  --ss-tm-top: -0.35em;
+
+  /* Heading symbol sizing (smaller for visual balance) */
+  --ss-heading-font-size: 0.6em;
+  --ss-heading-tm-top: -0.5em;
+
+  /* Spacing */
+  --ss-margin-left: 0.05em;
+  --ss-margin-right: 0.1em;
+}
+
+/* Trademark symbol (™) - positioned as superscript */
+.ss-tm {
+  font-size: var(--ss-tm-font-size);
+  line-height: 0;
+  position: relative;
+  top: var(--ss-tm-top);
+  vertical-align: baseline;
+  margin-left: var(--ss-margin-left);
+  margin-right: var(--ss-margin-right);
+  font-weight: inherit;
+}
+
+/* Registered symbol (®) - positioned as superscript */
+.ss-reg {
+  font-size: var(--ss-tm-font-size);
+  line-height: 0;
+  position: relative;
+  top: calc(var(--ss-tm-top) + 0.05em); /* Slightly lower than TM */
+  vertical-align: baseline;
+  margin-left: var(--ss-margin-left);
+  margin-right: var(--ss-margin-right);
+  font-weight: inherit;
+}
+
+/* Headings: smaller symbols for better visual balance */
+:is(h1, h2, h3, h4, h5, h6) .ss-tm,
+:is(h1, h2, h3, h4, h5, h6) .ss-reg {
+  font-size: var(--ss-heading-font-size);
+  top: var(--ss-heading-tm-top);
+}

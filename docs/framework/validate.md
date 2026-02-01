@@ -17,7 +17,7 @@ const validateTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
+  description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF(tm) helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
   :links="[
     { label: 'Browse Validation Profiles', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }

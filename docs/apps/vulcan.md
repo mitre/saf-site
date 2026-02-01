@@ -48,7 +48,7 @@ const resources = [
 <PageSection
   orientation="vertical"
   headline="SAF Apps"
-  description="Vulcan is MITRE SAF™'s security guidance authoring platform. Create, edit, and collaborate on security requirements documents, align content to source guidance, and generate InSpec test profiles directly from your baselines."
+  description="Vulcan is MITRE SAF's(tm) security guidance authoring platform. Create, edit, and collaborate on security requirements documents, align content to source guidance, and generate InSpec test profiles directly from your baselines."
 >
   <template #title>
     <span class="flex items-center gap-3">

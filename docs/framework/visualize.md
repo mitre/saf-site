@@ -16,7 +16,7 @@ const visualizeTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, Heimdall provides the visualization tools to communicate security posture effectively."
+  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, Heimdall provides the visualization tools to communicate security posture effectively."
   :links="[
     { label: 'View Heimdall', href: '/apps/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }

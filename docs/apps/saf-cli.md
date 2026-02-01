@@ -57,7 +57,7 @@ const resources = [
 <PageSection
   orientation="vertical"
   headline="SAF Apps"
-  description="SAF CLI is MITRE SAF™'s command-line tool for security automation. Convert security tool outputs to HDF, summarize test results, validate against thresholds, update InSpec profiles, create attestations, and interface with eMASS - all from your terminal or CI/CD pipeline."
+  description="SAF CLI is MITRE SAF's(tm) command-line tool for security automation. Convert security tool outputs to HDF, summarize test results, validate against thresholds, update InSpec profiles, create attestations, and interface with eMASS - all from your terminal or CI/CD pipeline."
 >
   <template #title>
     <span class="flex items-center gap-3">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import SmartScriptProcessor from './components/SmartScriptProcessor.vue'
 
 const { theme } = useData()
 
@@ -9,6 +10,10 @@ const { Layout } = DefaultTheme
 
 <template>
   <Layout>
+    <template #layout-bottom>
+      <!-- Client-side processor for Vue component content -->
+      <SmartScriptProcessor />
+    </template>
     <template #doc-after>
       <div class="custom-footer">
         <p class="footer-message">

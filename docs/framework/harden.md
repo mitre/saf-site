@@ -21,7 +21,7 @@ const hardenTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? MITRE SAF's hardening pillar helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
+  description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? MITRE SAF's(tm) hardening pillar helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
   :links="[
     { label: 'Browse Hardening Content', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
@@ -61,7 +61,7 @@ const hardenTools = [
       {
         icon: Spool,
         title: 'Tailored Content',
-        description: 'Avoid brittle hardening scripts. MITRE SAF Hardening content is easy to tailor to the particular needs of your organization, ensuring that your systems meet your security requirements. Add, remove, or adjust how hardening is done.'
+        description: 'Avoid brittle hardening scripts. MITRE SAF(tm) Hardening content is easy to tailor to the particular needs of your organization, ensuring that your systems meet your security requirements. Add, remove, or adjust how hardening is done.'
       }
     ]"
     gap="lg"

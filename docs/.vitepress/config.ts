@@ -1,8 +1,18 @@
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
+import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 
 export default defineConfig({
+  markdown: {
+    config: (md) => {
+      md.use(markdownItSmartScript, {
+        trademark: true,
+        registered: true,
+        copyright: true,
+      })
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -11,7 +21,7 @@ export default defineConfig({
       },
     },
   },
-  title: 'MITRE SAF™',
+  title: 'MITRE SAF(tm)',
   description: 'Security Automation Framework - Open Source Security Testing & Compliance Toolkit',
   cleanUrls: true,
 

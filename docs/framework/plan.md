@@ -17,7 +17,7 @@ const planTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="It's hard to hit a target that you can't see. Similarly, it's hard to implement quality security automation without understanding your requirements. The Plan phase of the MITRE SAF helps you identify which security guidance applies to your software components."
+  description="It's hard to hit a target that you can't see. Similarly, it's hard to implement quality security automation without understanding your requirements. The Plan phase of the MITRE SAF(tm) helps you identify which security guidance applies to your software components."
   :links="[
     { label: 'Browse Security Content', href: '/content/', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }

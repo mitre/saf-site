@@ -67,7 +67,7 @@ const resources = [
 <PageSection
   orientation="vertical"
   headline="SAF Apps"
-  description="Heimdall is MITRE SAF™'s security data visualization and analysis platform. Upload security validation results in Heimdall Data Format (HDF), view interactive compliance dashboards, compare results across systems and time periods, and generate comprehensive reports for stakeholders."
+  description="Heimdall is MITRE SAF's(tm) security data visualization and analysis platform. Upload security validation results in Heimdall Data Format (HDF), view interactive compliance dashboards, compare results across systems and time periods, and generate comprehensive reports for stakeholders."
 >
   <template #title>
     <span class="flex items-center gap-3">
