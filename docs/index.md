@@ -145,7 +145,7 @@ const vendors = [
   { name: 'Rancher Government Solutions', image: '/logos/vendors/rgs.png' },
   { name: 'Google Cloud', image: '/logos/vendors/google-cloud.png' },
   { name: 'GitHub', image: '/logos/vendors/github.svg' },
-  { name: 'Ansible', image: 'https://via.placeholder.com/150x150.png?text=Ansible' },
+  { name: 'Ansible' },
   { name: 'CrunchyData', image: '/logos/vendors/crunchy-data.png' },
   { name: 'Elastic', image: '/logos/vendors/elastic.svg' }
 ]
@@ -297,12 +297,69 @@ const getStartedCards = [
   </div>
 </PageSection>
 
+<!-- Homepage Footer -->
+<div class="custom-footer">
+  <div class="footer-links">
+    <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
+    <span class="footer-separator">•</span>
+    <a href="javascript:void(0)" class="footer-link manage-cookies">Manage Cookies</a>
+  </div>
+  <p class="footer-message">
+    MITRE Security Automation Framework (MITRE SAF) is a trademark of The MITRE Corporation. Released under the Apache 2.0 License.
+  </p>
+  <p class="footer-copyright">
+    Copyright © 2026 The MITRE Corporation
+  </p>
+</div>
+
 <style>
 .VPDoc .container {
   max-width: 1400px !important;
 }
 .VPDoc .content {
   max-width: none !important;
+}
+
+/* Homepage Footer Styles (match Layout.vue scoped styles) */
+.custom-footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--vp-c-divider);
+  text-align: center;
+}
+
+.footer-links {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.footer-link {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration: underline;
+}
+
+.footer-separator {
+  margin: 0 0.75rem;
+  color: var(--vp-c-text-3);
+}
+
+.footer-message {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+  margin: 0 0 0.5rem 0;
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2);
+  margin: 0;
 }
 
 /* Remove VitePress default h2 border on homepage */
