@@ -9,7 +9,7 @@ import { FileSearch, PenTool } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const planTools = [
-  { name: 'Vulcan', href: '/apps/' },
+  { name: 'Vulcan', iconName: 'saf', href: '/apps/' },
   { name: 'SAF CLI', href: '/apps/' }
 ]
 </script>

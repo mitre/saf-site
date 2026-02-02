@@ -218,7 +218,7 @@ const getStartedCards = [
     <span class="centered-title">The MITRE SAF(tm) Open Source Toolset</span>
   </template>
   <template #description>
-    <p class="centered-description">MITRE SAF(tm) is made up of a toolkit of utilities that support security automation. MITRE SAF(tm) is modularized into different functions so you can use whichever one makes sense for your favorite security tools. You can use MITRE SAF(tm) tools on their own or without a container.</p>
+    <p class="centered-description">MITRE SAF(tm) is made up of a toolkit of utilities that support security automation. MITRE SAF(tm) is modularized into different functions so you can use whichever ones make sense for your favorite security tools. You can use MITRE SAF(tm) tools on their own, with or without a container.</p>
   </template>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,7 +245,7 @@ const getStartedCards = [
   orientation="vertical"
 >
   <template #title>
-    <span class="centered-title">Adopted by The Community</span>
+    <span class="centered-title">Adopted by the Community</span>
   </template>
 
   <LogoGrid :items="sponsors" :columns="5" show-names variant="card" title="Sponsors" :size="100" />
@@ -452,7 +452,6 @@ const getStartedCards = [
 
 .centered-description {
   text-align: center;
-  max-width: 800px;
   margin: 0 auto;
 }
 

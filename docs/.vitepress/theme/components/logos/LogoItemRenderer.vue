@@ -31,11 +31,11 @@ const props = defineProps<{
         :alt="item.name"
         :width="size"
         :height="size"
-        class="logo-image"
+        class="logo-image" :class="[{ 'logo-image--invert-dark': item.name.toLowerCase() === 'github' }]"
       >
       <BrandIcon
         v-else
-        :name="item.name"
+        :name="item.iconName || item.name"
         :size="size"
       />
     </div>
@@ -55,5 +55,10 @@ const props = defineProps<{
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+/* Invert GitHub logo in dark mode for visibility */
+.dark .logo-image--invert-dark {
+  filter: brightness(0) invert(1);
 }
 </style>

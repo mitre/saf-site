@@ -145,6 +145,11 @@ const relatedContent = computed(() => props.relatedContent || [])
       <span class="current">{{ content.name }}</span>
     </nav>
 
+    <!-- Draft Disclaimer -->
+    <div class="draft-disclaimer">
+      <p>This content is in draft form. It is made available here as reference but is not expected to be useable without continued development work.</p>
+    </div>
+
     <!-- Hero Section (reusable component) -->
     <ContentHero
       :title="content.name"
@@ -238,6 +243,22 @@ const relatedContent = computed(() => props.relatedContent || [])
 }
 
 .breadcrumb .current {
+  color: var(--vp-c-text-1);
+}
+
+/* Draft Disclaimer */
+.draft-disclaimer {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--vp-c-warning-soft);
+  border-left: 4px solid var(--vp-c-warning-1);
+  border-radius: 4px;
+}
+
+.draft-disclaimer p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
   color: var(--vp-c-text-1);
 }
 

@@ -37,12 +37,17 @@ const brandColors: Record<string, string> = {
   kubernetes: '#326CE5',
   mongodb: '#47A248',
   mysql: '#4479A1',
+  netlify: '#00C7B7',
   nginx: '#009639',
   npm: '#CB3837',
   owasp: '#000000',
   postgresql: '#4169E1',
   prisma: '#2D3748',
   puppet: '#FFAE1A',
+  ruby: '#CC342D',
+  salt: '#57BCAD',
+  saltproject: '#57BCAD',
+  saltstack: '#57BCAD',
   snyk: '#4C4A73',
   sonarqube: '#4E9BCD',
   splunk: '#000000',
@@ -74,6 +79,10 @@ const iconMap: Record<string, string> = {
   'puppet': 'simple-icons:puppet',
   'powershell': 'simple-icons:powershell',
   'test-kitchen': 'simple-icons:chef',
+  'ruby': 'simple-icons:ruby',
+  'salt': 'simple-icons:saltproject',
+  'saltproject': 'simple-icons:saltproject',
+  'saltstack': 'simple-icons:saltproject',
 
   // Cloud & Platforms
   'amazon web services': 'simple-icons:amazonwebservices',
@@ -83,6 +92,7 @@ const iconMap: Record<string, string> = {
   'gcp': 'simple-icons:googlecloud',
   'microsoft azure': 'simple-icons:microsoftazure',
   'azure': 'simple-icons:microsoftazure',
+  'netlify': 'simple-icons:netlify',
 
   // Vendors & Organizations
   'vmware': 'simple-icons:vmware',
