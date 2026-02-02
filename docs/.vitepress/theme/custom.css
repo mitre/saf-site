@@ -149,6 +149,99 @@
   transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 
+/* Wide layout for app and framework pages */
+@media (min-width: 960px) {
+  /* Narrower sidebar to give more space to content */
+  .wide-layout aside.VPSidebar {
+    width: 226px !important;
+    padding-left: 24px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Adjust VPContent padding to match sidebar width */
+  .wide-layout .VPContent.has-sidebar {
+    padding-left: 226px !important;
+  }
+
+  /* Adjust navbar elements to match sidebar width */
+  .wide-layout .VPNavBar.has-sidebar .title {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 226px !important;
+    padding-left: 24px !important;
+  }
+
+  .wide-layout .VPNavBar.has-sidebar .content {
+    padding-left: 226px !important;
+  }
+
+  .wide-layout .VPNavBar.has-sidebar .divider {
+    padding-left: 226px !important;
+  }
+
+  .wide-layout .VPDoc .content {
+    max-width: 1152px !important;
+  }
+
+  .wide-layout .VPDoc .container {
+    max-width: 1408px !important;
+  }
+
+  .wide-layout .VPDoc {
+    padding-left: 24px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Make PageSection containers wider for larger screenshots */
+  .wide-layout .page-section-container {
+    max-width: 1600px !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Give more space to visual side (screenshots) in horizontal layout */
+  /* Normal layout: visual on right (60%), content on left (40%) */
+  .wide-layout .page-section--horizontal .page-section-container {
+    grid-template-columns: 2fr 3fr !important;
+  }
+
+  /* Reversed layout: visual on left (60%), content on right (40%) */
+  .wide-layout .page-section--horizontal.page-section--reverse .page-section-container {
+    grid-template-columns: 3fr 2fr !important;
+  }
+
+  /* Allow screenshots to use full width and remove border/background */
+  .wide-layout .screenshot {
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Remove background from visual container */
+  .wide-layout .page-section-visual {
+    background: none !important;
+    padding: 0 !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .wide-layout .VPDoc .content {
+    max-width: 1216px !important;
+  }
+
+  .wide-layout .VPDoc .container {
+    max-width: 1536px !important;
+  }
+}
+
+.wide-layout .VPDoc img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Homepage uses custom full-width layout - apply to all non-wide pages */
 .VPDoc .container {
   max-width: 1400px !important;
 }

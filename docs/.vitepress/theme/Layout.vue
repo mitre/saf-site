@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { useRoute } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import SmartScriptProcessor from './components/SmartScriptProcessor.vue'
 
 const { Layout } = DefaultTheme
+
+// Detect wide layout pages (apps and framework)
+const route = useRoute()
+const isWideLayout = computed(() => {
+  return /^\/(?:apps|framework)\//.test(route.path)
+})
 
 // Osano cookie consent handler
 function showCookiePreferences() {
@@ -25,7 +32,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Layout>
+  <Layout :class="{ 'wide-layout': isWideLayout }">
     <template #layout-bottom>
       <!-- Client-side processor for Vue component content -->
       <SmartScriptProcessor />
