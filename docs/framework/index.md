@@ -60,8 +60,8 @@ const pillars = [
   title="A Complete Security Automation Lifecycle"
   description="Each pillar addresses a specific phase in the security automation journey. Jump in at any point or follow the complete workflow."
 >
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <a v-for="pillar in pillars" :key="pillar.title" :href="pillar.href" class="pillar-card block p-6 bg-card rounded-lg hover:shadow-lg transition-all border border-border hover:border-[--vp-c-brand-1]">
+  <div class="pillar-grid">
+    <a v-for="(pillar, index) in pillars" :key="pillar.title" :href="pillar.href" :class="['pillar-card', `pillar-${index + 1}`]">
       <div class="flex flex-col items-center text-center gap-4">
         <component :is="pillar.icon" />
         <div>
@@ -81,12 +81,56 @@ const pillars = [
   max-width: none !important;
 }
 
+/* Pillar grid: 3 cards on top, 2 centered on bottom, all same width */
+.pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 767px) {
+  .pillar-grid {
+    grid-template-columns: 1fr;
+  }
+  .pillar-card {
+    grid-column: 1 !important;
+  }
+}
+
+/* Tablet and up: 3-2 layout */
+@media (min-width: 768px) {
+  /* Top row: 3 cards, each spans 2 columns */
+  .pillar-1,
+  .pillar-2,
+  .pillar-3 {
+    grid-column: span 2;
+  }
+
+  /* Bottom row: 2 cards centered, each spans 2 columns */
+  .pillar-4 {
+    grid-column: 2 / 4;
+  }
+
+  .pillar-5 {
+    grid-column: 5 / 7;
+  }
+}
+
 .pillar-card {
+  display: block;
+  padding: 1.5rem;
+  background-color: var(--vp-c-bg);
+  border-radius: 0.5rem;
+  border: 1px solid var(--vp-c-divider);
   text-decoration: none !important;
   color: inherit !important;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
 }
 
 .pillar-card:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border-color: var(--vp-c-brand-1);
   text-decoration: none !important;
 }
 

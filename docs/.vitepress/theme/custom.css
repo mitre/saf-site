@@ -196,8 +196,8 @@
   /* Make PageSection containers wider for larger screenshots */
   .wide-layout .page-section-container {
     max-width: 1600px !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
   }
 
   /* Give more space to visual side (screenshots) in horizontal layout */

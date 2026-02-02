@@ -179,7 +179,7 @@ const hasVisual = computed(() => !!slots.default)
 .page-section--contained .page-section-container {
   max-width: var(--vp-layout-max-width, 1280px);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 /* Variant backgrounds */
@@ -273,6 +273,10 @@ const hasVisual = computed(() => !!slots.default)
     padding: 3rem 0;
   }
 
+  .page-section--contained .page-section-container {
+    padding: 0 2.5rem;
+  }
+
   .page-section-container {
     gap: 2.5rem;
   }
@@ -294,6 +298,10 @@ const hasVisual = computed(() => !!slots.default)
 @media (min-width: 1024px) {
   .page-section {
     padding: 4rem 0;
+  }
+
+  .page-section--contained .page-section-container {
+    padding: 0 2rem;
   }
 
   /* Horizontal: switch to CSS Grid */
