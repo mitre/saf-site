@@ -128,6 +128,8 @@ const iconMap: Record<string, string> = {
   'prisma cloud': 'simple-icons:prisma',
   'nessus': 'file-icons:nessus',
   'tenable': 'file-icons:nessus',
+  'elastic': 'simple-icons:elastic',
+  'elasticsearch': 'simple-icons:elastic',
 }
 
 // Check for local SVG first

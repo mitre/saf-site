@@ -169,7 +169,7 @@ withDefaults(defineProps<LogoGridProps>(), {
   color: var(--vp-c-text-2);
   text-align: center;
   max-width: 120px;
-  min-height: 2.6em; /* Reserve space for 2 lines */
+  min-height: 3.9em; /* Reserve space for 3 lines (3 * 1.3 line-height) */
   line-height: 1.3;
   word-wrap: break-word;
   hyphens: auto;

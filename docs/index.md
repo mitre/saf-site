@@ -20,6 +20,7 @@ import PillarIcon from './.vitepress/theme/components/icons/PillarIcon.vue'
 import BrandIcon from './.vitepress/theme/components/icons/BrandIcon.vue'
 import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
 import LogoGrid from './.vitepress/theme/components/LogoGrid.vue'
+import { data as orgsData } from './.vitepress/loaders/organizations.data'
 
 const pillars = [
   {
@@ -122,33 +123,20 @@ const toolset = [
   }
 ]
 
-// Sponsors and partners using SAF (using static image placeholders)
-// Replace image paths with actual logo files in /public/img/partners/
-const sponsors = [
-  { name: 'Platform One', image: '/logos/sponsors/platform-one.png' },
-  { name: 'Defense Security Cooperation Agency', image: '/logos/sponsors/dsca.jpg' },
-  { name: 'Defense Counterintelligence and Security Agency', image: '/logos/sponsors/dcsa.png' },
-  { name: 'United States Air Force', image: '/logos/sponsors/usaf.svg' },
-  { name: 'Department of Defense CIO', image: '/logos/sponsors/dod.png' },
-  { name: 'Defense Information Systems Agency', image: '/logos/sponsors/disa.svg' },
-  { name: 'United States Army Enterprise Cloud Management Agency', image: '/logos/sponsors/army-ecma.png' },
-  { name: 'Centers for Medicare & Medicaid Services', image: '/logos/sponsors/cms.svg' },
-  { name: 'Center for Disease Control and Prevention', image: '/logos/sponsors/cdc.svg' },
-  { name: 'National Reconnaissance Office', image: '/logos/sponsors/nro.png' }
-]
+// Sponsors and vendors from database, mapped to LogoGrid format
+const sponsors = orgsData.sponsors.map(org => ({
+  name: org.name,
+  image: org.logo,
+  href: org.website,
+  description: org.description
+}))
 
-const vendors = [
-  { name: 'Progress Chef', image: '/logos/vendors/chef.svg' },
-  { name: 'VMware', image: '/logos/vendors/vmware.png' },
-  { name: 'Sophos', image: '/logos/vendors/sophos.png' },
-  { name: 'Lockheed Martin', image: '/logos/vendors/lockheed-martin.png' },
-  { name: 'Rancher Government Solutions', image: '/logos/vendors/rgs.png' },
-  { name: 'Google Cloud', image: '/logos/vendors/google-cloud.png' },
-  { name: 'GitHub', image: '/logos/vendors/github.svg' },
-  { name: 'Ansible' },
-  { name: 'CrunchyData', image: '/logos/vendors/crunchy-data.png' },
-  { name: 'Elastic', image: '/logos/vendors/elastic.svg' }
-]
+const vendors = orgsData.vendors.map(org => ({
+  name: org.name,
+  image: org.logo,
+  href: org.website,
+  description: org.description
+}))
 
 const userStories = [
   {
@@ -260,9 +248,9 @@ const getStartedCards = [
     <span class="centered-title">Adopted by The Community</span>
   </template>
 
-  <LogoGrid :items="sponsors" :columns="5" show-names variant="card" title="Sponsors" />
+  <LogoGrid :items="sponsors" :columns="5" show-names variant="card" title="Sponsors" :size="100" />
 
-  <LogoGrid :items="vendors" :columns="5" show-names variant="card" title="Vendors" class="partner-group-spacing" />
+  <LogoGrid :items="vendors" :columns="5" show-names variant="card" title="Vendors" class="partner-group-spacing" :size="100" />
 </PageSection>
 
 <PageSection
