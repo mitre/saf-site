@@ -1,0 +1,16 @@
+{
+    "name": "training_classes",
+    "columns": [
+        "course_url",
+        "created",
+        "description",
+        "id",
+        "objectives",
+        "order",
+        "slug",
+        "title",
+        "updated",
+        "youtube_url"
+    ],
+    "schema": "CREATE TABLE `training_classes` (`course_url` TEXT DEFAULT '' NOT NULL, `created` TEXT DEFAULT '' NOT NULL, `description` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `objectives` JSON DEFAULT NULL, `order` NUMERIC DEFAULT 0 NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `title` TEXT DEFAULT '' NOT NULL, `updated` TEXT DEFAULT '' NOT NULL, `youtube_url` TEXT DEFAULT '' NOT NULL)"
+}

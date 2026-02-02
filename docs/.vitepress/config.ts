@@ -64,7 +64,7 @@ export default defineConfig({
         ],
       },
       { text: 'Content', link: '/content/' },
-      { text: 'Docs', link: '/docs/' },
+      { text: 'Training', link: '/training/' },
       // Demo page hidden in production
       ...(process.env.NODE_ENV !== 'production' ? [{ text: 'Demo', link: '/test-index' }] : []),
     ],
@@ -92,16 +92,6 @@ export default defineConfig({
             { text: 'Vulcan', link: '/apps/vulcan' },
             { text: 'SAF CLI', link: '/apps/saf-cli' },
             { text: 'eMASSer', link: '/apps/emasser' },
-          ],
-        },
-      ],
-      '/docs/': [
-        {
-          text: 'Getting Started',
-          items: [
-            { text: 'Introduction', link: '/docs/' },
-            { text: 'Installation', link: '/docs/installation' },
-            { text: 'Quick Start', link: '/docs/quick-start' },
           ],
         },
       ],
