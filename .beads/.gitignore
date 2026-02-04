@@ -11,7 +11,6 @@ daemon.log
 daemon.pid
 bd.sock
 sync-state.json
-.sync.lock
 last-touched
 
 # Local version tracking (prevents upgrade notification spam after git ops)
@@ -32,6 +31,10 @@ beads.left.jsonl
 beads.left.meta.json
 beads.right.jsonl
 beads.right.meta.json
+
+# Sync state (local-only, per-machine)
+# These files are machine-specific and should not be shared across clones
+.sync.lock
 sync_base.jsonl
 
 # NOTE: Do NOT add negation patterns (e.g., !issues.jsonl) here.
