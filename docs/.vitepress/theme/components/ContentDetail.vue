@@ -147,7 +147,7 @@ const relatedContent = computed(() => props.relatedContent || [])
 
     <!-- Draft Disclaimer -->
     <div class="draft-disclaimer">
-      <p>This content is in draft form. It is made available here as reference but is not expected to be useable without continued development work.</p>
+      <p>This content is in draft form. It is made available here as reference but is not expected to be feature-complete without continued development work.</p>
     </div>
 
     <!-- Hero Section (reusable component) -->

@@ -2,6 +2,7 @@
 title: Training
 layout: doc
 aside: false
+wideLayout: true
 ---
 
 <script setup>
@@ -31,6 +32,7 @@ import { data as trainingData } from '../.vitepress/loaders/training.data'
 </PageSection>
 
 <PageSection
+  id="upcoming-classes"
   variant="muted"
   orientation="vertical"
   title="Upcoming Classes"
@@ -40,6 +42,7 @@ import { data as trainingData } from '../.vitepress/loaders/training.data'
 </PageSection>
 
 <PageSection
+  id="classes"
   orientation="vertical"
   title="Classes"
   description="Browse our training offerings. Each class includes learning objectives, course materials, and recordings of past sessions."

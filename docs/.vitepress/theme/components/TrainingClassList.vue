@@ -29,7 +29,7 @@ function getYouTubeId(url?: string) {
 
 <template>
   <div class="space-y-12">
-    <div v-for="(trainingClass, index) in classes" :key="trainingClass.id" class="class-section">
+    <div v-for="(trainingClass, index) in classes" :id="`class-${trainingClass.slug}`" :key="trainingClass.id" class="class-section">
       <div v-if="index > 0" class="class-divider" />
 
       <div class="class-content">

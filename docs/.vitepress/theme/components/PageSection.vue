@@ -44,6 +44,8 @@ export interface PageSectionLink {
 export interface PageSectionProps {
   /** Render as different element */
   as?: string
+  /** Section ID for anchor links */
+  id?: string
   /** Small text above title */
   headline?: string
   /** Main section title */
@@ -94,6 +96,7 @@ const hasVisual = computed(() => !!slots.default)
 <template>
   <component
     :is="as"
+    :id="id"
     class="page-section"
     :class="[
       `page-section--${orientation}`,

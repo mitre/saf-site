@@ -2,6 +2,7 @@
 title: SAF Apps
 layout: doc
 aside: false
+wideLayout: true
 ---
 
 <script setup>
@@ -141,13 +142,6 @@ const gettingStarted = [
 </PageSection>
 
 <style>
-.VPDoc .container {
-  max-width: 1400px !important;
-}
-.VPDoc .content {
-  max-width: none !important;
-}
-
 .app-card,
 .getting-started-card {
   display: block;

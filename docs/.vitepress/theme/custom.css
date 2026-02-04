@@ -224,6 +224,14 @@
     background: none !important;
     padding: 0 !important;
   }
+
+  /* Ensure sidebar links wrap properly */
+  .wide-layout aside.VPSidebar .link-text {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.4 !important;
+  }
 }
 
 @media (min-width: 1440px) {

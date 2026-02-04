@@ -2,6 +2,7 @@
 title: MITRE SAF Framework
 layout: doc
 aside: false
+wideLayout: true
 ---
 
 <script setup>
@@ -74,13 +75,6 @@ const pillars = [
 </PageSection>
 
 <style>
-.VPDoc .container {
-  max-width: 1400px !important;
-}
-.VPDoc .content {
-  max-width: none !important;
-}
-
 /* Pillar grid: 3 cards on top, 2 centered on bottom, all same width */
 .pillar-grid {
   display: grid;

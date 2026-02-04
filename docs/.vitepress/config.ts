@@ -1,7 +1,12 @@
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
+import { getTrainingSidebar } from './config/trainingSidebar'
 import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
+
+// VitePress config supports top-level await for dynamic data loading
+// eslint-disable-next-line antfu/no-top-level-await
+const trainingSidebar = await getTrainingSidebar()
 
 export default defineConfig({
   markdown: {
@@ -95,6 +100,7 @@ export default defineConfig({
           ],
         },
       ],
+      '/training/': trainingSidebar,
     },
 
     socialLinks: [

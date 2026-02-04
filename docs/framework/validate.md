@@ -2,6 +2,7 @@
 title: Validate
 layout: doc
 aside: false
+wideLayout: true
 ---
 
 <script setup>
@@ -92,13 +93,6 @@ const validateTools = [
 </PageSection>
 
 <style>
-.VPDoc .container {
-  max-width: 1400px !important;
-}
-.VPDoc .content {
-  max-width: none !important;
-}
-
 /* Framework page icon responsive behavior */
 .framework-page-title {
   display: flex;

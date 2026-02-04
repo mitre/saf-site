@@ -2,6 +2,7 @@
 title: SAF CLI - Security Automation Command-Line Tool
 layout: doc
 aside: false
+wideLayout: true
 ---
 
 <script setup>
@@ -205,13 +206,6 @@ const resources = [
 </PageSection>
 
 <style>
-.VPDoc .container {
-  max-width: 1400px !important;
-}
-.VPDoc .content {
-  max-width: none !important;
-}
-
 .button-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
