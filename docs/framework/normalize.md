@@ -86,12 +86,12 @@ const toolCategories = [
       {
         icon: ArrowLeftRight,
         title: 'Bi-directional Conversion',
-        description: 'SAF CLI converts security tool outputs into HDF for analysis, and can also export HDF data back into formats like CSV, XLSX, or tool-specific formats for integration with existing workflows and reporting systems.'
+        description: 'The SAF toolset converts security tool outputs into HDF for analysis, and can also export HDF data back into formats like CSV, XLSX, or tool-specific formats for integration with existing workflows and reporting systems.'
       },
       {
         icon: Database,
         title: 'Comprehensive Coverage',
-        description: 'SAF CLI supports conversion from 20+ security tools including vulnerability scanners (Nessus, Tenable.io), code analyzers (SonarQube, Fortify), cloud security (AWS Config, Prowler), compliance tools (SCAP, Chef InSpec), and more.'
+        description: 'HDF supports conversion from 20+ security tools including vulnerability scanners (Nessus, Tenable.io), code analyzers (SonarQube, Fortify), cloud security (AWS Config, Prowler), compliance tools (SCAP, Chef InSpec), and more.'
       },
       {
         icon: GitCompare,

@@ -70,6 +70,14 @@ export default defineConfig({
       },
       { text: 'Content', link: '/content/' },
       { text: 'Training', link: '/training/' },
+      {
+        text: 'Resources',
+        items: [
+          { text: 'HDF Examples', link: '/resources/' },
+          { text: 'HDF Schema', link: '/resources/schema' },
+          { text: 'Media & Downloads', link: '/resources/media' },
+        ],
+      },
       // Demo page hidden in production
       ...(process.env.NODE_ENV !== 'production' ? [{ text: 'Demo', link: '/test-index' }] : []),
     ],
@@ -101,6 +109,17 @@ export default defineConfig({
         },
       ],
       '/training/': trainingSidebar,
+      '/resources/': [
+        {
+          text: 'Resources',
+          link: '/resources/',
+          items: [
+            { text: 'HDF Examples', link: '/resources/' },
+            { text: 'HDF Schema', link: '/resources/schema' },
+            { text: 'Media & Downloads', link: '/resources/media' },
+          ],
+        },
+      ],
     },
 
     socialLinks: [
