@@ -199,15 +199,11 @@ The same findings now have a consistent structure — each vulnerability becomes
 | **Impact Score** | Numeric severity (0.5 = medium) applied based on finding type |
 | **Target Context** | Host, port, and banner preserved in `platform` and `summary` |
 
-::: info Where did the NIST tag values come from?
-MITRE SAF's converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization — enriching sparse tool output with the metadata needed for unified compliance analysis.
+::: info Where did the NIST and CCI tag values come from?
+MITRE SAF's converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization — enriching sparse tool output with the metadata needed for unified compliance analysis.
 :::
 
-This normalized output can now be loaded into [Heimdall](/apps/heimdall) alongside results from any other security tool for unified analysis.
-
-## Native HDF from InSpec
-
-InSpec produces HDF natively — no conversion needed. The profile's tags and metadata map directly to HDF core elements. Different compliance frameworks use different tags, shown below.
+This normalized output can be viewed in [Heimdall](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that the SAF CLI uses to convert data are built into Heimdall, meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to Heimdall and it will be displayed as HDF automatically.
 
 ### CIS Benchmark Template
 
@@ -329,4 +325,4 @@ end
 | `fix_id` | — | Yes | STIG fix identifier |
 | `rid` | — | Yes | Rule version identifier |
 
-Both CIS and STIG tags are preserved in the HDF output alongside the core elements, enabling cross-framework analysis in [Heimdall](/apps/heimdall).
+Both CIS and STIG tags are preserved in the HDF output alongside the core elements.

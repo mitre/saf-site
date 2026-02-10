@@ -8,6 +8,36 @@ import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 // eslint-disable-next-line antfu/no-top-level-await
 const trainingSidebar = await getTrainingSidebar()
 
+/**
+ * Extract searchable text from Vue component props in markdown files.
+ * VitePress local search strips HTML tags, losing prop values like
+ * title="..." and description="..." that aren't in raw markdown text.
+ */
+function extractVueComponentText(src: string, relativePath: string): string {
+  const texts: string[] = []
+
+  // Static string props: headline="...", title="...", description="..."
+  for (const m of src.matchAll(/\b(?:headline|title|description)\s*=\s*"([^"]+)"/g))
+    texts.push(m[1])
+
+  // Dynamic object props (single-quoted): title: '...', description: '...'
+  for (const m of src.matchAll(/(?:title|description):\s*'((?:[^'\\]|\\.)*)'/g))
+    texts.push(m[1].replace(/\\'/g, '\''))
+
+  // Dynamic object props (double-quoted inside template): title: "...", description: "..."
+  for (const m of src.matchAll(/(?:title|description):\s*"([^"]+)"/g))
+    texts.push(m[1])
+
+  // Boost framework pillar pages with extra keyword signal
+  if (relativePath.startsWith('framework/')) {
+    const pillar = relativePath.replace('framework/', '').replace('.md', '')
+    if (['validate', 'harden', 'plan', 'normalize', 'visualize'].includes(pillar))
+      texts.push(`${pillar} SAF framework ${pillar}`)
+  }
+
+  return texts.join(' ')
+}
+
 export default defineConfig({
   markdown: {
     config: (md) => {
@@ -43,6 +73,43 @@ export default defineConfig({
 
     search: {
       provider: 'local',
+      options: {
+        miniSearch: {
+          searchOptions: {
+            fuzzy: 0.2,
+            prefix: true,
+            boost: { title: 6, text: 2, titles: 1 },
+          },
+        },
+        _render(src, env, md) {
+          let html = md.render(src, env)
+
+          // Respect per-page frontmatter opt-out
+          if (env.frontmatter?.search === false)
+            return ''
+
+          // Exclude test/dev pages by path pattern
+          if (env.relativePath.match(/^(test-|icon-test|taxonomy\/)/))
+            return ''
+
+          // Pages without VitePress-formatted headings (with anchor links)
+          // produce zero search sections because the indexer splits on
+          // <h*> tags with header-anchor links. Raw <h3> tags inside Vue
+          // templates don't count. Inject a heading from frontmatter title.
+          const title = env.frontmatter?.title
+          if (title && !/<h\d.*?<a.*?class="header-anchor"/.test(html)) {
+            const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+            html = `<h1 id="${slug}">${title} <a class="header-anchor" href="#${slug}">\u200B</a></h1>\n${html}`
+          }
+
+          // Extract text from Vue component props for indexing
+          const extraText = extractVueComponentText(src, env.relativePath)
+          if (extraText)
+            html += `\n<p>${extraText}</p>`
+
+          return html
+        },
+      },
     },
 
     nav: [

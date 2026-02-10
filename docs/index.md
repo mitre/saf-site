@@ -1,5 +1,6 @@
 ---
 layout: home
+title: MITRE Security Automation Framework
 
 hero:
   name: MITRE

@@ -27,7 +27,7 @@ wideLayout: true
   icon="document"
   title="How to Use MITRE SAF"
   meta="One-page overview • PDF"
-  description="Slick sheet on MITRE SAF(tm)'s capabilities in relation to planning, development, assessment, and operations."
+  description="Slick sheet on MITRE SAF's(tm) capabilities in relation to planning, development, assessment, and operations."
   action="Download PDF"
   download
 />
