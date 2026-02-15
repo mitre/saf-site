@@ -144,6 +144,7 @@ watch(selectedStandard, value => emit('update:standard', value))
           v-model="searchQuery"
           type="text"
           placeholder="Search content..."
+          class="pl-4"
           @input="$emit('update:search', searchQuery)"
         />
       </div>

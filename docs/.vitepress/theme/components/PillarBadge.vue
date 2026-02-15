@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { BarChart3, ClipboardList, Hammer, RefreshCw, Shield } from 'lucide-vue-next'
 import { computed } from 'vue'
+import HardenIcon from './icons/pillars/HardenIcon.vue'
+import NormalizeIcon from './icons/pillars/NormalizeIcon.vue'
+import PlanIcon from './icons/pillars/PlanIcon.vue'
+import ValidateIcon from './icons/pillars/ValidateIcon.vue'
+import VisualizeIcon from './icons/pillars/VisualizeIcon.vue'
 
 export type PillarType = 'validate' | 'harden' | 'plan' | 'normalize' | 'visualize'
 
@@ -13,35 +17,35 @@ const props = defineProps<{
 const pillarConfig = {
   validate: {
     label: 'Validate',
-    icon: Shield,
+    icon: ValidateIcon,
     bgClass: 'bg-blue-500/15',
     textClass: 'text-blue-600 dark:text-blue-400',
     borderClass: 'border-blue-500/30',
   },
   harden: {
     label: 'Harden',
-    icon: Hammer,
+    icon: HardenIcon,
     bgClass: 'bg-green-500/15',
     textClass: 'text-green-600 dark:text-green-400',
     borderClass: 'border-green-500/30',
   },
   plan: {
     label: 'Plan',
-    icon: ClipboardList,
+    icon: PlanIcon,
     bgClass: 'bg-purple-500/15',
     textClass: 'text-purple-600 dark:text-purple-400',
     borderClass: 'border-purple-500/30',
   },
   normalize: {
     label: 'Normalize',
-    icon: RefreshCw,
+    icon: NormalizeIcon,
     bgClass: 'bg-orange-500/15',
     textClass: 'text-orange-600 dark:text-orange-400',
     borderClass: 'border-orange-500/30',
   },
   visualize: {
     label: 'Visualize',
-    icon: BarChart3,
+    icon: VisualizeIcon,
     bgClass: 'bg-cyan-500/15',
     textClass: 'text-cyan-600 dark:text-cyan-400',
     borderClass: 'border-cyan-500/30',
