@@ -44,7 +44,7 @@ const contentUrl = computed(() => {
             {{ content.name }}
           </CardTitle>
           <div class="flex flex-wrap gap-1 shrink-0">
-            <PillarBadge :pillar="pillar" size="sm" />
+            <PillarBadge :pillar="pillar" size="sm" :show-label="true" />
             <Badge
               v-if="content.status"
               :variant="getStatusVariant(content.status)"
