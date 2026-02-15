@@ -144,7 +144,6 @@ watch(selectedStandard, value => emit('update:standard', value))
           v-model="searchQuery"
           type="text"
           placeholder="Search content..."
-          class="pl-4"
           @input="$emit('update:search', searchQuery)"
         />
       </div>
@@ -204,6 +203,7 @@ watch(selectedStandard, value => emit('update:standard', value))
 
 .filter-search :deep(input) {
   background: var(--vp-c-bg);
+  padding-left: 1rem !important; /* 16px - better left spacing for text */
 }
 
 .filter-label {
