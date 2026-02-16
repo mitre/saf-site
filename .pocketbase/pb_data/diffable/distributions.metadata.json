@@ -14,7 +14,13 @@
         "slug",
         "status",
         "tool",
-        "version"
+        "version",
+        "deployment_description",
+        "display_name",
+        "icon_override",
+        "show_on_page",
+        "sort_order",
+        "links"
     ],
-    "schema": "CREATE TABLE \"distributions\" (`description` TEXT DEFAULT '' NOT NULL, `distribution_type` TEXT DEFAULT '' NOT NULL, `documentation_url` TEXT DEFAULT '' NOT NULL, `github` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `install_command` TEXT DEFAULT '' NOT NULL, `license` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `registry` TEXT DEFAULT '' NOT NULL, `registry_url` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `tool` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL)"
+    "schema": "CREATE TABLE \"distributions\" (`description` TEXT DEFAULT '' NOT NULL, `distribution_type` TEXT DEFAULT '' NOT NULL, `documentation_url` TEXT DEFAULT '' NOT NULL, `github` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `install_command` TEXT DEFAULT '' NOT NULL, `license` TEXT DEFAULT '' NOT NULL, `name` TEXT DEFAULT '' NOT NULL, `registry` TEXT DEFAULT '' NOT NULL, `registry_url` TEXT DEFAULT '' NOT NULL, `slug` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `tool` TEXT DEFAULT '' NOT NULL, `version` TEXT DEFAULT '' NOT NULL, \"deployment_description\" TEXT DEFAULT '' NOT NULL, \"display_name\" TEXT DEFAULT '' NOT NULL, \"icon_override\" TEXT DEFAULT '' NOT NULL, \"show_on_page\" BOOLEAN DEFAULT FALSE NOT NULL, \"sort_order\" NUMERIC DEFAULT 0 NOT NULL, \"links\" JSON DEFAULT NULL)"
 }

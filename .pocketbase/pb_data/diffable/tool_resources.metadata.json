@@ -1,0 +1,13 @@
+{
+    "name": "tool_resources",
+    "columns": [
+        "description",
+        "icon_type",
+        "id",
+        "sort_order",
+        "title",
+        "tool",
+        "url"
+    ],
+    "schema": "CREATE TABLE `tool_resources` (`description` TEXT DEFAULT '' NOT NULL, `icon_type` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `sort_order` NUMERIC DEFAULT 0 NOT NULL, `title` TEXT DEFAULT '' NOT NULL, `tool` TEXT DEFAULT '' NOT NULL, `url` TEXT DEFAULT '' NOT NULL)"
+}
