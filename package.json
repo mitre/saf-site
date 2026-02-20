@@ -4,7 +4,7 @@
   "description": "MITRE SAF documentation site built with VitePress",
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev docs",
+    "dev": "./scripts/check-db-freshness.sh && vitepress dev docs",
     "build": "vitepress build docs",
     "preview": "vitepress preview docs",
     "test": "vitest",
