@@ -11,8 +11,8 @@ defineProps<Props>()
 
 <template>
   <PageSection
-    :orientation="feature.orientation || 'horizontal'"
-    :variant="feature.variant || 'default'"
+    :orientation="(feature.orientation || 'horizontal') as any"
+    :variant="(feature.variant || 'default') as any"
     :reverse="!!feature.reverse"
     :headline="feature.headline"
     :title="feature.title"

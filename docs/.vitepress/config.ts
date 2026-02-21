@@ -122,7 +122,7 @@ export default defineConfig({
           // templates don't count. Inject a heading from frontmatter title.
           const title = env.frontmatter?.title
           if (title && !/<h\d.*?<a.*?class="header-anchor"/.test(html)) {
-            const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+            const slug = String(title).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
             html = `<h1 id="${slug}">${title} <a class="header-anchor" href="#${slug}">\u200B</a></h1>\n${html}`
           }
 

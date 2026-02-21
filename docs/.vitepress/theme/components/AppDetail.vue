@@ -143,7 +143,7 @@ function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
             size="lg"
             class="flex items-center gap-2 no-underline"
           >
-            <PillarIcon :pillar="tool.primaryCapability.slug" :size="20" />
+            <PillarIcon :pillar="tool.primaryCapability.slug as any" :size="20" />
             {{ tool.primaryCapability.name }}
           </Button>
         </div>
