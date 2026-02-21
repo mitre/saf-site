@@ -91,13 +91,16 @@ export interface ContentItem {
   slug: string
   name: string
   description?: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  pillar?: string
   target_name?: string
   standard_name?: string
   standard_short_name?: string
   technology_name?: string
   version?: string
   status?: string
+  packages?: { registry: string, name: string }[]
+  tags?: string[]
 }
 ```
 </docs>
