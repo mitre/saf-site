@@ -30,6 +30,7 @@ import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 export const ContentType = {
   VALIDATION: 'validation',
   HARDENING: 'hardening',
+  LIBRARY: 'library',
 } as const
 
 export const Status = {
@@ -274,6 +275,10 @@ export const content = sqliteTable('content', {
   technology: text('technology').references(() => technologies.id),
   vendor: text('vendor').references(() => organizations.id), // Who created it
   maintainer: text('maintainer').references(() => teams.id), // Who maintains it
+  primaryCapability: text('primary_capability').references(() => capabilities.id), // SAF pillar
+
+  // Packages (libraries only) - JSON array of {registry, name} objects
+  packages: text('packages', { mode: 'json' }),
 
   // Links
   github: text('github'),
@@ -796,6 +801,10 @@ export const contentRelations = relations(content, ({ one, many }) => ({
   maintainer: one(teams, {
     fields: [content.maintainer],
     references: [teams.id],
+  }),
+  primaryCapability: one(capabilities, {
+    fields: [content.primaryCapability],
+    references: [capabilities.id],
   }),
   capabilities: many(contentCapabilities),
   tags: many(contentTags),

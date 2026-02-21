@@ -65,7 +65,8 @@ interface RelatedContentItem {
   slug: string
   name: string
   description: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  pillar?: string
   technology_name: string
 }
 
@@ -75,6 +76,7 @@ const {
   benchmarkLabel,
   actionUrls,
   isValidation,
+  isLibrary,
   quickStart,
   prerequisites,
   hasQuickStart,
@@ -95,8 +97,13 @@ onMounted(async () => {
   }
 })
 
-// Map content_type to pillar
+// Use pillar field from data, fallback to content_type derivation
+const validPillars: PillarType[] = ['validate', 'harden', 'plan', 'normalize', 'visualize']
 const pillar = computed<PillarType>(() => {
+  const p = props.content.pillar
+  if (p && validPillars.includes(p as PillarType)) {
+    return p as PillarType
+  }
   return isValidation.value ? 'validate' : 'harden'
 })
 
@@ -109,6 +116,13 @@ const heroActions = computed<ActionItem[]>(() => {
   }))
 })
 
+// Format package info for metadata display
+const packagesLabel = computed(() => {
+  if (!props.content.packages?.length)
+    return undefined
+  return props.content.packages.map(p => `${p.name} (${p.registry})`).join(', ')
+})
+
 // Build metadata items for sidebar using shared utilities
 const metadataItems = computed(() => {
   // Determine standard display value (benchmark label or short name)
@@ -118,15 +132,19 @@ const metadataItems = computed(() => {
 
   return buildMetadataItems(
     createMetadataItem('Target', props.content.target_name, { filterParam: 'target' }),
-    createMetadataItem('Standard', standardValue, {
-      href: props.content.standard_name
-        ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
-        : undefined,
-    }),
+    // Hide standard/controls/profile for libraries (they don't have compliance standards)
+    isLibrary.value
+      ? undefined
+      : createMetadataItem('Standard', standardValue, {
+          href: props.content.standard_name
+            ? `/content/?standard=${encodeURIComponent(props.content.standard_name)}`
+            : undefined,
+        }),
     createMetadataItem('Tech', props.content.technology_name, { filterParam: 'technology' }),
     createMetadataItem('Status', props.content.status),
-    createMetadataItem('Profile', formattedProfileVersion.value),
-    createMetadataItem('Controls', props.content.control_count),
+    isLibrary.value ? undefined : createMetadataItem('Profile', formattedProfileVersion.value),
+    isLibrary.value ? undefined : createMetadataItem('Controls', props.content.control_count),
+    createMetadataItem('Packages', packagesLabel.value),
     createMetadataItem('Vendor', props.content.vendor_name, { filterParam: 'vendor' }),
     createMetadataItem('Maintainer', props.content.maintainer_name),
   )
@@ -145,8 +163,8 @@ const relatedContent = computed(() => props.relatedContent || [])
       <span class="current">{{ content.name }}</span>
     </nav>
 
-    <!-- Draft Disclaimer -->
-    <div class="draft-disclaimer">
+    <!-- Draft Disclaimer (only shown for draft status content) -->
+    <div v-if="content.status === 'draft'" class="draft-disclaimer">
       <p>This content is in draft form. It is made available here as reference but is not expected to be feature-complete without continued development work.</p>
     </div>
 
@@ -201,7 +219,7 @@ const relatedContent = computed(() => props.relatedContent || [])
           <div class="related-card-header">
             <span class="related-card-name">{{ related.name }}</span>
             <PillarBadge
-              :pillar="related.content_type === 'validation' ? 'validate' : 'harden'"
+              :pillar="(related.pillar as PillarType) || (related.content_type === 'validation' ? 'validate' : 'harden')"
               size="sm"
             />
           </div>

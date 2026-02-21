@@ -8,7 +8,8 @@ import FilterSelect from './FilterSelect.vue'
 
 interface ContentItem {
   id: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  pillar?: string
   target_name?: string
   technology_name?: string
   vendor_name?: string
@@ -44,10 +45,13 @@ const selectedVendor = ref(props.initialVendor || 'all')
 const selectedStandard = ref(props.initialStandard || 'all')
 const searchQuery = ref(props.initialSearch || '')
 
-// Static pillar options
+// Static pillar options (all 5 SAF pillars)
 const pillarOptions: FilterOption[] = [
   { value: 'validate', label: 'Validate' },
   { value: 'harden', label: 'Harden' },
+  { value: 'plan', label: 'Plan' },
+  { value: 'normalize', label: 'Normalize' },
+  { value: 'visualize', label: 'Visualize' },
 ]
 
 // Dynamic filter options using composable

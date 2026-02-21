@@ -15,7 +15,7 @@ export interface PBContent {
   description?: string
   long_description?: string
   version?: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
   status?: 'active' | 'beta' | 'deprecated' | 'draft'
   github?: string
   documentation_url?: string
@@ -28,19 +28,35 @@ export interface PBContent {
   license?: string
   release_date?: string
   is_featured?: boolean
+  // Library-specific
+  packages?: string // JSON string: array of {registry, name}
   // FK IDs (raw, before expansion)
   target?: string
   standard?: string
   technology?: string
   vendor?: string
   maintainer?: string
+  primary_capability?: string
   expand?: {
     target?: PBTarget
     standard?: PBStandard
     technology?: PBTechnology
     vendor?: PBOrganization
     maintainer?: PBTeam
+    primary_capability?: PBCapability
   }
+}
+
+/**
+ * Pocketbase capability record
+ */
+export interface PBCapability {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  icon?: string
+  color?: string
 }
 
 /**

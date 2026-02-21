@@ -4,141 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Note:** This project's CLAUDE.md is version-controlled and should be committed with changes. Update it as architectural decisions are made.
 
-## Context Restoration (Start Here After Compact/New Session)
-
-This project uses **beads** for task tracking and context preservation. After a `/compact` or starting a new session:
-
-```bash
-# 1. Load architecture overview (READ FIRST)
-bd show saf-site-ga0
-
-# 2. Load database workflow reference
-bd show saf-site-35u
-
-# 3. Check for session recovery card
-bd list --status=open | grep -i recovery
-
-# 4. See available work
-bd ready
-```
-
-**Key Cards (Hub & Spoke Pattern):**
-- **HUB:** `saf-site-ga0` - Architecture overview, tech stack, key directories
-- **SPOKE:** `saf-site-35u` - Database & Pocketbase workflow details
-
-**Related Documentation:**
-- [README.md](README.md) - Setup, commands, workflows
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow, PR process
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
-- [AGENT.md](AGENT.md) - AI agent-specific guidance
-- [Components CLAUDE.md](docs/.vitepress/theme/components/CLAUDE.md) - Component patterns, testing, Histoire stories
-- [Components STYLE-GUIDE.md](docs/.vitepress/theme/components/STYLE-GUIDE.md) - Documentation conventions
-
-## Critical Development Principles
-
-**NEVER USE HACKS. ALWAYS FIX ROOT CAUSE.**
-
-- When encountering bugs, CSS conflicts, or unexpected behavior: investigate and fix the actual cause
-- Do not use `!important` hacks, inline style overrides, or workarounds that mask problems
-- If a fix requires `!important`, it belongs in the component definition with a comment explaining WHY (e.g., framework conflict), not in a separate CSS file
-- Understand the cascade, specificity, and architecture before proposing solutions
-- Quick fixes create technical debt - take the time to understand and fix properly
-- Document architectural decisions so future sessions understand the reasoning
-
-**Example - VitePress + shadcn-vue conflict:**
-- BAD: Add `!important` overrides in custom.css
-- GOOD: Add Tailwind's `!` modifier in button/index.ts with comment explaining VitePress `.vp-doc a` conflict
-
-**MOBILE-FIRST RESPONSIVE DESIGN**
-
-All pages and components must be tested and optimized for mobile devices.
-
-- **Test all changes on mobile** - Use browser dev tools to test mobile viewport sizes (320px, 375px, 768px, 1024px+)
-- **Mobile-first CSS** - Write mobile styles first, add desktop enhancements with `@media (min-width: ...)`
-- **Responsive patterns to follow:**
-  - Grids: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` (stack on mobile)
-  - Flex: Use `flex-col` on mobile, `md:flex-row` on desktop
-  - Font sizes: Smaller base sizes, scale up on desktop
-  - Spacing: Reduced padding/margins on mobile
-  - Icons: Scale down on mobile (see framework pages: large icon on desktop, small inline icon on mobile)
-- **Common breakpoints:**
-  - Mobile: `< 640px`
-  - Tablet: `640px - 1023px` (use `md:` prefix)
-  - Desktop: `1024px+` (use `lg:` prefix)
-- **Test checklist:**
-  - [ ] Text is readable (not too small)
-  - [ ] Buttons/links are tappable (min 44px touch target)
-  - [ ] No horizontal scrolling
-  - [ ] Images/icons scale appropriately
-  - [ ] Navigation works on mobile
-  - [ ] Cards/grids stack properly
-
-**Tools for mobile testing:**
-- Browser DevTools responsive mode
-- `pnpm dev` and test on actual mobile device
-- VitePress dev server accessible on local network for device testing
-
-## Vue in Markdown Best Practices
-
-**CRITICAL:** VitePress processes markdown files through markdown-it BEFORE Vue compilation. This causes specific issues when mixing HTML with Vue components.
-
-### The Raw HTML Problem
-
-**Root Cause:** When you wrap Vue components in HTML tags (`<div>`, `<section>`, `<h3>`, etc.), markdown-it treats everything inside those tags as raw HTML (not Vue). Vue components get passed through as literal text instead of being compiled.
-
-**❌ INCORRECT - Causes raw HTML to appear:**
-```vue
-<div class="wrapper">
-  <h3>Section Title</h3>
-  <VueComponent :prop="data" />
-</div>
-```
-
-**✅ CORRECT - Components render properly:**
-```vue
-<!-- Use component props for titles/sections -->
-<VueComponent :prop="data" title="Section Title" />
-
-<!-- Or use multiple components directly -->
-<VueComponent :prop="data1" />
-<VueComponent :prop="data2" />
-```
-
-**✅ CORRECT - For complex layouts, create a wrapper component:**
-```vue
-<!-- Create WrapperComponent.vue in components/ -->
-<WrapperComponent :data1="data1" :data2="data2" />
-```
-
-### VitePress Vue-in-Markdown Rules
-
-1. **Never wrap Vue components in HTML tags** - Use components directly in markdown
-2. **Use component props** - Pass titles, sections, etc. as props instead of separate HTML elements
-3. **PascalCase or hyphen-case** - Component names must use these to avoid `<p>` tag wrapping
-4. **Create wrapper components** - For complex layouts, make a new Vue component instead of using HTML divs
-5. **Use `<script setup>`** - Place directly in markdown after frontmatter (no `<template>` tag needed)
-6. **Import locally or register globally** - Import in markdown for one-off use, register in theme for frequent use
-
-### Reference
-
-- [VitePress: Using Vue in Markdown](https://vitepress.dev/guide/using-vue)
-- Markdown content IS the template (implicit `<template>` tag)
-- All Vue features work (Composition API, reactivity, computed, etc.)
-
 ## Project Overview
 
 MITRE SAF documentation site built with VitePress. Static site with content managed in Pocketbase, queried at build time.
 
-**Tech Stack:**
-- VitePress 2.0.0-alpha.15 (static site generator)
-- Vue 3.5 with Composition API
-- Tailwind CSS 4 (utility-first styling)
-- shadcn-vue (component library)
-- Reka UI (headless primitives, via shadcn-vue)
-- Pocketbase 0.36 (content database)
-- Vitest 4 (testing)
-- pnpm 10.x (package manager)
-- TypeScript
+**Tech Stack:** VitePress 2.0.0-alpha.15, Vue 3.5 (Composition API), Tailwind CSS 4, shadcn-vue + Reka UI, Pocketbase (content database), Vitest 4, pnpm 10.x, TypeScript.
 
 ## Quick Reference
 
@@ -146,7 +16,7 @@ MITRE SAF documentation site built with VitePress. Static site with content mana
 # Setup (first-time or after git pull)
 pnpm dev:setup
 
-# Development
+# Development (requires two terminals)
 cd .pocketbase && ./pocketbase serve  # Terminal 1
 pnpm dev                               # Terminal 2
 
@@ -155,190 +25,171 @@ pnpm db:export                         # Export to git
 pnpm reload-data                       # Refresh dev server
 
 # Testing & Linting
-pnpm test:run                          # Run tests
-pnpm lint:fix                          # Auto-fix code style (ESLint)
-pnpm ci:check                          # Full CI check (typecheck + lint + test + docs)
+pnpm test:run                          # Run all tests once
+pnpm vitest run path/to/file.spec.ts   # Run single test file
+pnpm test                              # Watch mode
+pnpm test:coverage                     # With coverage
+pnpm lint:fix                          # Auto-fix code style
+pnpm typecheck                         # TypeScript checking (vue-tsc)
+pnpm ci:check                          # Full CI: typecheck + lint + test + docs check
 
 # Component development (Histoire)
-pnpm story:dev     # Start Histoire on :6006
-pnpm story:docs    # Generate docs from component JSDoc
+pnpm story:dev                         # Start Histoire on :6006
+pnpm story:docs                        # Generate docs from component JSDoc
 ```
 
 **URLs:**
 - Dev site: http://localhost:5173
-- Pocketbase Admin: http://localhost:8090/_/
+- Pocketbase Admin: http://localhost:8090/_/ (login: `admin@localhost.com` / `testpassword123`)
 - Histoire: http://localhost:6006/
-- Login: `admin@localhost.com` / `testpassword123`
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BUILD TIME                                │
-├─────────────────────────────────────────────────────────────────┤
-│  Pocketbase API  →  Data Loaders  →  VitePress  →  Static HTML  │
-│  (localhost:8090)   (*.data.ts)      (build)       (dist/)      │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                        RUNTIME (Client)                          │
-├─────────────────────────────────────────────────────────────────┤
-│  Static Data  →  Vue Components  →  Client-side filtering/UI    │
-│  (embedded)      (*.vue)            (reactive, no server)       │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                        VERSION CONTROL                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Pocketbase UI  →  data.db  →  sqlite-diffable  →  diffable/   │
-│  (edit here)       (local)     (export)            (git tracked)│
-└─────────────────────────────────────────────────────────────────┘
+BUILD TIME:   Pocketbase API  ->  Data Loaders (*.data.ts)  ->  VitePress  ->  Static HTML
+RUNTIME:      Static Data (embedded)  ->  Vue Components  ->  Client-side filtering/UI
+VERSION CTRL: Pocketbase UI  ->  data.db  ->  db-diffable (export)  ->  diffable/ (git tracked)
 ```
+
+Pocketbase must be running during `pnpm dev` and `pnpm build`. The deployed site is fully static -- no database at runtime.
 
 ## Directory Structure
 
 ```
 docs/
-├── .vitepress/
-│   ├── config.ts                 # VitePress config, nav, sidebar
-│   ├── loaders/
-│   │   └── profiles.data.ts      # Build-time Pocketbase queries
-│   └── theme/
-│       ├── index.ts              # Theme setup, component registration
-│       ├── custom.css            # MITRE branding
-│       ├── components/           # Vue components
-│       │   ├── ui/               # shadcn-vue components
-│       │   │   ├── badge/
-│       │   │   ├── button/
-│       │   │   ├── card/
-│       │   │   └── input/
-│       │   ├── ProfileCard.vue
-│       │   ├── ProfileFilters.vue
-│       │   ├── ContentDetail.vue
-│       │   └── *.spec.ts         # Component tests
-│       ├── lib/utils.ts          # cn() utility for class merging
-│       └── composables/          # Logic extraction
-│           ├── useContentDetail.ts
-│           └── *.spec.ts         # Unit tests
-├── index.md                      # Home page
-└── validate/
-    ├── index.md                  # Browse page
-    ├── [slug].md                 # Detail page template
-    └── [slug].paths.ts           # Dynamic route generator
+  .vitepress/
+    config.ts                    # VitePress config, nav, sidebar
+    lib/loader-utils.ts          # Shared PB init + FK extraction helpers
+    loaders/
+      content.data.ts            # Main content loader (validation + hardening)
+      tools.data.ts              # SAF tools
+      training.data.ts           # Training courses
+      organizations.data.ts      # Partner organizations
+    database/schema.ts           # Drizzle schema (source of truth for DB structure)
+    theme/
+      index.ts                   # Theme setup, global component registration
+      Layout.vue                 # Custom layout wrapper
+      custom.css                 # MITRE branding, VitePress->Tailwind color bridge
+      components/                # Vue components (+ colocated .spec.ts and .story.vue)
+        ui/                      # shadcn-vue primitives (badge/, button/, card/, input/, select/)
+        icons/                   # Custom SVG icons (pillars/, tools/, BrandIcon.vue)
+      composables/               # Logic extraction (useContentDetail, useFuzzySearch, useFilterOptions)
+      lib/utils.ts               # cn() utility for class merging
+  content/                       # Content library (unified validation + hardening)
+    index.md                     # Browse page
+    [slug].md                    # Detail page template
+    [slug].paths.ts              # Dynamic route generator
+  apps/                          # SAF tools/applications
+    index.md                     # Browse page
+    [slug].md + [slug].paths.ts  # Dynamic app detail pages
+  framework/                     # SAF framework pillar pages (static)
+    index.md, validate.md, harden.md, plan.md, normalize.md, visualize.md
+  training/index.md              # Training courses
+  resources/                     # Resources, media, schema viewer
+  index.md                       # Home page
 
 .pocketbase/
-├── pocketbase                    # Binary (macOS ARM64)
-├── pb_data/
-│   ├── data.db                   # SQLite database (gitignored)
-│   └── diffable/                 # Git-tracked NDJSON export
-└── pb_migrations/                # Auto-generated (clear for fresh setup)
+  pocketbase                     # Binary (platform-specific, not in git)
+  pb_data/
+    data.db                      # SQLite database (gitignored)
+    diffable/                    # Git-tracked NDJSON export
 
 scripts/
-├── setup.sh                      # Idempotent setup script
-├── export-db.sh                  # Export database to diffable/
-└── *.ts                          # Various migration/import scripts
+  setup.sh                       # Idempotent setup script
+  export-db.sh                   # Export database to diffable/
+  inject-story-docs.ts           # Generate component docs for Histoire
+  fetch-readmes.ts               # Populate content from GitHub READMEs
+  db-diffable.ts                 # Database dump/load tool
+
+cli/                             # Separate pnpm workspace: SAF Site CLI tool
 ```
 
-## Content Management
+## Critical Development Principles
 
-### Database Workflow
+**NEVER USE HACKS. ALWAYS FIX ROOT CAUSE.**
 
-1. **Edit content:** Pocketbase Admin UI (http://localhost:8090/_/)
-2. **Export to git:** `pnpm db:export`
-3. **Commit:** `git add .pocketbase/pb_data/diffable/ && git commit`
-4. **Others restore:** `pnpm dev:setup` (restores from diffable/)
+- Do not use `!important` hacks, inline style overrides, or workarounds that mask problems
+- If a fix requires `!important`, it belongs in the component definition with a comment explaining WHY (e.g., framework conflict), not in a separate CSS file
+- Understand the cascade, specificity, and architecture before proposing solutions
 
-### Current Collections
+**Example - VitePress + shadcn-vue conflict:**
+- BAD: Add `!important` overrides in custom.css
+- GOOD: Add Tailwind's `!` modifier in `button/index.ts` with comment explaining VitePress `.vp-doc a` conflict
 
-**Core Content:**
-| Collection | Records | Purpose |
-|------------|---------|---------|
-| content | 82 | Unified profiles (validation + hardening) |
-| content_tags | 117 | Content-tag junction |
-| content_relationships | 4 | Links between content items |
+**MOBILE-FIRST RESPONSIVE DESIGN**
 
-**Reference Data:**
-| Collection | Records | Purpose |
-|------------|---------|---------|
-| organizations | 16 | MITRE, CIS, DISA, AWS, etc. |
-| standards | 18 | STIG, CIS Benchmark, etc. |
-| technologies | 8 | InSpec, Ansible, Chef, etc. |
-| targets | 26 | What gets secured (RHEL 8, MySQL, etc.) |
-| categories | 7 | Target groupings (OS, Database, etc.) |
-| teams | 4 | Maintainer groups |
-| tags | 52 | Categorization tags |
-| tools | 7 | SAF CLI, Heimdall, etc. |
-| capabilities | 5 | SAF pillars (validate, harden, etc.) |
+- Write mobile styles first, add desktop enhancements with breakpoint prefixes
+- Grids: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` (stack on mobile)
+- Flex: `flex-col` on mobile, `md:flex-row` on desktop
+- Breakpoints: Mobile `< 640px`, Tablet `md:` (640-1023px), Desktop `lg:` (1024px+)
+- Test at 320px, 375px, 768px, 1024px+ viewports
 
-**Schema source of truth:** `docs/.vitepress/database/schema.ts` (Drizzle)
+## Vue in Markdown Best Practices
 
-### Pocketbase API Patterns
+**CRITICAL:** VitePress processes markdown through markdown-it BEFORE Vue compilation. When you wrap Vue components in HTML tags (`<div>`, `<section>`, etc.), markdown-it treats everything inside as raw HTML, not Vue.
 
-```typescript
-// Query content with FK expansion
-const profiles = await pb.collection('content').getFullList({
-  filter: 'content_type = "validation"',
-  expand: 'target,standard,technology,vendor,maintainer',
-  sort: 'name'
-})
+```vue
+<!-- BAD: Components inside HTML tags render as raw text -->
+<div class="wrapper">
+  <VueComponent :prop="data" />
+</div>
 
-// Access expanded relations
-profile.expand?.vendor?.name       // "MITRE"
-profile.expand?.standard?.name     // "DISA STIG"
-profile.expand?.target?.name       // "Red Hat Enterprise Linux 8"
+<!-- GOOD: Use components directly, pass layout via props -->
+<VueComponent :prop="data" title="Section Title" />
+
+<!-- GOOD: For complex layouts, create a wrapper component -->
+<WrapperComponent :data1="data1" :data2="data2" />
 ```
+
+Rules: Never wrap Vue components in HTML tags. Use PascalCase or hyphen-case for component names. Use `<script setup>` directly in markdown after frontmatter. Import locally for one-off use; register globally in `theme/index.ts` for frequent use.
 
 ## Key Patterns
 
 ### Data Loaders (Build-Time)
 
+All loaders use shared utilities from `docs/.vitepress/lib/loader-utils.ts`:
+
 ```typescript
-// docs/.vitepress/loaders/profiles.data.ts
-import { defineLoader } from 'vitepress'
-import PocketBase from 'pocketbase'
+import { initPocketBase, extractFK, extractStandardFK } from '../lib/loader-utils'
 
 export default defineLoader({
   async load() {
-    const pb = new PocketBase('http://localhost:8090')
-    await pb.collection('_superusers').authWithPassword(email, password)
+    const pb = await initPocketBase()
     const records = await pb.collection('content').getFullList({
-      filter: 'content_type = "validation"',
-      expand: 'target,standard,technology,vendor,maintainer'
+      expand: 'target,standard,technology,vendor,maintainer',
+      sort: 'name',
     })
-    return { profiles: records }
-  }
+    // Transform PB records to flattened format for VitePress
+    return { items: records.map(r => ({ ... })) }
+  },
 })
 ```
+
+`initPocketBase()` handles auth using env vars (`POCKETBASE_URL`, `POCKETBASE_ADMIN_EMAIL`, `POCKETBASE_ADMIN_PASSWORD`) with localhost defaults.
 
 ### Dynamic Routes
 
 ```typescript
-// docs/validate/[slug].paths.ts
+// docs/content/[slug].paths.ts
 export default {
   async paths() {
-    const pb = new PocketBase('http://localhost:8090')
-    await pb.collection('_superusers').authWithPassword(email, password)
-    const records = await pb.collection('content').getFullList({
-      filter: 'content_type = "validation"'
-    })
-    return records.map(r => ({ params: { slug: r.slug, content: r } }))
+    const pb = await initPocketBase()
+    const records = await pb.collection('content').getFullList({ expand: '...' })
+    return records.map(r => ({ params: { slug: r.slug, content: transformedRecord } }))
   }
 }
 ```
 
-### Composables Pattern
+### Composables
 
-```typescript
-// Logic in composable
-export function useContentDetail(content: ContentItem) {
-  const formattedVersion = computed(() => formatVersion(content.version))
-  const actionUrls = computed(() => buildUrls(content))
-  return { formattedVersion, actionUrls }
-}
+- `useContentDetail(content)` - Format versions, build action URLs, compute metadata for detail pages
+- `useFuzzySearch(items, keys)` - Fuse.js-powered fuzzy text search
+- `useFilterOptions(items)` - Extract unique filter values from content items
 
-// Component uses composable
-const { formattedVersion, actionUrls } = useContentDetail(props.content)
-```
+### Global Components
+
+These are registered globally in `theme/index.ts` and available in any markdown page without imports:
+`ContentCard`, `ContentFilters`, `ContentDetail`, `PillarBadge`, `LogoGrid`, `LogoMarquee`, `CardGrid`, `MediaCard`, `PageSection`, `FeatureItem`, `FeatureList`, `Skeleton`, `Placeholder`, `SchemaViewer`
 
 ### Browse Page Layout
 
@@ -349,254 +200,102 @@ aside: false
 ---
 ```
 
-CSS override for full-width:
-```css
-.VPDoc .container { max-width: 1400px !important; }
-.VPDoc .content { max-width: none !important; }
+## Content Management
+
+### Database Workflow
+
+1. **Edit content:** Pocketbase Admin UI (http://localhost:8090/_/)
+2. **Refresh dev:** `pnpm reload-data`
+3. **Export to git:** `pnpm db:export`
+4. **Commit:** `git add .pocketbase/pb_data/diffable/ && git commit`
+5. **Others restore:** `pnpm dev:setup` (restores from diffable/)
+
+### Key Collections
+
+| Collection | Purpose |
+|------------|---------|
+| `content` | Unified profiles (validation + hardening) |
+| `content_tags` | Content-tag junction table |
+| `content_relationships` | Links between content items |
+| `organizations` | MITRE, CIS, DISA, AWS, etc. |
+| `standards` | STIG, CIS Benchmark, etc. |
+| `technologies` | InSpec, Ansible, Chef, etc. |
+| `targets` | What gets secured (RHEL 8, MySQL, etc.) |
+| `categories` | Target groupings (OS, Database, etc.) |
+| `teams` | Maintainer groups |
+| `tags` | Categorization tags |
+| `tools` | SAF CLI, Heimdall, etc. |
+| `capabilities` | SAF pillars (validate, harden, etc.) |
+
+**Schema source of truth:** `docs/.vitepress/database/schema.ts` (Drizzle)
+
+### Pocketbase API Patterns
+
+```typescript
+// Query content with FK expansion
+const records = await pb.collection('content').getFullList({
+  filter: 'content_type = "validation"',
+  expand: 'target,standard,technology,vendor,maintainer',
+  sort: 'name'
+})
+
+// Access expanded relations
+record.expand?.vendor?.name       // "MITRE"
+record.expand?.standard?.name     // "DISA STIG"
 ```
-
-## Testing
-
-Colocated test files with source:
-- `composables/useContentDetail.ts` → `composables/useContentDetail.spec.ts`
-- `components/ContentDetail.vue` → `components/ContentDetail.spec.ts`
-
-```bash
-pnpm test:run        # Run once
-pnpm test:coverage   # With coverage
-pnpm test            # Watch mode
-```
-
-## Component Documentation (DRY Pattern)
-
-Component documentation is auto-generated from JSDoc comments to maintain a single source of truth:
-
-1. **Write JSDoc in component:** Use `@component` tag with description and `@example` tags
-2. **Create story file:** `ComponentName.story.vue` with variants
-3. **Run doc generator:** `pnpm story:docs` injects `<docs>` block into story file
-4. **View in Histoire:** Documentation appears in docs panel
-
-**Example:**
-```vue
-<script setup lang="ts">
-/**
- * @component LogoGrid - Display logos in responsive grid.
- *
- * @example Basic
- * <LogoGrid :items="partners" />
- */
-export interface LogoGridProps {
-  /** Array of logo items */
-  items: LogoItem[]
-}
-</script>
-```
-
-This keeps component docs, props table, and examples in sync automatically. See `docs/.vitepress/theme/components/STYLE-GUIDE.md` for full conventions.
-
-## Scripts Reference
-
-| Script | Purpose |
-|--------|---------|
-| `pnpm dev:setup` | Idempotent setup (deps, database, migrations) |
-| `pnpm dev:setup:check` | Validate setup without changes |
-| `pnpm dev:setup:force` | Force fresh database restore |
-| `pnpm db:export` | Export Pocketbase to diffable/ |
-| `pnpm reload-data` | Trigger data loader refresh |
-
-## Task Tracking
-
-This project uses **beads** for task management. Tasks are stored in `.beads/` and sync with git.
-
-```bash
-bd ready                    # See available work
-bd list --status=open       # All open tasks
-bd show <id>                # Task details
-bd sync                     # Sync with remote (commit all changes first)
-```
-
-**Note:** `bd sync` performs a `git pull` internally, so commit all modified files before running it.
-
-## Common Issues
-
-### bd sync fails with "unstaged changes"
-**IMPORTANT:** `bd sync` does a git pull internally. If ANY files are modified (not just .beads/), it will fail.
-
-**Correct workflow:**
-```bash
-# 1. Commit ALL modified files first (including CLAUDE.md, any work in progress)
-git add <files>
-git commit -m "your message"
-
-# 2. Push your changes
-git push
-
-# 3. NOW run bd sync (it can pull cleanly)
-bd sync
-```
-
-**Never run `bd sync` with uncommitted changes.** Commit everything first.
-
-### Pocketbase won't start (migration errors)
-```bash
-rm -rf .pocketbase/pb_migrations/*
-```
-
-### Data changes not appearing
-```bash
-pnpm reload-data
-```
-
-### Database out of sync after git pull
-```bash
-pnpm dev:setup  # Restores from diffable/
-```
-
-### Wrong platform binary
-Download correct binary from https://pocketbase.io/docs/
 
 ## shadcn-vue + VitePress Theme Integration
 
-The project uses [shadcn-vue](https://www.shadcn-vue.com/) for UI components, integrated with VitePress's theme system via Tailwind CSS 4.
-
-### Architecture: VitePress → Tailwind 4 → shadcn-vue
+VitePress is the single source of truth for colors. The `@theme` directive in `custom.css` bridges VitePress CSS variables to Tailwind utilities, which shadcn components use. Light/dark mode works automatically.
 
 ```
 VitePress CSS Variables     Tailwind @theme          Utility Classes
-─────────────────────────────────────────────────────────────────────
---vp-c-bg            →    --color-card        →    bg-card
---vp-c-text-1        →    --color-foreground  →    text-foreground
---vp-c-divider       →    --color-border      →    border-border
---vp-c-brand-1       →    --color-primary     →    bg-primary
+--vp-c-bg            ->    --color-card        ->    bg-card
+--vp-c-text-1        ->    --color-foreground  ->    text-foreground
+--vp-c-divider       ->    --color-border      ->    border-border
+--vp-c-brand-1       ->    --color-primary     ->    bg-primary
 ```
-
-**Key insight**: VitePress is the single source of truth for colors. The `@theme` directive in `custom.css` bridges VitePress variables to Tailwind utilities, which shadcn components use.
-
-**Benefits**:
-- Light/dark mode works automatically (VitePress handles it)
-- Consistent colors between VitePress chrome and custom components
-- No duplicate color systems to maintain
-
-### Theme Color Reference
 
 | Tailwind Class | VitePress Variable | Use For |
 |----------------|-------------------|---------|
-| `bg-background` | `--vp-c-bg` | Page backgrounds |
-| `bg-card` | `--vp-c-bg` | Card backgrounds |
+| `bg-background` / `bg-card` | `--vp-c-bg` | Page/card backgrounds |
 | `bg-muted` | `--vp-c-bg-soft` | Subtle backgrounds |
 | `bg-primary` | `--vp-c-brand-1` | Primary actions (MITRE blue) |
 | `text-foreground` | `--vp-c-text-1` | Primary text |
 | `text-muted-foreground` | `--vp-c-text-2` | Secondary text |
 | `border-border` | `--vp-c-divider` | Borders, dividers |
 
-See `custom.css` for the complete mapping table.
+**Adding new shadcn components:** `pnpm dlx shadcn-vue@latest add <component-name>` (installs to `components/ui/`)
 
-### Adding Components
+**Adding theme colors:** Map VitePress variables in `custom.css` `@theme` block. Never define separate HSL values.
 
-```bash
-pnpm dlx shadcn-vue@latest add <component-name>
-# Examples: dialog, select, table, dropdown-menu
-```
+**VitePress transition fix:** VitePress applies slow 0.5s transitions inside `.VPDoc`. This is overridden in `custom.css` to 0.1s for elements with Tailwind hover classes.
 
-Components are installed to `docs/.vitepress/theme/components/ui/`.
+## Git Conventions
 
-### Using Components
-
-```vue
-<script setup lang="ts">
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-</script>
-
-<template>
-  <!-- Use Tailwind classes that map to VitePress colors -->
-  <Card class="bg-card border-border">
-    <CardHeader>
-      <CardTitle class="text-foreground">Title</CardTitle>
-      <Badge variant="default">Status</Badge>
-    </CardHeader>
-    <CardContent class="text-muted-foreground">
-      Content here
-    </CardContent>
-  </Card>
-</template>
-```
-
-### Available Components
-
-| Component | Path | Usage |
-|-----------|------|-------|
-| Badge | `ui/badge` | Status indicators, tags |
-| Button | `ui/button` | Actions, links |
-| Card | `ui/card` | Content containers |
-| Input | `ui/input` | Form text inputs |
-| Select | `ui/select` | Dropdown selects (filters) |
-
-### Adding New Theme Colors
-
-1. Find the VitePress variable in `node_modules/vitepress/.../vars.css`
-2. Add mapping in `custom.css` `@theme` block:
-   ```css
-   @theme {
-     --color-my-color: var(--vp-c-some-var);
-   }
-   ```
-3. Use the Tailwind class in components: `bg-my-color`, `text-my-color`
-
-**Important**: Never define separate HSL values for shadcn. Always map to VitePress variables to maintain consistency.
-
-### VitePress Transition Override
-
-VitePress applies slow 0.5s transitions to elements inside `.VPDoc`. This makes hover states feel sluggish. We fix this globally in `custom.css`:
-
-```css
-/* Any element with Tailwind hover classes gets fast 0.1s transitions */
-.VPDoc [class*="hover:border-"],
-.VPDoc [class*="hover:shadow-"],
-.VPDoc [class*="hover:bg-"] {
-  transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
-}
-```
-
-This means you can use Tailwind hover classes normally (`hover:border-primary`, `hover:shadow-md`) and they'll respond quickly.
+- **Do NOT add `Co-Authored-By` lines to commit messages.** This is a company policy.
+- **Do NOT modify git config** (user.name, user.email, etc.)
 
 ## Conventions
 
 - Vue 3 Composition API with `<script setup lang="ts">`
-- shadcn-vue for pre-built components (Card, Badge, Button, etc.)
-- Tailwind CSS 4 for utility styling
 - Logic in composables, presentation in components
-- Tests colocated with source files
-- Path alias `@/` maps to `docs/.vitepress/theme/`
-- ESLint auto-formatting with `@antfu/eslint-config` (opinionated style, run `pnpm lint:fix` before commits)
+- Tests colocated with source: `Foo.vue` / `Foo.spec.ts` / `Foo.story.vue`
+- Path aliases: `@/` -> `docs/.vitepress/theme/`, `@theme`, `@composables`, `@components`
+- ESLint via `@antfu/eslint-config`: 2-space indent, single quotes, no semicolons, no Prettier
+- CVA (class-variance-authority) for component variant styling
+- Pre-commit hooks (husky + lint-staged): ESLint auto-fix, typecheck, story docs validation
 
-## Icon Libraries
-
-Two icon libraries for different purposes:
+### Icon Libraries
 
 | Library | Purpose | Import |
 |---------|---------|--------|
 | `lucide-vue-next` | UI icons (actions, pillar badges) | `import { Shield } from 'lucide-vue-next'` |
 | `vue3-simple-icons` | Brand logos (Ansible, AWS, etc.) | `import { AnsibleIcon } from 'vue3-simple-icons'` |
+| Custom `icons/pillars/` | SAF pillar icons | `<PillarIcon pillar="validate" />` |
+| `BrandIcon.vue` | Dynamic brand icon resolver | `<BrandIcon name="aws" :size="32" />` |
 
-```vue
-<script setup>
-import { Shield, Hammer } from 'lucide-vue-next'
-import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
-</script>
-```
-
-## Unified Content Library (Planned Feature)
-
-**Goal:** Replace separate `/validate/` and `/harden/` pages with unified `/content/` browse.
-
-**Design Decisions:**
-- URL: `/content/`
-- Default: Show all content
-- Sort: By name
-- Related content: Cross-link on detail pages
-
-**SAF Pillars (Color-Coded Badges):**
+### SAF Pillars (Color-Coded)
 
 | Pillar | Tailwind | Lucide Icon | Use Case |
 |--------|----------|-------------|----------|
@@ -606,10 +305,53 @@ import { AnsibleIcon, RedhatIcon } from 'vue3-simple-icons'
 | Normalize | `orange-500` | `RefreshCw` | CLI converters |
 | Visualize | `cyan-500` | `BarChart3` | Heimdall, reports |
 
-**Implementation Tasks:**
-1. Create PillarBadge component
-2. Generalize ProfileCard → ContentCard
-3. Generalize ProfileFilters → ContentFilters (add Pillar filter)
-4. Create `/content/` route (replaces `/validate/`)
-5. Update data loader to fetch all content types
-6. Add related content section to detail pages
+## Component Documentation (DRY Pattern)
+
+Documentation is auto-generated from JSDoc comments into Histoire story files:
+
+1. Write `@component` and `@example` tags in component JSDoc
+2. Create `ComponentName.story.vue` with variants
+3. Run `pnpm story:docs` to inject `<docs>` block into story file
+4. See `docs/.vitepress/theme/components/STYLE-GUIDE.md` for full conventions
+
+## Scripts Reference
+
+| Script | Purpose |
+|--------|---------|
+| `pnpm dev:setup` | Idempotent setup (deps, database, migrations) |
+| `pnpm dev:setup:force` | Force fresh database restore |
+| `pnpm db:export` | Export Pocketbase to diffable/ |
+| `pnpm db:populate` | Fetch README content from GitHub repos |
+| `pnpm reload-data` | Trigger data loader refresh |
+| `pnpm story:docs` | Generate component docs for Histoire |
+| `pnpm cli --help` | SAF Site CLI (content management) |
+
+## Task Tracking (Beads)
+
+This project uses **beads** for task management. Tasks are stored in `.beads/` and sync with git.
+
+```bash
+bd ready                    # See available work
+bd list --status=open       # All open tasks
+bd show <id>                # Task details
+bd sync                     # Sync with remote (commit ALL files first)
+```
+
+**Never run `bd sync` with uncommitted changes.** It does a `git pull` internally.
+
+## Common Issues
+
+| Problem | Fix |
+|---------|-----|
+| Pocketbase won't start (migration errors) | `rm -rf .pocketbase/pb_migrations/*` |
+| Data changes not appearing | `pnpm reload-data` |
+| Database out of sync after git pull | `pnpm dev:setup` |
+| Wrong platform binary | Download from https://pocketbase.io/docs/ |
+
+## Related Documentation
+
+- [README.md](README.md) - Setup, commands, workflows
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow, PR process
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed technical architecture
+- [Components CLAUDE.md](docs/.vitepress/theme/components/CLAUDE.md) - Component patterns, testing, Histoire stories
+- [Components STYLE-GUIDE.md](docs/.vitepress/theme/components/STYLE-GUIDE.md) - Documentation conventions

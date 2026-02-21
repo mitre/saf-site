@@ -48,10 +48,9 @@ function clearAllFilters() {
 const filteredItems = computed(() => {
   let result = allItems
 
-  // Filter by pillar (content_type)
+  // Filter by pillar (uses pillar field from data, not content_type)
   if (selectedPillar.value !== 'all') {
-    const contentType = selectedPillar.value === 'validate' ? 'validation' : 'hardening'
-    result = result.filter(item => item.content_type === contentType)
+    result = result.filter(item => item.pillar === selectedPillar.value)
   }
 
   // Filter by target (what the content secures)
@@ -84,21 +83,15 @@ const filteredItems = computed(() => {
   return result
 })
 
-// Stats for header
-const validationCount = computed(() => allItems.filter(i => i.content_type === 'validation').length)
-const hardeningCount = computed(() => allItems.filter(i => i.content_type === 'hardening').length)
+
 </script>
 
 # Content Library
 
-Security content for validation and hardening across platforms and compliance standards.
+Security content for validation, hardening, and developer libraries across platforms and compliance standards.
 
 <div class="library-stats">
   <span class="stat">{{ allItems.length }} items</span>
-  <span class="stat-divider">•</span>
-  <span class="stat">{{ validationCount }} validation</span>
-  <span class="stat-divider">•</span>
-  <span class="stat">{{ hardeningCount }} hardening</span>
 </div>
 
 <ContentFilters

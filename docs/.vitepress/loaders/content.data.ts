@@ -9,6 +9,11 @@ import {
   initPocketBase,
 } from '../lib/loader-utils'
 
+export interface PackageInfo {
+  registry: 'npm' | 'rubygems' | 'pypi'
+  name: string
+}
+
 // Flattened content item for VitePress consumption
 export interface ContentItem {
   id: string
@@ -17,8 +22,13 @@ export interface ContentItem {
   description?: string
   long_description?: string
   version?: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
   status?: string
+  // SAF pillar (derived from primary_capability or content_type)
+  pillar: string
+  pillar_name: string
+  // Packages (libraries only)
+  packages?: PackageInfo[]
   // Target (what this content secures)
   target?: string
   target_name?: string
@@ -77,8 +87,9 @@ export default defineLoader({
 
       // Query ALL content with FK expansion (no filter)
       // Include maintainer.organization to get org logo as fallback for teams without logos
+      // Include primary_capability for pillar association
       const records = await pb.collection('content').getFullList<PBContent>({
-        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
+        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization,primary_capability',
         sort: 'name',
       })
 
@@ -90,6 +101,36 @@ export default defineLoader({
         const vendor = extractOrgFK(record.expand, 'vendor')
         const maintainer = extractMaintainerFK(record.expand)
 
+        // Extract pillar from primary_capability FK, fallback to content_type derivation
+        const capability = record.expand?.primary_capability
+        let pillar: string
+        let pillarName: string
+        if (capability?.slug) {
+          pillar = capability.slug
+          pillarName = capability.name
+        }
+        else {
+          // Fallback for records without primary_capability set
+          pillar = record.content_type === 'validation' ? 'validate' : 'harden'
+          pillarName = record.content_type === 'validation' ? 'Validate' : 'Harden'
+        }
+
+        // Parse packages JSON (libraries only)
+        let packages: PackageInfo[] | undefined
+        if (record.packages) {
+          try {
+            const parsed = typeof record.packages === 'string'
+              ? JSON.parse(record.packages)
+              : record.packages
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              packages = parsed
+            }
+          }
+          catch {
+            // Ignore malformed JSON
+          }
+        }
+
         return {
           id: record.id,
           slug: record.slug,
@@ -99,6 +140,9 @@ export default defineLoader({
           version: record.version,
           content_type: record.content_type,
           status: record.status,
+          pillar,
+          pillar_name: pillarName,
+          packages,
           // Target
           target: target.id,
           target_name: target.name,
@@ -144,8 +188,9 @@ export default defineLoader({
       // Group by content type
       const validation = items.filter(item => item.content_type === 'validation')
       const hardening = items.filter(item => item.content_type === 'hardening')
+      const library = items.filter(item => item.content_type === 'library')
 
-      console.log(`✓ Loaded ${items.length} content items (${validation.length} validation, ${hardening.length} hardening)`)
+      console.log(`✓ Loaded ${items.length} content items (${validation.length} validation, ${hardening.length} hardening, ${library.length} library)`)
       return { items, validation, hardening }
     }
     catch (error) {

@@ -13,6 +13,8 @@ function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
     version: '1.0.0',
     status: 'active',
     content_type: 'validation',
+    pillar: 'validate',
+    pillar_name: 'Validate',
     target_name: 'Test Target',
     target_slug: 'test-target',
     standard_name: 'DISA STIG',
@@ -28,6 +30,29 @@ function createContentItem(overrides: Partial<ContentItem> = {}): ContentItem {
     benchmark_version: '2.2.0',
     ...overrides,
   }
+}
+
+// Factory for creating library content items
+function createLibraryItem(overrides: Partial<ContentItem> = {}): ContentItem {
+  return createContentItem({
+    id: 'lib-123',
+    slug: 'test-library',
+    name: 'Test Library',
+    description: 'A test library for testing',
+    content_type: 'library',
+    pillar: 'normalize',
+    pillar_name: 'Normalize',
+    target_name: '',
+    target_slug: '',
+    standard_name: '',
+    standard_short_name: '',
+    standard_slug: '',
+    benchmark_version: '',
+    control_count: undefined,
+    stig_id: '',
+    packages: [{ registry: 'npm', name: '@mitre/test-lib' }],
+    ...overrides,
+  })
 }
 
 /**
@@ -248,6 +273,65 @@ describe('contentDetail', () => {
 
       const controlsItem = findMetadataByLabel(wrapper, 'Controls')
       expect(controlsItem).toBeUndefined()
+    })
+  })
+
+  describe('library content', () => {
+    it('uses pillar field for pillar badge', () => {
+      const content = createLibraryItem({ pillar: 'normalize' })
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      // PillarBadge should show Normalize
+      const badge = wrapper.find('[title="Normalize"]')
+      expect(badge.exists()).toBe(true)
+    })
+
+    it('hides controls metadata for libraries', () => {
+      const content = createLibraryItem()
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      const controlsItem = findMetadataByLabel(wrapper, 'Controls')
+      expect(controlsItem).toBeUndefined()
+    })
+
+    it('hides standard metadata for libraries', () => {
+      const content = createLibraryItem()
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      const standardItem = findMetadataByLabel(wrapper, 'Standard')
+      expect(standardItem).toBeUndefined()
+    })
+
+    it('hides profile version metadata for libraries', () => {
+      const content = createLibraryItem({ version: '1.0.0' })
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      const profileItem = findMetadataByLabel(wrapper, 'Profile')
+      expect(profileItem).toBeUndefined()
+    })
+
+    it('shows packages metadata for libraries', () => {
+      const content = createLibraryItem({
+        packages: [{ registry: 'npm', name: '@mitre/hdf-converters' }],
+      })
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      const packagesItem = findMetadataByLabel(wrapper, 'Packages')
+      expect(packagesItem).toBeDefined()
+      expect(getMetadataValue(wrapper, 'Packages')).toContain('@mitre/hdf-converters')
+    })
+
+    it('shows package registry links in actions', () => {
+      const content = createLibraryItem({
+        github_url: 'https://github.com/mitre/inspecjs',
+        packages: [{ registry: 'npm', name: '@mitre/inspecjs' }],
+      })
+      const wrapper = mount(ContentDetail, { props: { content } })
+
+      const allBtns = wrapper.findAll('.action-btn')
+      const npmBtn = allBtns.find(btn => btn.text().includes('npm'))
+      expect(npmBtn).toBeDefined()
+      expect(npmBtn?.attributes('href')).toContain('npmjs.com/package/@mitre/inspecjs')
     })
   })
 })
