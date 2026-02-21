@@ -12,10 +12,7 @@ import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 const hardenTools = [
   { name: 'Ansible', href: '/content/?technology=Ansible' },
   { name: 'Chef', href: '/content/?technology=Chef' },
-  { name: 'Terraform', href: '/content/?technology=Terraform' },
-  { name: 'Puppet', href: '/content/?technology=Puppet' },
-  { name: 'PowerShell', href: '/content/?technology=PowerShell' },
-  { name: 'Salt', href: '/content/?technology=Salt' }
+  { name: 'Terraform', href: '/content/?technology=Terraform' }
 ]
 </script>
 
@@ -24,7 +21,7 @@ const hardenTools = [
   headline="SAF Framework"
   description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? MITRE SAF's(tm) hardening pillar helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
   :links="[
-    { label: 'Browse Hardening Content', href: '/content/', variant: 'default' },
+    { label: 'Browse Hardening Content', href: '/content/?pillar=harden', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -81,19 +78,19 @@ const hardenTools = [
         {
           title: 'Hardening Content Library',
           description: 'Browse ready-to-use Ansible playbooks, Chef recipes, and other Infrastructure as Code implementations of security baselines. Apply proven hardening configurations to common platforms and applications.',
-          href: '/content/'
+          href: '/content/?pillar=harden'
         },
         {
           title: 'SAF CLI',
           description: 'Convert security guidance documents like XCCDF benchmarks into Ansible playbooks and other automation formats. Generate hardening content from security requirements using SAF CLI conversion tools.',
-          href: '/apps/'
+          href: '/apps/saf-cli'
         }
       ]"
       gap="lg"
     />
   </template>
 
-  <LogoGrid :items="hardenTools" :size="56" :showNames="true" variant="card" :columns="3" />
+  <LogoGrid :items="hardenTools" :size="56" :showNames="true" variant="card" :columns="2" />
 </PageSection>
 
 <style>

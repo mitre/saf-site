@@ -11,7 +11,7 @@ import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const validateTools = [
   { name: 'InSpec', href: '/content/?technology=InSpec' },
-  { name: 'SAF CLI', href: '/apps/' }
+  { name: 'SAF CLI', href: '/apps/saf-cli' }
 ]
 </script>
 
@@ -20,7 +20,7 @@ const validateTools = [
   headline="SAF Framework"
   description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF(tm) helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
   :links="[
-    { label: 'Browse Validation Profiles', href: '/content/', variant: 'default' },
+    { label: 'Browse Validation Profiles', href: '/content/?pillar=validate', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -77,12 +77,12 @@ const validateTools = [
         {
           title: 'InSpec Profiles',
           description: 'Browse our library of validated InSpec profiles for common platforms and applications. Each profile implements security requirements from STIGs, CIS Benchmarks, and other frameworks as executable tests. Download and run profiles directly or customize them for your environment.',
-          href: '/content/'
+          href: '/content/?pillar=validate'
         },
         {
           title: 'SAF CLI',
           description: 'Rapidly generate the scaffolding for an InSpec testing profile using a benchmark document (STIGs, CIS Benchmarks) and the SAF CLI. Use SAF CLI to accelerate updates to test profiles when new benchmarks are released.',
-          href: '/apps/'
+          href: '/apps/saf-cli'
         }
       ]"
       gap="lg"

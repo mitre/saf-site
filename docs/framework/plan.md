@@ -10,8 +10,8 @@ import { FileSearch, PenTool } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const planTools = [
-  { name: 'Vulcan', iconName: 'saf', href: '/apps/' },
-  { name: 'SAF CLI', href: '/apps/' }
+  { name: 'Vulcan', iconName: 'saf', href: '/apps/vulcan' },
+  { name: 'SAF CLI', href: '/apps/saf-cli' }
 ]
 </script>
 
@@ -72,12 +72,12 @@ const planTools = [
         {
           title: 'Vulcan',
           description: 'Author and edit security guidance documents that serve as a basis for later automation content. Create comprehensive documentation of security requirements, controls, and validation procedures.',
-          href: '/apps/'
+          href: '/apps/vulcan'
         },
         {
           title: 'SAF CLI',
           description: 'Build the foundation of an InSpec profile from your security guidance documents using SAF CLI.',
-          href: '/apps/'
+          href: '/apps/saf-cli'
         }
       ]"
       gap="lg"

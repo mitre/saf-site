@@ -10,7 +10,7 @@ import { BarChart3, Users, TrendingUp, FileText } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const visualizeTools = [
-  { name: 'Heimdall', href: '/apps/' }
+  { name: 'Heimdall', href: '/apps/heimdall' }
 ]
 </script>
 
@@ -19,7 +19,7 @@ const visualizeTools = [
   headline="SAF Framework"
   description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, Heimdall provides the visualization tools to communicate security posture effectively."
   :links="[
-    { label: 'View Heimdall', href: '/apps/', variant: 'default' },
+    { label: 'View Heimdall', href: '/apps/heimdall', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -88,12 +88,12 @@ const visualizeTools = [
         {
           title: 'Heimdall Dashboard',
           description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by SAF CLI, or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
-          href: '/apps/'
+          href: '/apps/heimdall'
         },
         {
           title: 'Report Generation',
           description: 'Generate comprehensive security reports in multiple formats. Export executive summaries, detailed technical reports, or compliance evidence packages. Schedule automated report generation and distribution to stakeholders via email or shared drives.',
-          href: '/apps/'
+          href: '/apps/heimdall'
         }
       ]"
       gap="lg"

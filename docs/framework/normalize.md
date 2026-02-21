@@ -10,7 +10,7 @@ import { RefreshCw, ArrowLeftRight, Database, GitCompare, TrendingUp, CheckCircl
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const normalizeTools = [
-  { name: 'SAF CLI', href: '/apps/' }
+  { name: 'SAF CLI', href: '/apps/saf-cli' }
 ]
 
 const toolCategories = [
@@ -46,7 +46,7 @@ const toolCategories = [
   headline="SAF Framework"
   description="Security tools speak different languages. Nessus outputs XML, SonarQube produces JSON, SCAP tools generate XCCDF results - each with different schemas and structures. The Normalize phase of the MITRE SAF(tm) converts security scan results from dozens of different tools into a common format, enabling unified analysis, comparison, and visualization across your entire security toolchain."
   :links="[
-    { label: 'View SAF CLI', href: '/apps/', variant: 'default' },
+    { label: 'View SAF CLI', href: '/apps/saf-cli', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -75,6 +75,10 @@ const toolCategories = [
   headline="The Solution"
   title="Heimdall Data Format (HDF)"
   description="MITRE SAF(tm) uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. The SAF CLI provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
+  :links="[
+    { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },
+    { label: 'InSpecJS Library', href: '/content/inspecjs', variant: 'outline' }
+  ]"
 >
   <FeatureList
     :items="[
@@ -174,12 +178,12 @@ const toolCategories = [
         {
           title: 'SAF CLI Converters',
           description: 'Convert security scan results from 20+ tools into Heimdall Data Format (HDF) using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
-          href: '/apps/'
+          href: '/apps/saf-cli'
         },
         {
           title: 'Export Options',
           description: 'Export HDF results into multiple formats for reporting and integration. Generate CSV spreadsheets for executives, XLSX workbooks for auditors, or CKL files for STIG compliance reporting. Share data with stakeholders in the format they need.',
-          href: '/apps/'
+          href: '/apps/saf-cli'
         }
       ]"
       gap="lg"
