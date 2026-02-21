@@ -2,6 +2,7 @@
 import type { ActionItem } from './ActionButtons.vue'
 import type { PillarType } from './PillarBadge.vue'
 import type { MetadataItem } from '@/lib/metadata'
+import { Badge } from '@/components/ui/badge'
 import ActionButtons from './ActionButtons.vue'
 import BrandIcon from './icons/BrandIcon.vue'
 import PillarBadge from './PillarBadge.vue'
@@ -13,6 +14,7 @@ defineProps<{
   title: string
   description?: string
   pillar?: PillarType
+  tags?: string[]
   actions: ActionItem[]
   metadata: MetadataItem[]
 }>()
@@ -25,7 +27,17 @@ defineProps<{
       <h1 class="hero-title">
         {{ title }}
       </h1>
-      <PillarBadge v-if="pillar" :pillar="pillar" size="md" />
+      <div class="hero-badges">
+        <PillarBadge v-if="pillar" :pillar="pillar" size="md" />
+        <Badge
+          v-for="tag in tags"
+          :key="tag"
+          variant="outline"
+          class="text-xs px-2.5 py-1"
+        >
+          {{ tag }}
+        </Badge>
+      </div>
     </div>
 
     <!-- Description -->
@@ -89,6 +101,14 @@ defineProps<{
   font-weight: 700;
   line-height: 1.2;
   color: var(--vp-c-text-1);
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 /* Description */

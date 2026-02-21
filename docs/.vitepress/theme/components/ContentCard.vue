@@ -20,6 +20,7 @@ export interface ContentItem {
   version?: string
   status?: string
   packages?: { registry: string, name: string }[]
+  tags?: string[]
 }
 
 const props = defineProps<{
@@ -62,6 +63,13 @@ const contentUrl = computed(() => {
           </CardTitle>
           <div class="flex flex-wrap gap-1 shrink-0">
             <PillarBadge :pillar="pillar" size="sm" :show-label="true" />
+            <Badge
+              v-if="content.tags?.includes('tool')"
+              variant="outline"
+              class="text-[0.625rem] px-2 py-0.5"
+            >
+              Tool
+            </Badge>
             <Badge
               v-if="content.status"
               :variant="getStatusVariant(content.status)"

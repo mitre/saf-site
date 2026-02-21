@@ -1,6 +1,9 @@
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
+import { redirects } from './config/redirects'
 import { getTrainingSidebar } from './config/trainingSidebar'
 import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 
@@ -39,6 +42,27 @@ function extractVueComponentText(src: string, relativePath: string): string {
 }
 
 export default defineConfig({
+  buildEnd(siteConfig) {
+    for (const [from, to] of Object.entries(redirects)) {
+      const filePath = join(siteConfig.outDir, from, 'index.html')
+      const dir = dirname(filePath)
+      if (!existsSync(dir))
+        mkdirSync(dir, { recursive: true })
+      writeFileSync(filePath, [
+        '<!DOCTYPE html>',
+        '<html>',
+        '<head>',
+        `  <meta http-equiv="refresh" content="0;url=${to}">`,
+        `  <link rel="canonical" href="${to}">`,
+        '</head>',
+        '<body>',
+        `  <p>This page has moved to <a href="${to}">${to}</a>.</p>`,
+        '</body>',
+        '</html>',
+      ].join('\n'))
+    }
+  },
+
   markdown: {
     config: (md) => {
       md.use(markdownItSmartScript, {

@@ -20,6 +20,39 @@ const props = defineProps<Props>()
 const visibleDistributions = computed(() => {
   return props.tool.distributions.filter(d => d.showOnPage)
 })
+
+// Distributions for hero buttons — visible distributions with a registry link or special icon
+// Excludes "From Source" entries since those duplicate the "View on GitHub" button
+const heroDistributions = computed(() => {
+  return props.tool.distributions.filter(d =>
+    d.showOnPage
+    && (d.registryUrl || d.iconOverride)
+    && d.displayName !== 'From Source',
+  )
+})
+
+// Map distribution type slug to BrandIcon name
+const distTypeIconMap: Record<string, string> = {
+  docker_image: 'docker',
+  npm_package: 'npm',
+  ruby_gem: 'rubygems',
+  helm_chart: 'helm',
+  pypi_package: 'pypi',
+  github_release: 'github',
+}
+
+function distIconName(dist: typeof props.tool.distributions[0]): string {
+  if (dist.iconOverride)
+    return dist.iconOverride
+  return distTypeIconMap[dist.distributionType?.slug || ''] || ''
+}
+
+// Hero button label: prefer registry name for registry-linked dists, displayName for special dists
+function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
+  if (dist.iconOverride)
+    return dist.displayName || dist.name
+  return dist.registry?.displayName || dist.displayName || dist.name
+}
 </script>
 
 <template>
@@ -49,7 +82,9 @@ const visibleDistributions = computed(() => {
             rel="noopener noreferrer"
             variant="default"
             size="lg"
+            class="flex items-center gap-2 no-underline"
           >
+            <BrandIcon v-if="tool.logo" :name="tool.slug" :size="20" />
             {{ demo.label }}
           </Button>
 
@@ -81,6 +116,22 @@ const visibleDistributions = computed(() => {
           >
             <BookOpen :size="20" />
             Documentation
+          </Button>
+
+          <!-- Distribution links (DockerHub, NPM, Helm, etc.) -->
+          <Button
+            v-for="dist in heroDistributions"
+            :key="dist.id"
+            as="a"
+            :href="dist.registryUrl || dist.github"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="outline"
+            size="lg"
+            class="flex items-center gap-2 no-underline"
+          >
+            <BrandIcon v-if="distIconName(dist)" :name="distIconName(dist)" :size="20" />
+            {{ distHeroLabel(dist) }}
           </Button>
 
           <!-- Primary capability link -->

@@ -68,6 +68,8 @@ export interface ContentItem {
   stig_id?: string
   benchmark_version?: string
   is_featured?: boolean
+  // Tags
+  tags?: string[]
 }
 
 export interface ContentData {
@@ -92,6 +94,23 @@ export default defineLoader({
         expand: 'target,standard,technology,vendor,maintainer,maintainer.organization,primary_capability',
         sort: 'name',
       })
+
+      // Query content_tags junction table with expanded tag names
+      const contentTags = await pb.collection('content_tags').getFullList({
+        expand: 'tag_id',
+      })
+
+      // Build content ID -> tag names map
+      const tagMap = new Map<string, string[]>()
+      for (const ct of contentTags) {
+        const contentId = ct.content_id
+        const tagName = (ct.expand?.tag_id as { name?: string })?.name
+        if (contentId && tagName) {
+          const existing = tagMap.get(contentId) || []
+          existing.push(tagName)
+          tagMap.set(contentId, existing)
+        }
+      }
 
       // Transform Pocketbase records to flattened ContentItem format
       const items: ContentItem[] = records.map((record) => {
@@ -182,6 +201,7 @@ export default defineLoader({
           stig_id: record.stig_id,
           benchmark_version: record.benchmark_version,
           is_featured: record.is_featured,
+          tags: tagMap.get(record.id),
         }
       })
 

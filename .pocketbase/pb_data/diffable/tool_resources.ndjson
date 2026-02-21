@@ -4,5 +4,6 @@
 ["Command reference, usage guides, and integration examples.","book-open","qbhpqohkiy25wvw",0,"Documentation","74qfgc6h7fj682q","https://saf-cli.mitre.org"]
 ["View the complete source code, contribute features, or report issues on GitHub.","github","w4zjdyqoatgcfaq",0,"Source Code","6h9937j31oh29b5","https://github.com/mitre/vulcan"]
 ["Installation guides, API documentation, and usage examples.","book-open","7nohipid9z841py",0,"Documentation","6h9937j31oh29b5","https://github.com/mitre/vulcan/wiki"]
-["View the complete source code, contribute features, or report issues on GitHub.","github","ceq4w4gdvfuneqq",0,"Source Code","dsw6ed9026j092r","https://github.com/mitre/emass_client"]
+["View the complete source code, contribute features, or report issues on GitHub.","github","ceq4w4gdvfuneqq",0,"Source Code","dsw6ed9026j092r","https://github.com/mitre/emasser"]
 ["Installation guides, API documentation, and usage examples.","book-open","1wc6utwbprfmdiu",0,"Documentation","dsw6ed9026j092r","https://github.com/mitre/emass_client/wiki"]
+["Ruby client library for the eMASS REST API. Provides programmatic access to eMASS for custom integrations.","book-open","60fc0ab56wuuyie",0,"eMASS Client Library","dsw6ed9026j092r","https://github.com/mitre/emass_client"]

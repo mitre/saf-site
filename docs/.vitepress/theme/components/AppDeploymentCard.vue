@@ -9,9 +9,21 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Determine icon to use (override or from distribution type)
+// Map distribution type slug to BrandIcon name
+const distTypeIconMap: Record<string, string> = {
+  docker_image: 'docker',
+  npm_package: 'npm',
+  ruby_gem: 'rubygems',
+  helm_chart: 'helm',
+  pypi_package: 'pypi',
+  github_release: 'github',
+}
+
+// Determine icon to use (override, then dist type mapping)
 const iconName = computed(() => {
-  return props.distribution.iconOverride || props.distribution.distributionType?.icon || 'saf'
+  if (props.distribution.iconOverride)
+    return props.distribution.iconOverride
+  return distTypeIconMap[props.distribution.distributionType?.slug || ''] || ''
 })
 
 // Display name (override or use name)
@@ -23,7 +35,7 @@ const displayName = computed(() => {
 <template>
   <div class="deployment-card">
     <div class="card-header">
-      <BrandIcon :name="iconName" :size="32" />
+      <BrandIcon v-if="iconName" :name="iconName" :size="32" />
       <h3>{{ displayName }}</h3>
     </div>
     <p

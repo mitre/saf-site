@@ -37,6 +37,23 @@ export default {
         sort: 'name',
       })
 
+      // Query content_tags junction table with expanded tag names
+      const contentTags = await pb.collection('content_tags').getFullList({
+        expand: 'tag_id',
+      })
+
+      // Build content ID -> tag names map
+      const tagMap = new Map<string, string[]>()
+      for (const ct of contentTags) {
+        const contentId = ct.content_id
+        const tagName = (ct.expand?.tag_id as { name?: string })?.name
+        if (contentId && tagName) {
+          const existing = tagMap.get(contentId) || []
+          existing.push(tagName)
+          tagMap.set(contentId, existing)
+        }
+      }
+
       console.log(`✓ Generating ${records.length} content detail pages`)
 
       return records.map((record) => {
@@ -139,6 +156,7 @@ export default {
               benchmark_version: record.benchmark_version || '',
               license: record.license || '',
               release_date: record.release_date || '',
+              tags: tagMap.get(record.id) || [],
             },
             // Related content for cross-linking
             relatedContent,

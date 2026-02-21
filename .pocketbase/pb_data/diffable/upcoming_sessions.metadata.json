@@ -2,12 +2,10 @@
     "name": "upcoming_sessions",
     "columns": [
         "class",
-        "created",
         "date",
         "id",
         "signup_url",
-        "status",
-        "updated"
+        "status"
     ],
-    "schema": "CREATE TABLE `upcoming_sessions` (`class` TEXT DEFAULT '' NOT NULL, `created` TEXT DEFAULT '' NOT NULL, `date` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `signup_url` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL, `updated` TEXT DEFAULT '' NOT NULL)"
+    "schema": "CREATE TABLE `upcoming_sessions` (`class` TEXT DEFAULT '' NOT NULL, `date` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `signup_url` TEXT DEFAULT '' NOT NULL, `status` TEXT DEFAULT '' NOT NULL)"
 }

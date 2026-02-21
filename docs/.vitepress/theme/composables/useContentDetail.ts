@@ -58,6 +58,8 @@ export interface ContentItem {
   benchmark_version?: string
   license?: string
   release_date?: string
+  // Tags
+  tags?: string[]
 }
 
 export interface ContentDetailReturn {

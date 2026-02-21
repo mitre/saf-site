@@ -18,6 +18,8 @@ const localSvgMap: Record<string, string> = {
   'mitre saf team': '/icons/saf-logo.svg',
   'mitre saf': '/icons/saf-logo.svg',
   'saf': '/icons/saf-logo.svg',
+  'emasser': '/icons/saf-logo.svg',
+  'vulcan': '/icons/saf-logo.svg',
   'heimdall': '/icons/heimdall.svg',
 }
 
@@ -56,6 +58,9 @@ const brandColors: Record<string, string> = {
   vmware: '#607078',
   nessus: '#00C176',
   tenable: '#00C176',
+  rubygems: '#E9573F',
+  pypi: '#3775A9',
+  homebrew: '#FBB040',
 }
 
 // Dark mode color variants for icons with dark colors
@@ -125,6 +130,11 @@ const iconMap: Record<string, string> = {
   'cis benchmark': 'lucide:clipboard-check',
   'pci-dss': 'lucide:credit-card',
   'nist': 'lucide:landmark',
+
+  // Package registries & distribution
+  'rubygems': 'simple-icons:rubygems',
+  'pypi': 'simple-icons:pypi',
+  'homebrew': 'simple-icons:homebrew',
 
   // Security Tools
   'snyk': 'simple-icons:snyk',

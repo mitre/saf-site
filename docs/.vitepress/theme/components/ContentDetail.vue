@@ -173,6 +173,7 @@ const relatedContent = computed(() => props.relatedContent || [])
       :title="content.name"
       :description="content.description"
       :pillar="pillar"
+      :tags="content.tags"
       :actions="heroActions"
       :metadata="metadataItems"
     />
