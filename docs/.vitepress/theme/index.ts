@@ -1,5 +1,8 @@
 import type { EnhanceAppContext } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+// Page layout components
+import CardGrid from './components/CardGrid.vue'
+
 // Content library components
 import ContentCard from './components/ContentCard.vue'
 
@@ -11,16 +14,20 @@ import FeatureList from './components/FeatureList.vue'
 // Logo display components
 import LogoGrid from './components/LogoGrid.vue'
 import LogoMarquee from './components/LogoMarquee.vue'
-
-// Page layout components
+import MediaCard from './components/MediaCard.vue'
 import PageSection from './components/PageSection.vue'
 import PillarBadge from './components/PillarBadge.vue'
+
 import Placeholder from './components/Placeholder.vue'
+// Schema display
+import SchemaViewer from './components/SchemaViewer.vue'
 import Skeleton from './components/Skeleton.vue'
+import Layout from './Layout.vue'
 import './custom.css'
 
 export default {
   extends: DefaultTheme,
+  Layout,
   enhanceApp({ app }: EnhanceAppContext) {
     // Content library
     app.component('ContentCard', ContentCard)
@@ -33,10 +40,15 @@ export default {
     app.component('LogoMarquee', LogoMarquee)
 
     // Page layout
+    app.component('CardGrid', CardGrid)
+    app.component('MediaCard', MediaCard)
     app.component('PageSection', PageSection)
     app.component('FeatureItem', FeatureItem)
     app.component('FeatureList', FeatureList)
     app.component('Skeleton', Skeleton)
     app.component('Placeholder', Placeholder)
+
+    // Schema display
+    app.component('SchemaViewer', SchemaViewer)
   },
 }

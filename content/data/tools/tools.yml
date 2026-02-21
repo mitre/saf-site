@@ -6,42 +6,42 @@ tools:
     website: "/libs/harden"
     logo: "/img/logos/tools/hardening-library.png"
     category: "Security Tool"
-  
+
   - id: ohdf
     name: "OHDF"
     description: "OASIS Heimdall Data Format (OHDF) is the international data format standard that facilitates sharing security results from multiple tools in a common format that includes sufficient metadata to support improved data analysis and findings remediation."
     website: "/libs/ohdf-converters"
     logo: "/img/logos/tools/ohdf.png"
     category: "Security Tool"
-  
+
   - id: saf-cli
     name: "SAF CLI"
     description: "The MITRE SAF© Command Line Interface (CLI) utility automates the normalization of data and other security processes for pipeline users."
     website: "/apps/saf-cli"
     logo: "/img/logos/tools/saf-cli.png"
     category: "Security Tool"
-  
+
   - id: vulcan
     name: "Vulcan"
     description: "The Vulcan© project streamlines the process to create STIG-ready content that is ready for DISA review."
     website: "/apps/vulcan"
     logo: "/img/logos/tools/vulcan.png"
     category: "Security Tool"
-  
+
   - id: validation-library
     name: "Validation Library"
     description: "The MITRE SAF© includes a library of standardized validation content written in the InSpec language to implement compliance checks that can be tailored to your organization to eliminate false positives. InSpec profiles can be run on premises or in the cloud or in a container."
     website: "/libs/validate"
     logo: "/img/logos/tools/validation-library.png"
     category: "Security Tool"
-  
+
   - id: emasser
     name: "emasser"
     description: "emasser is a CLI tool for interfacing with an eMASS instance to drop off data and run queries."
     website: "/apps/emasser"
     logo: "/img/logos/tools/emasser.png"
     category: "Security Tool"
-  
+
   - id: heimdall
     name: "Heimdall"
     description: "The Heimdall© data visualization application that ingests security data from multiple security tools to create an aggregated view of the security posture for all components of a system stack. Users can examine individual findings for a deep dive on what actions are needed to secure the system."

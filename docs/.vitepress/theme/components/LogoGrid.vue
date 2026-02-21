@@ -138,12 +138,15 @@ withDefaults(defineProps<LogoGridProps>(), {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.375rem;
   padding: 0.5rem;
   border-radius: 6px;
   text-decoration: none;
   color: inherit;
   transition: background-color 0.15s ease, transform 0.15s ease;
+  min-height: 100px;
+  width: 100%;
 }
 
 .logo-item:hover {
@@ -155,6 +158,8 @@ withDefaults(defineProps<LogoGridProps>(), {
 }
 
 .logo-image {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -163,10 +168,14 @@ withDefaults(defineProps<LogoGridProps>(), {
   font-weight: 500;
   color: var(--vp-c-text-2);
   text-align: center;
-  max-width: 70px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 120px;
+  min-height: 3.9em; /* Reserve space for 3 lines (3 * 1.3 line-height) */
+  line-height: 1.3;
+  word-wrap: break-word;
+  hyphens: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Compact variant */
@@ -188,6 +197,7 @@ withDefaults(defineProps<LogoGridProps>(), {
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
   padding: 0.75rem;
+  min-height: 120px;
 }
 
 .logo-grid--card .logo-item:hover {
@@ -222,11 +232,12 @@ withDefaults(defineProps<LogoGridProps>(), {
 
   .logo-name {
     font-size: 0.75rem;
-    max-width: 85px;
+    max-width: 140px;
   }
 
   .logo-grid--card .logo-item {
     padding: 1rem;
+    min-height: 130px;
   }
 }
 
@@ -259,7 +270,7 @@ withDefaults(defineProps<LogoGridProps>(), {
   }
 
   .logo-name {
-    max-width: 100px;
+    max-width: 160px;
   }
 
   .logo-grid--compact .logo-grid-items {
@@ -272,6 +283,7 @@ withDefaults(defineProps<LogoGridProps>(), {
 
   .logo-grid--card .logo-item {
     padding: 1.25rem;
+    min-height: 150px;
   }
 
   .logo-grid--card .logo-item:hover {

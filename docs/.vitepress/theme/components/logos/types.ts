@@ -9,6 +9,8 @@ export interface LogoItem {
   href?: string
   /** Optional custom image URL (overrides BrandIcon) */
   image?: string
+  /** Optional icon name override for BrandIcon lookup */
+  iconName?: string
   /** Optional description shown on hover */
   description?: string
 }

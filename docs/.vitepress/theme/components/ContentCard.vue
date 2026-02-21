@@ -11,22 +11,40 @@ export interface ContentItem {
   slug: string
   name: string
   description?: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  pillar?: string
   target_name?: string
   standard_name?: string
   standard_short_name?: string
   technology_name?: string
   version?: string
   status?: string
+  packages?: { registry: string, name: string }[]
+  tags?: string[]
 }
 
 const props = defineProps<{
   content: ContentItem
 }>()
 
-// Map content_type to pillar
+// Valid pillar values for validation
+const validPillars = new Set<string>(['validate', 'harden', 'plan', 'normalize', 'visualize'])
+
+// Use pillar field if available, fallback to content_type derivation
 const pillar = computed<PillarType>(() => {
+  if (props.content.pillar && validPillars.has(props.content.pillar)) {
+    return props.content.pillar as PillarType
+  }
   return props.content.content_type === 'validation' ? 'validate' : 'harden'
+})
+
+// For libraries without a target, show the first package name
+const footerLabel = computed(() => {
+  if (props.content.target_name)
+    return props.content.target_name
+  if (props.content.packages?.length)
+    return props.content.packages[0].name
+  return undefined
 })
 
 // Generate URL based on content type
@@ -44,7 +62,14 @@ const contentUrl = computed(() => {
             {{ content.name }}
           </CardTitle>
           <div class="flex flex-wrap gap-1 shrink-0">
-            <PillarBadge :pillar="pillar" size="sm" />
+            <PillarBadge :pillar="pillar" size="sm" :show-label="true" />
+            <Badge
+              v-if="content.tags?.includes('tool')"
+              variant="outline"
+              class="text-[0.625rem] px-2 py-0.5"
+            >
+              Tool
+            </Badge>
             <Badge
               v-if="content.status"
               :variant="getStatusVariant(content.status)"
@@ -73,11 +98,11 @@ const contentUrl = computed(() => {
         <div class="flex items-center gap-1.5 ml-auto">
           <span v-if="content.version" class="font-mono text-[0.6875rem]">v{{ content.version }}</span>
           <Badge
-            v-if="content.target_name"
+            v-if="footerLabel"
             variant="outline"
             class="text-[0.625rem] px-2 py-0.5 max-w-36 truncate"
           >
-            {{ content.target_name }}
+            {{ footerLabel }}
           </Badge>
         </div>
       </CardFooter>

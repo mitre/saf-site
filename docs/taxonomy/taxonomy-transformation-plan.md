@@ -48,10 +48,10 @@ const pb = new PocketBase('http://localhost:8090')
 
 async function addTaxonomyFields() {
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
-  
+
   // Add fields to profiles collection
   // Add fields to hardening_profiles collection
-  
+
   console.log('✓ Schema updated successfully')
 }
 ```
@@ -112,7 +112,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'VMware',
     profile_maintainer: 'VMware'
   },
-  
+
   // Operating Systems - Windows
   {
     pattern: /Windows (10|2012|2016|2019)/,
@@ -123,7 +123,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Microsoft',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Databases - SQL Server
   {
     pattern: /MSQL 2014|SQL Server/,
@@ -134,7 +134,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Microsoft',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Databases - MySQL
   {
     pattern: /MySQL/,
@@ -145,7 +145,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Oracle',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Databases - PostgreSQL
   {
     pattern: /PostgreSQL/,
@@ -156,7 +156,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Open Source',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Databases - Oracle
   {
     pattern: /Oracle Database/,
@@ -167,7 +167,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Oracle',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Databases - MongoDB
   {
     pattern: /MongoDB/,
@@ -178,7 +178,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'MongoDB',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Web Servers
   {
     pattern: /Apache (HTTP )?Server/,
@@ -207,7 +207,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Microsoft',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Application Servers
   {
     pattern: /Tomcat/,
@@ -227,7 +227,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Red Hat',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Runtime Environments
   {
     pattern: /JRE [78]/,
@@ -238,7 +238,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Oracle',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Containers
   {
     pattern: /Docker/,
@@ -258,7 +258,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'CNCF',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Virtualization - VMware
   {
     pattern: /VMware ESXi/,
@@ -332,7 +332,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'VMware',
     profile_maintainer: 'VMware'
   },
-  
+
   // Cloud Services - AWS
   {
     pattern: /AWS.*RDS/,
@@ -361,7 +361,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'AWS',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Cloud Services - GCP
   {
     pattern: /GCP|Google Cloud/,
@@ -381,7 +381,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Google',
     profile_maintainer: 'Google'
   },
-  
+
   // Cloud Services - Azure
   {
     pattern: /Azure/,
@@ -392,7 +392,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'Microsoft',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // DevSecOps
   {
     pattern: /GitHub/,
@@ -403,7 +403,7 @@ const transformationRules: TransformationRule[] = [
     vendor: 'GitHub',
     profile_maintainer: 'MITRE SAF'
   },
-  
+
   // Security Tools
   {
     pattern: /Red Hat CVE Scan/,
@@ -419,13 +419,13 @@ const transformationRules: TransformationRule[] = [
 async function transformData() {
   const pb = new PocketBase('http://localhost:8090')
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
-  
+
   const profiles = await pb.collection('profiles').getFullList()
-  
+
   let matched = 0
   let unmatched = 0
   const unmatchedProfiles = []
-  
+
   for (const profile of profiles) {
     let rule = transformationRules.find(r => {
       if (typeof r.pattern === 'string') {
@@ -433,7 +433,7 @@ async function transformData() {
       }
       return r.pattern.test(profile.name)
     })
-    
+
     if (rule) {
       await pb.collection('profiles').update(profile.id, {
         target_type: rule.target_type,
@@ -451,10 +451,10 @@ async function transformData() {
       console.log(`✗ ${profile.name} - NO MATCH`)
     }
   }
-  
+
   console.log(`\n✓ Matched: ${matched}/${profiles.length}`)
   console.log(`✗ Unmatched: ${unmatched}/${profiles.length}`)
-  
+
   if (unmatchedProfiles.length > 0) {
     console.log('\nUnmatched profiles (need manual review):')
     unmatchedProfiles.forEach(name => console.log(`  - ${name}`))
@@ -486,23 +486,23 @@ tsx transform-taxonomy-data.ts
 async function verifyTransformation() {
   const pb = new PocketBase('http://localhost:8090')
   await pb.admins.authWithPassword('admin@localhost.com', 'test1234567')
-  
+
   const profiles = await pb.collection('profiles').getFullList()
-  
+
   // Check coverage
   const withTargetType = profiles.filter(p => p.target_type)
   const withOsFamily = profiles.filter(p => p.os_family)
   const withCategory = profiles.filter(p => p.category)
-  
+
   console.log('Coverage Report:')
   console.log(`  target_type: ${withTargetType.length}/${profiles.length}`)
   console.log(`  os_family: ${withOsFamily.length}/${profiles.length}`)
   console.log(`  category: ${withCategory.length}/${profiles.length}`)
-  
+
   // Check for "Cross Platform" remnants
   const crossPlatform = profiles.filter(p => p.platform === 'Cross Platform')
   console.log(`\n✗ Still marked "Cross Platform": ${crossPlatform.length}`)
-  
+
   // Distribution report
   const targetTypes = {}
   const osFamilies = {}
@@ -510,12 +510,12 @@ async function verifyTransformation() {
     targetTypes[p.target_type] = (targetTypes[p.target_type] || 0) + 1
     osFamilies[p.os_family] = (osFamilies[p.os_family] || 0) + 1
   })
-  
+
   console.log('\nTarget Type Distribution:')
   Object.entries(targetTypes).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
     console.log(`  ${type}: ${count}`)
   })
-  
+
   console.log('\nOS Family Distribution:')
   Object.entries(osFamilies).sort((a, b) => b[1] - a[1]).forEach(([family, count]) => {
     console.log(`  ${family}: ${count}`)
@@ -591,17 +591,17 @@ export interface Profile {
   slug: string
   name: string
   description?: string
-  
+
   // NEW TAXONOMY FIELDS
   target_type?: string
   target_subtype?: string
   os_family?: string
   profile_maintainer?: string
-  
+
   // UPDATED FIELDS
   category?: string
   vendor?: string
-  
+
   // KEEP EXISTING
   version?: string
   framework?: string
@@ -617,7 +617,7 @@ export interface Profile {
   github_url?: string
   requirements?: string
   status?: string
-  
+
   // DEPRECATED (keep for backwards compat)
   platform?: string
 }
@@ -642,7 +642,7 @@ const profiles: Profile[] = records.map(record => ({
 <template>
   <div class="profile-card">
     <h3>{{ profile.name }}</h3>
-    
+
     <!-- NEW: Show taxonomy -->
     <div class="profile-meta">
       <span class="badge" v-if="profile.target_type">
@@ -655,9 +655,9 @@ const profiles: Profile[] = records.map(record => ({
         {{ profile.os_family }}
       </span>
     </div>
-    
+
     <p class="description">{{ profile.description }}</p>
-    
+
     <div class="profile-details">
       <span v-if="profile.vendor">Vendor: {{ profile.vendor }}</span>
       <span v-if="profile.version">v{{ profile.version }}</span>
@@ -684,32 +684,32 @@ const searchQuery = ref('')
 // Computed filtered profiles
 const filteredProfiles = computed(() => {
   let result = allProfiles
-  
+
   if (selectedCategory.value !== 'all') {
     result = result.filter(p => p.category === selectedCategory.value)
   }
-  
+
   if (selectedStandard.value !== 'all') {
     result = result.filter(p => p.standard_name === selectedStandard.value)
   }
-  
+
   if (selectedTargetType.value !== 'all') {
     result = result.filter(p => p.target_type === selectedTargetType.value)
   }
-  
+
   if (selectedOsFamily.value !== 'all') {
     result = result.filter(p => p.os_family === selectedOsFamily.value)
   }
-  
+
   if (selectedVendor.value !== 'all') {
     result = result.filter(p => p.vendor === selectedVendor.value)
   }
-  
+
   if (selectedTech.value !== 'all') {
     const techName = p.technology_name || p.technology
     result = result.filter(p => techName === selectedTech.value)
   }
-  
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(p =>
@@ -717,7 +717,7 @@ const filteredProfiles = computed(() => {
       (p.description && p.description.toLowerCase().includes(query))
     )
   }
-  
+
   return result
 })
 ```
@@ -808,4 +808,3 @@ git revert HEAD
 3. Add taxonomy filtering to harden/index.md
 4. Consider adding "Related Profiles" based on taxonomy
 5. Add taxonomy-based navigation (e.g., "All Linux Profiles" page)
-

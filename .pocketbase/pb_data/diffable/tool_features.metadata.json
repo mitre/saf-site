@@ -1,0 +1,17 @@
+{
+    "name": "tool_features",
+    "columns": [
+        "description",
+        "headline",
+        "id",
+        "image",
+        "image_alt",
+        "orientation",
+        "reverse",
+        "sort_order",
+        "title",
+        "tool",
+        "variant"
+    ],
+    "schema": "CREATE TABLE `tool_features` (`description` TEXT DEFAULT '' NOT NULL, `headline` TEXT DEFAULT '' NOT NULL, `id` TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL, `image` TEXT DEFAULT '' NOT NULL, `image_alt` TEXT DEFAULT '' NOT NULL, `orientation` TEXT DEFAULT '' NOT NULL, `reverse` BOOLEAN DEFAULT FALSE NOT NULL, `sort_order` NUMERIC DEFAULT 0 NOT NULL, `title` TEXT DEFAULT '' NOT NULL, `tool` TEXT DEFAULT '' NOT NULL, `variant` TEXT DEFAULT '' NOT NULL)"
+}

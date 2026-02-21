@@ -7,257 +7,257 @@ tags:
     description: "Configuration management and automation tool"
     category: "tools"
     status: active
-  
+
   - id: apache
     description: "Apache HTTP Server and related technologies"
     category: "web"
     status: active
-  
+
   - id: application-server
     description: "Server software that hosts applications"
     category: "servers"
     status: active
-  
+
   - id: aws
     description: "Amazon Web Services cloud platform"
     category: "cloud"
     status: active
-  
+
   - id: azure
     description: "Microsoft Azure cloud platform"
     category: "cloud"
     status: active
-  
+
   - id: benchmark
     description: "Standardized testing metrics and evaluations"
     category: "assessment"
     status: active
-  
+
   - id: best
     description: "Best practices and recommended configurations"
     category: "guidance"
     status: active
-  
+
   - id: chef
     description: "Configuration management tool"
     category: "tools"
     status: active
-  
+
   - id: cis
     description: "Center for Internet Security guidelines"
     category: "standards"
     status: active
-  
+
   - id: cloud
     description: "Cloud-based services and infrastructure"
     category: "infrastructure"
     status: active
-  
+
   - id: compliance
     description: "Standards compliance and regulatory requirements"
     category: "governance"
     status: active
-  
+
   - id: container
     description: "Containerization technologies"
     category: "infrastructure"
     status: active
-  
+
   - id: cve
     description: "Common Vulnerabilities and Exposures"
     category: "security"
     status: active
-  
+
   - id: database
     description: "Database systems and management"
     category: "data"
     status: active
-  
+
   - id: devsecops
     description: "Development, security, and operations integration"
     category: "process"
     status: active
-  
+
   - id: docker
     description: "Docker containerization platform"
     category: "containers"
     status: active
-  
+
   - id: engine
     description: "Software engines and runtime environments"
     category: "software"
     status: active
-  
+
   - id: foundations
     description: "Core components and fundamental technologies"
     category: "infrastructure"
     status: active
-  
+
   - id: gcp
     description: "Google Cloud Platform"
     category: "cloud"
     status: active
-  
+
   - id: git
     description: "Git version control system"
     category: "tools"
     status: active
-  
+
   - id: github
     description: "GitHub platform and services"
     category: "tools"
     status: active
-  
+
   - id: gke
     description: "Google Kubernetes Engine"
     category: "cloud"
     status: active
-  
+
   - id: http
     description: "HTTP protocol and related technologies"
     category: "web"
     status: active
-  
+
   - id: httpd
     description: "HTTP daemon servers"
     category: "web"
     status: active
-  
+
   - id: iac
     description: "Infrastructure as Code"
     category: "automation"
     status: active
-  
+
   - id: infrastructure
     description: "IT infrastructure components and systems"
     category: "systems"
     status: active
-  
+
   - id: java
     description: "Java programming language and platform"
     category: "languages"
     status: active
-  
+
   - id: k8s
     description: "Kubernetes (shorthand)"
     category: "containers"
     status: active
-  
+
   - id: kubernetes
     description: "Kubernetes container orchestration"
     category: "containers"
     status: active
-  
+
   - id: microsoft
     description: "Microsoft technologies and platforms"
     category: "vendors"
     status: active
-  
+
   - id: mysql
     description: "MySQL database system"
     category: "databases"
     status: active
-  
+
   - id: nginx
     description: "NGINX web server and proxy"
     category: "web"
     status: active
-  
+
   - id: oracle
     description: "Oracle technologies and products"
     category: "vendors"
     status: active
-  
+
   - id: orchestration
     description: "System orchestration and management"
     category: "automation"
     status: active
-  
+
   - id: payments
     description: "Payment processing and systems"
     category: "financial"
     status: active
-  
+
   - id: pci
     description: "Payment Card Industry standards"
     category: "compliance"
     status: active
-  
+
   - id: practices
     description: "Recommended practices and guidelines"
     category: "guidance"
     status: active
-  
+
   - id: rdbms
     description: "Relational Database Management Systems"
     category: "databases"
     status: active
-  
+
   - id: rds
     description: "AWS Relational Database Service"
     category: "cloud"
     status: active
-  
+
   - id: redhat
     description: "Red Hat technologies and products"
     category: "vendors"
     status: active
-  
+
   - id: s3
     description: "AWS Simple Storage Service"
     category: "cloud"
     status: active
-  
+
   - id: scan
     description: "Security scanning and vulnerability assessment"
     category: "security"
     status: active
-  
+
   - id: scm
     description: "Source Code Management"
     category: "development"
     status: active
-  
+
   - id: security
     description: "Security-related frameworks and tools"
     category: "security"
     status: active
-  
+
   - id: server
     description: "Server hardware and software"
     category: "infrastructure"
     status: active
-  
+
   - id: sql
     description: "Structured Query Language and databases"
     category: "databases"
     status: active
-  
+
   - id: srg
     description: "Security Requirements Guide"
     category: "standards"
     status: active
-  
+
   - id: storage
     description: "Data storage systems and technologies"
     category: "infrastructure"
     status: active
-  
+
   - id: terraform
     description: "HashiCorp Terraform IaC tool"
     category: "tools"
     status: active
-  
+
   - id: tomcat
     description: "Apache Tomcat application server"
     category: "servers"
     status: active
-  
+
   - id: vulnerability
     description: "Security vulnerabilities and mitigations"
     category: "security"
     status: active
-  
+
   - id: web
     description: "Web technologies and applications"
     category: "web"

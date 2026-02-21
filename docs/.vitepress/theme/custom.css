@@ -149,6 +149,107 @@
   transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 
+/* Wide layout for app and framework pages */
+@media (min-width: 960px) {
+  /* Narrower sidebar to give more space to content */
+  .wide-layout aside.VPSidebar {
+    width: 226px !important;
+    padding-left: 24px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Adjust VPContent padding to match sidebar width */
+  .wide-layout .VPContent.has-sidebar {
+    padding-left: 226px !important;
+  }
+
+  /* Adjust navbar elements to match sidebar width */
+  .wide-layout .VPNavBar.has-sidebar .title {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 226px !important;
+    padding-left: 24px !important;
+  }
+
+  .wide-layout .VPNavBar.has-sidebar .content {
+    padding-left: 226px !important;
+  }
+
+  .wide-layout .VPNavBar.has-sidebar .divider {
+    padding-left: 226px !important;
+  }
+
+  .wide-layout .VPDoc .content {
+    max-width: 1152px !important;
+  }
+
+  .wide-layout .VPDoc .container {
+    max-width: 1408px !important;
+  }
+
+  .wide-layout .VPDoc {
+    padding-left: 24px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Make PageSection containers wider for larger screenshots */
+  .wide-layout .page-section-container {
+    max-width: 1600px !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+
+  /* Give more space to visual side (screenshots) in horizontal layout */
+  /* Normal layout: visual on right (60%), content on left (40%) */
+  .wide-layout .page-section--horizontal .page-section-container {
+    grid-template-columns: 2fr 3fr !important;
+  }
+
+  /* Reversed layout: visual on left (60%), content on right (40%) */
+  .wide-layout .page-section--horizontal.page-section--reverse .page-section-container {
+    grid-template-columns: 3fr 2fr !important;
+  }
+
+  /* Allow screenshots to use full width and remove border/background */
+  .wide-layout .screenshot {
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Remove background from visual container */
+  .wide-layout .page-section-visual {
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure sidebar links wrap properly */
+  .wide-layout aside.VPSidebar .link-text {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.4 !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .wide-layout .VPDoc .content {
+    max-width: 1216px !important;
+  }
+
+  .wide-layout .VPDoc .container {
+    max-width: 1536px !important;
+  }
+}
+
+.wide-layout .VPDoc img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Homepage uses custom full-width layout - apply to all non-wide pages */
 .VPDoc .container {
   max-width: 1400px !important;
 }
@@ -166,4 +267,54 @@
 .dark img[src*="/icons/mitre-m"],
 .htw-dark img[src*="/icons/mitre-m"] {
   filter: brightness(0) invert(1);
+}
+
+/* ==========================================================================
+   SmartScript - Smart Typography Transformations
+   Based on nuxt-smartscript approach with VitePress-specific tuning
+   ========================================================================== */
+
+:root {
+  /* Body text symbol sizing */
+  --ss-tm-font-size: 0.75em;
+  --ss-tm-top: -0.35em;
+
+  /* Heading symbol sizing (smaller for visual balance) */
+  --ss-heading-font-size: 0.6em;
+  --ss-heading-tm-top: -0.5em;
+
+  /* Spacing */
+  --ss-margin-left: 0.05em;
+  --ss-margin-right: 0.1em;
+}
+
+/* Trademark symbol (™) - positioned as superscript */
+.ss-tm {
+  font-size: var(--ss-tm-font-size);
+  line-height: 0;
+  position: relative;
+  top: var(--ss-tm-top);
+  vertical-align: baseline;
+  margin-left: var(--ss-margin-left);
+  margin-right: var(--ss-margin-right);
+  font-weight: inherit;
+}
+
+/* Registered symbol (®) - positioned as superscript */
+.ss-reg {
+  font-size: var(--ss-tm-font-size);
+  line-height: 0;
+  position: relative;
+  top: calc(var(--ss-tm-top) + 0.05em); /* Slightly lower than TM */
+  vertical-align: baseline;
+  margin-left: var(--ss-margin-left);
+  margin-right: var(--ss-margin-right);
+  font-weight: inherit;
+}
+
+/* Headings: smaller symbols for better visual balance */
+:is(h1, h2, h3, h4, h5, h6) .ss-tm,
+:is(h1, h2, h3, h4, h5, h6) .ss-reg {
+  font-size: var(--ss-heading-font-size);
+  top: var(--ss-heading-tm-top);
 }

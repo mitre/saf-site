@@ -44,6 +44,8 @@ export interface PageSectionLink {
 export interface PageSectionProps {
   /** Render as different element */
   as?: string
+  /** Section ID for anchor links */
+  id?: string
   /** Small text above title */
   headline?: string
   /** Main section title */
@@ -94,6 +96,7 @@ const hasVisual = computed(() => !!slots.default)
 <template>
   <component
     :is="as"
+    :id="id"
     class="page-section"
     :class="[
       `page-section--${orientation}`,
@@ -179,7 +182,7 @@ const hasVisual = computed(() => !!slots.default)
 .page-section--contained .page-section-container {
   max-width: var(--vp-layout-max-width, 1280px);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 /* Variant backgrounds */
@@ -217,7 +220,7 @@ const hasVisual = computed(() => !!slots.default)
 }
 
 .page-section-headline {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -273,6 +276,10 @@ const hasVisual = computed(() => !!slots.default)
     padding: 3rem 0;
   }
 
+  .page-section--contained .page-section-container {
+    padding: 0 2.5rem;
+  }
+
   .page-section-container {
     gap: 2.5rem;
   }
@@ -294,6 +301,10 @@ const hasVisual = computed(() => !!slots.default)
 @media (min-width: 1024px) {
   .page-section {
     padding: 4rem 0;
+  }
+
+  .page-section--contained .page-section-container {
+    padding: 0 2rem;
   }
 
   /* Horizontal: switch to CSS Grid */

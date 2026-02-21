@@ -1,8 +1,13 @@
 import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
+export interface PackageInfo {
+  registry: 'npm' | 'rubygems' | 'pypi'
+  name: string
+}
+
 /**
- * Content item from Pocketbase (validation or hardening profile)
+ * Content item from Pocketbase (validation, hardening, or library)
  */
 export interface ContentItem {
   id: string
@@ -12,7 +17,12 @@ export interface ContentItem {
   long_description?: string
   version: string
   status: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  // SAF pillar
+  pillar?: string
+  pillar_name?: string
+  // Packages (libraries)
+  packages?: PackageInfo[]
   // Target
   target_name: string
   target_slug: string
@@ -48,6 +58,8 @@ export interface ContentItem {
   benchmark_version?: string
   license?: string
   release_date?: string
+  // Tags
+  tags?: string[]
 }
 
 export interface ContentDetailReturn {
@@ -65,6 +77,8 @@ export interface ContentDetailReturn {
   isValidation: ComputedRef<boolean>
   /** Whether this is a hardening profile */
   isHardening: ComputedRef<boolean>
+  /** Whether this is a library */
+  isLibrary: ComputedRef<boolean>
   /** Interpolated quick start template */
   quickStart: ComputedRef<string>
   /** Interpolated prerequisites template */
@@ -125,6 +139,13 @@ function interpolateTemplate(template: string, content: ContentItem): string {
     .replace(/\{name\}/g, content.name || '')
 }
 
+/** Registry base URLs for package links */
+const REGISTRY_URLS: Record<string, string> = {
+  npm: 'https://www.npmjs.com/package/',
+  rubygems: 'https://rubygems.org/gems/',
+  pypi: 'https://pypi.org/project/',
+}
+
 /**
  * Composable for content detail page logic
  * Extracts formatting, URLs, and display configuration from component
@@ -132,6 +153,7 @@ function interpolateTemplate(template: string, content: ContentItem): string {
 export function useContentDetail(content: ContentItem): ContentDetailReturn {
   const isValidation = computed(() => content.content_type === 'validation')
   const isHardening = computed(() => content.content_type === 'hardening')
+  const isLibrary = computed(() => content.content_type === 'library')
 
   const formattedBenchmarkVersion = computed(() => {
     return formatBenchmarkVersion(
@@ -191,10 +213,20 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
       })
     }
 
-    // Future: Add content-type specific URLs for hardening profiles
-    // - Ansible Galaxy: https://galaxy.ansible.com/...
-    // - Chef Supermarket: https://supermarket.chef.io/...
-    // - Terraform Registry: https://registry.terraform.io/...
+    // Package registry links (libraries)
+    if (content.packages?.length) {
+      for (const pkg of content.packages) {
+        const baseUrl = REGISTRY_URLS[pkg.registry]
+        if (baseUrl) {
+          const registryLabel = pkg.registry === 'npm' ? 'npm' : pkg.registry === 'rubygems' ? 'RubyGems' : 'PyPI'
+          urls.push({
+            label: `${registryLabel}: ${pkg.name}`,
+            url: `${baseUrl}${pkg.name}`,
+            primary: false,
+          })
+        }
+      }
+    }
 
     return urls
   })
@@ -251,6 +283,7 @@ export function useContentDetail(content: ContentItem): ContentDetailReturn {
     featureCards,
     isValidation,
     isHardening,
+    isLibrary,
     quickStart,
     prerequisites,
     hasQuickStart,

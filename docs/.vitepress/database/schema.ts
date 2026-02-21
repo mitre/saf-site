@@ -30,6 +30,7 @@ import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 export const ContentType = {
   VALIDATION: 'validation',
   HARDENING: 'hardening',
+  LIBRARY: 'library',
 } as const
 
 export const Status = {
@@ -274,6 +275,10 @@ export const content = sqliteTable('content', {
   technology: text('technology').references(() => technologies.id),
   vendor: text('vendor').references(() => organizations.id), // Who created it
   maintainer: text('maintainer').references(() => teams.id), // Who maintains it
+  primaryCapability: text('primary_capability').references(() => capabilities.id), // SAF pillar
+
+  // Packages (libraries only) - JSON array of {registry, name} objects
+  packages: text('packages', { mode: 'json' }),
 
   // Links
   github: text('github'),
@@ -325,6 +330,10 @@ export const tools = sqliteTable('tools', {
   website: text('website'),
   github: text('github'),
   documentationUrl: text('documentation_url'),
+  demos: text('demos'), // JSON array: [{ label: string, url: string }]
+
+  // Primary capability (for pillar association)
+  primaryCapability: text('primary_capability').references(() => capabilities.id),
 
   // Media
   logo: text('logo'),
@@ -337,6 +346,53 @@ export const tools = sqliteTable('tools', {
 
   // Metadata
   license: text('license'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+})
+
+/**
+ * Tool Features - Feature sections for tool detail pages
+ */
+export const toolFeatures = sqliteTable('tool_features', {
+  id: text('id').primaryKey(),
+  tool: text('tool').notNull().references(() => tools.id, { onDelete: 'cascade' }),
+
+  // Feature metadata
+  headline: text('headline').notNull(), // "Dashboard View", "Data Aggregation"
+  title: text('title').notNull(), // "Visualize Your Security Posture"
+  description: text('description'), // Feature description
+
+  // Visual
+  image: text('image'), // Screenshot/diagram path
+  imageAlt: text('image_alt'), // Alt text for accessibility
+
+  // Layout
+  orientation: text('orientation').default('horizontal'), // 'horizontal' | 'vertical'
+  variant: text('variant').default('default'), // 'default' | 'muted'
+  reverse: integer('reverse', { mode: 'boolean' }).default(false),
+
+  // Display order
+  sortOrder: integer('sort_order').default(0),
+
+  // Metadata
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+})
+
+/**
+ * Tool Resources - Resource cards for tool detail pages
+ */
+export const toolResources = sqliteTable('tool_resources', {
+  id: text('id').primaryKey(),
+  tool: text('tool').notNull().references(() => tools.id, { onDelete: 'cascade' }),
+
+  title: text('title').notNull(), // "Source Code", "Documentation"
+  description: text('description'), // Card description
+  url: text('url').notNull(), // External link
+  iconType: text('icon_type'), // 'github' | 'book-open' | custom
+
+  sortOrder: integer('sort_order').default(0),
+
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 })
@@ -502,6 +558,14 @@ export const distributions = sqliteTable('distributions', {
 
   // Installation
   installCommand: text('install_command'), // e.g., "helm install...", "npm install..."
+
+  // Deployment card display
+  deploymentDescription: text('deployment_description'), // Prose description for deployment card
+  displayName: text('display_name'), // Alternative display name (e.g., "Heimdall Server")
+  iconOverride: text('icon_override'), // Icon override (defaults to distribution_type icon)
+  showOnPage: integer('show_on_page', { mode: 'boolean' }).default(true), // Show in deployment options
+  sortOrder: integer('sort_order').default(0), // Display order
+  links: text('links'), // JSON array: [{ label: string, href: string }]
 
   // Metadata
   license: text('license'),
@@ -738,6 +802,10 @@ export const contentRelations = relations(content, ({ one, many }) => ({
     fields: [content.maintainer],
     references: [teams.id],
   }),
+  primaryCapability: one(capabilities, {
+    fields: [content.primaryCapability],
+    references: [capabilities.id],
+  }),
   capabilities: many(contentCapabilities),
   tags: many(contentTags),
   relationships: many(contentRelationships),
@@ -763,6 +831,22 @@ export const toolsRelations = relations(tools, ({ one, many }) => ({
   capabilities: many(toolCapabilities),
   tags: many(toolTags),
   distributions: many(distributions),
+  features: many(toolFeatures),
+  resources: many(toolResources),
+}))
+
+export const toolFeaturesRelations = relations(toolFeatures, ({ one }) => ({
+  tool: one(tools, {
+    fields: [toolFeatures.tool],
+    references: [tools.id],
+  }),
+}))
+
+export const toolResourcesRelations = relations(toolResources, ({ one }) => ({
+  tool: one(tools, {
+    fields: [toolResources.tool],
+    references: [tools.id],
+  }),
 }))
 
 export const distributionTypesRelations = relations(distributionTypes, ({ many }) => ({
@@ -896,6 +980,8 @@ export type DistributionType = typeof distributionTypes.$inferSelect
 export type Registry = typeof registries.$inferSelect
 export type Content = typeof content.$inferSelect
 export type Tool = typeof tools.$inferSelect
+export type ToolFeature = typeof toolFeatures.$inferSelect
+export type ToolResource = typeof toolResources.$inferSelect
 export type Course = typeof courses.$inferSelect
 export type Distribution = typeof distributions.$inferSelect
 export type Release = typeof releases.$inferSelect

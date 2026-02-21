@@ -136,6 +136,7 @@ title="Enterprise Ready"
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `as` | `string` | `'section'` | Render as different element |
+| `id` | `string` | `-` | Section ID for anchor links |
 | `headline` | `string` | `-` | Small text above title |
 | `title` | `string` | `-` | Main section title |
 | `description` | `string` | `-` | Section description |
@@ -174,6 +175,8 @@ export interface PageSectionLink {
 export interface PageSectionProps {
   /** Render as different element */
   as?: string
+  /** Section ID for anchor links */
+  id?: string
   /** Small text above title */
   headline?: string
   /** Main section title */

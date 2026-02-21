@@ -14,8 +14,14 @@ interface RelatedContent {
   slug: string
   name: string
   description: string
-  content_type: 'validation' | 'hardening'
+  content_type: 'validation' | 'hardening' | 'library'
+  pillar?: string
   technology_name: string
+}
+
+interface PackageInfo {
+  registry: 'npm' | 'rubygems' | 'pypi'
+  name: string
 }
 
 export default {
@@ -23,12 +29,30 @@ export default {
     try {
       const pb = await initPocketBase()
 
-      // Query ALL content with FK expansion (no filter - both validation and hardening)
+      // Query ALL content with FK expansion (no filter - validation, hardening, and library)
       // Include maintainer.organization to get org logo as fallback for teams without logos
+      // Include primary_capability for pillar association
       const records = await pb.collection('content').getFullList<PBContent>({
-        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization',
+        expand: 'target,standard,technology,vendor,maintainer,maintainer.organization,primary_capability',
         sort: 'name',
       })
+
+      // Query content_tags junction table with expanded tag names
+      const contentTags = await pb.collection('content_tags').getFullList({
+        expand: 'tag_id',
+      })
+
+      // Build content ID -> tag names map
+      const tagMap = new Map<string, string[]>()
+      for (const ct of contentTags) {
+        const contentId = ct.content_id
+        const tagName = (ct.expand?.tag_id as { name?: string })?.name
+        if (contentId && tagName) {
+          const existing = tagMap.get(contentId) || []
+          existing.push(tagName)
+          tagMap.set(contentId, existing)
+        }
+      }
 
       console.log(`✓ Generating ${records.length} content detail pages`)
 
@@ -53,8 +77,33 @@ export default {
             name: r.name,
             description: r.description || '',
             content_type: r.content_type,
+            pillar: r.expand?.primary_capability?.slug
+              || (r.content_type === 'validation' ? 'validate' : 'harden'),
             technology_name: r.expand?.technology?.name || '',
           }))
+
+        // Extract pillar from primary_capability FK, fallback to content_type derivation
+        const capability = record.expand?.primary_capability
+        const pillar = capability?.slug
+          || (record.content_type === 'validation' ? 'validate' : 'harden')
+        const pillarName = capability?.name
+          || (record.content_type === 'validation' ? 'Validate' : 'Harden')
+
+        // Parse packages JSON (libraries only)
+        let packages: PackageInfo[] | undefined
+        if (record.packages) {
+          try {
+            const parsed = typeof record.packages === 'string'
+              ? JSON.parse(record.packages)
+              : record.packages
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              packages = parsed
+            }
+          }
+          catch {
+            // Ignore malformed JSON
+          }
+        }
 
         return {
           params: {
@@ -69,6 +118,9 @@ export default {
               version: record.version || '',
               status: record.status || 'active',
               content_type: record.content_type,
+              pillar,
+              pillar_name: pillarName,
+              packages,
               // Target
               target_name: target.name || '',
               target_slug: target.slug || '',
@@ -104,6 +156,7 @@ export default {
               benchmark_version: record.benchmark_version || '',
               license: record.license || '',
               release_date: record.release_date || '',
+              tags: tagMap.get(record.id) || [],
             },
             // Related content for cross-linking
             relatedContent,

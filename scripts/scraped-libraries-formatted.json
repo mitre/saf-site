@@ -1,0 +1,1604 @@
+{
+  "metadata": {
+    "scraped_at": "2026-02-12T17:58:05.848265Z",
+    "source": "https://saf-site-backend.herokuapp.com/graphql",
+    "validation_total": 75,
+    "hardening_total": 73,
+    "validation_missing": 5,
+    "hardening_missing": 73,
+    "validation_in_db": 78,
+    "hardening_in_db": 4
+  },
+  "validation": [
+    {
+      "id": "21",
+      "name": "AWS RDS MySQL 5.7 CIS",
+      "name_long": "AWS RDS MySQL Enterprise Edition 5.7 CIS",
+      "github": "https://github.com/mitre/aws-rds-oracle-mysql-ee-5.7-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "2",
+      "name": "Red Hat 7 STIG",
+      "name_long": "Red Hat 7 STIG",
+      "github": "https://github.com/mitre/redhat-enterprise-linux-7-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "4",
+      "name": "Red Hat CVE Scan",
+      "name_long": "Red Hat CVE Vulnerability Scan",
+      "github": "https://github.com/CMSgov/redhat-enterprise-linux-cve-vulnerability-scan-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "5",
+      "name": "Windows 2012 STIG",
+      "name_long": "Microsoft Windows 2012r2 Member Server STIG",
+      "github": "https://github.com/mitre/microsoft-windows-2012r2-memberserver-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "6",
+      "name": "Windows 2016 STIG",
+      "name_long": "Microsoft Windows Server 2016 STIG",
+      "github": "https://github.com/mitre/microsoft-windows-server-2016-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "7",
+      "name": "Windows 2019 STIG",
+      "name_long": "Microsoft Windows Server 2019 STIG",
+      "github": "https://github.com/mitre/microsoft-windows-server-2019-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "8",
+      "name": "Docker CE CIS",
+      "name_long": "Docker CE CIS",
+      "github": "https://github.com/mitre/docker-ce-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "9",
+      "name": "Ubuntu 16.04 STIG",
+      "name_long": "Canonical Ubuntu 16.04 STIG",
+      "github": "https://github.com/mitre/canonical-ubuntu-16.04-lts-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "10",
+      "name": "Ubuntu 20.04 STIG",
+      "name_long": "Canonical Ubuntu 20.04 STIG",
+      "github": "https://github.com/mitre/canonical-ubuntu-20.04-lts-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "11",
+      "name": "Windows 10 STIG",
+      "name_long": "Microsoft Windows 10 STIG v1r19",
+      "github": "https://github.com/mitre/microsoft-windows-10-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "12",
+      "name": "RSA Archer 6 SCG",
+      "name_long": "RSA Archer 6 Security Configuration Guide",
+      "github": "https://github.com/mitre/rsa-archer-6-security-configuration-guide-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "14",
+      "name": "JRE 7 STIG",
+      "name_long": "Oracle Java Runtime Environment 7 Unix STIG",
+      "github": "https://github.com/mitre/oracle-java-runtime-environment-7-unix-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "15",
+      "name": "JRE 8 STIG",
+      "name_long": "Oracle Java Runtime Environment 8 Unix STIG",
+      "github": "https://github.com/mitre/oracle-java-runtime-environment-8-unix-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "13",
+      "name": "Red Hat Jboss EAP 6.3 STIG",
+      "name_long": "Red Hat Jboss Enterprise Application Server 6.3 STIG",
+      "github": "https://github.com/mitre/redhat-jboss-enterprise-application-platform-6.3-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "16",
+      "name": "IIS 8.5 Server STIG",
+      "name_long": "Microsoft IIS 8.5 Server STIG",
+      "github": "https://github.com/mitre/microsoft-iis-8.5-server-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "17",
+      "name": "IIS 8.5 Site STIG",
+      "name_long": "Microsoft IIS 8.5 Site STIG",
+      "github": "https://github.com/mitre/microsoft-iis-8.5-site-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "18",
+      "name": "NGINX Baseline",
+      "name_long": "NGINX Baseline",
+      "github": "https://github.com/mitre/nginx-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "20",
+      "name": "Oracle MySQL 5.7 CIS",
+      "name_long": "Oracle MySQL Enterprise Edition 5.7 CIS",
+      "github": "https://github.com/mitre/oracle-mysql-ee-5.7-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "22",
+      "name": "PostgreSQL 9.x STIG",
+      "name_long": "Crunchy Data PostgreSQL 9.x STIG",
+      "github": "https://github.com/mitre/pgstigcheck-inspec",
+      "content_type": "validation"
+    },
+    {
+      "id": "23",
+      "name": "AWS RDS PostgreSQL 9.x STIG",
+      "name_long": "AWS RDS Crunchy Data PostgreSQL 9.x STIG",
+      "github": "https://github.com/mitre/aws-rds-crunchy-data-postgresql-9-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "24",
+      "name": "MSQL 2014 Database STIG",
+      "name_long": "Microsoft SQL Server 2014 Database STIG",
+      "github": "https://github.com/mitre/microsoft-sql-server-2014-database-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "25",
+      "name": "MSQL 2014 Instance STIG",
+      "name_long": "Microsoft SQL Server 2014 Database STIG",
+      "github": "https://github.com/mitre/microsoft-sql-server-2014-instance-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "27",
+      "name": "AWS RDS Oracle Database 12c STIG",
+      "name_long": "AWS RDS Oracle Database 12c STIG",
+      "github": "https://github.com/mitre/aws-rds-oracle-database-12c-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "28",
+      "name": "Oracle Database 12c STIG",
+      "name_long": "Oracle Database 12c STIG",
+      "github": "https://github.com/mitre/oracle-database-12c-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "29",
+      "name": "MongoDB STIG",
+      "name_long": "MongoDB STIG",
+      "github": "https://github.com/mitre/mongodb-enterprise-advanced-3-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "31",
+      "name": "AWS S3",
+      "name_long": "AWS S3",
+      "github": "https://github.com/mitre/aws-s3-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "32",
+      "name": "AWS RDS CIS",
+      "name_long": "AWS RDS Infrastructure CIS",
+      "github": "https://github.com/mitre/aws-rds-infrastructure-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "33",
+      "name": "GCP PCI-DSS 3.2.1",
+      "name_long": "Google Cloud Platform PCI-DSS 3.2.1",
+      "github": "https://github.com/GoogleCloudPlatform/inspec-gcp-pci-profile",
+      "content_type": "validation"
+    },
+    {
+      "id": "34",
+      "name": "GCP CIS Benchmark",
+      "name_long": "Google Cloud Platform CIS Benchmark",
+      "github": "https://github.com/GoogleCloudPlatform/inspec-gcp-cis-benchmark",
+      "content_type": "validation"
+    },
+    {
+      "id": "35",
+      "name": "GKE CIS Benchmark",
+      "name_long": "Google Kubernetes Engine CIS Benchmark",
+      "github": "https://github.com/GoogleCloudPlatform/inspec-gke-cis-benchmark",
+      "content_type": "validation"
+    },
+    {
+      "id": "36",
+      "name": "VMware ESXI 6.7 STIG",
+      "name_long": "VMware ESXI 6.7 STIG",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vsphere/inspec/vmware-esxi-6.7-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "37",
+      "name": "VMware vSphere VM 6.7 STIG",
+      "name_long": "VMware vSphere Virtual Machines version 6.7 STIG",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vsphere/inspec/vmware-vm-6.7-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "38",
+      "name": "VMware ESXI 6.5 STIG",
+      "name_long": "VMware ESXI 6.5 STIG",
+      "github": "https://github.com/kclinden/vmware-esxi-6.5-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "39",
+      "name": "VMware VCSA 6.7 STIG",
+      "name_long": "VMware vCenter Server Appliance 6.7 STIG",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vcsa/inspec/vmware-vcsa-6.7-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "40",
+      "name": "VMware vSphere 7.0 STIG Readiness Guide",
+      "name_long": "VMware vSphere(ESXi,vCenter,VMs) 7.0 STIG Readiness Guide",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/inspec/vmware-vsphere-7.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "1",
+      "name": "Red Hat 6 STIG",
+      "name_long": "Red Hat 6 STIG",
+      "github": "https://github.com/mitre/redhat-enterprise-linux-6-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "48",
+      "name": "Kubernetes Cluster STIG",
+      "name_long": "Kubernetes Cluster STIG",
+      "github": "https://github.com/mitre/k8s-cluster-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "49",
+      "name": "Apache Server 2.2 STIG",
+      "name_long": "Apache Server 2.2 STIG",
+      "github": "https://github.com/mitre/apache-server-2.2-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "3",
+      "name": "Red Hat 8 STIG",
+      "name_long": "Red Hat 8 STIG",
+      "github": "https://github.com/mitre/redhat-enterprise-linux-8-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "50",
+      "name": "Apache Site 2.2 STIG",
+      "name_long": "Apache Site 2.2 STIG",
+      "github": "https://github.com/mitre/apache-site-2.2-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "51",
+      "name": "Apache Server 2.4x STIG",
+      "name_long": "Apache Server 2.4x STIG",
+      "github": "https://github.com/mitre/apache-server-2.4x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "52",
+      "name": "Apache Site 2.4x STIG",
+      "name_long": "Apache Site 2.4x STIG",
+      "github": "https://github.com/mitre/apache-site-2.4x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "53",
+      "name": "Apache Tomcat 9.x STIG",
+      "name_long": "Apache Tomcat 9.x STIG",
+      "github": "https://github.com/mitre/apache-tomcat-9.x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "54",
+      "name": "AWS RDS Best Practices Benchmark",
+      "name_long": "AWS RDS Best Practices Benchmark",
+      "github": "https://github.com/Staggerlee011/rds-bp-benchmark",
+      "content_type": "validation"
+    },
+    {
+      "id": "26",
+      "name": "AWS MSQL 2014 STIG",
+      "name_long": "AWS RDS Microsoft SQL 2014 Server STIG Instance",
+      "github": "https://github.com/mitre/aws-rds-microsoft-sql-server-2014-instance-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "41",
+      "name": "VMware VCSA 7.0 STIG Readiness Guide",
+      "name_long": "VMware vCenter Service Appliance version 7.0 STIG Readiness Guide",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/inspec/vmware-vcsa-7.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "42",
+      "name": "DRAFT: Tomcat 8 CIS",
+      "name_long": "DRAFT: Apache Tomcat 8 CIS",
+      "github": "https://github.com/mitre/apache-tomcat-8-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "43",
+      "name": "DRAFT: Tomcat 7 CIS",
+      "name_long": "DRAFT: Apache Tomcat 7 CIS",
+      "github": "https://github.com/mitre/apache-tomcat-7-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "44",
+      "name": "Kubernetes CIS",
+      "name_long": "Kubernetes CIS",
+      "github": "https://github.com/mitre/kubernetes-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "45",
+      "name": "K3s Node STIG",
+      "name_long": "K3s Node STIG",
+      "github": "https://github.com/mitre/k3s-node-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "46",
+      "name": "K3s Cluster STIG",
+      "name_long": "K3s Cluster STIG",
+      "github": "https://github.com/mitre/k3s-cluster-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "47",
+      "name": "Kubernetes Node STIG",
+      "name_long": "Kubernetes Node STIG",
+      "github": "https://github.com/mitre/k8s-node-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "55",
+      "name": "AWS S3 Best Practices Benchmark",
+      "name_long": "AWS S3 Best Practices Benchmark",
+      "github": "https://github.com/Staggerlee011/s3-bp-benchmark",
+      "content_type": "validation"
+    },
+    {
+      "id": "56",
+      "name": "Oracle Database 19c CIS",
+      "name_long": "Oracle Database 19c CIS Benchmark",
+      "github": "https://github.com/mitre/oracle-database-19c-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "57",
+      "name": "Oracle MySQL 8.0 STIG",
+      "name_long": "Oracle MySQL 8.0 STIG Baseline",
+      "github": "https://github.com/mitre/oracle-mysql-8-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "58",
+      "name": "PostgreSQL 10+ STIG",
+      "name_long": "PostgreSQL 10+ STIG",
+      "github": "https://github.com/mitre/crunchy-data-postgresql-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "59",
+      "name": "AWS RDS PostgreSQL 10+ STIG",
+      "name_long": "AWS RDS PostgreSQL 10+ STIG",
+      "github": "https://github.com/mitre/aws-rds-crunchy-data-postgresql-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "92",
+      "name": "VMware vSphere vCenter 7.0 STIG",
+      "name_long": "VMware vSphere vCenter Appliance 7.0 STIG Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/inspec/vmware-vcsa-7.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "93",
+      "name": "VMware vSphere 7.0 STIG",
+      "name_long": "VMware vSphere 7.0 STIG Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/inspec/vmware-vsphere-7.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "94",
+      "name": "VMware vSphere vCenter 8.0 STIG",
+      "name_long": "VMware vSphere vCenter Appliance 8.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vcsa/inspec/vmware-vcsa-8.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "104",
+      "name": "VMware Cloud Director 10.4 STIG",
+      "name_long": "VMware Cloud Director 10.4 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcd/10.4/inspec/vmware-cloud-director-10.4-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "96",
+      "name": "VMware NSX-T 3.x STIG",
+      "name_long": "VMware NSX-T 3.x STIG Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/3.x/inspec/vmware-nsxt-3.x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "97",
+      "name": "VMware NSX 4.x STIG",
+      "name_long": "VMware NSX 4.x STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/4.x/inspec/vmware-nsx-4.x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "98",
+      "name": "VMware Photon OS 3.0 STIG",
+      "name_long": "VMware Photon OS 3.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/3.0/inspec/vmware-photon-3.0-stig-inspec-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "99",
+      "name": "VMware Photon OS 4.0 STIG ",
+      "name_long": "VMware Photon OS 4.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/4.0/inspec/vmware-photon-4.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "100",
+      "name": "VMware Photon OS 5.0 STIG",
+      "name_long": "VMware Photon OS 5.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/5.0/inspec/vmware-photon-5.0-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "101",
+      "name": "VMware Cloud Foundation 4.5 STIG",
+      "name_long": "VMware Cloud Foundation 4.5 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/4.x/inspec/vmware-vcf-sddcmgr-4x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "103",
+      "name": "VMware Identity Manager 3.3.x STIG",
+      "name_long": "VMware Identity Manager 3.3.x STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vidm/3.3.x/inspec/vmware-vidm-3.3.x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "106",
+      "name": "VMware Aria Automation 8.x STIG",
+      "name_long": "VMware Aria Automation 8.x STIG  Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/automation/8.x/inspec/vmware-vra-8x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "105",
+      "name": "VMware Horizon 8.0 STIG",
+      "name_long": "VMware Horizon 8.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/horizon/8.0/inspec",
+      "content_type": "validation"
+    },
+    {
+      "id": "107",
+      "name": "VMware Aria Operations 8.x STIG",
+      "name_long": "VMware Aria Operations 8.x STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/operations/8.x/inspec/vmware-aria-operations-8x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "102",
+      "name": "VMware Cloud Foundation 5.0 STIG",
+      "name_long": "VMware Cloud Foundation 5.0 STIG Readiness Guide Chef InSpec Profile",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/5.x/inspec/vmware-cloud-foundation-sddcmgr-5x-stig-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "30",
+      "name": "AWS CIS",
+      "name_long": "AWS CIS Foundations",
+      "github": "https://github.com/mitre/aws-foundations-cis-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "19",
+      "name": "NGINX STIG Ready Baseline",
+      "name_long": "NGINX STIG Ready Baseline",
+      "github": "https://github.com/mitre/nginx-stigready-baseline",
+      "content_type": "validation"
+    },
+    {
+      "id": "108",
+      "name": "MongoDB STIG",
+      "name_long": "MongoDB Enterprise STIG",
+      "github": "https://github.com/mitre/mongodb-enterprise-advanced-4-stig-baseline",
+      "content_type": "validation"
+    }
+  ],
+  "hardening": [
+    {
+      "id": "22",
+      "name": "Red Hat 7 CIS Benchmark",
+      "name_long": "Red Hat Enterprise 7 Linux CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/RHEL7-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "2",
+      "name": "Windows 2012 STIG",
+      "name_long": "Windows 2012 r2 STIG",
+      "github": "https://github.com/mitre/chef-stig-windows-2012-v2r12-memberserver-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "3",
+      "name": "Ubuntu 16.04 STIG",
+      "name_long": "Ubuntu 16.04 Linux STIG",
+      "github": "https://github.com/mitre/chef-canonical-ubuntu-16.04-lts-stig-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "5",
+      "name": "Docker CIS Benchmark",
+      "name_long": "Docker CIS Benchmark",
+      "github": "https://github.com/mitre/ansible-cis-docker-ce-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "6",
+      "name": "Docker CIS Benchmark",
+      "name_long": "Docker CIS Benchmark",
+      "github": "https://github.com/mitre/chef-cis-docker-ce-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "7",
+      "name": "Tomcat CIS Benchmark",
+      "name_long": "Apache Tomcat 7 and 8 CIS Benchmark",
+      "github": "https://github.com/mitre/ansible-cis-tomcat-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "8",
+      "name": "Tomcat CIS Benchmark",
+      "name_long": "Apache Tomcat 8 CIS Benchmark",
+      "github": "https://github.com/mitre/chef-cis-tomcat-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "9",
+      "name": "NGINX [WIP]",
+      "name_long": "NGINX [Work-In-Progress]",
+      "github": "https://github.com/mitre/chef-nginx-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "10",
+      "name": "NGINX STIG Ready",
+      "name_long": "NGINX STIG Ready",
+      "github": "https://github.com/mitre/ansible-nginx-stigready-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "11",
+      "name": "IIS Sites STIG",
+      "name_long": "IIS Sites STIG",
+      "github": "https://github.com/mitre/chef-iis-site-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "12",
+      "name": "IIS Server STIG",
+      "name_long": "IIS Server STIG",
+      "github": "https://github.com/mitre/chef-iis-85-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "13",
+      "name": "AWS CIS Benchmark",
+      "name_long": "AWS Foundations CIS Benchmark",
+      "github": "https://github.com/mitre/cis-aws-foundations-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "14",
+      "name": "MongoDB STIG",
+      "name_long": "MongoDB Enterprise STIG",
+      "github": "https://github.com/mitre/chef-stig-mongodb-enterprise-advanced-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "15",
+      "name": "VMware VCSA 6.7 STIG",
+      "name_long": "VMware vCenter Server Appliance 6.7 STIG",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vcsa/ansible/vmware-vcsa-6.7-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "16",
+      "name": "VMware VCSA 7.0 STIG Readiness Guide",
+      "name_long": "VMware vCenter Server Appliance 7.0 STIG Readiness Guide",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/ansible/vmware-vcsa-7.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "18",
+      "name": "Elasticsearch",
+      "name_long": "Elasticsearch",
+      "github": "https://github.com/mitre/elasticsearch-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "19",
+      "name": "JRE 8 STIG",
+      "name_long": "Oracle Java Runtime Environment 8 Unix STIG",
+      "github": "https://github.com/mitre/oracle-java-runtime-environment-8-stig-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "20",
+      "name": "Red Hat 8 STIG",
+      "name_long": "Red Hat Enterprise 8 Linux STIG",
+      "github": "https://github.com/ansible-lockdown/RHEL8-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "21",
+      "name": "Windows 2016 CIS Benchmark",
+      "name_long": "Windows 2016 CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Windows-2016-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "23",
+      "name": "Ubuntu 18.04 CIS Benchmark",
+      "name_long": "Ubuntu 18.04 Linux CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/UBUNTU18-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "24",
+      "name": "Apache CIS Benchmark",
+      "name_long": "Apache 2.4 CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/APACHE-2.4-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "25",
+      "name": "Azure CIS Benchmark",
+      "name_long": "Azure CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/AZURE-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "26",
+      "name": "Apache STIG",
+      "name_long": "Apache 2.4 STIG",
+      "github": "https://github.com/ansible-lockdown/APACHE-2.4-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "27",
+      "name": "Windows 10 STIG",
+      "name_long": "Windows 10 STIG",
+      "github": "https://github.com/ansible-lockdown/Windows-10-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "33",
+      "name": "Ubuntu 20.04 CIS Benchmark",
+      "name_long": "Ubuntu 20.04 Linux CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/UBUNTU20-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "29",
+      "name": "Windows 2019 STIG",
+      "name_long": "Windows 2019 STIG",
+      "github": "https://github.com/ansible-lockdown/Windows-2019-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "30",
+      "name": "Red Hat 8 CIS Benchmark",
+      "name_long": "Red Hat Enterprise 8 Linux CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/RHEL8-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "34",
+      "name": "Windows 2019 CIS Benchmark",
+      "name_long": "Windows 2019 CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Windows-2019-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "31",
+      "name": "Ubuntu 18.04 LTS STIG",
+      "name_long": "Ubuntu 18.04 LTS STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "32",
+      "name": "Ubuntu 20.04 LTS STIG",
+      "name_long": "Ubuntu 20.04 LTS STIG",
+      "github": "https://public.cyber.mil/stigs/downloads",
+      "content_type": "hardening"
+    },
+    {
+      "id": "28",
+      "name": "Windows 2016 STIG",
+      "name_long": "Windows 2016 STIG",
+      "github": "https://github.com/ansible-lockdown/Windows-2016-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "35",
+      "name": "PostgreSQL 12.x CIS Benchmark",
+      "name_long": "PostgreSQL 12.x CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/POSTGRES-12-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "36",
+      "name": "PostgreSQL 9.x STIG",
+      "name_long": "PostgreSQL 9.x STIG",
+      "github": "https://github.com/ansible-lockdown/POSTGRES-9-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "37",
+      "name": "Kubernetes CIS Benchmark",
+      "name_long": "Kubernetes CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Kubernetes1.6.1-CIS",
+      "content_type": "hardening"
+    },
+    {
+      "id": "38",
+      "name": "Windows 2012 Server CIS Benchmark",
+      "name_long": "Windows 2012 Server CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Windows-2012-Member-Server-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "41",
+      "name": "Windows 2008 Server CIS Benchmark",
+      "name_long": "Windows 2008 r2 Server CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Windows-2008R2-Member-Server-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "1",
+      "name": "Windows 2016 STIG",
+      "name_long": "Windows 2016 r2 STIG",
+      "github": "https://github.com/mitre/chef-stig-windows-server-2016-v1r4-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "42",
+      "name": "Windows 2012 Domain Controller CIS Benchmark",
+      "name_long": "Windows 2012 Domain Controller CIS Benchmark",
+      "github": "https://github.com/ansible-lockdown/Windows-2012-Domain-Controller-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "43",
+      "name": "Tomcat 9 STIG",
+      "name_long": "Tomcat 9 STIG",
+      "github": "https://github.com/ansible-lockdown/TOMCAT-9-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "17",
+      "name": "VMware vSphere 7.0 STIG Readiness Guide",
+      "name_long": "VMware vSphere 7.0 STIG Readiness Guide",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/powercli",
+      "content_type": "hardening"
+    },
+    {
+      "id": "45",
+      "name": "Cisco IOS XE NDM/RTR STIG",
+      "name_long": "Cisco IOS XE NDM and RTR STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "46",
+      "name": "Cisco IOS XE Router STIG",
+      "name_long": "Cisco IOS XE Router STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "44",
+      "name": "Ubuntu 18.04 STIG",
+      "name_long": "Ubuntu 18.04 Linux STIG",
+      "github": "https://github.com/ansible-lockdown/UBUNTU18-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "47",
+      "name": "Docker Enterprise 2.x STIG",
+      "name_long": "Docker Enterprise 2.x Linux/Unix STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "48",
+      "name": "Juniper SRX SG STIG",
+      "name_long": "Juniper SRX SG STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "50",
+      "name": "Windows 2016 STIG",
+      "name_long": "Windows 2016 r2 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "51",
+      "name": "SUSE 15 STIG",
+      "name_long": "SUSE 15 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "53",
+      "name": "Windows Server 2016 STIG",
+      "name_long": "Windows Server 2016 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "54",
+      "name": "Windows Server 2019 STIG",
+      "name_long": "Windows Server 2019 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "55",
+      "name": "Red Hat 7 STIG",
+      "name_long": "Red Hat 7 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "56",
+      "name": "Red Hat 8 STIG",
+      "name_long": "Red Hat 8 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "52",
+      "name": "Keycloak Custom Modules",
+      "name_long": "Keycloak Custom Modules",
+      "github": "https://github.com/mitre/keycloak-custom-policies",
+      "content_type": "hardening"
+    },
+    {
+      "id": "66",
+      "name": "VMware Cloud Foundation 5.0 STIG",
+      "name_long": "VMware Cloud Foundation 5.0 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/5.x/ansible/vmware-cloud-foundation-sddcmgr-5x-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "49",
+      "name": "VMware vSphere 6.5 STIG",
+      "name_long": "VMware vSphere 6.5 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "62",
+      "name": "VMware NSX 4.x STIG",
+      "name_long": "VMware NSX 4.x STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/4.x/ansible/vmware-nsx-4.x-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "69",
+      "name": "Windows Server 2022 STIG",
+      "name_long": "Windows Server 2022 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "59",
+      "name": "VMware vSphere vCenter 8.0 STIG",
+      "name_long": "VMware vSphere vCenter Appliance 8.0 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vcsa/ansible/vmware-vcsa-8.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "60",
+      "name": "VMware vSphere 8.0 STIG ",
+      "name_long": "VMware vSphere 8.0 STIG Readiness Guide PowerCLI",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vsphere/powercli",
+      "content_type": "hardening"
+    },
+    {
+      "id": "67",
+      "name": "VMware Cloud Director 10.4 STIG",
+      "name_long": "VMware Cloud Director 10.4 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcd/10.4/ansible/vmware-cloud-director-10.4-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "61",
+      "name": "VMware NSX-T 3.x STIG",
+      "name_long": "VMware NSX-T 3.x STIG Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/3.x/ansible/vmware-nsxt-3.x-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "64",
+      "name": "VMware Photon OS 4.0 STIG",
+      "name_long": "VMware Photon OS 4.0 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/4.0/ansible/vmware-photon-4.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "70",
+      "name": "Windows Server 2022 STIG",
+      "name_long": "Windows Server 2022 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "65",
+      "name": "VMware Photon OS 5.0 STIG",
+      "name_long": "VMware Photon OS 5.0 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/5.0/ansible/vmware-photon-5.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "68",
+      "name": "VMware Aria Operations 8.x STIG",
+      "name_long": "VMware Aria Operations 8.x STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/operations/8.x/ansible/vmware-aria-operations-8x-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "57",
+      "name": "VMware vSphere vCenter 7.0 STIG",
+      "name_long": "VMware vSphere vCenter Appliance 7.0 STIG Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/ansible/vmware-vcsa-7.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "58",
+      "name": "VMware vSphere 7.0 STIG",
+      "name_long": "VMware vSphere 7.0 STIG PowerCLI",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/powercli",
+      "content_type": "hardening"
+    },
+    {
+      "id": "63",
+      "name": "VMware Photon OS 3.0 STIG",
+      "name_long": "VMware Photon OS 3.0 STIG Readiness Guide Ansible Playbook",
+      "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/3.0/ansible/vmware-photon-3.0-stig-ansible-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "71",
+      "name": "Ubuntu 20.04 STIG",
+      "name_long": "Ubuntu 20.04 STIG",
+      "github": "https://github.com/ansible-lockdown/UBUNTU20-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "73",
+      "name": "Red Hat 9 STIG",
+      "name_long": "Red Hat Enterprise Linux 9 STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "72",
+      "name": "Red Hat 9 STIG",
+      "name_long": "Red Hat Enterprise 9 Linux STIG",
+      "github": "https://public.cyber.mil/stigs/downloads/",
+      "content_type": "hardening"
+    },
+    {
+      "id": "74",
+      "name": "Red Hat 9 STIG",
+      "name_long": "Red Hat Enterprise Linux 9",
+      "github": "https://github.com/ansible-lockdown/RHEL9-STIG",
+      "content_type": "hardening"
+    },
+    {
+      "id": "75",
+      "name": "MongoDB STIG",
+      "name_long": "MongoDB Enterprise STIG",
+      "github": "https://github.com/mitre/mongodb-enterprise-advanced-4-stig-baseline-hardening",
+      "content_type": "hardening"
+    },
+    {
+      "id": "4",
+      "name": "Red Hat 7 STIG",
+      "name_long": "Red Hat Enterprise 7 Linux STIG",
+      "github": "https://github.com/ansible-lockdown/RHEL7-STIG",
+      "content_type": "hardening"
+    }
+  ],
+  "missing_from_db": {
+    "validation": [
+      {
+        "id": "12",
+        "name": "RSA Archer 6 SCG",
+        "name_long": "RSA Archer 6 Security Configuration Guide",
+        "github": "https://github.com/mitre/rsa-archer-6-security-configuration-guide-baseline",
+        "content_type": "validation"
+      },
+      {
+        "id": "18",
+        "name": "NGINX Baseline",
+        "name_long": "NGINX Baseline",
+        "github": "https://github.com/mitre/nginx-baseline",
+        "content_type": "validation"
+      },
+      {
+        "id": "42",
+        "name": "DRAFT: Tomcat 8 CIS",
+        "name_long": "DRAFT: Apache Tomcat 8 CIS",
+        "github": "https://github.com/mitre/apache-tomcat-8-cis-baseline",
+        "content_type": "validation"
+      },
+      {
+        "id": "43",
+        "name": "DRAFT: Tomcat 7 CIS",
+        "name_long": "DRAFT: Apache Tomcat 7 CIS",
+        "github": "https://github.com/mitre/apache-tomcat-7-cis-baseline",
+        "content_type": "validation"
+      },
+      {
+        "id": "99",
+        "name": "VMware Photon OS 4.0 STIG ",
+        "name_long": "VMware Photon OS 4.0 STIG Readiness Guide Chef InSpec Profile",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/4.0/inspec/vmware-photon-4.0-stig-baseline",
+        "content_type": "validation"
+      }
+    ],
+    "hardening": [
+      {
+        "id": "22",
+        "name": "Red Hat 7 CIS Benchmark",
+        "name_long": "Red Hat Enterprise 7 Linux CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/RHEL7-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "2",
+        "name": "Windows 2012 STIG",
+        "name_long": "Windows 2012 r2 STIG",
+        "github": "https://github.com/mitre/chef-stig-windows-2012-v2r12-memberserver-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "3",
+        "name": "Ubuntu 16.04 STIG",
+        "name_long": "Ubuntu 16.04 Linux STIG",
+        "github": "https://github.com/mitre/chef-canonical-ubuntu-16.04-lts-stig-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "5",
+        "name": "Docker CIS Benchmark",
+        "name_long": "Docker CIS Benchmark",
+        "github": "https://github.com/mitre/ansible-cis-docker-ce-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "6",
+        "name": "Docker CIS Benchmark",
+        "name_long": "Docker CIS Benchmark",
+        "github": "https://github.com/mitre/chef-cis-docker-ce-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "7",
+        "name": "Tomcat CIS Benchmark",
+        "name_long": "Apache Tomcat 7 and 8 CIS Benchmark",
+        "github": "https://github.com/mitre/ansible-cis-tomcat-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "8",
+        "name": "Tomcat CIS Benchmark",
+        "name_long": "Apache Tomcat 8 CIS Benchmark",
+        "github": "https://github.com/mitre/chef-cis-tomcat-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "9",
+        "name": "NGINX [WIP]",
+        "name_long": "NGINX [Work-In-Progress]",
+        "github": "https://github.com/mitre/chef-nginx-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "10",
+        "name": "NGINX STIG Ready",
+        "name_long": "NGINX STIG Ready",
+        "github": "https://github.com/mitre/ansible-nginx-stigready-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "11",
+        "name": "IIS Sites STIG",
+        "name_long": "IIS Sites STIG",
+        "github": "https://github.com/mitre/chef-iis-site-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "12",
+        "name": "IIS Server STIG",
+        "name_long": "IIS Server STIG",
+        "github": "https://github.com/mitre/chef-iis-85-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "13",
+        "name": "AWS CIS Benchmark",
+        "name_long": "AWS Foundations CIS Benchmark",
+        "github": "https://github.com/mitre/cis-aws-foundations-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "14",
+        "name": "MongoDB STIG",
+        "name_long": "MongoDB Enterprise STIG",
+        "github": "https://github.com/mitre/chef-stig-mongodb-enterprise-advanced-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "15",
+        "name": "VMware VCSA 6.7 STIG",
+        "name_long": "VMware vCenter Server Appliance 6.7 STIG",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/6.7/vcsa/ansible/vmware-vcsa-6.7-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "16",
+        "name": "VMware VCSA 7.0 STIG Readiness Guide",
+        "name_long": "VMware vCenter Server Appliance 7.0 STIG Readiness Guide",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/ansible/vmware-vcsa-7.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "18",
+        "name": "Elasticsearch",
+        "name_long": "Elasticsearch",
+        "github": "https://github.com/mitre/elasticsearch-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "19",
+        "name": "JRE 8 STIG",
+        "name_long": "Oracle Java Runtime Environment 8 Unix STIG",
+        "github": "https://github.com/mitre/oracle-java-runtime-environment-8-stig-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "20",
+        "name": "Red Hat 8 STIG",
+        "name_long": "Red Hat Enterprise 8 Linux STIG",
+        "github": "https://github.com/ansible-lockdown/RHEL8-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "21",
+        "name": "Windows 2016 CIS Benchmark",
+        "name_long": "Windows 2016 CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Windows-2016-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "23",
+        "name": "Ubuntu 18.04 CIS Benchmark",
+        "name_long": "Ubuntu 18.04 Linux CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/UBUNTU18-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "24",
+        "name": "Apache CIS Benchmark",
+        "name_long": "Apache 2.4 CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/APACHE-2.4-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "25",
+        "name": "Azure CIS Benchmark",
+        "name_long": "Azure CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/AZURE-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "26",
+        "name": "Apache STIG",
+        "name_long": "Apache 2.4 STIG",
+        "github": "https://github.com/ansible-lockdown/APACHE-2.4-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "27",
+        "name": "Windows 10 STIG",
+        "name_long": "Windows 10 STIG",
+        "github": "https://github.com/ansible-lockdown/Windows-10-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "33",
+        "name": "Ubuntu 20.04 CIS Benchmark",
+        "name_long": "Ubuntu 20.04 Linux CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/UBUNTU20-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "29",
+        "name": "Windows 2019 STIG",
+        "name_long": "Windows 2019 STIG",
+        "github": "https://github.com/ansible-lockdown/Windows-2019-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "30",
+        "name": "Red Hat 8 CIS Benchmark",
+        "name_long": "Red Hat Enterprise 8 Linux CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/RHEL8-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "34",
+        "name": "Windows 2019 CIS Benchmark",
+        "name_long": "Windows 2019 CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Windows-2019-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "31",
+        "name": "Ubuntu 18.04 LTS STIG",
+        "name_long": "Ubuntu 18.04 LTS STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "32",
+        "name": "Ubuntu 20.04 LTS STIG",
+        "name_long": "Ubuntu 20.04 LTS STIG",
+        "github": "https://public.cyber.mil/stigs/downloads",
+        "content_type": "hardening"
+      },
+      {
+        "id": "28",
+        "name": "Windows 2016 STIG",
+        "name_long": "Windows 2016 STIG",
+        "github": "https://github.com/ansible-lockdown/Windows-2016-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "35",
+        "name": "PostgreSQL 12.x CIS Benchmark",
+        "name_long": "PostgreSQL 12.x CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/POSTGRES-12-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "36",
+        "name": "PostgreSQL 9.x STIG",
+        "name_long": "PostgreSQL 9.x STIG",
+        "github": "https://github.com/ansible-lockdown/POSTGRES-9-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "37",
+        "name": "Kubernetes CIS Benchmark",
+        "name_long": "Kubernetes CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Kubernetes1.6.1-CIS",
+        "content_type": "hardening"
+      },
+      {
+        "id": "38",
+        "name": "Windows 2012 Server CIS Benchmark",
+        "name_long": "Windows 2012 Server CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Windows-2012-Member-Server-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "41",
+        "name": "Windows 2008 Server CIS Benchmark",
+        "name_long": "Windows 2008 r2 Server CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Windows-2008R2-Member-Server-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "1",
+        "name": "Windows 2016 STIG",
+        "name_long": "Windows 2016 r2 STIG",
+        "github": "https://github.com/mitre/chef-stig-windows-server-2016-v1r4-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "42",
+        "name": "Windows 2012 Domain Controller CIS Benchmark",
+        "name_long": "Windows 2012 Domain Controller CIS Benchmark",
+        "github": "https://github.com/ansible-lockdown/Windows-2012-Domain-Controller-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "43",
+        "name": "Tomcat 9 STIG",
+        "name_long": "Tomcat 9 STIG",
+        "github": "https://github.com/ansible-lockdown/TOMCAT-9-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "17",
+        "name": "VMware vSphere 7.0 STIG Readiness Guide",
+        "name_long": "VMware vSphere 7.0 STIG Readiness Guide",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/powercli",
+        "content_type": "hardening"
+      },
+      {
+        "id": "45",
+        "name": "Cisco IOS XE NDM/RTR STIG",
+        "name_long": "Cisco IOS XE NDM and RTR STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "46",
+        "name": "Cisco IOS XE Router STIG",
+        "name_long": "Cisco IOS XE Router STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "44",
+        "name": "Ubuntu 18.04 STIG",
+        "name_long": "Ubuntu 18.04 Linux STIG",
+        "github": "https://github.com/ansible-lockdown/UBUNTU18-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "47",
+        "name": "Docker Enterprise 2.x STIG",
+        "name_long": "Docker Enterprise 2.x Linux/Unix STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "48",
+        "name": "Juniper SRX SG STIG",
+        "name_long": "Juniper SRX SG STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "50",
+        "name": "Windows 2016 STIG",
+        "name_long": "Windows 2016 r2 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "51",
+        "name": "SUSE 15 STIG",
+        "name_long": "SUSE 15 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "53",
+        "name": "Windows Server 2016 STIG",
+        "name_long": "Windows Server 2016 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "54",
+        "name": "Windows Server 2019 STIG",
+        "name_long": "Windows Server 2019 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "55",
+        "name": "Red Hat 7 STIG",
+        "name_long": "Red Hat 7 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "56",
+        "name": "Red Hat 8 STIG",
+        "name_long": "Red Hat 8 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "52",
+        "name": "Keycloak Custom Modules",
+        "name_long": "Keycloak Custom Modules",
+        "github": "https://github.com/mitre/keycloak-custom-policies",
+        "content_type": "hardening"
+      },
+      {
+        "id": "66",
+        "name": "VMware Cloud Foundation 5.0 STIG",
+        "name_long": "VMware Cloud Foundation 5.0 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcf/5.x/ansible/vmware-cloud-foundation-sddcmgr-5x-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "49",
+        "name": "VMware vSphere 6.5 STIG",
+        "name_long": "VMware vSphere 6.5 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "62",
+        "name": "VMware NSX 4.x STIG",
+        "name_long": "VMware NSX 4.x STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/4.x/ansible/vmware-nsx-4.x-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "69",
+        "name": "Windows Server 2022 STIG",
+        "name_long": "Windows Server 2022 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "59",
+        "name": "VMware vSphere vCenter 8.0 STIG",
+        "name_long": "VMware vSphere vCenter Appliance 8.0 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vcsa/ansible/vmware-vcsa-8.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "60",
+        "name": "VMware vSphere 8.0 STIG ",
+        "name_long": "VMware vSphere 8.0 STIG Readiness Guide PowerCLI",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/8.0/vsphere/powercli",
+        "content_type": "hardening"
+      },
+      {
+        "id": "67",
+        "name": "VMware Cloud Director 10.4 STIG",
+        "name_long": "VMware Cloud Director 10.4 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vcd/10.4/ansible/vmware-cloud-director-10.4-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "61",
+        "name": "VMware NSX-T 3.x STIG",
+        "name_long": "VMware NSX-T 3.x STIG Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/nsx/3.x/ansible/vmware-nsxt-3.x-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "64",
+        "name": "VMware Photon OS 4.0 STIG",
+        "name_long": "VMware Photon OS 4.0 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/4.0/ansible/vmware-photon-4.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "70",
+        "name": "Windows Server 2022 STIG",
+        "name_long": "Windows Server 2022 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "65",
+        "name": "VMware Photon OS 5.0 STIG",
+        "name_long": "VMware Photon OS 5.0 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/5.0/ansible/vmware-photon-5.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "68",
+        "name": "VMware Aria Operations 8.x STIG",
+        "name_long": "VMware Aria Operations 8.x STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/aria/operations/8.x/ansible/vmware-aria-operations-8x-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "57",
+        "name": "VMware vSphere vCenter 7.0 STIG",
+        "name_long": "VMware vSphere vCenter Appliance 7.0 STIG Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vcsa/ansible/vmware-vcsa-7.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "58",
+        "name": "VMware vSphere 7.0 STIG",
+        "name_long": "VMware vSphere 7.0 STIG PowerCLI",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/vsphere/7.0/vsphere/powercli",
+        "content_type": "hardening"
+      },
+      {
+        "id": "63",
+        "name": "VMware Photon OS 3.0 STIG",
+        "name_long": "VMware Photon OS 3.0 STIG Readiness Guide Ansible Playbook",
+        "github": "https://github.com/vmware/dod-compliance-and-automation/tree/master/photon/3.0/ansible/vmware-photon-3.0-stig-ansible-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "71",
+        "name": "Ubuntu 20.04 STIG",
+        "name_long": "Ubuntu 20.04 STIG",
+        "github": "https://github.com/ansible-lockdown/UBUNTU20-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "73",
+        "name": "Red Hat 9 STIG",
+        "name_long": "Red Hat Enterprise Linux 9 STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "72",
+        "name": "Red Hat 9 STIG",
+        "name_long": "Red Hat Enterprise 9 Linux STIG",
+        "github": "https://public.cyber.mil/stigs/downloads/",
+        "content_type": "hardening"
+      },
+      {
+        "id": "74",
+        "name": "Red Hat 9 STIG",
+        "name_long": "Red Hat Enterprise Linux 9",
+        "github": "https://github.com/ansible-lockdown/RHEL9-STIG",
+        "content_type": "hardening"
+      },
+      {
+        "id": "75",
+        "name": "MongoDB STIG",
+        "name_long": "MongoDB Enterprise STIG",
+        "github": "https://github.com/mitre/mongodb-enterprise-advanced-4-stig-baseline-hardening",
+        "content_type": "hardening"
+      },
+      {
+        "id": "4",
+        "name": "Red Hat 7 STIG",
+        "name_long": "Red Hat Enterprise 7 Linux STIG",
+        "github": "https://github.com/ansible-lockdown/RHEL7-STIG",
+        "content_type": "hardening"
+      }
+    ]
+  }
+}

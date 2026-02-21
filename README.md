@@ -40,6 +40,19 @@ The script is **idempotent** - safe to run anytime (first-time setup, after `git
 ./scripts/setup.sh --help       # Show all options
 ```
 
+**What the setup script does:**
+- Installs pnpm dependencies (includes automatic git hook setup via husky)
+- Restores database from git-tracked export
+- Validates Pocketbase installation
+
+**Git hooks (automatic):**
+Git hooks are installed automatically via [husky](https://github.com/typicode/husky) when you run `pnpm install`. The pre-commit hook runs:
+- ESLint auto-fix on staged files
+- TypeScript type checking
+- Histoire story docs validation
+
+No additional setup required!
+
 ### Manual Setup
 
 If you prefer manual steps or need to troubleshoot:
@@ -132,6 +145,27 @@ pnpm dev
 | `pnpm dev:setup:force` | Force fresh database restore |
 | `pnpm db:export` | Export database to git-friendly format |
 | `pnpm db:export:diff` | Export and show git diff |
+
+### Database Schema (DBML)
+
+Generate DBML documentation from the Drizzle schema:
+
+| Command | Description |
+|---------|-------------|
+| `pnpm db:dbml` | Generate DBML from Drizzle schema |
+
+The script dynamically parses `docs/.vitepress/database/schema.ts` to:
+- Extract all tables and columns
+- Find all foreign key relationships (including junction tables)
+- Auto-generate TableGroups for organization
+
+Output: `docs/.vitepress/database/schema.dbml`
+
+**Visualizing the Schema:**
+1. Run `pnpm db:dbml` to generate fresh DBML
+2. Copy contents to [dbdiagram.io](https://dbdiagram.io/d)
+3. Drag tables to arrange layout
+4. Export as PNG/SVG for documentation
 
 ### Content Population
 
