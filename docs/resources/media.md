@@ -57,7 +57,7 @@ wideLayout: true
   icon="document"
   title="The New Normalized OHDF"
   meta="Technical deep dive • PDF"
-  description="Technical overview of the OASIS Heimdall Data Format (OHDF) and how it enables unified security data analysis."
+  description="Technical overview of the OASIS MITRE Heimdall(tm) Data Format (OHDF) and how it enables unified security data analysis."
   action="Download PDF"
   download
 />
@@ -88,9 +88,9 @@ wideLayout: true
 <MediaCard
   href="/MITRE-SAF-Vulcan.pdf"
   icon="presentation"
-  title="Vulcan Webinar"
+  title="MITRE Vulcan(tm) Webinar"
   meta="Product demo • PDF"
-  description="Introduction to Vulcan, the SAF security guidance authoring platform for creating and managing security baselines."
+  description="Introduction to MITRE Vulcan(tm), the MITRE SAF(tm) security guidance authoring platform for creating and managing security baselines."
   action="Download Slides"
   download
 />

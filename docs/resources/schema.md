@@ -7,7 +7,7 @@ wideLayout: true
 
 # HDF Schema Reference
 
-The Heimdall Data Format (HDF) schema defines the structure for security assessment results. The schema is a [JSON Schema](https://json-schema.org/) document maintained in the [heimdall2 repository](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json).
+The MITRE Heimdall(tm) Data Format (HDF) schema defines the structure for security assessment results. The schema is a [JSON Schema](https://json-schema.org/) document maintained in the [heimdall2 repository](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json).
 
 **[View Schema on GitHub](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json)** | **[HDF Examples](/resources/)** | **[Download Schema](/exec-json-schema.json)**
 
@@ -122,7 +122,7 @@ npx ajv-cli validate \
   -s https://raw.githubusercontent.com/mitre/heimdall2/master/libs/inspecjs/schemas/exec-json.json \
   -d my-results.json
 
-# Using SAF CLI (validates during conversion)
+# Using MITRE SAF CLI(tm) (validates during conversion)
 saf convert nikto2hdf -i scan.json -o results.json
 ```
 
@@ -130,6 +130,6 @@ saf convert nikto2hdf -i scan.json -o results.json
 
 - **[HDF Examples](/resources/)** — Minimal examples and real conversion walkthroughs
 - **[Normalize](/framework/normalize)** — Why normalization matters and which tools are supported
-- **[SAF CLI](/apps/saf-cli)** — Convert security tool output to HDF
-- **[Heimdall](/apps/heimdall)** — Visualize HDF files
+- **[MITRE SAF CLI(tm)](/apps/saf-cli)** — Convert security tool output to HDF
+- **[MITRE Heimdall(tm)](/apps/heimdall)** — Visualize HDF files
 - **[Schema Source (GitHub)](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json)** — The canonical JSON Schema definition

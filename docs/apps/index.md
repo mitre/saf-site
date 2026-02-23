@@ -12,7 +12,7 @@ import BrandIcon from '../.vitepress/theme/components/icons/BrandIcon.vue'
 const apps = [
   {
     icon: 'heimdall',
-    name: 'Heimdall',
+    name: 'MITRE Heimdall(tm)',
     description: 'Security data visualization and analysis platform. View compliance dashboards, compare results, and generate reports.',
     href: '/apps/heimdall',
     links: [
@@ -23,7 +23,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'SAF CLI',
+    name: 'MITRE SAF CLI(tm)',
     description: 'Command-line tool for security automation. Convert security tool outputs to HDF, generate InSpec profiles, and more.',
     href: '/apps/saf-cli',
     links: [
@@ -34,7 +34,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'Vulcan',
+    name: 'MITRE Vulcan(tm)',
     description: 'Security guidance authoring tool. Create and edit security requirements documents that serve as the foundation for automation.',
     href: '/apps/vulcan',
     links: [
@@ -45,7 +45,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'eMASSer',
+    name: 'MITRE eMASSer(tm)',
     description: 'eMASS integration tool. Automate interactions with Enterprise Mission Assurance Support Service to keep compliance packages up to date.',
     href: '/apps/emasser',
     links: [
@@ -67,25 +67,25 @@ const apps = [
 const gettingStarted = [
   {
     title: 'New to Security Automation?',
-    description: 'Start by validating your systems with existing InSpec profiles, then visualize the results in Heimdall.',
+    description: 'Start by validating your systems with existing InSpec profiles, then visualize the results in MITRE Heimdall(tm).',
     links: [
       { label: 'Browse Security Profiles', href: '/content/' },
-      { label: 'Learn About Heimdall', href: '/apps/heimdall' }
+      { label: 'Learn About MITRE Heimdall(tm)', href: '/apps/heimdall' }
     ]
   },
   {
     title: 'Already Running Security Scans?',
-    description: 'Use SAF CLI to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.',
+    description: 'Use MITRE SAF CLI(tm) to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.',
     links: [
-      { label: 'Learn About SAF CLI', href: '/apps/saf-cli' },
+      { label: 'Learn About MITRE SAF CLI(tm)', href: '/apps/saf-cli' },
       { label: 'Normalization Guide', href: '/framework/normalize' }
     ]
   },
   {
     title: 'Creating Custom Requirements?',
-    description: 'Use Vulcan to author security guidance documents, then generate InSpec profiles from your requirements.',
+    description: 'Use MITRE Vulcan(tm) to author security guidance documents, then generate InSpec profiles from your requirements.',
     links: [
-      { label: 'Learn About Vulcan', href: '/apps/vulcan' },
+      { label: 'Learn About MITRE Vulcan(tm)', href: '/apps/vulcan' },
       { label: 'Planning Guide', href: '/framework/plan' }
     ]
   }
