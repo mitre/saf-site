@@ -8,11 +8,14 @@ hero:
   tagline: Open source security testing and compliance automation toolkit
   actions:
     - theme: brand
-      text: Get Started
-      link: /docs/
+      text: Explore Framework
+      link: /framework/
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/mitre/saf
+      text: MITRE SAF(tm) Apps
+      link: /apps/
+    - theme: alt
+      text: View Automation Content
+      link: /content/
 ---
 
 <script setup>
@@ -28,7 +31,7 @@ const pillars = [
     pillar: 'plan',
     title: 'PLAN',
     description: 'Select, tailor, and create security guidance content appropriate for your mission.',
-    body: 'Use Vulcan to create and manage security baselines to implement security requirements.',
+    body: 'Use MITRE Vulcan(tm) to create and manage security baselines to implement security requirements.',
     href: '/framework/plan'
   },
   {
@@ -56,7 +59,7 @@ const pillars = [
     pillar: 'visualize',
     title: 'VISUALIZE',
     description: 'Identify overall security status and deep-dive to resolve specific security defects.',
-    body: 'Use the MITRE SAF(tm) Heimdall Lite/Server to visualize security status across all security tools and even to share with your organization\'s reporting / GRC tools.',
+    body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and even to share with your organization\'s reporting / GRC tools.',
     href: '/framework/visualize'
   }
 ]
@@ -81,23 +84,23 @@ const values = [
 
 const toolset = [
   {
-    name: 'SAF CLI',
+    name: 'MITRE SAF CLI(tm)',
     icon: 'saf',
     description: 'The MITRE SAF(tm) Command Line Interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to HDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
-    name: 'Heimdall',
+    name: 'MITRE Heimdall(tm)',
     icon: 'heimdall',
-    description: 'Heimdall is MITRE SAF\'s(tm) visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
+    description: 'MITRE Heimdall(tm) is the MITRE SAF(tm) visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
-    name: 'Vulcan',
+    name: 'MITRE Vulcan(tm)',
     icon: 'saf',
-    description: 'The MITRE SAF(tm) Vulcan application allows users to create security guidance utilizing the Security Requirements Guides. Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
+    description: 'MITRE Vulcan(tm) allows users to create security guidance utilizing the Security Requirements Guides. MITRE Vulcan(tm) streamlines the process to help authors concentrate on writing quality security guidance.',
     pillars: ['plan'],
     href: '/apps/vulcan'
   },
@@ -109,9 +112,9 @@ const toolset = [
     href: '/content/'
   },
   {
-    name: 'eMASS',
+    name: 'MITRE eMASSer(tm)',
     icon: 'saf',
-    description: 'eMASS integration with MITRE SAF(tm) provides automated workflows to support continuous monitoring and assessment workflows.',
+    description: 'MITRE eMASSer(tm) provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
     pillars: ['normalize'],
     href: '/apps/emasser'
   },
@@ -146,11 +149,11 @@ const userStories = [
   },
   {
     question: '"How do I manage a diverse set of security data?"',
-    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the Heimdall Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
+    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the MITRE Heimdall(tm) Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
   },
   {
     question: '"How do I provide sufficient evidence to authorize (or ATO) my system?"',
-    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. Heimdall and the SAF CLI can generate robust reports for your data to illustrate a positive security posture.'
+    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. MITRE Heimdall(tm) and the MITRE SAF CLI(tm) can generate robust reports for your data to illustrate a positive security posture.'
   }
 ]
 
@@ -223,22 +226,22 @@ const getStartedCards = [
   </template>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div v-for="tool in toolset" :key="tool.name" class="tool-card">
-      <a :href="tool.href" class="tool-card-header">
+    <a v-for="tool in toolset" :key="tool.name" :href="tool.href" class="tool-card">
+      <div class="tool-card-header">
         <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" />
         <BookText v-else :size="40" class="text-[--vp-c-brand-1]" />
         <h3 class="tool-card-title">{{ tool.name }}</h3>
-      </a>
+      </div>
       <p class="tool-card-description">{{ tool.description }}</p>
       <div class="tool-card-pillars">
         <span class="pillar-label">Supports Capabilities:</span>
         <div class="pillar-icons-centered">
-          <a v-for="pillar in tool.pillars" :key="pillar" :href="`/framework/${pillar}`" class="pillar-icon-link">
+          <a v-for="pillar in tool.pillars" :key="pillar" :href="`/framework/${pillar}`" class="pillar-icon-link" @click.stop>
             <PillarIcon :pillar="pillar" :size="48" />
           </a>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 </PageSection>
 
@@ -491,6 +494,8 @@ const getStartedCards = [
   border-radius: 0.5rem;
   border: 1px solid var(--vp-c-divider);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none !important;
+  cursor: pointer;
 }
 
 .tool-card:hover {
@@ -498,12 +503,21 @@ const getStartedCards = [
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Override VitePress .vp-doc a link styles inside tool cards */
+.vp-doc .tool-card,
+.vp-doc .tool-card:hover,
+.vp-doc .tool-card p,
+.vp-doc .tool-card span,
+.vp-doc .tool-card h3 {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
 .tool-card-header {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  text-decoration: none !important;
   margin-bottom: 1rem;
 }
 
@@ -526,6 +540,7 @@ const getStartedCards = [
   line-height: 1.6;
   color: var(--vp-c-text-2);
   margin: 0 0 1.5rem 0;
+  flex: 1;
 }
 
 .tool-card-pillars {
@@ -535,6 +550,7 @@ const getStartedCards = [
   gap: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--vp-c-divider);
+  margin-top: auto;
 }
 
 .pillar-label {

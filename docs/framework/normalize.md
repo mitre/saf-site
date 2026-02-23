@@ -10,7 +10,7 @@ import { RefreshCw, ArrowLeftRight, Database, GitCompare, TrendingUp, CheckCircl
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const normalizeTools = [
-  { name: 'SAF CLI', href: '/apps/saf-cli' }
+  { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
 ]
 
 const toolCategories = [
@@ -73,8 +73,8 @@ const toolCategories = [
 <PageSection
   orientation="vertical"
   headline="The Solution"
-  title="Heimdall Data Format (HDF)"
-  description="MITRE SAF(tm) uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. The SAF CLI provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
+  title="MITRE Heimdall(tm) Data Format (HDF)"
+  description="MITRE SAF(tm) uses the MITRE Heimdall(tm) Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI(tm) provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
   :links="[
     { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },
     { label: 'InSpecJS Library', href: '/content/inspecjs', variant: 'outline' }
@@ -132,7 +132,7 @@ const toolCategories = [
   orientation="vertical"
   headline="Supported Tools"
   title="Convert From Any Security Tool"
-  description="SAF CLI provides converters for a wide range of security tools across different categories. Each converter transforms the tool's native output format into HDF, enabling unified analysis in Heimdall."
+  description="MITRE SAF CLI(tm) provides converters for a wide range of security tools across different categories. Each converter transforms the tool's native output format into HDF, enabling unified analysis in MITRE Heimdall(tm)."
 >
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div v-for="category in toolCategories" :key="category.title" class="tool-card block p-6 bg-card rounded-lg border border-border">
@@ -169,15 +169,15 @@ const toolCategories = [
 <PageSection
   orientation="horizontal"
   headline="Tools"
-  title="Normalize with SAF CLI"
-  description="Use the SAF CLI to convert security tool outputs into HDF and export results for reporting."
+  title="Normalize with MITRE SAF CLI(tm)"
+  description="Use MITRE SAF CLI(tm) to convert security tool outputs into HDF and export results for reporting."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'SAF CLI Converters',
-          description: 'Convert security scan results from 20+ tools into Heimdall Data Format (HDF) using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
+          title: 'MITRE SAF CLI(tm) Converters',
+          description: 'Convert security scan results from 20+ tools into MITRE Heimdall(tm) Data Format (HDF) using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
           href: '/apps/saf-cli'
         },
         {
