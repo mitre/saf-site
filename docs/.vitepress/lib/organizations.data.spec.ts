@@ -1,12 +1,15 @@
 /**
  * Integration tests for organizations data loader
  * Validates that logo paths are correct and all organizations have required fields
+ *
+ * These tests require a running Pocketbase instance. They are automatically
+ * skipped when Pocketbase is not available (e.g. in CI without a database).
  */
 
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import PocketBase from 'pocketbase'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const pbUrl = process.env.PB_URL || 'http://localhost:8090'
 const pbEmail = process.env.PB_ADMIN_EMAIL || 'admin@localhost.com'
@@ -21,8 +24,39 @@ interface Organization {
   website?: string
 }
 
+/**
+ * Check whether Pocketbase is reachable and we can authenticate.
+ * Returns true if the connection succeeds, false otherwise.
+ */
+async function isPocketbaseAvailable(): Promise<boolean> {
+  try {
+    const pb = new PocketBase(pbUrl)
+    await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
+let pbAvailable = false
+
+beforeAll(async () => {
+  pbAvailable = await isPocketbaseAvailable()
+  if (!pbAvailable) {
+    console.warn(
+      `[SKIP] Pocketbase is not reachable at ${pbUrl}. `
+      + 'Skipping organizations data loader integration tests. '
+      + 'Start Pocketbase to run these tests: cd .pocketbase && ./pocketbase serve',
+    )
+  }
+})
+
 describe('organizations data loader', () => {
-  it('loads sponsors and vendors from database', async () => {
+  it('loads sponsors and vendors from database', async ({ skip }) => {
+    if (!pbAvailable)
+      return skip()
+
     const pb = new PocketBase(pbUrl)
     await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
 
@@ -40,7 +74,10 @@ describe('organizations data loader', () => {
     expect(vendors.length).toBeGreaterThan(0)
   })
 
-  it('all organizations have required fields', async () => {
+  it('all organizations have required fields', async ({ skip }) => {
+    if (!pbAvailable)
+      return skip()
+
     const pb = new PocketBase(pbUrl)
     await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
 
@@ -55,7 +92,10 @@ describe('organizations data loader', () => {
     })
   })
 
-  it('logo paths point to existing files or are empty (BrandIcon fallback)', async () => {
+  it('logo paths point to existing files or are empty (BrandIcon fallback)', async ({ skip }) => {
+    if (!pbAvailable)
+      return skip()
+
     const pb = new PocketBase(pbUrl)
     await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
 
@@ -88,7 +128,10 @@ describe('organizations data loader', () => {
     }
   })
 
-  it('no duplicate organizations by slug', async () => {
+  it('no duplicate organizations by slug', async ({ skip }) => {
+    if (!pbAvailable)
+      return skip()
+
     const pb = new PocketBase(pbUrl)
     await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
 
@@ -100,7 +143,10 @@ describe('organizations data loader', () => {
     expect(slugs.length).toBe(uniqueSlugs.size)
   })
 
-  it('army ECMA has correct name', async () => {
+  it('army ECMA has correct name', async ({ skip }) => {
+    if (!pbAvailable)
+      return skip()
+
     const pb = new PocketBase(pbUrl)
     await pb.collection('_superusers').authWithPassword(pbEmail, pbPassword)
 

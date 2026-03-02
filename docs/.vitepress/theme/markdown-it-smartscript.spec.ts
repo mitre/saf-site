@@ -2,7 +2,6 @@
  * Tests for markdown-it-smartscript plugin
  */
 
-// @ts-expect-error -- markdown-it lacks type declarations
 import MarkdownIt from 'markdown-it'
 import { describe, expect, it } from 'vitest'
 import { markdownItSmartScript } from '../plugins/markdown-it-smartscript'

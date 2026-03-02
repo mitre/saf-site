@@ -8,9 +8,7 @@
  * - (c) or (C) → ©
  */
 
-// @ts-expect-error -- markdown-it lacks type declarations
 import type MarkdownIt from 'markdown-it'
-// @ts-expect-error -- markdown-it lacks type declarations
 import type StateCore from 'markdown-it/lib/rules_core/state_core.mjs'
 
 export interface SmartScriptOptions {

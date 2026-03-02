@@ -10,8 +10,8 @@ import { FileSearch, PenTool } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const planTools = [
-  { name: 'Vulcan', iconName: 'saf', href: '/apps/vulcan' },
-  { name: 'SAF CLI', href: '/apps/saf-cli' }
+  { name: 'MITRE Vulcan(tm)', iconName: 'saf', href: '/apps/vulcan' },
+  { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
 ]
 </script>
 
@@ -53,7 +53,7 @@ const planTools = [
       {
         icon: PenTool,
         title: 'Create New Documentation',
-        description: 'Build security guidance for software components that lack government or industry standards. Author InSpec profiles to define security requirements and provide clear configuration guidance for your customers. Use Vulcan to create comprehensive security validation profiles that document security controls and testing procedures.'
+        description: 'Build security guidance for software components that lack government or industry standards. Author InSpec profiles to define security requirements and provide clear configuration guidance for your customers. Use MITRE Vulcan(tm) to create comprehensive security validation profiles that document security controls and testing procedures.'
       }
     ]"
     gap="lg"
@@ -64,19 +64,19 @@ const planTools = [
   orientation="horizontal"
   headline="Tools"
   title="Plan with SAF Tools"
-  description="Use Vulcan to author security guidance or browse our content library for existing baselines."
+  description="Use MITRE Vulcan(tm) to author security guidance or browse our content library for existing baselines."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'Vulcan',
+          title: 'MITRE Vulcan(tm)',
           description: 'Author and edit security guidance documents that serve as a basis for later automation content. Create comprehensive documentation of security requirements, controls, and validation procedures.',
           href: '/apps/vulcan'
         },
         {
-          title: 'SAF CLI',
-          description: 'Build the foundation of an InSpec profile from your security guidance documents using SAF CLI.',
+          title: 'MITRE SAF CLI(tm)',
+          description: 'Build the foundation of an InSpec profile from your security guidance documents using MITRE SAF CLI(tm).',
           href: '/apps/saf-cli'
         }
       ]"

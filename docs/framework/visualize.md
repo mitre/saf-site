@@ -10,16 +10,16 @@ import { BarChart3, Users, TrendingUp, FileText } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const visualizeTools = [
-  { name: 'Heimdall', href: '/apps/heimdall' }
+  { name: 'MITRE Heimdall(tm)', href: '/apps/heimdall' }
 ]
 </script>
 
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, Heimdall provides the visualization tools to communicate security posture effectively."
+  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, MITRE Heimdall(tm) provides the visualization tools to communicate security posture effectively."
   :links="[
-    { label: 'View Heimdall', href: '/apps/heimdall', variant: 'default' },
+    { label: 'View MITRE Heimdall(tm)', href: '/apps/heimdall', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -46,8 +46,8 @@ const visualizeTools = [
 <PageSection
   orientation="vertical"
   headline="The Solution"
-  title="Heimdall - Security Visualization Platform"
-  description="Heimdall transforms Heimdall Data Format (HDF) security results (or, to put it another way, the output of the Normalize pillar) into interactive dashboards and comprehensive reports. Upload validation results from InSpec or any other security data source with an HDF converter; Heimdall will automatically translate it into HDF and store it in a centralized database. View aggregated compliance statistics across your entire infrastructure, drill down into specific failures, compare results over time, and export reports for stakeholders."
+  title="MITRE Heimdall(tm) - Security Visualization Platform"
+  description="MITRE Heimdall(tm) transforms MITRE Heimdall(tm) Data Format (HDF) security results (or, to put it another way, the output of the Normalize pillar) into interactive dashboards and comprehensive reports. Upload validation results from InSpec or any other security data source with an HDF converter; MITRE Heimdall(tm) will automatically translate it into HDF and store it in a centralized database. View aggregated compliance statistics across your entire infrastructure, drill down into specific failures, compare results over time, and export reports for stakeholders."
 >
   <FeatureList
     :items="[
@@ -79,15 +79,15 @@ const visualizeTools = [
 <PageSection
   orientation="horizontal"
   headline="Tools"
-  title="Visualize with Heimdall"
-  description="Use Heimdall to view, analyze, and report on security validation results across your infrastructure."
+  title="Visualize with MITRE Heimdall(tm)"
+  description="Use MITRE Heimdall(tm) to view, analyze, and report on security validation results across your infrastructure."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'Heimdall Dashboard',
-          description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by SAF CLI, or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
+          title: 'MITRE Heimdall(tm) Dashboard',
+          description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by MITRE SAF CLI(tm), or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
           href: '/apps/heimdall'
         },
         {

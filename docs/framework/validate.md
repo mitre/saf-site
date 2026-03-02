@@ -11,7 +11,7 @@ import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const validateTools = [
   { name: 'InSpec', href: '/content/?technology=InSpec' },
-  { name: 'SAF CLI', href: '/apps/saf-cli' }
+  { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
 ]
 </script>
 
@@ -48,7 +48,7 @@ const validateTools = [
       {
         icon: TestTube2,
         title: 'Security Compliance Testing',
-        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the Heimdall Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
+        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the MITRE Heimdall(tm) Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
       },
       {
         icon: Repeat2,
@@ -69,7 +69,7 @@ const validateTools = [
   orientation="horizontal"
   headline="Tools"
   title="Validate with SAF"
-  description="Use InSpec profiles from our content library and accelerate profile development with SAF CLI."
+  description="Use InSpec profiles from our content library and accelerate profile development with MITRE SAF CLI(tm)."
 >
   <template #body>
     <FeatureList
@@ -80,8 +80,8 @@ const validateTools = [
           href: '/content/?pillar=validate'
         },
         {
-          title: 'SAF CLI',
-          description: 'Rapidly generate the scaffolding for an InSpec testing profile using a benchmark document (STIGs, CIS Benchmarks) and the SAF CLI. Use SAF CLI to accelerate updates to test profiles when new benchmarks are released.',
+          title: 'MITRE SAF CLI(tm)',
+          description: 'Rapidly generate the scaffolding for an InSpec testing profile using a benchmark document (STIGs, CIS Benchmarks) and the MITRE SAF CLI(tm). Use MITRE SAF CLI(tm) to accelerate updates to test profiles when new benchmarks are released.',
           href: '/apps/saf-cli'
         }
       ]"

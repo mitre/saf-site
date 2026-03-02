@@ -262,6 +262,22 @@
   max-width: none !important;
 }
 
+/* Homepage only: full-width colored section backgrounds.
+   VPHome is the VitePress wrapper for layout: home pages.
+   The 100vw breakout extends muted/dark PageSections edge-to-edge,
+   and overflow-x: clip prevents the horizontal scrollbar. */
+.VPHome {
+  overflow-x: clip;
+}
+
+.VPHome .page-section--muted,
+.VPHome .page-section--dark {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+}
+
 /* MITRE logo - white in dark mode, blue (original) in light mode */
 /* Dark mode image filter: .dark (VitePress) or .htw-dark (Histoire) */
 .dark img[src*="/icons/mitre-m"],

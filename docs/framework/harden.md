@@ -81,8 +81,8 @@ const hardenTools = [
           href: '/content/?pillar=harden'
         },
         {
-          title: 'SAF CLI',
-          description: 'Convert security guidance documents like XCCDF benchmarks into Ansible playbooks and other automation formats. Generate hardening content from security requirements using SAF CLI conversion tools.',
+          title: 'MITRE SAF CLI(tm)',
+          description: 'Convert security guidance documents like XCCDF benchmarks into Ansible playbooks and other automation formats. Generate hardening content from security requirements using MITRE SAF CLI(tm) conversion tools.',
           href: '/apps/saf-cli'
         }
       ]"

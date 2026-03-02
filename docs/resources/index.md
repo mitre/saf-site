@@ -7,7 +7,7 @@ wideLayout: true
 
 # HDF Examples
 
-The Heimdall Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up — starting with a minimal example, building to real-world conversions.
+The MITRE Heimdall(tm) Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up — starting with a minimal example, building to real-world conversions.
 
 **[HDF Schema](/resources/schema)** | **[Normalize](/framework/normalize)**
 
@@ -125,7 +125,7 @@ Nikto produces a flat JSON file with a list of vulnerabilities. Each finding has
 }
 ```
 
-### Convert with SAF CLI
+### Convert with MITRE SAF CLI(tm)
 
 ```bash
 saf convert nikto2hdf -i nikto-scan.json -o nikto-hdf.json
@@ -203,7 +203,7 @@ The same findings now have a consistent structure — each vulnerability becomes
 MITRE SAF's converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization — enriching sparse tool output with the metadata needed for unified compliance analysis.
 :::
 
-This normalized output can be viewed in [Heimdall](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that the SAF CLI uses to convert data are built into Heimdall, meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to Heimdall and it will be displayed as HDF automatically.
+This normalized output can be viewed in [MITRE Heimdall(tm)](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that MITRE SAF CLI(tm) uses to convert data are built into MITRE Heimdall(tm), meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to MITRE Heimdall(tm) and it will be displayed as HDF automatically.
 
 ### CIS Benchmark Template
 
