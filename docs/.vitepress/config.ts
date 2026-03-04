@@ -1,3 +1,4 @@
+import type { HeadConfig } from 'vitepress'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
@@ -90,6 +91,13 @@ export default defineConfig({
     ['script', { src: 'https://cmp.osano.com/AzyhULTdPkqmy4aDN/f0e8e901-3feb-47c4-bd04-96df98c75dab/osano.js' }],
     // Hide Osano's default widget (we trigger via footer link instead)
     ['style', {}, '.osano-cm-widget{display: none;}'],
+    // Google Analytics 4 (only when VITE_GA_ID is set)
+    ...(process.env.VITE_GA_ID
+      ? [
+          ['script', { async: '', src: `https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_ID}` }] satisfies HeadConfig,
+          ['script', {}, `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${process.env.VITE_GA_ID}');`] satisfies HeadConfig,
+        ]
+      : []),
   ],
 
   themeConfig: {
