@@ -10,11 +10,7 @@ import { RefreshCw, ArrowLeftRight, Database, GitCompare, TrendingUp, CheckCircl
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const normalizeTools = [
-<<<<<<< HEAD
-  { name: 'SAF CLI', href: '/apps/saf-cli' }
-=======
   { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
->>>>>>> framework
 ]
 
 const toolCategories = [
@@ -77,13 +73,8 @@ const toolCategories = [
 <PageSection
   orientation="vertical"
   headline="The Solution"
-<<<<<<< HEAD
-  title="Heimdall Data Format (HDF)"
-  description="MITRE SAF(tm) uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. The SAF CLI provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
-=======
   title="MITRE Heimdall(tm) Data Format (HDF)"
   description="MITRE SAF(tm) uses the MITRE Heimdall(tm) Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI(tm) provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
->>>>>>> framework
   :links="[
     { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },
     { label: 'InSpecJS Library', href: '/content/inspecjs', variant: 'outline' }

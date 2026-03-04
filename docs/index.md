@@ -11,16 +11,11 @@ hero:
       text: Explore Framework
       link: /framework/
     - theme: alt
-<<<<<<< HEAD
-      text: View on GitHub
-      link: https://github.com/mitre/saf
-=======
       text: MITRE SAF(tm) Apps
       link: /apps/
     - theme: alt
       text: View Automation Content
       link: /content/
->>>>>>> framework
 ---
 
 <script setup>
@@ -36,11 +31,7 @@ const pillars = [
     pillar: 'plan',
     title: 'PLAN',
     description: 'Select, tailor, and create security guidance content appropriate for your mission.',
-<<<<<<< HEAD
-    body: 'Use Vulcan to create and manage security baselines to implement security requirements.',
-=======
     body: 'Use MITRE Vulcan(tm) to create and manage security baselines to implement security requirements.',
->>>>>>> framework
     href: '/framework/plan'
   },
   {
@@ -68,11 +59,7 @@ const pillars = [
     pillar: 'visualize',
     title: 'VISUALIZE',
     description: 'Identify overall security status and deep-dive to resolve specific security defects.',
-<<<<<<< HEAD
-    body: 'Use the MITRE SAF(tm) Heimdall Lite/Server to visualize security status across all security tools and even to share with your organization\'s reporting / GRC tools.',
-=======
     body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and even to share with your organization\'s reporting / GRC tools.',
->>>>>>> framework
     href: '/framework/visualize'
   }
 ]
@@ -97,39 +84,23 @@ const values = [
 
 const toolset = [
   {
-<<<<<<< HEAD
-    name: 'SAF CLI',
-=======
     name: 'MITRE SAF CLI(tm)',
->>>>>>> framework
     icon: 'saf',
     description: 'The MITRE SAF(tm) Command Line Interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to HDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
-<<<<<<< HEAD
-    name: 'Heimdall',
-    icon: 'heimdall',
-    description: 'Heimdall is MITRE SAF\'s(tm) visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
-=======
     name: 'MITRE Heimdall(tm)',
     icon: 'heimdall',
     description: 'MITRE Heimdall(tm) is the MITRE SAF(tm) visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
->>>>>>> framework
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
-<<<<<<< HEAD
-    name: 'Vulcan',
-    icon: 'saf',
-    description: 'The MITRE SAF(tm) Vulcan application allows users to create security guidance utilizing the Security Requirements Guides. Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
-=======
     name: 'MITRE Vulcan(tm)',
     icon: 'saf',
     description: 'MITRE Vulcan(tm) allows users to create security guidance utilizing the Security Requirements Guides. MITRE Vulcan(tm) streamlines the process to help authors concentrate on writing quality security guidance.',
->>>>>>> framework
     pillars: ['plan'],
     href: '/apps/vulcan'
   },
@@ -141,15 +112,9 @@ const toolset = [
     href: '/content/'
   },
   {
-<<<<<<< HEAD
-    name: 'eMASS',
-    icon: 'saf',
-    description: 'eMASS integration with MITRE SAF(tm) provides automated workflows to support continuous monitoring and assessment workflows.',
-=======
     name: 'MITRE eMASSer(tm)',
     icon: 'saf',
     description: 'MITRE eMASSer(tm) provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
->>>>>>> framework
     pillars: ['normalize'],
     href: '/apps/emasser'
   },
@@ -184,19 +149,11 @@ const userStories = [
   },
   {
     question: '"How do I manage a diverse set of security data?"',
-<<<<<<< HEAD
-    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the Heimdall Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
-  },
-  {
-    question: '"How do I provide sufficient evidence to authorize (or ATO) my system?"',
-    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. Heimdall and the SAF CLI can generate robust reports for your data to illustrate a positive security posture.'
-=======
     answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the MITRE Heimdall(tm) Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
   },
   {
     question: '"How do I provide sufficient evidence to authorize (or ATO) my system?"',
     answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. MITRE Heimdall(tm) and the MITRE SAF CLI(tm) can generate robust reports for your data to illustrate a positive security posture.'
->>>>>>> framework
   }
 ]
 
