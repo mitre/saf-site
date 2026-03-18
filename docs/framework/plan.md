@@ -48,12 +48,12 @@ const planTools = [
       {
         icon: FileSearch,
         title: 'Find Existing Guidance',
-        description: 'Discover which STIGs, CIS Benchmarks, and security baselines apply to your technology stack. Browse our content library to find validated InSpec profiles and hardening guides for common software components.'
+        description: 'Discover which Security Technical Implementation Guides (STIGs), Center for Internet Security (CIS) Benchmarks, and security baselines apply to your technology stack. Browse our content library to find validated InSpec profiles and hardening guides for common software components.'
       },
       {
         icon: PenTool,
         title: 'Create New Documentation',
-        description: 'Build security guidance for software components that lack government or industry standards. Author InSpec profiles to define security requirements and provide clear configuration guidance for your customers. Use MITRE Vulcan(tm) to create comprehensive security validation profiles that document security controls and testing procedures.'
+        description: 'Build security guidance for software components that lack government or industry standards. Author InSpec profiles to define security requirements and provide clear configuration guidance for your customers. Use MITRE Vulcan to create comprehensive security validation profiles that document security controls and testing procedures.'
       }
     ]"
     gap="lg"
@@ -64,19 +64,19 @@ const planTools = [
   orientation="horizontal"
   headline="Tools"
   title="Plan with SAF Tools"
-  description="Use MITRE Vulcan(tm) to author security guidance or browse our content library for existing baselines."
+  description="Use MITRE Vulcan to author security guidance or browse our content library for existing baselines."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'MITRE Vulcan(tm)',
+          title: 'MITRE Vulcan',
           description: 'Author and edit security guidance documents that serve as a basis for later automation content. Create comprehensive documentation of security requirements, controls, and validation procedures.',
           href: '/apps/vulcan'
         },
         {
-          title: 'MITRE SAF CLI(tm)',
-          description: 'Build the foundation of an InSpec profile from your security guidance documents using MITRE SAF CLI(tm).',
+          title: 'MITRE SAF CLI',
+          description: 'Build the foundation of an InSpec profile from your security guidance documents using MITRE SAF CLI.',
           href: '/apps/saf-cli'
         }
       ]"

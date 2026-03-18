@@ -41,7 +41,7 @@ const validateTools = [
   orientation="vertical"
   headline="Use Cases"
   title="Automated Security Testing"
-  description="The Validate pillar enables continuous security compliance through automated testing. Validate a wide variety of common system components regardless of deployment strategy -- cloud platforms, container images, virtual machines, databases, network equipment, and more. Run InSpec profiles to validate systems against STIGs, CIS Benchmarks, and custom security baselines."
+  description="The Validate pillar enables continuous security compliance through automated testing. Validate a wide variety of common system components regardless of deployment strategy—cloud platforms, container images, virtual machines, databases, network equipment, and more. Run InSpec profiles to validate systems against STIGs, CIS Benchmarks, and custom security baselines."
 >
   <FeatureList
     :items="[
@@ -53,7 +53,7 @@ const validateTools = [
       {
         icon: Repeat2,
         title: 'Continuous Validation',
-        description: 'Integrate security testing into your CI/CD pipeline. Validate container images before deployment, test infrastructure changes before they reach production, and monitor running systems for configuration drift. Catch security issues early when they\'re easiest to fix.'
+        description: 'Integrate security testing into your continuous integration/continuous delivery (CI/CD) pipeline. Validate container images before deployment, test infrastructure changes before they reach production, and monitor running systems for configuration drift. Catch security issues early when they\'re easiest to fix.'
       },
       {
         icon: Zap,
@@ -69,7 +69,7 @@ const validateTools = [
   orientation="horizontal"
   headline="Tools"
   title="Validate with SAF"
-  description="Use InSpec profiles from our content library and accelerate profile development with MITRE SAF CLI(tm)."
+  description="Use InSpec profiles from our content library and accelerate profile development with MITRE SAF CLI."
 >
   <template #body>
     <FeatureList
@@ -80,8 +80,8 @@ const validateTools = [
           href: '/content/?pillar=validate'
         },
         {
-          title: 'MITRE SAF CLI(tm)',
-          description: 'Rapidly generate the scaffolding for an InSpec testing profile using a benchmark document (STIGs, CIS Benchmarks) and the MITRE SAF CLI(tm). Use MITRE SAF CLI(tm) to accelerate updates to test profiles when new benchmarks are released.',
+          title: 'MITRE SAF CLI',
+          description: 'Rapidly generate the scaffolding for an InSpec testing profile using a benchmark document (STIGs, CIS Benchmarks) and the MITRE SAF CLI. Use MITRE SAF CLI to accelerate updates to test profiles when new benchmarks are released.',
           href: '/apps/saf-cli'
         }
       ]"

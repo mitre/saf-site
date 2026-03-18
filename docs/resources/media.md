@@ -7,16 +7,16 @@ wideLayout: true
 
 <PageSection
   orientation="vertical"
-  headline="MITRE SAF Resources"
+  headline="MITRE SAF(tm) Resources"
   title="Media & Downloads"
-  description="Download whitepapers, presentations, and training materials to learn about the MITRE Security Automation Framework and share it with your organization."
+  description="Download white papers, presentations, and training materials to learn about the MITRE Security Automation Framework and share it with your organization."
 />
 
 <PageSection
   variant="muted"
   orientation="vertical"
   headline="Documentation"
-  title="Whitepapers & Guides"
+  title="White Papers & Guides"
   description="Comprehensive guides covering SAF capabilities, best practices, and implementation strategies."
 >
 
@@ -27,7 +27,7 @@ wideLayout: true
   icon="document"
   title="How to Use MITRE SAF"
   meta="One-page overview • PDF"
-  description="Slick sheet on MITRE SAF's(tm) capabilities in relation to planning, development, assessment, and operations."
+  description="Slick sheet on MITRE SAF's capabilities in relation to planning, development, assessment, and operations."
   action="Download PDF"
   download
 />
@@ -37,7 +37,7 @@ wideLayout: true
   icon="document"
   title="DevSecOps Best Practices"
   meta="Implementation guide • PDF"
-  description="Guidance on implementing DevSecOps pipelines with MITRE SAF(tm) tools for continuous security testing and compliance automation."
+  description="Guidance on implementing DevSecOps pipelines with MITRE SAF tools for continuous security testing and compliance automation."
   action="Download PDF"
   download
 />
@@ -47,7 +47,7 @@ wideLayout: true
   icon="document"
   title="Executive Summary"
   meta="Leadership overview • PDF"
-  description="High-level overview of MITRE SAF(tm) capabilities and benefits for organizational leadership and decision-makers."
+  description="High-level overview of MITRE SAF capabilities and benefits for organizational leadership and decision makers."
   action="Download PDF"
   download
 />
@@ -70,7 +70,7 @@ wideLayout: true
   orientation="vertical"
   headline="Presentations"
   title="Conference Talks & Webinars"
-  description="Slides from MITRE SAF(tm) team presentations at industry conferences and community events."
+  description="Slides from MITRE SAF team presentations at industry conferences and community events."
 >
 
 <CardGrid>
@@ -78,7 +78,7 @@ wideLayout: true
 <MediaCard
   href="/SCAP-InSpec-Comparison.pdf"
   icon="presentation"
-  title="SCAP vs InSpec Comparison"
+  title="Security Content Automation Protocol (SCAP) vs InSpec Comparison"
   meta="Technical comparison • PDF"
   description="Side-by-side comparison of SCAP and InSpec for compliance automation, covering strengths, limitations, and use cases."
   action="Download Slides"
@@ -90,7 +90,7 @@ wideLayout: true
   icon="presentation"
   title="MITRE Vulcan(tm) Webinar"
   meta="Product demo • PDF"
-  description="Introduction to MITRE Vulcan(tm), the MITRE SAF(tm) security guidance authoring platform for creating and managing security baselines."
+  description="Introduction to MITRE Vulcan, the MITRE SAF security guidance authoring platform for creating and managing security baselines."
   action="Download Slides"
   download
 />
@@ -114,7 +114,7 @@ wideLayout: true
   orientation="vertical"
   headline="Additional Resources"
   title="External Documentation"
-  description="Links to documentation for InSpec and related security automation tools frequently used by MITRE SAF(tm)."
+  description="Links to documentation for InSpec and related security automation tools frequently used by MITRE SAF."
 >
 
 <CardGrid :columns="3">

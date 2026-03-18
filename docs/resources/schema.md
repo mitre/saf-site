@@ -32,8 +32,8 @@ All four fields are required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `name` | string | Yes | Platform name (e.g. `"ubuntu"`, `"windows"`) |
-| `release` | string | Yes | Platform version (e.g. `"22.04"`, `"10.0.19041"`) |
+| `name` | string | Yes | Platform name (e.g., `"ubuntu"`, `"windows"`) |
+| `release` | string | Yes | Platform version (e.g., `"22.04"`, `"10.0.19041"`) |
 | `target_id` | string | No | Additional identifier (hostname, IP, etc.) |
 
 ## Profile
@@ -52,7 +52,7 @@ All four fields are required.
 | `maintainer` | string | No | Profile maintainer |
 | `copyright` | string | No | Copyright holder |
 | `copyright_email` | string | No | Contact email |
-| `license` | string | No | License identifier (e.g. `"Apache-2.0"`) |
+| `license` | string | No | License identifier (e.g., `"Apache-2.0"`) |
 | `status` | string | No | Load status (`"loaded"`, `"failed"`, `"skipped"`) |
 | `status_message` | string | No | Explanation when status is not `"loaded"` |
 | `depends` | array | No | Profile dependencies |
@@ -62,7 +62,7 @@ All four fields are required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | string | Yes | Unique control identifier (e.g. `"V-75443"`, `"C-1.1.1.1"`) |
+| `id` | string | Yes | Unique control identifier (e.g., `"V-75443"`, `"C-1.1.1.1"`) |
 | `impact` | number | Yes | Severity: `0.0`–`1.0` (0.7 = high, 0.5 = medium, 0.3 = low, 0.0 = informational) |
 | `tags` | object | Yes | Metadata tags — typically includes `nist` (NIST SP 800-53 controls) and `cci` (DoD identifiers) |
 | `refs` | array | Yes | External references (URLs, documents) |
@@ -130,6 +130,6 @@ saf convert nikto2hdf -i scan.json -o results.json
 
 - **[HDF Examples](/resources/)** — Minimal examples and real conversion walkthroughs
 - **[Normalize](/framework/normalize)** — Why normalization matters and which tools are supported
-- **[MITRE SAF CLI(tm)](/apps/saf-cli)** — Convert security tool output to HDF
-- **[MITRE Heimdall(tm)](/apps/heimdall)** — Visualize HDF files
+- **[MITRE SAF CLI](/apps/saf-cli)** — Convert security tool output to HDF
+- **[MITRE Heimdall](/apps/heimdall)** — Visualize HDF files
 - **[Schema Source (GitHub)](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json)** — The canonical JSON Schema definition

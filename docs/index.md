@@ -38,28 +38,28 @@ const pillars = [
     pillar: 'harden',
     title: 'HARDEN',
     description: 'Implement security baselines using verified Ansible, Chef, and Terraform content.',
-    body: 'Use Ansible, Terraform, Chef, and Puppet content from the MITRE SAF(tm) Hardening Library to implement security baselines.',
+    body: 'Use Ansible, Terraform, Chef, and Puppet content from the MITRE SAF Hardening Library to implement security baselines.',
     href: '/framework/harden'
   },
   {
     pillar: 'validate',
     title: 'VALIDATE',
-    description: 'Generate detailed security testing results throughout the lifecycle of a system through automated tests and manual attestation.',
-    body: 'Use InSpec content from the MITRE SAF(tm) Validation Library to assess security control compliance.',
+    description: 'Generate detailed security testing results throughout the life cycle of a system through automated tests and manual attestation.',
+    body: 'Use InSpec content from the MITRE SAF Validation Library to assess security control compliance.',
     href: '/framework/validate'
   },
   {
     pillar: 'normalize',
     title: 'NORMALIZE',
     description: 'Convert security results from all your security tools into a common data format.',
-    body: 'Use the MITRE SAF(tm) command line interface (CLI) to normalize security tool output in the OASIS Heimdall Data Format (OHDF).',
+    body: 'Use the MITRE SAF command line interface (CLI) to normalize security tool output in the OASIS Heimdall Data Format (OHDF).',
     href: '/framework/normalize'
   },
   {
     pillar: 'visualize',
     title: 'VISUALIZE',
     description: 'Identify overall security status and deep-dive to resolve specific security defects.',
-    body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and even to share with your organization\'s reporting / GRC tools.',
+    body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and share with your organization\'s governance, risk, and compliance tools.',
     href: '/framework/visualize'
   }
 ]
@@ -68,17 +68,17 @@ const values = [
   {
     icon: DollarSign,
     title: 'Free',
-    description: 'All MITRE SAF(tm) content is free to use under the Apache 2 license. The Framework is currently in use by government sponsors, vendors, and private sector companies, tailoring content for their own organizational requirements.'
+    description: 'All MITRE SAF content is free to use under the Apache 2 license. The Framework is currently in use by government sponsors, vendors, and private sector companies, tailoring content for their own organizational requirements.'
   },
   {
     icon: Github,
     title: 'Open Source',
-    description: 'MITRE SAF(tm) hosts all source code for tools and test profiles publicly on GitHub. Organizations are free to use the code or its capabilities however required.'
+    description: 'MITRE SAF hosts all source code for tools and test profiles publicly on GitHub. Organizations are free to use the code or its capabilities however required.'
   },
   {
     icon: Users,
     title: 'A Community',
-    description: 'All MITRE SAF(tm) content is generated and maintained by a robust security community of both MITRE and non-MITRE contributors; MITRE serves as the framework steward. Collaboration across the community multiplies the impact for all users.'
+    description: 'All MITRE SAF content is generated and maintained by a robust security community of both MITRE and non-MITRE contributors; MITRE serves as the framework steward. Collaboration across the community multiplies the impact for all users.'
   }
 ]
 
@@ -86,42 +86,42 @@ const toolset = [
   {
     name: 'MITRE SAF CLI(tm)',
     icon: 'saf',
-    description: 'The MITRE SAF(tm) Command Line Interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to HDF, generate InSpec profiles, and validate that security requirements have been met.',
+    description: 'The MITRE SAF command line interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to OHDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
-    name: 'MITRE Heimdall(tm)',
+    name: 'MITRE Heimdall',
     icon: 'heimdall',
-    description: 'MITRE Heimdall(tm) is the MITRE SAF(tm) visualization platform. Upload results from the baseline validations that you have run or view existing security standards, and generate reports to give to your organization\'s reporting or SIEM tools.',
+    description: 'MITRE Heimdall is the MITRE SAF visualization platform. Upload baseline validation results, view existing security standards, and generate reports for your organization\'s reporting or security information and event management tools.',
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
-    name: 'MITRE Vulcan(tm)',
+    name: 'MITRE Vulcan',
     icon: 'saf',
-    description: 'MITRE Vulcan(tm) allows users to create security guidance utilizing the Security Requirements Guides. MITRE Vulcan(tm) streamlines the process to help authors concentrate on writing quality security guidance.',
+    description: 'MITRE Vulcan allows users to create security guidance using the Security Requirements Guides. MITRE Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
     pillars: ['plan'],
     href: '/apps/vulcan'
   },
   {
     name: 'Content Library',
     icon: 'content',
-    description: 'The MITRE SAF(tm) content library includes InSpec validation profiles and Chef, Ansible, and Puppet hardening content. These can be used as a starting point or as reference material for developing your organization\'s security controls and hardening baselines.',
+    description: 'The MITRE SAF content library includes InSpec validation profiles and Chef, Ansible, and Puppet hardening content. These can be used as a starting point or as reference material for developing your organization\'s security controls and hardening baselines.',
     pillars: ['harden', 'validate'],
     href: '/content/'
   },
   {
     name: 'MITRE eMASSer(tm)',
     icon: 'saf',
-    description: 'MITRE eMASSer(tm) provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
+    description: 'MITRE eMASSer provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
     pillars: ['normalize'],
     href: '/apps/emasser'
   },
   {
     name: 'OHDF',
     icon: 'saf',
-    description: 'OASIS Heimdall Data Format (OHDF) is the common data format standard that facilitates security results analysis and consumption as a building metric, consolidate data, compare security results from a variety of tools over time, and much more.',
+    description: 'OASIS Heimdall Data Format (OHDF) is the common data format standard that facilitates security results analysis and consumption as a building metric, consolidates data, compares security results from a variety of tools over time, and much more.',
     pillars: ['normalize', 'validate'],
     href: '/framework/normalize'
   }
@@ -149,11 +149,11 @@ const userStories = [
   },
   {
     question: '"How do I manage a diverse set of security data?"',
-    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the MITRE Heimdall(tm) Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
+    answer: 'Normalization enhances the analysis of security data, facilitating wholistic system security assessments. Converting security tool output to the MITRE Heimdall Data Format enables you to aggregate data and visualize the disparate security results across all components of a stack.'
   },
   {
     question: '"How do I provide sufficient evidence to authorize (or ATO) my system?"',
-    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. MITRE Heimdall(tm) and the MITRE SAF CLI(tm) can generate robust reports for your data to illustrate a positive security posture.'
+    answer: 'Modern software environments require effective, pervasive automated testing. Each component of the stack – no matter how simple or how complex – should be regularly scanned. MITRE Heimdall and the MITRE SAF CLI can generate robust reports for your data to illustrate a positive security posture.'
   }
 ]
 
@@ -183,7 +183,7 @@ const getStartedCards = [
   variant="muted"
   orientation="vertical"
   title="Jump Start Your Security Journey"
-  description="MITRE SAF(tm) supports security processes at all stages of the software lifecycle, from planning secure system design to analyzing operational security data. All MITRE SAF(tm) tools can work in concert or standalone; adopt the parts of the Framework that make sense for your environment."
+  description="MITRE SAF supports security processes at all stages of the software life cycle, from planning secure system design to analyzing operational security data. All MITRE SAF tools can work in concert or standalone; adopt the parts of the Framework that make sense for your environment."
 >
   <div class="pillar-grid">
     <a v-for="item in pillars" :key="item.pillar" :href="item.href" class="pillar-card">
@@ -201,7 +201,7 @@ const getStartedCards = [
   orientation="vertical"
 >
   <template #title>
-    <span class="centered-title">MITRE SAF(tm) Is</span>
+    <span class="centered-title">MITRE SAF Is</span>
   </template>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <div v-for="value in values" :key="value.title" class="value-card">
@@ -219,10 +219,10 @@ const getStartedCards = [
   orientation="vertical"
 >
   <template #title>
-    <span class="centered-title">The MITRE SAF(tm) Open Source Toolset</span>
+    <span class="centered-title">The MITRE SAF Open Source Toolset</span>
   </template>
   <template #description>
-    <p class="centered-description">MITRE SAF(tm) is made up of a toolkit of utilities that support security automation. MITRE SAF(tm) is modularized into different functions so you can use whichever ones make sense for your favorite security tools. You can use MITRE SAF(tm) tools on their own, with or without a container.</p>
+    <p class="centered-description">MITRE SAF is made up of a toolkit of utilities that support security automation. MITRE SAF is modularized into different functions so you can use whichever ones make sense for your favorite security tools. You can use MITRE SAF tools on their own, with or without a container.</p>
   </template>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

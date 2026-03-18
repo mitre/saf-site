@@ -7,7 +7,7 @@ wideLayout: true
 
 # HDF Examples
 
-The MITRE Heimdall(tm) Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up — starting with a minimal example, building to real-world conversions.
+The MITRE Heimdall(tm) Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up—starting with a minimal example, building to real-world conversions.
 
 **[HDF Schema](/resources/schema)** | **[Normalize](/framework/normalize)**
 
@@ -54,16 +54,16 @@ Every HDF file follows the same top-level structure. The example below includes 
 }
 ```
 
-**Root object** — all required:
+**Root object**—all required:
 
 | Field | Purpose |
 |-------|---------|
-| `platform` | The target system assessed — contains required `name` and `release` fields |
+| `platform` | The target system assessed—contains required `name` and `release` fields |
 | `version` | Version of the tool that produced this HDF file |
-| `profiles` | Array of security baselines used for the assessment (STIG, CIS Benchmark, custom profile) |
+| `profiles` | Array of security baselines used for the assessment (Security Technical Implementation Guide (STIG), CIS Benchmark, custom profile) |
 | `statistics` | Summary data such as `duration` (all inner fields are optional) |
 
-**Profile** — required fields shown, plus common optional fields `title`, `version`, `status`, `summary`:
+**Profile**—required fields shown, plus common optional fields `title`, `version`, `status`, `summary`:
 
 | Field | Purpose |
 |-------|---------|
@@ -74,18 +74,18 @@ Every HDF file follows the same top-level structure. The example below includes 
 | `groups` | Logical groupings of controls |
 | `controls` | The individual security requirements and their results |
 
-**Control** — required fields shown, plus common optional fields `title`, `desc`, `code`:
+**Control**—required fields shown, plus common optional fields `title`, `desc`, `code`:
 
 | Field | Purpose |
 |-------|---------|
-| `id` | Unique control identifier (e.g. `V-75443`, `C-1.1.1.1`) |
+| `id` | Unique control identifier (e.g., `V-75443`, `C-1.1.1.1`) |
 | `impact` | Severity as a numeric value (0.0–1.0): 0.7 = high, 0.5 = medium, 0.3 = low |
-| `tags` | Metadata including NIST SP 800-53 mappings — the common thread across all security data |
+| `tags` | Metadata including National Institute of Standards and Technology (NIST) SP 800-53 mappings—the common thread across all security data |
 | `refs` | External references (URLs, documents) |
 | `source_location` | File location of the control source (all inner fields optional) |
 | `results` | Array of test outcomes |
 
-**Result** — required fields shown, plus common optional fields `status`, `run_time`, `message`:
+**Result**—required fields shown, plus common optional fields `status`, `run_time`, `message`:
 
 | Field | Purpose |
 |-------|---------|
@@ -98,7 +98,7 @@ HDF's value is clearest when you see a conversion from a tool's native output in
 
 ### Nikto Native Output
 
-Nikto produces a flat JSON file with a list of vulnerabilities. Each finding has an ID, message, HTTP method, and URL — but no NIST control mapping, no severity rating, and no structured test results:
+Nikto produces a flat JSON file with a list of vulnerabilities. Each finding has an ID, message, HTTP method, and URL—but no NIST control mapping, no severity rating, and no structured test results:
 
 ```json
 {
@@ -133,7 +133,7 @@ saf convert nikto2hdf -i nikto-scan.json -o nikto-hdf.json
 
 ### Normalized HDF Output
 
-The same findings now have a consistent structure — each vulnerability becomes a `control` with NIST SP 800-53 mappings, CCI identifiers, an impact score, and structured test results:
+The same findings now have a consistent structure—each vulnerability becomes a `control` with NIST SP 800-53 mappings, Control Correlation Identifier (CCI) identifiers, an impact score, and structured test results:
 
 ```json
 {
@@ -200,10 +200,10 @@ The same findings now have a consistent structure — each vulnerability becomes
 | **Target Context** | Host, port, and banner preserved in `platform` and `summary` |
 
 ::: info Where did the NIST and CCI tag values come from?
-MITRE SAF's converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization — enriching sparse tool output with the metadata needed for unified compliance analysis.
+MITRE SAF(tm)'s converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization—enriching sparse tool output with the metadata needed for unified compliance analysis.
 :::
 
-This normalized output can be viewed in [MITRE Heimdall(tm)](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that MITRE SAF CLI(tm) uses to convert data are built into MITRE Heimdall(tm), meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to MITRE Heimdall(tm) and it will be displayed as HDF automatically.
+This normalized output can be viewed in [MITRE Heimdall](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that MITRE SAF CLI uses to convert data are built into MITRE Heimdall, meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to MITRE Heimdall and it will be displayed as HDF automatically.
 
 ### CIS Benchmark Template
 

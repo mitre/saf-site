@@ -67,25 +67,25 @@ const apps = [
 const gettingStarted = [
   {
     title: 'New to Security Automation?',
-    description: 'Start by validating your systems with existing InSpec profiles, then visualize the results in MITRE Heimdall(tm).',
+    description: 'Start by validating your systems with existing InSpec profiles, then visualize the results in MITRE Heimdall.',
     links: [
       { label: 'Browse Security Profiles', href: '/content/' },
-      { label: 'Learn About MITRE Heimdall(tm)', href: '/apps/heimdall' }
+      { label: 'Learn About MITRE Heimdall', href: '/apps/heimdall' }
     ]
   },
   {
     title: 'Already Running Security Scans?',
-    description: 'Use MITRE SAF CLI(tm) to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.',
+    description: 'Use MITRE SAF CLI to convert your existing security tool outputs (Nessus, SonarQube, etc.) into a common format.',
     links: [
-      { label: 'Learn About MITRE SAF CLI(tm)', href: '/apps/saf-cli' },
+      { label: 'Learn About MITRE SAF CLI', href: '/apps/saf-cli' },
       { label: 'Normalization Guide', href: '/framework/normalize' }
     ]
   },
   {
     title: 'Creating Custom Requirements?',
-    description: 'Use MITRE Vulcan(tm) to author security guidance documents, then generate InSpec profiles from your requirements.',
+    description: 'Use MITRE Vulcan to author security guidance documents, then generate InSpec profiles from your requirements.',
     links: [
-      { label: 'Learn About MITRE Vulcan(tm)', href: '/apps/vulcan' },
+      { label: 'Learn About MITRE Vulcan', href: '/apps/vulcan' },
       { label: 'Planning Guide', href: '/framework/plan' }
     ]
   }
@@ -94,9 +94,9 @@ const gettingStarted = [
 
 <PageSection
   orientation="vertical"
-  headline="MITRE SAF(tm)"
+  headline="MITRE SAF"
   title="Security Automation Tools"
-  description="The MITRE Security Automation Framework(tm) provides a comprehensive suite of open-source tools to support every phase of the security automation lifecycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
+  description="The MITRE Security Automation Framework(tm) provides a comprehensive suite of open-source tools to support every phase of the security automation life cycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
 />
 
 <PageSection
@@ -126,7 +126,7 @@ const gettingStarted = [
   orientation="vertical"
   headline="Getting Started"
   title="Choose Your Starting Point"
-  description="Jump in at any phase of the security automation lifecycle based on your current needs and maturity level."
+  description="Jump in at any phase of the security automation life cycle based on your current needs and maturity level."
 >
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div v-for="item in gettingStarted" :key="item.title" class="getting-started-card">

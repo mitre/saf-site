@@ -17,9 +17,9 @@ const visualizeTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, MITRE Heimdall(tm) provides the visualization tools to communicate security posture effectively."
+  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, MITRE Heimdall provides the visualization tools to communicate security posture effectively."
   :links="[
-    { label: 'View MITRE Heimdall(tm)', href: '/apps/heimdall', variant: 'default' },
+    { label: 'View MITRE Heimdall', href: '/apps/heimdall', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
   ]"
 >
@@ -40,14 +40,14 @@ const visualizeTools = [
   orientation="vertical"
   headline="The Problem"
   title="Security Data Overload"
-  description="Security teams generate massive amounts of test data from validation runs across hundreds or thousands of systems. Raw, machine-friendly output from tools make it difficult for stakeholders to understand and prioritize security posture at a glance. Executives need summaries, developers need detailed failure information, and auditors need compliance evidence - but they're all looking at the same incomprehensible data dumps. Implementing a dashboard to properly track and aggregate all this data is a challenge."
+  description="Security teams generate massive amounts of test data from validation runs across hundreds or thousands of systems. Raw, machine-friendly output from tools makes it difficult for stakeholders to understand and prioritize security posture at a glance. Executives need summaries, developers need detailed failure information, and auditors need compliance evidence—but they're all looking at the same incomprehensible data dumps. Implementing a dashboard to properly track and aggregate all this data is a challenge."
 />
 
 <PageSection
   orientation="vertical"
   headline="The Solution"
-  title="MITRE Heimdall(tm) - Security Visualization Platform"
-  description="MITRE Heimdall(tm) transforms MITRE Heimdall(tm) Data Format (HDF) security results (or, to put it another way, the output of the Normalize pillar) into interactive dashboards and comprehensive reports. Upload validation results from InSpec or any other security data source with an HDF converter; MITRE Heimdall(tm) will automatically translate it into HDF and store it in a centralized database. View aggregated compliance statistics across your entire infrastructure, drill down into specific failures, compare results over time, and export reports for stakeholders."
+  title="MITRE Heimdall - Security Visualization Platform"
+  description="MITRE Heimdall transforms MITRE Heimdall Data Format (HDF) security results (or, to put it another way, the output of the Normalize pillar) into interactive dashboards and comprehensive reports. Upload validation results from InSpec or any other security data source with an HDF converter; MITRE Heimdall will automatically translate it into HDF and store it in a centralized database. View aggregated compliance statistics across your entire infrastructure, drill down into specific failures, compare results over time, and export reports for stakeholders."
 >
   <FeatureList
     :items="[
@@ -79,14 +79,14 @@ const visualizeTools = [
 <PageSection
   orientation="horizontal"
   headline="Tools"
-  title="Visualize with MITRE Heimdall(tm)"
-  description="Use MITRE Heimdall(tm) to view, analyze, and report on security validation results across your infrastructure."
+  title="Visualize with MITRE Heimdall"
+  description="Use MITRE Heimdall to view, analyze, and report on security validation results across your infrastructure."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'MITRE Heimdall(tm) Dashboard',
+          title: 'MITRE Heimdall Dashboard',
           description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by MITRE SAF CLI(tm), or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
           href: '/apps/heimdall'
         },

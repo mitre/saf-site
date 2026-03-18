@@ -48,7 +48,7 @@ const pillars = [
   orientation="vertical"
   headline="The Framework"
   title="Building a Security Automation Capability"
-  description="The MITRE Security Automation Framework provides a complete lifecycle approach to security automation, from initial project planning all the way through operational monitoring. Approaching security automation through a refined and field-tested framework will help you achieve your security goals more efficiently."
+  description="The MITRE Security Automation Framework(tm) provides a complete life cycle approach to security automation, from initial project planning all the way through operational monitoring. Approaching security automation through a refined and field-tested framework will help you achieve your security goals more efficiently."
   :links="[
     { label: 'Browse Security Content', href: '/content/', variant: 'default' },
     { label: 'View SAF Tools', href: '/apps/', variant: 'outline' }

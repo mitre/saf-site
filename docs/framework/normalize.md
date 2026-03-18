@@ -10,7 +10,7 @@ import { RefreshCw, ArrowLeftRight, Database, GitCompare, TrendingUp, CheckCircl
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const normalizeTools = [
-  { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
+  { name: 'MITRE SAF CLI', href: '/apps/saf-cli' }
 ]
 
 const toolCategories = [
@@ -67,14 +67,14 @@ const toolCategories = [
   orientation="vertical"
   headline="The Problem"
   title="Security Tool Data Fragmentation"
-  description="Proper secure software development has many facets. Organizations need to cover all the bases - vulnerability scanning, static and dynamic code analysis (SAST/DAST), configuration management and validation, Software Bill of Materials (SBOM) generation, penetration testing, and more. While today's vibrant cybersecurity tooling landscape gives solutions to each of these problems, each tool tends to produce results in its own proprietary format. Without normalization, security teams waste countless hours manually correlating data, building custom integrations, and maintaining fragile parsing scripts that break with every tool update."
+  description="Proper secure software development has many facets. Organizations need to cover all the bases - vulnerability scanning, static and dynamic code analysis, configuration management and validation, software bill of materials generation, penetration testing, and more. While today's vibrant cybersecurity tooling landscape gives solutions to each of these problems, each tool tends to produce results in its own proprietary format. Without normalization, security teams waste countless hours manually correlating data, building custom integrations, and maintaining fragile parsing scripts that break with every tool update."
 />
 
 <PageSection
   orientation="vertical"
   headline="The Solution"
   title="MITRE Heimdall(tm) Data Format (HDF)"
-  description="MITRE SAF(tm) uses the MITRE Heimdall(tm) Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI(tm) provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
+  description="MITRE SAF uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI(tm) provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
   :links="[
     { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },
     { label: 'InSpecJS Library', href: '/content/inspecjs', variant: 'outline' }
@@ -89,7 +89,7 @@ const toolCategories = [
       },
       {
         icon: ArrowLeftRight,
-        title: 'Bi-directional Conversion',
+        title: 'Bi-Directional Conversion',
         description: 'The SAF toolset converts security tool outputs into HDF for analysis, and can also export HDF data back into formats like CSV, XLSX, or tool-specific formats for integration with existing workflows and reporting systems.'
       },
       {
@@ -99,22 +99,22 @@ const toolCategories = [
       },
       {
         icon: GitCompare,
-        title: 'Compare results',
+        title: 'Compare Results',
         description: 'Analyze security findings across different tools and timeframes. Track how your security posture changes over time and identify trends in vulnerabilities discovered by different scanning tools.'
       },
       {
         icon: ListCheck,
-        title: 'Aggregate findings',
+        title: 'Aggregate Findings',
         description: 'Consolidate security data from multiple sources into a unified security dashboard. View all vulnerabilities, compliance issues, and security findings in one place regardless of which tool discovered them.'
       },
       {
         icon: TrendingUp,
-        title: 'Track remediation',
+        title: 'Track Remediation',
         description: 'Monitor security issue resolution consistently across all tools. Measure progress on fixing vulnerabilities and demonstrate that security issues are being addressed in a timely manner.'
       },
       {
         icon: CheckCircle,
-        title: 'Demonstrate compliance',
+        title: 'Demonstrate Compliance',
         description: 'Prove compliance using evidence from multiple security testing sources. Show auditors and stakeholders comprehensive security validation results from your entire toolchain in a unified format.'
       },
       {
@@ -132,7 +132,7 @@ const toolCategories = [
   orientation="vertical"
   headline="Supported Tools"
   title="Convert From Any Security Tool"
-  description="MITRE SAF CLI(tm) provides converters for a wide range of security tools across different categories. Each converter transforms the tool's native output format into HDF, enabling unified analysis in MITRE Heimdall(tm)."
+  description="MITRE SAF CLI provides converters for a wide range of security tools across different categories. Each converter transforms the tool's native output format into HDF, enabling unified analysis in MITRE Heimdall."
 >
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div v-for="category in toolCategories" :key="category.title" class="tool-card block p-6 bg-card rounded-lg border border-border">
@@ -169,15 +169,15 @@ const toolCategories = [
 <PageSection
   orientation="horizontal"
   headline="Tools"
-  title="Normalize with MITRE SAF CLI(tm)"
-  description="Use MITRE SAF CLI(tm) to convert security tool outputs into HDF and export results for reporting."
+  title="Normalize with MITRE SAF CLI"
+  description="Use MITRE SAF CLI to convert security tool outputs into HDF and export results for reporting."
 >
   <template #body>
     <FeatureList
       :items="[
         {
-          title: 'MITRE SAF CLI(tm) Converters',
-          description: 'Convert security scan results from 20+ tools into MITRE Heimdall(tm) Data Format (HDF) using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
+          title: 'MITRE SAF CLI Converters',
+          description: 'Convert security scan results from 20+ tools into HDF using a simple command-line interface. Batch convert multiple files, automate in CI/CD pipelines, or integrate into existing security workflows.',
           href: '/apps/saf-cli'
         },
         {
