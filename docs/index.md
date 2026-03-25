@@ -19,12 +19,10 @@ hero:
 ---
 
 <script setup>
-import { DollarSign, Github, Users, BookText, Layers, Package, Wrench } from 'lucide-vue-next'
+import { DollarSign, Github, Users, BookText, Layers, Wrench } from 'lucide-vue-next'
 import PillarIcon from './.vitepress/theme/components/icons/PillarIcon.vue'
 import BrandIcon from './.vitepress/theme/components/icons/BrandIcon.vue'
 import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
-import LogoGrid from './.vitepress/theme/components/LogoGrid.vue'
-import { data as orgsData } from './.vitepress/loaders/organizations.data'
 
 const pillars = [
   {
@@ -127,20 +125,6 @@ const toolset = [
   }
 ]
 
-// Sponsors and vendors from database, mapped to LogoGrid format
-const sponsors = orgsData.sponsors.map(org => ({
-  name: org.name,
-  image: org.logo,
-  href: org.website,
-  description: org.description
-}))
-
-const vendors = orgsData.vendors.map(org => ({
-  name: org.name,
-  image: org.logo,
-  href: org.website,
-  description: org.description
-}))
 
 const userStories = [
   {
@@ -245,17 +229,6 @@ const getStartedCards = [
   </div>
 </PageSection>
 
-<PageSection
-  orientation="vertical"
->
-  <template #title>
-    <span class="centered-title">Adopted by the Community</span>
-  </template>
-
-  <LogoGrid :items="sponsors" :columns="5" show-names variant="card" title="Sponsors" :size="100" />
-
-  <LogoGrid :items="vendors" :columns="5" show-names variant="card" title="Vendors" class="partner-group-spacing" :size="100" />
-</PageSection>
 
 <PageSection
   variant="dark"
@@ -585,10 +558,6 @@ const getStartedCards = [
   background-color: var(--vp-c-bg-soft) !important;
 }
 
-/* Spacing between sponsor and vendor grids */
-.partner-group-spacing {
-  margin-top: 3rem;
-}
 
 /* User Stories Section */
 .user-story-card {

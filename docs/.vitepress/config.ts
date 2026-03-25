@@ -177,8 +177,6 @@ export default defineConfig({
           { text: 'Media & Downloads', link: '/resources/media' },
         ],
       },
-      // Demo page hidden in production
-      ...(process.env.NODE_ENV !== 'production' ? [{ text: 'Demo', link: '/test-index' }] : []),
     ],
 
     sidebar: {
