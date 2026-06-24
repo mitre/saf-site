@@ -1,6 +1,9 @@
 # Dependencies
 node_modules
 
+# Local pnpm content-addressable store (created when store is repo-local)
+.pnpm-store/
+
 # VitePress build output
 docs/.vitepress/cache
 docs/.vitepress/dist

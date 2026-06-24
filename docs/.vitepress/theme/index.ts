@@ -21,6 +21,7 @@ import PillarBadge from './components/PillarBadge.vue'
 import Placeholder from './components/Placeholder.vue'
 // Schema display
 import SchemaViewer from './components/SchemaViewer.vue'
+import SiteFooter from './components/SiteFooter.vue'
 import Skeleton from './components/Skeleton.vue'
 import Layout from './Layout.vue'
 import './custom.css'
@@ -50,5 +51,8 @@ export default {
 
     // Schema display
     app.component('SchemaViewer', SchemaViewer)
+
+    // Site chrome
+    app.component('SiteFooter', SiteFooter)
   },
 }
