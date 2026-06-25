@@ -46,6 +46,11 @@ daemon.lock
 daemon.log
 daemon-*.log.gz
 daemon.pid
+
+# Local Dolt backup store (auto-generated ~every 15m). Machine-local only:
+# the data also lives in issues.jsonl and the refs/dolt/data remote.
+backup/
+
 # NOTE: Do NOT add negation patterns here.
 # They would override fork protection in .git/info/exclude.
 # Config files (metadata.json, config.yaml) are tracked by git by default
