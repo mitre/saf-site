@@ -10,6 +10,7 @@ defineProps<{
     :height="size ? Number(size) * (106 / 86) : 106"
     viewBox="0 0 86 106"
     xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
     class="pillar-icon pillar-icon-validate"
   >
     <title>Validate Icon</title>

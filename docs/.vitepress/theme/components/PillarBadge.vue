@@ -84,7 +84,11 @@ const sizeClasses = computed(() => {
       sizeClasses.badge,
     ]"
     :title="config.label"
+    :role="showLabel === false ? 'img' : undefined"
+    :aria-label="showLabel === false ? config.label : undefined"
   >
+    <!-- Icon is decorative (aria-hidden in the icon component). The pillar name
+         comes from the visible label, or from aria-label when icon-only. -->
     <component :is="config.icon" :class="sizeClasses.icon" />
     <span v-if="showLabel !== false">{{ config.label }}</span>
   </span>

@@ -25,4 +25,26 @@ describe('pillarBadge accessibility', () => {
 
     expect(results).toHaveNoViolations()
   })
+
+  it('marks the icon as decorative (aria-hidden)', () => {
+    const wrapper = mount(PillarBadge, {
+      props: { pillar: 'harden', showLabel: true },
+    })
+
+    // The visible "Harden" text names the badge; the icon must not be announced.
+    expect(wrapper.find('svg').attributes('aria-hidden')).toBe('true')
+  })
+
+  it('exposes an accessible name when icon-only (showLabel=false)', async () => {
+    const wrapper = mount(PillarBadge, {
+      props: { pillar: 'validate', showLabel: false },
+    })
+
+    // No visible text, so the badge itself must carry the name for assistive tech.
+    expect(wrapper.attributes('role')).toBe('img')
+    expect(wrapper.attributes('aria-label')).toBe('Validate')
+
+    const results = await axeComponent(wrapper.element)
+    expect(results).toHaveNoViolations()
+  })
 })

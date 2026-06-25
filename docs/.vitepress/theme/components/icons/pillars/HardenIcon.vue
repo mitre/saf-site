@@ -10,6 +10,7 @@ defineProps<{
     :height="size ? Number(size) * (104 / 87) : 104"
     viewBox="0 0 87 104"
     xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
     class="pillar-icon pillar-icon-harden"
   >
     <title>Harden Icon</title>
