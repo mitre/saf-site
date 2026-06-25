@@ -10,6 +10,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "dev:setup": "./scripts/setup.sh",
     "dev:setup:check": "./scripts/setup.sh --check",
     "dev:setup:force": "./scripts/setup.sh --force",
@@ -66,6 +67,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",
     "@histoire/plugin-vue": "1.0.0-beta.1",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/better-sqlite3": "^7.6.13",
     "@types/markdown-it": "^14.1.2",

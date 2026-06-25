@@ -6,6 +6,12 @@ docs/.vitepress/cache
 docs/.vitepress/dist
 dist
 
+# Playwright (e2e accessibility tests)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # Logs
 *.log
 npm-debug.log*
