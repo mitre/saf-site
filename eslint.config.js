@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import vuejsA11y from 'eslint-plugin-vuejs-accessibility'
 
 export default antfu({
   // Enable Vue and TypeScript support
@@ -53,5 +54,16 @@ export default antfu({
   rules: {
     'node/prefer-global/process': 'off',
     'node/prefer-global/buffer': 'off',
+  },
+}, ...vuejsA11y.configs['flat/recommended'], {
+  // Vue template accessibility (WCAG 2.1 AA / Section 508). The recommended set
+  // runs at "error" so any NEW violation fails CI. The two form-label rules below
+  // flag pre-existing issues tracked in saf-site-vitepress-bmx; keep them at "warn"
+  // so the tooling surfaces them without blocking, until bmx fixes them and
+  // promotes both back to "error".
+  files: ['**/*.vue'],
+  rules: {
+    'vuejs-accessibility/label-has-for': 'warn',
+    'vuejs-accessibility/form-control-has-label': 'warn',
   },
 })
