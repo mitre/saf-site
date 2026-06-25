@@ -57,13 +57,11 @@ export default antfu({
   },
 }, ...vuejsA11y.configs['flat/recommended'], {
   // Vue template accessibility (WCAG 2.1 AA / Section 508). The recommended set
-  // runs at "error" so any NEW violation fails CI. The two form-label rules below
-  // flag pre-existing issues tracked in saf-site-vitepress-bmx; keep them at "warn"
-  // so the tooling surfaces them without blocking, until bmx fixes them and
-  // promotes both back to "error".
+  // runs at "error" so any new violation fails CI.
   files: ['**/*.vue'],
   rules: {
-    'vuejs-accessibility/label-has-for': 'warn',
-    'vuejs-accessibility/form-control-has-label': 'warn',
+    // Accept a `for`/id association (the rule's default also demands the label
+    // physically nest the control, which is stricter than WCAG requires).
+    'vuejs-accessibility/label-has-for': ['error', { required: { some: ['nesting', 'id'] } }],
   },
 })
