@@ -226,7 +226,7 @@ const relatedContent = computed(() => props.relatedContent || [])
           </div>
           <p class="related-card-description">{{ related.description }}</p>
           <div class="related-card-footer">
-            <BrandIcon :name="related.technology_name" :size="16" />
+            <BrandIcon :name="related.technology_name" :size="16" decorative />
             <span class="related-card-tech">{{ related.technology_name }}</span>
           </div>
         </a>

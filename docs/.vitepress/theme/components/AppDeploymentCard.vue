@@ -35,7 +35,7 @@ const displayName = computed(() => {
 <template>
   <div class="deployment-card">
     <div class="card-header">
-      <BrandIcon v-if="iconName" :name="iconName" :size="32" />
+      <BrandIcon v-if="iconName" :name="iconName" :size="32" decorative />
       <h3>{{ displayName }}</h3>
     </div>
     <p

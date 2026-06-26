@@ -212,7 +212,7 @@ const getStartedCards = [
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <a v-for="tool in toolset" :key="tool.name" :href="tool.href" class="tool-card">
       <div class="tool-card-header">
-        <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" />
+        <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" decorative />
         <BookText v-else :size="40" class="text-[--vp-c-brand-1]" />
         <h3 class="tool-card-title">{{ tool.name }}</h3>
       </div>
