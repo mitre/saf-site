@@ -29,7 +29,8 @@
   --vp-c-bg-alt: #f1f1f2;
   --vp-c-text-1: rgba(60, 60, 67);
   --vp-c-text-2: rgba(60, 60, 67, 0.78);
-  --vp-c-text-3: rgba(60, 60, 67, 0.56);
+  /* a11y (q92): 0.56 opacity only reached ~3:1; 0.75 = ~4.7:1 to meet WCAG 1.4.3 (4.5:1). */
+  --vp-c-text-3: rgba(60, 60, 67, 0.75);
   --vp-c-divider: rgba(60, 60, 67, 0.12);
 
   /* SAF Pillar icons - Light mode */
@@ -49,7 +50,8 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* a11y (q92): 0.556 only reached 4.38:1 on muted/soft backgrounds; 0.52 = ~4.9:1. */
+  --muted-foreground: oklch(0.52 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -68,7 +70,8 @@
   --vp-c-bg-alt: #161618;
   --vp-c-text-1: rgba(255, 255, 245, 0.86);
   --vp-c-text-2: rgba(235, 235, 245, 0.6);
-  --vp-c-text-3: rgba(235, 235, 245, 0.38);
+  /* a11y (q92): 0.38 opacity only reached ~3.2:1; 0.53 = ~4.8:1 to meet WCAG 1.4.3. */
+  --vp-c-text-3: rgba(235, 235, 245, 0.53);
   --vp-c-divider: rgba(82, 82, 89, 0.32);
 
   /* SAF Pillar icons - Dark mode */
