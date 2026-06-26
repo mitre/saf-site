@@ -44,7 +44,7 @@ const toolCategories = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security tools speak different languages. Nessus outputs XML, SonarQube produces JSON, SCAP tools generate XCCDF results - each with different schemas and structures. The Normalize phase of the MITRE SAF(tm) converts security scan results from dozens of different tools into a common format, enabling unified analysis, comparison, and visualization across your entire security toolchain."
+  description="Security tools speak different languages. Nessus outputs XML, SonarQube produces JSON, SCAP tools generate XCCDF results - each with different schemas and structures. The Normalize phase of the MITRE SAF™ converts security scan results from dozens of different tools into a common format, enabling unified analysis, comparison, and visualization across your entire security toolchain."
   :links="[
     { label: 'View SAF CLI', href: '/apps/saf-cli', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
@@ -73,8 +73,8 @@ const toolCategories = [
 <PageSection
   orientation="vertical"
   headline="The Solution"
-  title="MITRE Heimdall(tm) Data Format (HDF)"
-  description="MITRE SAF uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI(tm) provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
+  title="MITRE Heimdall™ Data Format (HDF)"
+  description="MITRE SAF uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI™ provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
   :links="[
     { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },
     { label: 'InSpecJS Library', href: '/content/inspecjs', variant: 'outline' }

@@ -12,7 +12,7 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('MITRE SAF(tm) is great')
-    expect(result).toContain('<span class="ss-tm">™</span>')
+    expect(result).toContain('™')
     expect(result).not.toContain('(tm)')
   })
 
@@ -21,7 +21,7 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('MITRE SAF(TM) is great')
-    expect(result).toContain('<span class="ss-tm">™</span>')
+    expect(result).toContain('™')
     expect(result).not.toContain('(TM)')
   })
 
@@ -30,7 +30,7 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('Company(r) name')
-    expect(result).toContain('<span class="ss-reg">®</span>')
+    expect(result).toContain('®')
     expect(result).not.toContain('(r)')
   })
 
@@ -49,7 +49,7 @@ describe('markdown-it-smartscript', () => {
 
     const result = md.render('```\nMITRE SAF(tm)\n```')
     expect(result).toContain('(tm)')
-    expect(result).not.toContain('<span class="ss-tm">')
+    expect(result).not.toContain('™')
   })
 
   it('should not transform inside inline code', () => {
@@ -58,7 +58,7 @@ describe('markdown-it-smartscript', () => {
 
     const result = md.render('This is `MITRE SAF(tm)` code')
     expect(result).toContain('(tm)')
-    expect(result).not.toContain('<span class="ss-tm">')
+    expect(result).not.toContain('™')
   })
 
   it('should transform in headings', () => {
@@ -66,7 +66,7 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('# MITRE SAF(tm)')
-    expect(result).toContain('<span class="ss-tm">™</span>')
+    expect(result).toContain('™')
   })
 
   it('should transform in paragraphs', () => {
@@ -74,7 +74,7 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('MITRE SAF(tm) provides tools.')
-    expect(result).toContain('<span class="ss-tm">™</span>')
+    expect(result).toContain('™')
   })
 
   it('should handle possessive forms correctly', () => {
@@ -82,6 +82,6 @@ describe('markdown-it-smartscript', () => {
     md.use(markdownItSmartScript)
 
     const result = md.render('MITRE SAF\'s(tm) security tools')
-    expect(result).toContain('SAF\'s<span class="ss-tm">™</span>')
+    expect(result).toContain('SAF\'s™')
   })
 })

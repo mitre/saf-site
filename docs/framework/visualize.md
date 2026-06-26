@@ -10,14 +10,14 @@ import { BarChart3, Users, TrendingUp, FileText } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const visualizeTools = [
-  { name: 'MITRE Heimdall(tm)', href: '/apps/heimdall' }
+  { name: 'MITRE Heimdall™', href: '/apps/heimdall' }
 ]
 </script>
 
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF(tm) transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, MITRE Heimdall provides the visualization tools to communicate security posture effectively."
+  description="Security data is only valuable when stakeholders can understand it and act on it. The Visualize phase of the MITRE SAF™ transforms security test results into clear, actionable insights through interactive dashboards and comprehensive reporting. Whether you're presenting to executives, collaborating with development teams, or preparing for audits, MITRE Heimdall provides the visualization tools to communicate security posture effectively."
   :links="[
     { label: 'View MITRE Heimdall', href: '/apps/heimdall', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
@@ -87,7 +87,7 @@ const visualizeTools = [
       :items="[
         {
           title: 'MITRE Heimdall Dashboard',
-          description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by MITRE SAF CLI(tm), or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
+          description: 'Web-based security visualization platform. Upload HDF results from InSpec validation runs, security scans converted by MITRE SAF CLI™, or any HDF-compliant source. View interactive dashboards, drill down into failures, compare results across systems and time periods, and export reports for stakeholders.',
           href: '/apps/heimdall'
         },
         {

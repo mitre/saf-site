@@ -4,14 +4,14 @@ title: MITRE Security Automation Framework
 
 hero:
   name: MITRE
-  text: Security Automation Framework(tm)
+  text: Security Automation Framework™
   tagline: Open source security testing and compliance automation toolkit
   actions:
     - theme: brand
       text: Explore Framework
       link: /framework/
     - theme: alt
-      text: MITRE SAF(tm) Apps
+      text: MITRE SAF™ Apps
       link: /apps/
     - theme: alt
       text: View Automation Content
@@ -29,7 +29,7 @@ const pillars = [
     pillar: 'plan',
     title: 'PLAN',
     description: 'Select, tailor, and create security guidance content appropriate for your mission.',
-    body: 'Use MITRE Vulcan(tm) to create and manage security baselines to implement security requirements.',
+    body: 'Use MITRE Vulcan™ to create and manage security baselines to implement security requirements.',
     href: '/framework/plan'
   },
   {
@@ -57,7 +57,7 @@ const pillars = [
     pillar: 'visualize',
     title: 'VISUALIZE',
     description: 'Identify overall security status and deep-dive to resolve specific security defects.',
-    body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and share with your organization\'s governance, risk, and compliance tools.',
+    body: 'Use MITRE Heimdall™ Lite/Server to visualize security status across all security tools and share with your organization\'s governance, risk, and compliance tools.',
     href: '/framework/visualize'
   }
 ]
@@ -82,21 +82,21 @@ const values = [
 
 const toolset = [
   {
-    name: 'MITRE SAF CLI(tm)',
+    name: 'MITRE SAF CLI™',
     icon: 'saf',
     description: 'The MITRE SAF command line interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to OHDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
-    name: 'MITRE Heimdall',
+    name: 'MITRE Heimdall™',
     icon: 'heimdall',
     description: 'MITRE Heimdall is the MITRE SAF visualization platform. Upload baseline validation results, view existing security standards, and generate reports for your organization\'s reporting or security information and event management tools.',
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
-    name: 'MITRE Vulcan',
+    name: 'MITRE Vulcan™',
     icon: 'saf',
     description: 'MITRE Vulcan allows users to create security guidance using the Security Requirements Guides. MITRE Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
     pillars: ['plan'],
@@ -110,7 +110,7 @@ const toolset = [
     href: '/content/'
   },
   {
-    name: 'MITRE eMASSer(tm)',
+    name: 'MITRE eMASSer™',
     icon: 'saf',
     description: 'MITRE eMASSer provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
     pillars: ['normalize'],

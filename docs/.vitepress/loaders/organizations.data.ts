@@ -7,6 +7,7 @@
 
 import PocketBase from 'pocketbase'
 import { defineLoader } from 'vitepress'
+import { smartScriptDeep } from '../lib/smart-script'
 
 interface Organization {
   id: string
@@ -46,11 +47,11 @@ export default defineLoader({
     const sponsors = all.filter(org => org.org_type === 'government')
     const vendors = all.filter(org => org.org_type === 'vendor')
 
-    return {
+    return smartScriptDeep({
       sponsors,
       vendors,
       all,
-    }
+    })
   },
 })
 

@@ -7,6 +7,7 @@ import {
   extractTechnologyFK,
   initPocketBase,
 } from '../.vitepress/lib/loader-utils'
+import { smartScriptDeep } from '../.vitepress/lib/smart-script'
 
 // Simplified related content item
 interface RelatedContent {
@@ -56,7 +57,7 @@ export default {
 
       console.log(`✓ Generating ${records.length} content detail pages`)
 
-      return records.map((record) => {
+      return smartScriptDeep(records.map((record) => {
         // Extract FK data using shared utilities
         const target = extractFK(record.expand, 'target')
         const standard = extractStandardFK(record.expand)
@@ -162,7 +163,7 @@ export default {
             relatedContent,
           },
         }
-      })
+      }))
     }
     catch (error) {
       console.error('Failed to generate content paths:', error)

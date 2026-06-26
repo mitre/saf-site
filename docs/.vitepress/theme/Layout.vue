@@ -2,7 +2,6 @@
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { computed, onMounted } from 'vue'
-import SmartScriptProcessor from './components/SmartScriptProcessor.vue'
 
 const { Layout } = DefaultTheme
 
@@ -33,10 +32,6 @@ onMounted(() => {
 
 <template>
   <Layout :class="{ 'wide-layout': isWideLayout }">
-    <template #layout-bottom>
-      <!-- Client-side processor for Vue component content -->
-      <SmartScriptProcessor />
-    </template>
     <template #doc-after>
       <!-- Footer for doc layout pages -->
       <div class="custom-footer">
