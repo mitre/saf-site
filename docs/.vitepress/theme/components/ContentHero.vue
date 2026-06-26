@@ -73,7 +73,7 @@ defineProps<{
               class="status-dot" :class="[`status-${item.value.toLowerCase()}`]"
             />
             <!-- Icon for non-status fields -->
-            <BrandIcon v-else :name="item.value" :size="28" />
+            <BrandIcon v-else :name="item.value" :size="28" decorative />
             <span class="metadata-text">{{ item.value }}</span>
           </span>
         </component>

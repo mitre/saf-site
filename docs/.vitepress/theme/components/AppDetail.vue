@@ -65,7 +65,7 @@ function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
     >
       <template #title>
         <span class="flex items-center gap-3">
-          <BrandIcon v-if="tool.logo" :name="tool.slug" :size="40" />
+          <BrandIcon v-if="tool.logo" :name="tool.slug" :size="40" decorative />
           {{ tool.name }}
         </span>
       </template>
@@ -84,7 +84,7 @@ function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
             size="lg"
             class="flex items-center gap-2 no-underline"
           >
-            <BrandIcon v-if="tool.logo" :name="tool.slug" :size="20" />
+            <BrandIcon v-if="tool.logo" :name="tool.slug" :size="20" decorative />
             {{ demo.label }}
           </Button>
 
@@ -130,7 +130,7 @@ function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
             size="lg"
             class="flex items-center gap-2 no-underline"
           >
-            <BrandIcon v-if="distIconName(dist)" :name="distIconName(dist)" :size="20" />
+            <BrandIcon v-if="distIconName(dist)" :name="distIconName(dist)" :size="20" decorative />
             {{ distHeroLabel(dist) }}
           </Button>
 

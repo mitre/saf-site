@@ -21,7 +21,7 @@ import { data as trainingData } from '../.vitepress/loaders/training.data'
 >
   <div class="flex gap-4 flex-wrap">
     <Button as="a" href="https://mitre.github.io/saf-training/" target="_blank" rel="noopener noreferrer" variant="default">
-      <BrandIcon name="github" :size="16" class="mr-2" />
+      <BrandIcon name="github" :size="16" class="mr-2" decorative />
       Training Site - GitHub
     </Button>
     <Button as="a" href="https://mitre-saf-training.netlify.app/" target="_blank" rel="noopener noreferrer" variant="outline">

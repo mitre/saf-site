@@ -76,3 +76,42 @@ jobs:
 
       - name: CLI Test
         run: pnpm --filter @saf-site/cli test:run
+
+  e2e:
+    name: Accessibility E2E (Playwright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Starts Pocketbase (port 8090) in the background; the Playwright config's
+      # webServer launches `vitepress dev`, whose data loaders query it.
+      - name: Setup Pocketbase
+        uses: ./.github/actions/setup-pocketbase
+
+      - name: Run accessibility E2E tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

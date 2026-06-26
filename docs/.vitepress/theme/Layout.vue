@@ -2,7 +2,6 @@
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { computed } from 'vue'
-import SmartScriptProcessor from './components/SmartScriptProcessor.vue'
 
 const { Layout } = DefaultTheme
 
@@ -15,10 +14,6 @@ const isWideLayout = computed(() => {
 
 <template>
   <Layout :class="{ 'wide-layout': isWideLayout }">
-    <template #layout-bottom>
-      <!-- Client-side processor for Vue component content -->
-      <SmartScriptProcessor />
-    </template>
     <template #doc-after>
       <!-- Shared site footer (also rendered on the home page via index.md) -->
       <SiteFooter />

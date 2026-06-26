@@ -6,6 +6,7 @@
 
 import process from 'node:process'
 import PocketBase from 'pocketbase'
+import { smartScriptDeep } from '../.vitepress/lib/smart-script'
 
 const pbUrl = process.env.PB_URL || 'http://localhost:8090'
 const pbEmail = process.env.PB_ADMIN_EMAIL || 'admin@localhost.com'
@@ -24,12 +25,12 @@ export default {
     })
 
     // Generate path for each tool
-    return tools.map(tool => ({
+    return smartScriptDeep(tools.map(tool => ({
       params: {
         slug: tool.slug,
         // Pass minimal data - the page will use the data loader
         toolName: tool.name,
       },
-    }))
+    })))
   },
 }

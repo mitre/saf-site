@@ -7,7 +7,7 @@ wideLayout: true
 
 <PageSection
   orientation="vertical"
-  headline="MITRE SAF(tm) Resources"
+  headline="MITRE SAF™ Resources"
   title="Media & Downloads"
   description="Download white papers, presentations, and training materials to learn about the MITRE Security Automation Framework and share it with your organization."
 />
@@ -57,7 +57,7 @@ wideLayout: true
   icon="document"
   title="The New Normalized OHDF"
   meta="Technical deep dive • PDF"
-  description="Technical overview of the OASIS MITRE Heimdall(tm) Data Format (OHDF) and how it enables unified security data analysis."
+  description="Technical overview of the OASIS MITRE Heimdall™ Data Format (OHDF) and how it enables unified security data analysis."
   action="Download PDF"
   download
 />
@@ -88,7 +88,7 @@ wideLayout: true
 <MediaCard
   href="/MITRE-SAF-Vulcan.pdf"
   icon="presentation"
-  title="MITRE Vulcan(tm) Webinar"
+  title="MITRE Vulcan™ Webinar"
   meta="Product demo • PDF"
   description="Introduction to MITRE Vulcan, the MITRE SAF security guidance authoring platform for creating and managing security baselines."
   action="Download Slides"

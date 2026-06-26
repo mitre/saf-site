@@ -7,7 +7,7 @@ wideLayout: true
 
 # HDF Schema Reference
 
-The MITRE Heimdall(tm) Data Format (HDF) schema defines the structure for security assessment results. The schema is a [JSON Schema](https://json-schema.org/) document maintained in the [heimdall2 repository](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json).
+The MITRE Heimdall™ Data Format (HDF) schema defines the structure for security assessment results. The schema is a [JSON Schema](https://json-schema.org/) document maintained in the [heimdall2 repository](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json).
 
 **[View Schema on GitHub](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json)** | **[HDF Examples](/resources/)** | **[Download Schema](/exec-json-schema.json)**
 

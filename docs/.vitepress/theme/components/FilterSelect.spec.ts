@@ -55,6 +55,16 @@ describe('filterSelect', () => {
     expect(wrapper.find('.filter-item').exists()).toBe(true)
   })
 
+  it('programmatically associates the visible label with the select trigger', () => {
+    const wrapper = mount(FilterSelect, { props: defaultProps })
+
+    const labelFor = wrapper.find('label.filter-label').attributes('for')
+    const triggerId = wrapper.find('[aria-label="Test filter"]').attributes('id')
+
+    expect(labelFor).toBeTruthy()
+    expect(triggerId).toBe(labelFor)
+  })
+
   it('emits update:modelValue when selection changes', async () => {
     const wrapper = mount(FilterSelect, { props: defaultProps })
 

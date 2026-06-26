@@ -11,14 +11,14 @@ import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const validateTools = [
   { name: 'InSpec', href: '/content/?technology=InSpec' },
-  { name: 'MITRE SAF CLI(tm)', href: '/apps/saf-cli' }
+  { name: 'MITRE SAF CLI™', href: '/apps/saf-cli' }
 ]
 </script>
 
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF(tm) helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
+  description="Security testing doesn't have to be a manual, error-prone process. The Validate phase of the MITRE SAF™ helps you test and verify security controls automatically. Transform security requirements from PDFs and spreadsheets into executable tests that run in seconds, providing consistent, repeatable, and tailorable security compliance validation across your entire infrastructure."
   :links="[
     { label: 'Browse Validation Profiles', href: '/content/?pillar=validate', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }
@@ -48,7 +48,7 @@ const validateTools = [
       {
         icon: TestTube2,
         title: 'Security Compliance Testing',
-        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the MITRE Heimdall(tm) Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
+        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the MITRE Heimdall™ Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
       },
       {
         icon: Repeat2,

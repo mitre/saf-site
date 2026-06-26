@@ -7,6 +7,7 @@
 import type { ToolFeature, ToolResource } from '../database/schema'
 import PocketBase from 'pocketbase'
 import { defineLoader } from 'vitepress'
+import { smartScriptDeep } from '../lib/smart-script'
 
 export interface ToolDemo {
   label: string
@@ -205,7 +206,7 @@ export default defineLoader({
       })
     }
 
-    return { tools }
+    return smartScriptDeep({ tools })
   },
 })
 

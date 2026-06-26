@@ -40,7 +40,7 @@ const style = computed(() => ({
     :class="[`placeholder--rounded-${rounded}`]"
     :style="style"
   >
-    <svg class="placeholder-pattern" fill="none">
+    <svg class="placeholder-pattern" fill="none" aria-hidden="true">
       <defs>
         <pattern
           :id="patternId"

@@ -8,6 +8,7 @@ import {
   extractTechnologyFK,
   initPocketBase,
 } from '../lib/loader-utils'
+import { smartScriptDeep } from '../lib/smart-script'
 
 export interface PackageInfo {
   registry: 'npm' | 'rubygems' | 'pypi'
@@ -211,7 +212,7 @@ export default defineLoader({
       const library = items.filter(item => item.content_type === 'library')
 
       console.log(`✓ Loaded ${items.length} content items (${validation.length} validation, ${hardening.length} hardening, ${library.length} library)`)
-      return { items, validation, hardening }
+      return smartScriptDeep({ items, validation, hardening })
     }
     catch (error) {
       console.error('Failed to load content from Pocketbase:', error)

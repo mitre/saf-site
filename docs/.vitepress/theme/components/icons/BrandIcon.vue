@@ -6,9 +6,25 @@ import { computed } from 'vue'
 const props = defineProps<{
   name: string
   size?: number | string
+  /**
+   * Mark the icon as decorative (hidden from assistive tech). Use when a visible
+   * text label for the same brand sits next to the icon, to avoid double
+   * announcements. Default false: the brand name is exposed as the accessible name.
+   */
+  decorative?: boolean
 }>()
 
 const { isDark } = useData()
+
+// a11y: a decorative icon is hidden; otherwise the brand name IS the content,
+// so expose it as the accessible name across every render path.
+const a11yAttrs = computed(() => {
+  const attrs: Record<string, string> = props.decorative
+    ? { 'aria-hidden': 'true' }
+    : { 'role': 'img', 'aria-label': props.name }
+  return attrs
+})
+const imgAlt = computed(() => (props.decorative ? '' : props.name))
 
 // Local SVG files in /public/icons/
 const localSvgMap: Record<string, string> = {
@@ -233,7 +249,7 @@ const brandColor = computed(() => {
     :src="localSvg"
     :height="iconSize"
     class="brand-icon brand-icon-local brand-icon-wide"
-    :alt="name"
+    :alt="imgAlt"
   >
   <!-- Square logos - fixed width and height -->
   <img
@@ -242,7 +258,7 @@ const brandColor = computed(() => {
     :width="iconSize"
     :height="iconSize"
     class="brand-icon brand-icon-local"
-    :alt="name"
+    :alt="imgAlt"
   >
   <Icon
     v-else-if="iconName"
@@ -251,9 +267,10 @@ const brandColor = computed(() => {
     :height="iconSize"
     :style="brandColor ? { color: brandColor } : undefined"
     class="brand-icon"
+    v-bind="a11yAttrs"
   />
-  <span v-else class="brand-icon-fallback">
-    <Icon icon="lucide:box" :width="iconSize" :height="iconSize" />
+  <span v-else class="brand-icon-fallback" v-bind="a11yAttrs">
+    <Icon icon="lucide:box" :width="iconSize" :height="iconSize" aria-hidden="true" />
   </span>
 </template>
 

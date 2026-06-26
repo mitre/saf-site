@@ -3,8 +3,13 @@
  * Mocks VitePress APIs and suppresses expected cleanup noise from happy-dom
  */
 
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
+// Register the `toHaveNoViolations` matcher for axe-core accessibility assertions.
+// (Type augmentation for the matcher lives in test-utils/vitest-axe.d.ts.)
+import * as axeMatchers from 'vitest-axe/matchers'
 import { ref } from 'vue'
+
+expect.extend(axeMatchers)
 
 // Mock VitePress module - provides useData(), useRoute(), etc.
 // Components like BrandIcon use useData() for dark mode detection.

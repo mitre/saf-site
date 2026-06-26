@@ -5,7 +5,8 @@
  * Pass an array of feature objects or use the default slot for custom items.
  * Good for benefit lists, feature highlights, capability descriptions.
  */
-import type { Component } from 'vue'
+import type { Component, VNode } from 'vue'
+import { Comment, computed, Fragment, Text, useSlots } from 'vue'
 import FeatureItem from './FeatureItem.vue'
 
 export interface FeatureItemData {
@@ -35,33 +36,72 @@ withDefaults(defineProps<FeatureListProps>(), {
   gap: 'md',
   direction: 'column',
 })
+
+const slots = useSlots()
+
+// Custom slot content (if provided), flattened and filtered so each real node
+// can be wrapped in an <li> for list semantics (WCAG 1.3.1).
+const slotItems = computed<VNode[]>(() => {
+  const flatten = (nodes: VNode[]): VNode[] =>
+    nodes.flatMap(node =>
+      node.type === Fragment && Array.isArray(node.children)
+        ? flatten(node.children as VNode[])
+        : [node],
+    )
+
+  return flatten(slots.default?.() ?? []).filter(node =>
+    node.type !== Comment
+    && !(node.type === Text && !String(node.children).trim()),
+  )
+})
 </script>
 
 <template>
-  <div
+  <!--
+    role="list" is intentional: the `list-style: none` needed for the flex layout
+    makes Safari/VoiceOver drop the implicit list semantics, so it must be
+    restated. The "redundancy" the linter flags is the actual accessibility fix.
+  -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-redundant-roles -->
+  <ul
     class="feature-list"
     :class="[
       `feature-list--gap-${gap}`,
       `feature-list--${direction}`,
     ]"
+    role="list"
   >
-    <slot>
-      <FeatureItem
-        v-for="(item, index) in items"
-        :key="index"
-        :icon="item.icon"
-        :title="item.title"
-        :description="item.description"
-        :href="item.href"
-        :orientation="orientation"
-      />
-    </slot>
-  </div>
+    <template v-if="slotItems.length">
+      <li v-for="(node, index) in slotItems" :key="index" class="feature-list__item">
+        <component :is="node" />
+      </li>
+    </template>
+    <template v-else>
+      <li v-for="(item, index) in items" :key="index" class="feature-list__item">
+        <FeatureItem
+          :icon="item.icon"
+          :title="item.title"
+          :description="item.description"
+          :href="item.href"
+          :orientation="orientation"
+        />
+      </li>
+    </template>
+  </ul>
 </template>
 
 <style scoped>
 .feature-list {
   display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Semantics-only wrapper: `display: contents` lets each FeatureItem remain the
+   flex item, so the list markup does not change the visual layout. */
+.feature-list__item {
+  display: contents;
 }
 
 .feature-list--column {

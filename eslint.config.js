@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import vuejsA11y from 'eslint-plugin-vuejs-accessibility'
 
 export default antfu({
   // Enable Vue and TypeScript support
@@ -53,5 +54,14 @@ export default antfu({
   rules: {
     'node/prefer-global/process': 'off',
     'node/prefer-global/buffer': 'off',
+  },
+}, ...vuejsA11y.configs['flat/recommended'], {
+  // Vue template accessibility (WCAG 2.1 AA / Section 508). The recommended set
+  // runs at "error" so any new violation fails CI.
+  files: ['**/*.vue'],
+  rules: {
+    // Accept a `for`/id association (the rule's default also demands the label
+    // physically nest the control, which is stricter than WCAG requires).
+    'vuejs-accessibility/label-has-for': ['error', { required: { some: ['nesting', 'id'] } }],
   },
 })
