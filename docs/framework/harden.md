@@ -19,7 +19,7 @@ const hardenTools = [
 <PageSection
   orientation="horizontal"
   headline="SAF Framework"
-  description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? MITRE SAF™'s Harden pillar helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
+  description="Have you ever wished you could automate your way out of a thankless security configuration task, but didn't have the time to invest to do it right? The Harden pillar of MITRE SAF™ helps you apply security configurations and controls to your systems using automated hardening content, paired with the same configuration management tools and processes your team is likely already familiar with. Transform compliance requirements into actionable remediation with Infrastructure as Code."
   :links="[
     { label: 'Browse Hardening Content', href: '/content/?pillar=harden', variant: 'default' },
     { label: 'View Framework', href: '/framework/', variant: 'outline' }

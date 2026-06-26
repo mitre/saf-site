@@ -200,7 +200,7 @@ The same findings now have a consistent structure—each vulnerability becomes a
 | **Target Context** | Host, port, and banner preserved in `platform` and `summary` |
 
 ::: info Where did the NIST and CCI tag values come from?
-MITRE SAF™'s converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization—enriching sparse tool output with the metadata needed for unified compliance analysis.
+The MITRE SAF™ converter library for Nikto data includes logic to add the NIST SP 800-53 control mappings and Control Correlation Identifiers based on Nikto's function and purpose. In other words, where data is missing from the original data format, HDF converters will fill it in based on the tool's known capabilities and the type of finding. This is a key part of normalization—enriching sparse tool output with the metadata needed for unified compliance analysis.
 :::
 
 This normalized output can be viewed in [MITRE Heimdall](/apps/heimdall) alongside results from any other security tool for unified analysis. Note that the same libraries that MITRE SAF CLI uses to convert data are built into MITRE Heimdall, meaning that you can pass the pre-converted file (in this case, the raw Nikto file) to MITRE Heimdall and it will be displayed as HDF automatically.
