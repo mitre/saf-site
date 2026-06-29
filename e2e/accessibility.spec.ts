@@ -11,15 +11,14 @@ import { expect, test } from '@playwright/test'
  * conformance step (saf-site-vitepress-rrz).
  */
 
-// Representative routes: the home (home layout) plus static doc-layout pages.
-const PAGES = ['/', '/privacy-policy', '/framework/validate']
+// Doc-layout pages render a <main> landmark. The home page uses VitePress's
+// `home` layout, which does not emit a <main>, so it is checked separately.
+const DOC_PAGES = ['/privacy-policy', '/framework/validate']
+const ALL_PAGES = ['/', ...DOC_PAGES]
 
-for (const path of PAGES) {
-  test(`${path} exposes the landmarks and headings a screen reader needs`, async ({ page }) => {
+for (const path of ALL_PAGES) {
+  test(`${path} exposes site navigation and a heading`, async ({ page }) => {
     await page.goto(path)
-
-    // A main landmark so AT users can skip straight to content.
-    await expect(page.getByRole('main')).toBeVisible()
 
     // Site navigation is reachable as a landmark.
     await expect(page.getByRole('navigation').first()).toBeVisible()
@@ -29,13 +28,26 @@ for (const path of PAGES) {
   })
 }
 
+for (const path of DOC_PAGES) {
+  test(`${path} exposes a main landmark`, async ({ page }) => {
+    await page.goto(path)
+
+    // A main landmark lets AT users skip straight to content.
+    await expect(page.getByRole('main')).toBeVisible()
+  })
+}
+
 test('home page navigation links have accessible names', async ({ page }) => {
   await page.goto('/')
+
+  const links = page.getByRole('navigation').first().getByRole('link')
+  // Wait for the nav to hydrate before counting, otherwise an early 0-count
+  // makes the assertion flaky.
+  await expect(links.first()).toBeVisible()
 
   // Every link must have a non-empty *accessible name*, otherwise a screen
   // reader announces it as an unlabeled "link". Assert against the computed
   // accessible name (covers aria-label/aria-labelledby), not just inner text.
-  const links = page.getByRole('navigation').first().getByRole('link')
   const count = await links.count()
   expect(count).toBeGreaterThan(0)
   for (let i = 0; i < count; i++)
