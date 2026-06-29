@@ -40,7 +40,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm exec vitepress dev docs --port 5173',
+    // --strictPort so the server fails fast instead of silently moving to
+    // another port (which would no longer match baseURL).
+    command: 'pnpm exec vitepress dev docs --port 5173 --strictPort',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

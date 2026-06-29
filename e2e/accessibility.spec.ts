@@ -32,10 +32,12 @@ for (const path of PAGES) {
 test('home page navigation links have accessible names', async ({ page }) => {
   await page.goto('/')
 
-  // Every link in the accessibility tree must have a non-empty accessible name,
-  // otherwise a screen reader announces it as an unlabeled "link".
-  const linkNames = await page.getByRole('navigation').first().getByRole('link').allInnerTexts()
-  expect(linkNames.length).toBeGreaterThan(0)
-  for (const name of linkNames)
-    expect(name.trim().length).toBeGreaterThan(0)
+  // Every link must have a non-empty *accessible name*, otherwise a screen
+  // reader announces it as an unlabeled "link". Assert against the computed
+  // accessible name (covers aria-label/aria-labelledby), not just inner text.
+  const links = page.getByRole('navigation').first().getByRole('link')
+  const count = await links.count()
+  expect(count).toBeGreaterThan(0)
+  for (let i = 0; i < count; i++)
+    await expect(links.nth(i)).toHaveAccessibleName(/\S/)
 })

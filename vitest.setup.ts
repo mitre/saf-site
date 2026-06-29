@@ -5,7 +5,8 @@
 
 import { expect, vi } from 'vitest'
 // Register the `toHaveNoViolations` matcher for axe-core accessibility assertions.
-// (Type augmentation for the matcher lives in test-utils/vitest-axe.d.ts.)
+// (Type augmentation for the matcher lives in
+// docs/.vitepress/theme/test-utils/vitest-axe.d.ts.)
 import * as axeMatchers from 'vitest-axe/matchers'
 import { ref } from 'vue'
 
