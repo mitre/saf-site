@@ -13,9 +13,21 @@ The MITRE Heimdall™ Data Format (HDF) schema defines the structure for securit
 
 ## Interactive Schema
 
-Expand and collapse sections to explore the full [HDF JSON Schema](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json).
+Expand and collapse sections to explore the full [HDF JSON Schema](https://github.com/mitre/heimdall2/blob/master/libs/inspecjs/schemas/exec-json.json). Use the tabs to jump straight to a referenced sub-schema — these mirror the field tables below.
 
-<SchemaViewer src="/exec-json-schema.json" :expand-depth="3" />
+<SchemaViewer
+  src="/exec-json-schema.json"
+  :expand-depth="3"
+  :tabs="[
+    { label: 'Full Schema', pointer: '' },
+    { label: 'Platform', pointer: 'definitions/Platform' },
+    { label: 'Profile', pointer: 'definitions/Exec_JSON_Profile' },
+    { label: 'Control', pointer: 'definitions/Exec_JSON_Control' },
+    { label: 'Result', pointer: 'definitions/Control_Result' },
+    { label: 'Statistics', pointer: 'definitions/Statistics' },
+    { label: 'Attestation', pointer: 'definitions/Attestation_Data' },
+  ]"
+/>
 
 ## Root Object
 
