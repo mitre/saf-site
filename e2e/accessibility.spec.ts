@@ -11,29 +11,21 @@ import { expect, test } from '@playwright/test'
  * conformance step (saf-site-vitepress-rrz).
  */
 
-// Doc-layout pages render a <main> landmark. The home page uses VitePress's
-// `home` layout, which does not emit a <main>, so it is checked separately.
-const DOC_PAGES = ['/privacy-policy', '/framework/validate']
-const ALL_PAGES = ['/', ...DOC_PAGES]
+// Home (home layout, main landmark added in index.md) plus static doc pages.
+const PAGES = ['/', '/privacy-policy', '/framework/validate']
 
-for (const path of ALL_PAGES) {
-  test(`${path} exposes site navigation and a heading`, async ({ page }) => {
+for (const path of PAGES) {
+  test(`${path} exposes the landmarks and headings a screen reader needs`, async ({ page }) => {
     await page.goto(path)
+
+    // A main landmark lets AT users skip straight to content.
+    await expect(page.getByRole('main')).toBeVisible()
 
     // Site navigation is reachable as a landmark.
     await expect(page.getByRole('navigation').first()).toBeVisible()
 
     // The page exposes a heading to anchor the document outline.
     await expect(page.getByRole('heading').first()).toBeVisible()
-  })
-}
-
-for (const path of DOC_PAGES) {
-  test(`${path} exposes a main landmark`, async ({ page }) => {
-    await page.goto(path)
-
-    // A main landmark lets AT users skip straight to content.
-    await expect(page.getByRole('main')).toBeVisible()
   })
 }
 

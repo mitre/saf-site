@@ -163,6 +163,10 @@ const getStartedCards = [
 ]
 </script>
 
+<!-- Wrap the home page's primary content in a <main> landmark; VitePress's home
+     layout doesn't emit one (saf-site-vitepress-t00). The footer stays outside. -->
+<main class="home-main">
+
 <PageSection
   variant="muted"
   orientation="vertical"
@@ -261,6 +265,8 @@ const getStartedCards = [
     </a>
   </div>
 </PageSection>
+
+</main>
 
 <!-- Homepage Footer (shared component — same footer as doc pages) -->
 <SiteFooter />
