@@ -25,7 +25,7 @@ const displayValue = computed(() => {
     :class="{ clickable: !!href }"
   >
     <!-- Icon via BrandIcon - single source of truth for all brand/logo icons -->
-    <BrandIcon :name="value" :size="18" />
+    <BrandIcon :name="value" :size="18" decorative />
 
     <!-- Label and value -->
     <span class="pill-content">

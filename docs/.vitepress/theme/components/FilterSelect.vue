@@ -3,7 +3,7 @@
  * Reusable filter select dropdown
  * Wraps shadcn Select with consistent styling and "All X" option
  */
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import {
   Select,
   SelectContent,
@@ -42,6 +42,10 @@ const computedAriaLabel = computed(() =>
   props.ariaLabel || `Filter by ${props.label.toLowerCase()}`,
 )
 
+// Unique id linking the visible <label> to the select trigger so clicking the
+// label focuses the control and assistive tech announces them as a pair.
+const triggerId = useId()
+
 /**
  * Normalize options to FilterOption format
  */
@@ -54,12 +58,19 @@ function normalizeOptions(options: string[] | FilterOption[]): FilterOption[] {
 
 <template>
   <div class="filter-item">
-    <label class="filter-label">{{ label }}</label>
+    <label :for="triggerId" class="filter-label">{{ label }}</label>
+    <!--
+      Reka's <Select> renders no element of its own; the labelable control is
+      <SelectTrigger> below, which carries the accessible name (aria-label) and
+      is tied to the visible <label> via for/id. form-control-has-label only
+      inspects `select`-typed nodes, so it false-positives on this wrapper.
+    -->
+    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
     <Select
       :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event as string)"
     >
-      <SelectTrigger :aria-label="computedAriaLabel">
+      <SelectTrigger :id="triggerId" :aria-label="computedAriaLabel">
         <SelectValue :placeholder="placeholder" />
       </SelectTrigger>
       <SelectContent>

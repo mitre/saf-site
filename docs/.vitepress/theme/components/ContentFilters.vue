@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FilterOption } from './FilterSelect.vue'
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, ref, toRef, useId, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useStandardOptions, useUniqueValues } from '@/composables/useFilterOptions'
@@ -36,6 +36,9 @@ const emit = defineEmits<{
   'update:search': [value: string]
   'clear': []
 }>()
+
+// Links the visible "Search" label to its input for assistive tech.
+const searchId = useId()
 
 // Filter state
 const selectedPillar = ref(props.initialPillar || 'all')
@@ -143,8 +146,9 @@ watch(selectedStandard, value => emit('update:standard', value))
     <!-- Row 2: Search + Clear -->
     <div class="filter-row filter-search-row">
       <div class="filter-item filter-search">
-        <label class="filter-label">Search</label>
+        <label :for="searchId" class="filter-label">Search</label>
         <Input
+          :id="searchId"
           v-model="searchQuery"
           type="text"
           placeholder="Search content..."

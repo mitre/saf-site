@@ -4,14 +4,14 @@ title: MITRE Security Automation Framework
 
 hero:
   name: MITRE
-  text: Security Automation Framework(tm)
+  text: Security Automation Framework™
   tagline: Open source security testing and compliance automation toolkit
   actions:
     - theme: brand
       text: Explore Framework
       link: /framework/
     - theme: alt
-      text: MITRE SAF(tm) Apps
+      text: MITRE SAF™ Apps
       link: /apps/
     - theme: alt
       text: View Automation Content
@@ -29,7 +29,7 @@ const pillars = [
     pillar: 'plan',
     title: 'PLAN',
     description: 'Select, tailor, and create security guidance content appropriate for your mission.',
-    body: 'Use MITRE Vulcan(tm) to create and manage security baselines to implement security requirements.',
+    body: 'Use MITRE Vulcan™ to create and manage security baselines to implement security requirements.',
     href: '/framework/plan'
   },
   {
@@ -57,7 +57,7 @@ const pillars = [
     pillar: 'visualize',
     title: 'VISUALIZE',
     description: 'Identify overall security status and deep-dive to resolve specific security defects.',
-    body: 'Use MITRE Heimdall(tm) Lite/Server to visualize security status across all security tools and share with your organization\'s governance, risk, and compliance tools.',
+    body: 'Use MITRE Heimdall™ Lite/Server to visualize security status across all security tools and share with your organization\'s governance, risk, and compliance tools.',
     href: '/framework/visualize'
   }
 ]
@@ -82,21 +82,21 @@ const values = [
 
 const toolset = [
   {
-    name: 'MITRE SAF CLI(tm)',
+    name: 'MITRE SAF CLI™',
     icon: 'saf',
     description: 'The MITRE SAF command line interface (CLI) gives users the ability to quickly normalize disparate scan results from multiple tools to OHDF, generate InSpec profiles, and validate that security requirements have been met.',
     pillars: ['harden', 'normalize', 'validate'],
     href: '/apps/saf-cli'
   },
   {
-    name: 'MITRE Heimdall',
+    name: 'MITRE Heimdall™',
     icon: 'heimdall',
     description: 'MITRE Heimdall is the MITRE SAF visualization platform. Upload baseline validation results, view existing security standards, and generate reports for your organization\'s reporting or security information and event management tools.',
     pillars: ['normalize', 'visualize'],
     href: '/apps/heimdall'
   },
   {
-    name: 'MITRE Vulcan',
+    name: 'MITRE Vulcan™',
     icon: 'saf',
     description: 'MITRE Vulcan allows users to create security guidance using the Security Requirements Guides. MITRE Vulcan streamlines the process to help authors concentrate on writing quality security guidance.',
     pillars: ['plan'],
@@ -110,7 +110,7 @@ const toolset = [
     href: '/content/'
   },
   {
-    name: 'MITRE eMASSer(tm)',
+    name: 'MITRE eMASSer™',
     icon: 'saf',
     description: 'MITRE eMASSer provides automated workflows to integrate with eMASS for continuous monitoring and assessment.',
     pillars: ['normalize'],
@@ -212,7 +212,7 @@ const getStartedCards = [
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <a v-for="tool in toolset" :key="tool.name" :href="tool.href" class="tool-card">
       <div class="tool-card-header">
-        <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" />
+        <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" decorative />
         <BookText v-else :size="40" class="text-[--vp-c-brand-1]" />
         <h3 class="tool-card-title">{{ tool.name }}</h3>
       </div>
@@ -262,20 +262,8 @@ const getStartedCards = [
   </div>
 </PageSection>
 
-<!-- Homepage Footer -->
-<div class="custom-footer">
-  <div class="footer-links">
-    <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
-    <span class="footer-separator">•</span>
-    <a href="javascript:void(0)" class="footer-link manage-cookies">Manage Cookies</a>
-  </div>
-  <p class="footer-message">
-    MITRE Security Automation Framework (MITRE SAF) is a trademark of The MITRE Corporation. Released under the Apache 2.0 License.
-  </p>
-  <p class="footer-copyright">
-    Copyright © 2026 The MITRE Corporation
-  </p>
-</div>
+<!-- Homepage Footer (shared component — same footer as doc pages) -->
+<SiteFooter />
 
 <style>
 .VPDoc .container {
@@ -283,48 +271,6 @@ const getStartedCards = [
 }
 .VPDoc .content {
   max-width: none !important;
-}
-
-/* Homepage Footer Styles (match Layout.vue scoped styles) */
-.custom-footer {
-  margin-top: 4rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--vp-c-divider);
-  text-align: center;
-}
-
-.footer-links {
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-
-.footer-link {
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.footer-link:hover {
-  color: var(--vp-c-brand-2);
-  text-decoration: underline;
-}
-
-.footer-separator {
-  margin: 0 0.75rem;
-  color: var(--vp-c-text-3);
-}
-
-.footer-message {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--vp-c-text-2);
-  margin: 0 0 0.5rem 0;
-}
-
-.footer-copyright {
-  font-size: 0.875rem;
-  color: var(--vp-c-text-2);
-  margin: 0;
 }
 
 /* Remove VitePress default h2 border on homepage */

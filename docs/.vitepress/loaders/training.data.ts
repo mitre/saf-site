@@ -6,6 +6,7 @@
 
 import PocketBase from 'pocketbase'
 import { defineLoader } from 'vitepress'
+import { smartScriptDeep } from '../lib/smart-script'
 
 interface TrainingClass {
   id: string
@@ -59,10 +60,10 @@ export default defineLoader({
       expand: 'class',
     })
 
-    return {
+    return smartScriptDeep({
       classes,
       upcomingSessions,
-    }
+    })
   },
 })
 

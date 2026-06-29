@@ -12,7 +12,7 @@ import BrandIcon from '../.vitepress/theme/components/icons/BrandIcon.vue'
 const apps = [
   {
     icon: 'heimdall',
-    name: 'MITRE Heimdall(tm)',
+    name: 'MITRE Heimdall™',
     description: 'Security data visualization and analysis platform. View compliance dashboards, compare results, and generate reports.',
     href: '/apps/heimdall',
     links: [
@@ -23,7 +23,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'MITRE SAF CLI(tm)',
+    name: 'MITRE SAF CLI™',
     description: 'Command-line tool for security automation. Convert security tool outputs to HDF, generate InSpec profiles, and more.',
     href: '/apps/saf-cli',
     links: [
@@ -34,7 +34,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'MITRE Vulcan(tm)',
+    name: 'MITRE Vulcan™',
     description: 'Security guidance authoring tool. Create and edit security requirements documents that serve as the foundation for automation.',
     href: '/apps/vulcan',
     links: [
@@ -45,7 +45,7 @@ const apps = [
   },
   {
     icon: 'saf',
-    name: 'MITRE eMASSer(tm)',
+    name: 'MITRE eMASSer™',
     description: 'eMASS integration tool. Automate interactions with Enterprise Mission Assurance Support Service to keep compliance packages up to date.',
     href: '/apps/emasser',
     links: [
@@ -96,7 +96,7 @@ const gettingStarted = [
   orientation="vertical"
   headline="MITRE SAF"
   title="Security Automation Tools"
-  description="The MITRE Security Automation Framework(tm) provides a comprehensive suite of open-source tools to support every phase of the security automation life cycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
+  description="The MITRE Security Automation Framework™ provides a comprehensive suite of open-source tools to support every phase of the security automation life cycle. From planning and authoring security requirements to validating controls and visualizing results, SAF tools enable teams to build, test, and maintain secure systems efficiently."
 />
 
 <PageSection

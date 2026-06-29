@@ -97,12 +97,6 @@ const linkedFeatures = [
 | `gap` | `union` | `'md'` | Gap between items |
 | `direction` | `union` | `'column'` | Stack direction |
 
-## Slots
-
-| Slot | Description |
-|------|-------------|
-| `default` |  |
-
 ## Types
 
 ```typescript

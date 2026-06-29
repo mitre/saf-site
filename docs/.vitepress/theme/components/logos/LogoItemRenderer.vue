@@ -4,6 +4,7 @@ import type { LogoItem } from './types'
  * Shared logo item renderer
  * Handles: custom image vs BrandIcon, link wrapping, accessibility
  */
+import { Comment, computed, Text, useSlots } from 'vue'
 import BrandIcon from '../icons/BrandIcon.vue'
 
 const props = defineProps<{
@@ -13,6 +14,17 @@ const props = defineProps<{
   /** Element to use for non-link items (default: div) */
   tag?: string
 }>()
+
+// When the grid renders a visible name beside the logo (default slot), the logo
+// is decorative; otherwise it carries the brand name as its accessible name.
+const slots = useSlots()
+const hasVisibleLabel = computed(() => {
+  const nodes = slots.default?.() ?? []
+  return nodes.some(node =>
+    node.type !== Comment
+    && !(node.type === Text && !String(node.children).trim()),
+  )
+})
 </script>
 
 <template>
@@ -28,7 +40,7 @@ const props = defineProps<{
       <img
         v-if="item.image"
         :src="item.image"
-        :alt="item.name"
+        :alt="hasVisibleLabel ? '' : item.name"
         :width="size"
         :height="size"
         class="logo-image" :class="[{ 'logo-image--invert-dark': item.name.toLowerCase() === 'github' }]"
@@ -37,6 +49,7 @@ const props = defineProps<{
         v-else
         :name="item.iconName || item.name"
         :size="size"
+        :decorative="hasVisibleLabel"
       />
     </div>
     <slot />

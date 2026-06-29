@@ -10,6 +10,7 @@ defineProps<{
     :height="size ? Number(size) * (97 / 99) : 97"
     viewBox="0 0 99 97"
     xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
     class="pillar-icon pillar-icon-normalize"
   >
     <title>Normalize Icon</title>
