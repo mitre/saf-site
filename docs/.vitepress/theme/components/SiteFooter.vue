@@ -28,7 +28,7 @@ function showCookiePreferences() {
       MITRE Security Automation Framework (MITRE SAF) is a trademark of The MITRE Corporation. Released under the Apache 2.0 License.
     </p>
     <p class="footer-copyright">
-      Copyright © 2026 The MITRE Corporation
+      ©2026 The MITRE Corporation. ALL RIGHTS RESERVED. Approved for Public Release; Distribution Unlimited. Case Number 26-0705.
     </p>
   </footer>
 </template>
