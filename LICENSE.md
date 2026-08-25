@@ -1,8 +1,8 @@
 # License
 
-Copyright © 2025 The MITRE Corporation.
+Copyright © 2026 The MITRE Corporation.
 
-Approved for Public Release; Distribution Unlimited. Case Number 18-3678.
+Approved for Public Release; Distribution Unlimited. Case Number 26-0705.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain a
