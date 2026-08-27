@@ -335,37 +335,41 @@ async function createCategories() {
   }
 }
 
+// Version patterns used when inferring targets from profile names
+const MAJOR_VERSION_REGEX = /(\d+)/
+const MAJOR_MINOR_VERSION_REGEX = /(\d+\.\d+)/
+
 // Map profile names to target info
 function inferTargetFromProfile(profileName: string): { name: string, slug: string, category: string, vendor?: string } | null {
   const name = profileName.toLowerCase()
 
   // Operating Systems
   if (name.includes('rhel') || name.includes('red hat')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `Red Hat Enterprise Linux ${version}`, slug: `rhel-${version}`, category: 'os', vendor: 'red-hat' }
   }
   if (name.includes('ubuntu')) {
-    const version = name.match(/(\d+\.\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_MINOR_VERSION_REGEX)?.[1] || ''
     return { name: `Ubuntu ${version}`, slug: `ubuntu-${version.replace('.', '')}`, category: 'os', vendor: 'canonical' }
   }
   if (name.includes('windows')) {
     if (name.includes('server')) {
-      const version = name.match(/(\d+)/)?.[1] || ''
+      const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
       return { name: `Windows Server ${version}`, slug: `windows-server-${version}`, category: 'os', vendor: 'microsoft' }
     }
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `Windows ${version}`, slug: `windows-${version}`, category: 'os', vendor: 'microsoft' }
   }
   if (name.includes('oracle linux')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `Oracle Linux ${version}`, slug: `oracle-linux-${version}`, category: 'os', vendor: 'oracle' }
   }
   if (name.includes('suse') || name.includes('sles')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `SUSE Linux Enterprise ${version}`, slug: `sles-${version}`, category: 'os', vendor: 'suse' }
   }
   if (name.includes('amazon linux')) {
-    const version = name.match(/(\d+)/)?.[1] || '2'
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || '2'
     return { name: `Amazon Linux ${version}`, slug: `amazon-linux-${version}`, category: 'os', vendor: 'amazon' }
   }
   if (name.includes('macos') || name.includes('mac os')) {
@@ -374,23 +378,23 @@ function inferTargetFromProfile(profileName: string): { name: string, slug: stri
 
   // Databases
   if (name.includes('mysql')) {
-    const version = name.match(/(\d+\.\d+)/)?.[1] || name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_MINOR_VERSION_REGEX)?.[1] || name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `MySQL ${version}`, slug: `mysql-${version.replace('.', '')}`, category: 'database', vendor: 'oracle' }
   }
   if (name.includes('postgresql') || name.includes('postgres')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `PostgreSQL ${version}`, slug: `postgresql-${version}`, category: 'database' }
   }
   if (name.includes('mongodb')) {
-    const version = name.match(/(\d+\.\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_MINOR_VERSION_REGEX)?.[1] || ''
     return { name: `MongoDB ${version}`, slug: `mongodb-${version.replace('.', '')}`, category: 'database', vendor: 'mongodb' }
   }
   if (name.includes('oracle') && name.includes('database')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `Oracle Database ${version}`, slug: `oracle-db-${version}`, category: 'database', vendor: 'oracle' }
   }
   if (name.includes('sql server') || name.includes('mssql')) {
-    const version = name.match(/(\d+)/)?.[1] || ''
+    const version = name.match(MAJOR_VERSION_REGEX)?.[1] || ''
     return { name: `Microsoft SQL Server ${version}`, slug: `mssql-${version}`, category: 'database', vendor: 'microsoft' }
   }
 
@@ -803,12 +807,16 @@ async function migrateContentRelationships() {
 // HELPERS
 // ============================================================================
 
+const NON_WORD_CHAR_REGEX = /[^\w\s-]/g
+const WHITESPACE_REGEX = /\s+/g
+const REPEATED_HYPHEN_REGEX = /-+/g
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(NON_WORD_CHAR_REGEX, '')
+    .replace(WHITESPACE_REGEX, '-')
+    .replace(REPEATED_HYPHEN_REGEX, '-')
     .trim()
 }
 
@@ -881,13 +889,15 @@ function normalizeUrl(url: string | undefined): string {
   return ''
 }
 
+// Leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
+const VERSION_PREFIX_REGEX = /^v/i
+
 function normalizeVersion(version: string | undefined): string {
   if (!version)
     return ''
 
-  // Strip leading 'v' or 'V' prefix - versions should be just "1.0.0" not "v1.0.0"
   // The display layer (Vue components) adds the "v" prefix for presentation
-  return version.replace(/^v/i, '')
+  return version.replace(VERSION_PREFIX_REGEX, '')
 }
 
 main().catch(console.error)

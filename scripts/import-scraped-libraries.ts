@@ -284,12 +284,16 @@ function inferRelationships(item: ScrapedLibrary) {
   }
 }
 
+const NON_WORD_CHAR_REGEX = /[^\w\s-]/g
+const WHITESPACE_REGEX = /\s+/g
+const REPEATED_HYPHEN_REGEX = /-+/g
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(NON_WORD_CHAR_REGEX, '')
+    .replace(WHITESPACE_REGEX, '-')
+    .replace(REPEATED_HYPHEN_REGEX, '-')
     .trim()
 }
 

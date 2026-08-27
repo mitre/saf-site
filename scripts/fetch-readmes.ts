@@ -33,6 +33,17 @@ const REFERENCE_URLS: Record<string, string> = {
   'PCI-DSS': 'https://www.pcisecuritystandards.org/document_library',
 }
 
+// Monorepo URL with /tree/branch/path
+const MONOREPO_URL_REGEX = /github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/
+// Simple repo URL (optionally ending in .git or a trailing slash)
+const SIMPLE_REPO_URL_REGEX = /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/
+const GIT_SUFFIX_REGEX = /\.git$/
+// Target slug suffixes normalized away for CIS benchmark URLs
+const CE_SUFFIX_REGEX = /-ce$/
+const EE_SUFFIX_REGEX = /-ee$/
+const ENTERPRISE_SUFFIX_REGEX = /-enterprise$/
+const COMMUNITY_SUFFIX_REGEX = /-community$/
+
 interface ContentRecord {
   id: string
   name: string
@@ -63,17 +74,17 @@ interface ParsedGitHubUrl {
  */
 function parseGitHubUrl(url: string): ParsedGitHubUrl | null {
   // Match monorepo URL with /tree/branch/path
-  const monorepoMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
+  const monorepoMatch = url.match(MONOREPO_URL_REGEX)
   if (monorepoMatch) {
     const [, owner, repo, branch, path] = monorepoMatch
     return { owner, repo, branch, path }
   }
 
   // Match simple repo URL
-  const simpleMatch = url.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/)
+  const simpleMatch = url.match(SIMPLE_REPO_URL_REGEX)
   if (simpleMatch) {
     const [, owner, repo] = simpleMatch
-    return { owner, repo: repo.replace(/\.git$/, '') }
+    return { owner, repo: repo.replace(GIT_SUFFIX_REGEX, '') }
   }
 
   return null
@@ -123,10 +134,10 @@ function deriveReferenceUrl(record: ContentRecord): string | null {
     if (targetSlug) {
       // Normalize target slug for CIS URL (e.g., "docker-ce" -> "docker")
       const normalizedTarget = targetSlug
-        .replace(/-ce$/, '') // docker-ce -> docker
-        .replace(/-ee$/, '') // docker-ee -> docker
-        .replace(/-enterprise$/, '') // remove enterprise suffix
-        .replace(/-community$/, '') // remove community suffix
+        .replace(CE_SUFFIX_REGEX, '') // docker-ce -> docker
+        .replace(EE_SUFFIX_REGEX, '') // docker-ee -> docker
+        .replace(ENTERPRISE_SUFFIX_REGEX, '') // remove enterprise suffix
+        .replace(COMMUNITY_SUFFIX_REGEX, '') // remove community suffix
         .split('-')[0] // take first part (e.g., "red-hat" -> "red")
       return pattern.replace('{target}', normalizedTarget)
     }

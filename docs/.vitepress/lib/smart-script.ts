@@ -19,6 +19,10 @@ export interface SmartScriptOptions {
   copyright?: boolean
 }
 
+const TRADEMARK_REGEX = /\(tm\)/gi
+const REGISTERED_REGEX = /\(r\)/gi
+const COPYRIGHT_REGEX = /\(c\)/gi
+
 /**
  * Substitute trademark/registered/copyright shorthand in a string.
  * Returns the input unchanged when it contains no shorthand.
@@ -29,11 +33,11 @@ export function smartScript(text: string, options: SmartScriptOptions = {}): str
 
   let result = text
   if (options.trademark !== false)
-    result = result.replace(/\(tm\)/gi, '™')
+    result = result.replace(TRADEMARK_REGEX, '™')
   if (options.registered !== false)
-    result = result.replace(/\(r\)/gi, '®')
+    result = result.replace(REGISTERED_REGEX, '®')
   if (options.copyright !== false)
-    result = result.replace(/\(c\)/gi, '©')
+    result = result.replace(COPYRIGHT_REGEX, '©')
   return result
 }
 

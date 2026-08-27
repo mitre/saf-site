@@ -15,15 +15,25 @@ import * as schema from '../docs/.vitepress/database/schema'
 const SCHEMA_PATH = 'docs/.vitepress/database/schema.ts'
 const OUTPUT_PATH = 'docs/.vitepress/database/schema.dbml'
 
+// sqliteTable definition capturing variable name and table name
+const TABLE_DEF_REGEX = /export const (\w+) = sqliteTable\('([^']+)'/g
+// sqliteTable definition capturing table name only
+const TABLE_NAME_REGEX = /export const \w+ = sqliteTable\('([^']+)'/g
+// Match: fieldName: text('column').references(() => targetTable.id)
+// Also handles .notNull() before .references()
+const REF_DEF_REGEX = /(\w+):\s*text\([^)]+\)(?:\.notNull\(\))?\.references\(\(\)\s*=>\s*(\w+)\.(\w+)/g
+// "ref: ..." lines emitted by drizzle-dbml-generator
+const DBML_REF_REGEX = /ref: .+/g
+const SQLITE_TABLE_REGEX = /sqliteTable/g
+
 // Parse schema file to find ALL references dynamically
 export function findAllRefs(schemaContent: string): string[] {
   const refs: string[] = []
 
   // Find all sqliteTable definitions
-  const tableRegex = /export const (\w+) = sqliteTable\('([^']+)'/g
   const tables: Map<string, string> = new Map() // varName -> tableName
 
-  for (const match of schemaContent.matchAll(tableRegex)) {
+  for (const match of schemaContent.matchAll(TABLE_DEF_REGEX)) {
     tables.set(match[1], match[2])
   }
 
@@ -33,11 +43,7 @@ export function findAllRefs(schemaContent: string): string[] {
     const nextExport = schemaContent.indexOf('export const', tableStart + 1)
     const tableBlock = schemaContent.slice(tableStart, nextExport > 0 ? nextExport : undefined)
 
-    // Match: fieldName: text('column').references(() => targetTable.id)
-    // Also handles .notNull() before .references()
-    const refRegex = /(\w+):\s*text\([^)]+\)(?:\.notNull\(\))?\.references\(\(\)\s*=>\s*(\w+)\.(\w+)/g
-
-    for (const refMatch of tableBlock.matchAll(refRegex)) {
+    for (const refMatch of tableBlock.matchAll(REF_DEF_REGEX)) {
       const fieldName = refMatch[1]
       const targetVar = refMatch[2]
       const targetCol = refMatch[3]
@@ -52,10 +58,9 @@ export function findAllRefs(schemaContent: string): string[] {
 
 // Auto-detect table groups based on naming patterns
 export function generateTableGroups(schemaContent: string): string {
-  const tableRegex = /export const \w+ = sqliteTable\('([^']+)'/g
   const allTables: string[] = []
 
-  for (const match of schemaContent.matchAll(tableRegex)) {
+  for (const match of schemaContent.matchAll(TABLE_NAME_REGEX)) {
     allTables.push(match[1])
   }
 
@@ -106,7 +111,7 @@ function main() {
 
   // Find all refs from schema (drizzle-dbml-generator misses some)
   const allRefs = findAllRefs(schemaContent)
-  const existingRefs = new Set(dbml.match(/ref: .+/g) || [])
+  const existingRefs = new Set(dbml.match(DBML_REF_REGEX) || [])
 
   // Find missing refs
   const missingRefs = allRefs.filter(ref => !existingRefs.has(ref))
@@ -131,7 +136,7 @@ function main() {
 
   writeFileSync(OUTPUT_PATH, output)
   console.log(`✅ Generated ${OUTPUT_PATH}`)
-  console.log(`   Tables: ${(schemaContent.match(/sqliteTable/g) || []).length}`)
+  console.log(`   Tables: ${(schemaContent.match(SQLITE_TABLE_REGEX) || []).length}`)
   console.log(`   Refs: ${allRefs.length} (${missingRefs.length} added by this script)`)
 }
 

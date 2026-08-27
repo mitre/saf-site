@@ -50,6 +50,10 @@ export interface AuditResult {
 // ============================================================================
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+// Standard names stripped from content names when deriving target abbreviations
+const STANDARD_NAME_REGEX = /stig|cis|pci.?dss|nist|hipaa/gi
+// Version patterns: 9, 9.0, 22.04, 2019, etc.
+const VERSION_REGEX = /(\d+(?:\.\d+)?(?:\.\d+)?)/
 const standardIdentifiers = Object.values(STANDARD_IDENTIFIERS)
 
 /**
@@ -82,7 +86,7 @@ export function validateSlug(slug: string): {
   const parts = slug.split('-')
 
   // Check if slug ends with a known standard
-  const lastPart = parts[parts.length - 1]
+  const lastPart = parts.at(-1)
   const secondLastPart = parts.length > 1 ? parts[parts.length - 2] : null
 
   // Standards can be hyphenated (pci-dss, nist-800-53)
@@ -336,10 +340,10 @@ export function auditEntity(
       }
 
       // Try to generate correct slug
-      const targetAbbrev = abbreviateTarget(data.name.replace(/stig|cis|pci.?dss|nist|hipaa/gi, '').trim())
+      const targetAbbrev = abbreviateTarget(data.name.replace(STANDARD_NAME_REGEX, '').trim())
 
       // Extract version from name
-      const versionMatch = data.name.match(/(\d+(?:\.\d+)?(?:\.\d+)?)/)
+      const versionMatch = data.name.match(VERSION_REGEX)
       const version = versionMatch ? versionMatch[1].replace('.', '') : ''
 
       if (targetAbbrev) {

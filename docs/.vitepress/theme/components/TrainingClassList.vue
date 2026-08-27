@@ -18,11 +18,13 @@ interface Props {
 
 defineProps<Props>()
 
+const YOUTUBE_ID_REGEX = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/
+
 // Extract YouTube video ID from URL
 function getYouTubeId(url?: string) {
   if (!url)
     return null
-  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
+  const match = url.match(YOUTUBE_ID_REGEX)
   return match ? match[1] : null
 }
 </script>

@@ -14,6 +14,9 @@ const pbUrl = process.env.PB_URL || 'http://localhost:8090'
 const pbEmail = process.env.PB_ADMIN_EMAIL || 'admin@localhost.com'
 const pbPassword = process.env.PB_ADMIN_PASSWORD || 'testpassword123'
 
+// Trailing " Class" suffix stripped from sidebar entries
+const CLASS_SUFFIX_REGEX = /\s+Class$/i
+
 export async function getTrainingSidebar() {
   try {
     const pb = new PocketBase(pbUrl)
@@ -33,7 +36,7 @@ export async function getTrainingSidebar() {
             text: 'All Classes',
             link: '/training/#classes',
             items: classes.map(cls => ({
-              text: cls.title.replace(/\s+Class$/i, ''),
+              text: cls.title.replace(CLASS_SUFFIX_REGEX, ''),
               link: `/training/#class-${cls.slug}`,
             })),
           },

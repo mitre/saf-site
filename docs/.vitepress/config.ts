@@ -12,6 +12,20 @@ import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 // eslint-disable-next-line antfu/no-top-level-await
 const trainingSidebar = await getTrainingSidebar()
 
+// Static string props: headline="...", title="...", description="..."
+const STATIC_STRING_PROP_REGEX = /\b(?:headline|title|description)\s*=\s*"([^"]+)"/g
+// Dynamic object props (single-quoted): title: '...', description: '...'
+const SINGLE_QUOTED_PROP_REGEX = /(?:title|description):\s*'((?:[^'\\]|\\.)*)'/g
+// Dynamic object props (double-quoted inside template): title: "...", description: "..."
+const DOUBLE_QUOTED_PROP_REGEX = /(?:title|description):\s*"([^"]+)"/g
+const ESCAPED_SINGLE_QUOTE_REGEX = /\\'/g
+// Test/dev pages excluded from search indexing
+const EXCLUDED_SEARCH_PATH_REGEX = /^(?:test-|icon-test|taxonomy\/)/
+// VitePress-formatted heading with a header-anchor link
+const HEADER_ANCHOR_REGEX = /<h\d.*?<a.*?class="header-anchor"/
+const WHITESPACE_REGEX = /\s+/g
+const NON_SLUG_CHAR_REGEX = /[^\w-]/g
+
 /**
  * Extract searchable text from Vue component props in markdown files.
  * VitePress local search strips HTML tags, losing prop values like
@@ -20,16 +34,13 @@ const trainingSidebar = await getTrainingSidebar()
 function extractVueComponentText(src: string, relativePath: string): string {
   const texts: string[] = []
 
-  // Static string props: headline="...", title="...", description="..."
-  for (const m of src.matchAll(/\b(?:headline|title|description)\s*=\s*"([^"]+)"/g))
+  for (const m of src.matchAll(STATIC_STRING_PROP_REGEX))
     texts.push(m[1])
 
-  // Dynamic object props (single-quoted): title: '...', description: '...'
-  for (const m of src.matchAll(/(?:title|description):\s*'((?:[^'\\]|\\.)*)'/g))
-    texts.push(m[1].replace(/\\'/g, '\''))
+  for (const m of src.matchAll(SINGLE_QUOTED_PROP_REGEX))
+    texts.push(m[1].replace(ESCAPED_SINGLE_QUOTE_REGEX, '\''))
 
-  // Dynamic object props (double-quoted inside template): title: "...", description: "..."
-  for (const m of src.matchAll(/(?:title|description):\s*"([^"]+)"/g))
+  for (const m of src.matchAll(DOUBLE_QUOTED_PROP_REGEX))
     texts.push(m[1])
 
   // Boost framework pillar pages with extra keyword signal
@@ -121,7 +132,7 @@ export default defineConfig({
             return ''
 
           // Exclude test/dev pages by path pattern
-          if (env.relativePath.match(/^(test-|icon-test|taxonomy\/)/))
+          if (EXCLUDED_SEARCH_PATH_REGEX.test(env.relativePath))
             return ''
 
           // Pages without VitePress-formatted headings (with anchor links)
@@ -129,8 +140,8 @@ export default defineConfig({
           // <h*> tags with header-anchor links. Raw <h3> tags inside Vue
           // templates don't count. Inject a heading from frontmatter title.
           const title = env.frontmatter?.title
-          if (title && !/<h\d.*?<a.*?class="header-anchor"/.test(html)) {
-            const slug = String(title).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+          if (title && !HEADER_ANCHOR_REGEX.test(html)) {
+            const slug = String(title).toLowerCase().replace(WHITESPACE_REGEX, '-').replace(NON_SLUG_CHAR_REGEX, '')
             html = `<h1 id="${slug}">${title} <a class="header-anchor" href="#${slug}">\u200B</a></h1>\n${html}`
           }
 

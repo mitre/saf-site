@@ -124,6 +124,12 @@ function formatBenchmarkVersion(version: string, standardName: string): string {
   return `v${version}`
 }
 
+/** Template variable patterns for {@link interpolateTemplate} */
+const GITHUB_TOKEN_REGEX = /\{github\}/g
+const SLUG_TOKEN_REGEX = /\{slug\}/g
+const VENDOR_SLUG_TOKEN_REGEX = /\{vendor_slug\}/g
+const NAME_TOKEN_REGEX = /\{name\}/g
+
 /**
  * Interpolate template variables with content values
  * Supported variables: {github}, {slug}, {vendor_slug}, {name}
@@ -133,10 +139,10 @@ function interpolateTemplate(template: string, content: ContentItem): string {
     return ''
 
   return template
-    .replace(/\{github\}/g, content.github_url || '')
-    .replace(/\{slug\}/g, content.slug || '')
-    .replace(/\{vendor_slug\}/g, content.vendor_slug || '')
-    .replace(/\{name\}/g, content.name || '')
+    .replace(GITHUB_TOKEN_REGEX, content.github_url || '')
+    .replace(SLUG_TOKEN_REGEX, content.slug || '')
+    .replace(VENDOR_SLUG_TOKEN_REGEX, content.vendor_slug || '')
+    .replace(NAME_TOKEN_REGEX, content.name || '')
 }
 
 /** Registry base URLs for package links */

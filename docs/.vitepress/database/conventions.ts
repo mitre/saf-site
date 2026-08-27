@@ -205,12 +205,18 @@ export function abbreviateStandard(standardName: string): string {
   return slugify(normalized)
 }
 
+// Match version patterns: 9, 9.0, 22.04, 2019, etc.
+const VERSION_REGEX = /(\d+(?:\.\d+)?(?:\.\d+)?)/
+// Versions like 9.0 or 14.0 (zero minor)
+const MAJOR_DOT_ZERO_REGEX = /^\d+\.0$/
+// Versions with a major and minor component (e.g., 22.04)
+const MAJOR_MINOR_REGEX = /^\d+\.\d+$/
+
 /**
  * Extract version from a string (e.g., "Red Hat 9" -> "9", "Ubuntu 22.04" -> "2204")
  */
 export function extractVersion(name: string): string | null {
-  // Match version patterns: 9, 9.0, 22.04, 2019, etc.
-  const versionMatch = name.match(/(\d+(?:\.\d+)?(?:\.\d+)?)/)
+  const versionMatch = name.match(VERSION_REGEX)
 
   if (!versionMatch)
     return null
@@ -218,12 +224,12 @@ export function extractVersion(name: string): string | null {
   const version = versionMatch[1]
 
   // For versions like 9.0 or 14.0, just use major
-  if (version.match(/^\d+\.0$/)) {
+  if (MAJOR_DOT_ZERO_REGEX.test(version)) {
     return version.split('.')[0]
   }
 
   // For OS versions like 22.04 (non-.0 minor), remove the dot (ubuntu-2204)
-  if (version.match(/^\d+\.\d+$/) && !version.endsWith('.0')) {
+  if (MAJOR_MINOR_REGEX.test(version) && !version.endsWith('.0')) {
     return version.replace('.', '')
   }
 
@@ -268,6 +274,11 @@ export function generateContentSlug(
   return parts.join('-')
 }
 
+// Hardening pattern: {tech}-{target}-{standard}-hardening
+const HARDENING_REPO_REGEX = /^(ansible|chef|puppet|terraform|powershell)-(.+)-(stig|cis|pci-dss|nist|hipaa)-hardening$/
+// Baseline pattern: {target}-{standard}-baseline
+const BASELINE_REPO_REGEX = /^(.+)-(stig|cis|pci-dss|nist|hipaa)-baseline$/
+
 /**
  * Parse a GitHub repo name into components
  *
@@ -286,10 +297,7 @@ export function parseRepoName(repoName: string): {
 } | null {
   const normalized = repoName.toLowerCase()
 
-  // Check for hardening pattern: {tech}-{target}-{standard}-hardening
-  const hardeningMatch = normalized.match(
-    /^(ansible|chef|puppet|terraform|powershell)-(.+)-(stig|cis|pci-dss|nist|hipaa)-hardening$/,
-  )
+  const hardeningMatch = normalized.match(HARDENING_REPO_REGEX)
 
   if (hardeningMatch) {
     return {
@@ -300,10 +308,7 @@ export function parseRepoName(repoName: string): {
     }
   }
 
-  // Check for baseline pattern: {target}-{standard}-baseline
-  const baselineMatch = normalized.match(
-    /^(.+)-(stig|cis|pci-dss|nist|hipaa)-baseline$/,
-  )
+  const baselineMatch = normalized.match(BASELINE_REPO_REGEX)
 
   if (baselineMatch) {
     return {
@@ -316,15 +321,21 @@ export function parseRepoName(repoName: string): {
   return null
 }
 
+const NON_ALPHANUMERIC_REGEX = /[^a-z0-9]+/g
+const EDGE_HYPHEN_REGEX = /^-|-$/g
+
 /**
  * Simple slugify - lowercase, replace non-alphanumeric with hyphens
  */
 export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+    .replace(NON_ALPHANUMERIC_REGEX, '-')
+    .replace(EDGE_HYPHEN_REGEX, '')
 }
+
+const HYPHEN_REGEX = /-/g
+const WORD_INITIAL_REGEX = /\b\w/g
 
 /**
  * Suggest a slug from a GitHub repository name
@@ -337,8 +348,8 @@ export function suggestSlugFromRepo(repoName: string): string | null {
 
   // Convert target from repo format to display format for abbreviation lookup
   const targetDisplay = parsed.target
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase())
+    .replace(HYPHEN_REGEX, ' ')
+    .replace(WORD_INITIAL_REGEX, c => c.toUpperCase())
 
   return generateContentSlug(
     targetDisplay,

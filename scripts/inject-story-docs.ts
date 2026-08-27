@@ -20,6 +20,17 @@ import { parse } from 'vue-docgen-api'
 
 const COMPONENTS_ROOT = 'docs/.vitepress/theme/components'
 
+// Leading " * " prefix on JSDoc comment lines
+const COMMENT_LINE_PREFIX_REGEX = /^\s*\*\s?/
+// JSDoc tag with optional inline content (e.g., "@example ...")
+const JSDOC_TAG_REGEX = /^@(\w+)\s*(.*)/
+// Exported interfaces: export interface Name { ... }
+const INTERFACE_REGEX = /export\s+interface\s+\w+\s*\{[\s\S]*?\n\}/g
+// Exported types: export type Name = ...
+const TYPE_ALIAS_REGEX = /export\s+type\s+\w+\s*=[^;]+;/g
+// Existing <docs> block in a story file
+const DOCS_BLOCK_REGEX = /<docs\s+lang="md">[\s\S]*?<\/docs>/
+
 /**
  * Custom script handler to extract @component JSDoc from <script setup>
  * See: https://github.com/vue-styleguidist/vue-styleguidist/issues/1399
@@ -45,10 +56,10 @@ const scriptSetupHandler: ScriptHandler = (
     let currentTag: string | null = null
 
     for (const line of lines) {
-      const cleaned = line.replace(/^\s*\*\s?/, '').trim()
+      const cleaned = line.replace(COMMENT_LINE_PREFIX_REGEX, '').trim()
 
       // Check for @tags
-      const tagMatch = cleaned.match(/^@(\w+)\s*(.*)/)
+      const tagMatch = cleaned.match(JSDOC_TAG_REGEX)
       if (tagMatch) {
         const [, tagName, tagContent] = tagMatch
         if (tagName === 'component') {
@@ -131,20 +142,12 @@ function extractInterfaces(componentPath: string): string[] {
   const content = readFileSync(componentPath, 'utf-8')
   const interfaces: string[] = []
 
-  // Match exported interfaces: export interface Name { ... }
-  const interfaceRegex = /export\s+interface\s+\w+\s*\{[\s\S]*?\n\}/g
-  let match = interfaceRegex.exec(content)
-  while (match !== null) {
+  for (const match of content.matchAll(INTERFACE_REGEX)) {
     interfaces.push(match[0])
-    match = interfaceRegex.exec(content)
   }
 
-  // Match exported types: export type Name = ...
-  const typeRegex = /export\s+type\s+\w+\s*=[^;]+;/g
-  match = typeRegex.exec(content)
-  while (match !== null) {
+  for (const match of content.matchAll(TYPE_ALIAS_REGEX)) {
     interfaces.push(match[0])
-    match = typeRegex.exec(content)
   }
 
   return interfaces
@@ -279,13 +282,10 @@ function injectDocs(storyPath: string, markdown: string): boolean {
 
   const docsBlock = `<docs lang="md">\n${markdown.trimEnd()}\n</docs>`
 
-  // Check if <docs> block already exists
-  const docsRegex = /<docs\s+lang="md">[\s\S]*?<\/docs>/
-
   let newContent: string
-  if (docsRegex.test(content)) {
+  if (DOCS_BLOCK_REGEX.test(content)) {
     // Replace existing <docs> block
-    newContent = content.replace(docsRegex, docsBlock)
+    newContent = content.replace(DOCS_BLOCK_REGEX, docsBlock)
   }
   else {
     // Append <docs> block at the end
@@ -306,11 +306,10 @@ function injectDocs(storyPath: string, markdown: string): boolean {
 function checkDocs(storyPath: string, markdown: string): boolean {
   const content = readFileSync(storyPath, 'utf-8')
   const docsBlock = `<docs lang="md">\n${markdown.trimEnd()}\n</docs>`
-  const docsRegex = /<docs\s+lang="md">[\s\S]*?<\/docs>/
 
   let expectedContent: string
-  if (docsRegex.test(content)) {
-    expectedContent = content.replace(docsRegex, docsBlock)
+  if (DOCS_BLOCK_REGEX.test(content)) {
+    expectedContent = content.replace(DOCS_BLOCK_REGEX, docsBlock)
   }
   else {
     expectedContent = `${content.trimEnd()}\n\n${docsBlock}\n`
