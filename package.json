@@ -111,10 +111,10 @@
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
     "fuse.js": "^7.5.0",
-    "marked": "^17.0.6",
-    "pocketbase": "^0.26.9",
+    "marked": "^18.0.10",
+    "pocketbase": "^0.28.0",
     "reka-ui": "^2.10.3",
-    "shiki": "^3.23.0",
+    "shiki": "^4.4.3",
     "vue3-json-viewer": "^2.4.1",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
