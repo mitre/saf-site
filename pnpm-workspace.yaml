@@ -1,5 +1,7 @@
 packages:
   - 'cli'
+storeDir: .pnpm-store
+minimumReleaseAge: 10080
 overrides:
   esbuild: '>=0.25.0'
   mdast-util-to-hast: '>=13.2.1'
