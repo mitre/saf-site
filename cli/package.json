@@ -32,26 +32,26 @@
     "pnpm": ">=10"
   },
   "dependencies": {
-    "@clack/prompts": "^0.10.0",
+    "@clack/prompts": "^0.10.1",
     "cli-table3": "^0.6.5",
-    "commander": "^14.0.0",
+    "commander": "^14.0.3",
     "ora": "^8.2.0",
     "picocolors": "^1.1.1",
-    "pocketbase": "^0.26.5",
-    "yaml": "^2.8.2",
-    "zod": "^4.3.5"
+    "pocketbase": "^0.26.9",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.13.2",
-    "@types/node": "^25.0.9",
+    "@antfu/eslint-config": "^4.19.0",
+    "@types/node": "^25.9.5",
     "@types/wait-on": "^5.3.4",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/coverage-v8": "^4.1.11",
     "execa": "^9.6.1",
     "interactive-cli-tester": "^0.3.0",
-    "tsup": "^8.5.0",
-    "tsx": "^4.21.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.12",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17",
-    "wait-on": "^9.0.3"
+    "vitest": "^4.1.11",
+    "wait-on": "^9.1.0"
   }
 }
