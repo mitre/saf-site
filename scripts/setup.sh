@@ -445,6 +445,19 @@ check_pocketbase() {
     echo ""
 }
 
+# sha256 per platform, from the release's checksums.txt. Must be updated
+# together with the pinned version in setup_pocketbase (and the CI copy in
+# .github/actions/setup-pocketbase/action.yml).
+pocketbase_checksum() {
+    case "$1" in
+        0.36.0_darwin_amd64) echo "27036082ed1a6d33980ee10646455db6b30e1cf48b18abfe3882249b60e18029" ;;
+        0.36.0_darwin_arm64) echo "73739a1f5bdc9ad86fc8bdf8f7c25d45c882f08c238c506e99e14aed8a7e3d81" ;;
+        0.36.0_linux_amd64)  echo "8a49425c867c62b9327c2f132a4229aba22fbd2f380578ae860264aaea1307de" ;;
+        0.36.0_linux_arm64)  echo "9e157b691478abe2a09eb9ac0d73a6c651f47d1ae354cea7fd7047a6d4ea6385" ;;
+        *) echo "" ;;
+    esac
+}
+
 download_pocketbase() {
     local version="$1"
     local platform="$2"
@@ -472,6 +485,27 @@ download_pocketbase() {
         }
     else
         error "Neither curl nor wget found"
+        exit 1
+    fi
+
+    # Verify checksum
+    local expected actual
+    expected=$(pocketbase_checksum "${version}_${platform}")
+    if [ -z "$expected" ]; then
+        error "No pinned checksum for Pocketbase ${version}_${platform}"
+        rm -f "$tmp_file"
+        exit 1
+    fi
+    if command -v sha256sum &>/dev/null; then
+        actual=$(sha256sum "$tmp_file" | cut -d' ' -f1)
+    else
+        actual=$(shasum -a 256 "$tmp_file" | cut -d' ' -f1)
+    fi
+    if [ "$actual" != "$expected" ]; then
+        error "Checksum mismatch for pocketbase_${version}_${platform}.${ext}"
+        echo "    expected: $expected"
+        echo "    actual:   $actual"
+        rm -f "$tmp_file"
         exit 1
     fi
 
