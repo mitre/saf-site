@@ -1,0 +1,44 @@
+version: 2
+
+# Cooldown: wait N days after a release before raising a PR.
+# Reduces exposure to supply chain attacks (compromised releases
+# typically get yanked within 24-48 hours). Security updates (CVEs)
+# bypass cooldown entirely. This complements the 7-day
+# minimumReleaseAge install-time gate in pnpm-workspace.yaml.
+
+updates:
+  # npm (pnpm workspace — root site + cli/ package)
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/cli"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+      semver-minor-days: 3
+      semver-patch-days: 3
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+      production-dependencies:
+        dependency-type: "production"
+    ignore:
+      # TypeScript majors break the toolchain until vue-tsc and
+      # typescript-eslint (inside @antfu/eslint-config) support them.
+      # Hold TS majors and adopt them manually; minor/patch still flow.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 10
+
+  # GitHub Actions (cooldown for new action releases)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 5
