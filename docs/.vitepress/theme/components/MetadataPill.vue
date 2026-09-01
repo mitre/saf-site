@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 import BrandIcon from './icons/BrandIcon.vue'
 
@@ -20,7 +21,7 @@ const displayValue = computed(() => {
 <template>
   <component
     :is="href ? 'a' : 'span'"
-    :href="href"
+    :href="href ? withBase(href) : undefined"
     class="metadata-pill"
     :class="{ clickable: !!href }"
   >

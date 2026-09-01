@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PillarType } from './PillarBadge.vue'
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -49,7 +50,7 @@ const footerLabel = computed(() => {
 
 // Generate URL based on content type
 const contentUrl = computed(() => {
-  return `/content/${props.content.slug}.html`
+  return withBase(`/content/${props.content.slug}.html`)
 })
 </script>
 

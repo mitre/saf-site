@@ -7,6 +7,7 @@ wideLayout: true
 
 <script setup>
 import { h } from 'vue'
+import { withBase } from 'vitepress'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 import { SafLogoIcon } from '../.vitepress/theme/components/icons/tools'
 
@@ -62,7 +63,7 @@ const pillars = [
   description="Each pillar addresses a specific phase in the security automation journey. Jump in at any point or follow the complete workflow."
 >
   <div class="pillar-grid">
-    <a v-for="(pillar, index) in pillars" :key="pillar.title" :href="pillar.href" :class="['pillar-card', `pillar-${index + 1}`]">
+    <a v-for="(pillar, index) in pillars" :key="pillar.title" :href="withBase(pillar.href)" :class="['pillar-card', `pillar-${index + 1}`]">
       <div class="flex flex-col items-center text-center gap-4">
         <component :is="pillar.icon" />
         <div>

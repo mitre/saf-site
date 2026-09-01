@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LogoItem } from './types'
+import { withBase } from 'vitepress'
 /**
  * Shared logo item renderer
  * Handles: custom image vs BrandIcon, link wrapping, accessibility
@@ -30,7 +31,7 @@ const hasVisibleLabel = computed(() => {
 <template>
   <component
     :is="item.href ? 'a' : (tag || 'div')"
-    :href="item.href"
+    :href="item.href ? withBase(item.href) : undefined"
     :target="item.href?.startsWith('http') ? '_blank' : undefined"
     :rel="item.href?.startsWith('http') ? 'noopener noreferrer' : undefined"
     :title="item.description || item.name"

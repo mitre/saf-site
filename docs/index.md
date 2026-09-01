@@ -20,6 +20,7 @@ hero:
 
 <script setup>
 import { DollarSign, Github, Users, BookText, Layers, Wrench } from 'lucide-vue-next'
+import { withBase } from 'vitepress'
 import PillarIcon from './.vitepress/theme/components/icons/PillarIcon.vue'
 import BrandIcon from './.vitepress/theme/components/icons/BrandIcon.vue'
 import { SafLogoIcon } from './.vitepress/theme/components/icons/tools'
@@ -174,7 +175,7 @@ const getStartedCards = [
   description="MITRE SAF supports security processes at all stages of the software life cycle, from planning secure system design to analyzing operational security data. All MITRE SAF tools can work in concert or standalone; adopt the parts of the Framework that make sense for your environment."
 >
   <div class="pillar-grid">
-    <a v-for="item in pillars" :key="item.pillar" :href="item.href" class="pillar-card">
+    <a v-for="item in pillars" :key="item.pillar" :href="withBase(item.href)" class="pillar-card">
       <div class="card-header">
         <PillarIcon :pillar="item.pillar" :size="32" />
         <h3>{{ item.title }}</h3>
@@ -214,7 +215,7 @@ const getStartedCards = [
   </template>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <a v-for="tool in toolset" :key="tool.name" :href="tool.href" class="tool-card">
+    <a v-for="tool in toolset" :key="tool.name" :href="withBase(tool.href)" class="tool-card">
       <div class="tool-card-header">
         <BrandIcon v-if="tool.icon !== 'content'" :name="tool.icon" :size="40" decorative />
         <BookText v-else :size="40" class="text-[--vp-c-brand-1]" />
@@ -224,7 +225,7 @@ const getStartedCards = [
       <div class="tool-card-pillars">
         <span class="pillar-label">Supports Capabilities:</span>
         <div class="pillar-icons-centered">
-          <a v-for="pillar in tool.pillars" :key="pillar" :href="`/framework/${pillar}`" class="pillar-icon-link" @click.stop>
+          <a v-for="pillar in tool.pillars" :key="pillar" :href="withBase(`/framework/${pillar}`)" class="pillar-icon-link" @click.stop>
             <PillarIcon :pillar="pillar" :size="48" />
           </a>
         </div>
@@ -256,7 +257,7 @@ const getStartedCards = [
   description="Explore the framework pillars to find the tools and content you need."
 >
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <a v-for="card in getStartedCards" :key="card.title" :href="card.href" class="get-started-card">
+    <a v-for="card in getStartedCards" :key="card.title" :href="withBase(card.href)" class="get-started-card">
       <div class="card-header">
         <component :is="card.icon" :size="32" />
         <h3>{{ card.title }}</h3>

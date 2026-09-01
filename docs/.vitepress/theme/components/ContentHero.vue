@@ -2,6 +2,7 @@
 import type { ActionItem } from './ActionButtons.vue'
 import type { PillarType } from './PillarBadge.vue'
 import type { MetadataItem } from '@/lib/metadata'
+import { withBase } from 'vitepress'
 import { Badge } from '@/components/ui/badge'
 import ActionButtons from './ActionButtons.vue'
 import BrandIcon from './icons/BrandIcon.vue'
@@ -61,7 +62,7 @@ defineProps<{
           :is="item.href ? 'a' : 'div'"
           v-for="item in metadata"
           :key="item.label"
-          :href="item.href"
+          :href="item.href ? withBase(item.href) : undefined"
           class="metadata-item"
           :class="{ clickable: !!item.href }"
         >

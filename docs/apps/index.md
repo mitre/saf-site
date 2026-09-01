@@ -7,6 +7,7 @@ wideLayout: true
 
 <script setup>
 import { Eye, Terminal, PenTool, BookText } from 'lucide-vue-next'
+import { withBase } from 'vitepress'
 import BrandIcon from '../.vitepress/theme/components/icons/BrandIcon.vue'
 
 const apps = [
@@ -106,7 +107,7 @@ const gettingStarted = [
   title="Complete Security Automation Toolkit"
 >
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <a v-for="app in apps" :key="app.name" :href="app.href" class="app-card">
+    <a v-for="app in apps" :key="app.name" :href="withBase(app.href)" class="app-card">
       <div class="card-header">
         <BrandIcon v-if="app.icon !== 'content'" :name="app.icon" :size="32" />
         <BookText v-else :size="32" class="text-[--vp-c-brand-1]" />
@@ -114,7 +115,7 @@ const gettingStarted = [
       </div>
       <p class="card-description">{{ app.description }}</p>
       <div class="card-links">
-        <a v-for="link in app.links" :key="link.label" :href="link.href" @click.stop>
+        <a v-for="link in app.links" :key="link.label" :href="withBase(link.href)" @click.stop>
           {{ link.label }} →
         </a>
       </div>
@@ -133,7 +134,7 @@ const gettingStarted = [
       <h3 class="card-title">{{ item.title }}</h3>
       <p class="card-description">{{ item.description }}</p>
       <div class="card-links">
-        <a v-for="link in item.links" :key="link.label" :href="link.href">
+        <a v-for="link in item.links" :key="link.label" :href="withBase(link.href)">
           {{ link.label }} →
         </a>
       </div>

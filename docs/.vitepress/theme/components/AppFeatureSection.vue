@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ToolFeature } from '../../database/schema'
+import { withBase } from 'vitepress'
 import PageSection from './PageSection.vue'
 
 interface Props {
@@ -20,7 +21,7 @@ defineProps<Props>()
   >
     <img
       v-if="feature.image"
-      :src="feature.image"
+      :src="withBase(feature.image)"
       :alt="feature.imageAlt || feature.title"
       class="screenshot"
     >

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
-import { useData } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import { computed, onMounted, ref, shallowRef } from 'vue'
 
 /**
@@ -67,7 +67,7 @@ onMounted(async () => {
     const mod = await import('vue3-json-viewer')
     ViewerComponent.value = mod.JsonViewer ?? mod.default
 
-    const res = await fetch(props.src)
+    const res = await fetch(withBase(props.src))
     if (!res.ok)
       throw new Error(`Failed to load schema: ${res.status}`)
     jsonData.value = await res.json()

@@ -12,6 +12,10 @@ import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 // eslint-disable-next-line antfu/no-top-level-await
 const trainingSidebar = await getTrainingSidebar()
 
+// GitHub Pages serves project sites from a subpath (mitre.github.io/saf-site/);
+// Cloudflare Pages serves from the root. GITHUB_PAGES is set by pages.yml only.
+const base = process.env.GITHUB_PAGES ? '/saf-site/' : '/'
+
 // Static string props: headline="...", title="...", description="..."
 const STATIC_STRING_PROP_REGEX = /\b(?:headline|title|description)\s*=\s*"([^"]+)"/g
 // Dynamic object props (single-quoted): title: '...', description: '...'
@@ -54,8 +58,12 @@ function extractVueComponentText(src: string, relativePath: string): string {
 }
 
 export default defineConfig({
+  base,
+
   buildEnd(siteConfig) {
     for (const [from, to] of Object.entries(redirects)) {
+      // Redirect targets are root-relative; prefix them with the base
+      const target = to.startsWith('/') ? base + to.slice(1) : to
       const filePath = join(siteConfig.outDir, from, 'index.html')
       const dir = dirname(filePath)
       if (!existsSync(dir))
@@ -64,11 +72,11 @@ export default defineConfig({
         '<!DOCTYPE html>',
         '<html>',
         '<head>',
-        `  <meta http-equiv="refresh" content="0;url=${to}">`,
-        `  <link rel="canonical" href="${to}">`,
+        `  <meta http-equiv="refresh" content="0;url=${target}">`,
+        `  <link rel="canonical" href="${target}">`,
         '</head>',
         '<body>',
-        `  <p>This page has moved to <a href="${to}">${to}</a>.</p>`,
+        `  <p>This page has moved to <a href="${target}">${target}</a>.</p>`,
         '</body>',
         '</html>',
       ].join('\n'))
@@ -97,7 +105,8 @@ export default defineConfig({
   cleanUrls: true,
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/icons/saf-logo.svg' }],
+    // head entries are not base-prefixed by VitePress; do it explicitly
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}icons/saf-logo.svg` }],
     // Osano cookie consent (required by MITRE Privacy - must be first script)
     ['script', { src: 'https://cmp.osano.com/AzyhULTdPkqmy4aDN/f0e8e901-3feb-47c4-bd04-96df98c75dab/osano.js' }],
     // Hide Osano's default widget (we trigger via footer link instead)

@@ -6,6 +6,7 @@
  * Supports horizontal (icon left) and vertical (icon top) orientations.
  */
 import type { Component } from 'vue'
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 
 export interface FeatureItemProps {
@@ -34,7 +35,7 @@ const isExternal = computed(() => props.href?.startsWith('http'))
 <template>
   <component
     :is="isLink ? 'a' : 'div'"
-    :href="href"
+    :href="href ? withBase(href) : undefined"
     :target="isExternal ? '_blank' : target"
     :rel="isExternal ? 'noopener noreferrer' : undefined"
     class="feature-item"

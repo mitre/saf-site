@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { useData } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -172,10 +172,10 @@ const iconMap: Record<string, string> = {
 const localSvg = computed(() => {
   const key = props.name.toLowerCase()
   if (localSvgMap[key])
-    return localSvgMap[key]
+    return withBase(localSvgMap[key])
   for (const [name, path] of Object.entries(localSvgMap)) {
     if (key.includes(name) || name.includes(key)) {
-      return path
+      return withBase(path)
     }
   }
   return null
