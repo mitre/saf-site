@@ -50,6 +50,14 @@ describe('validateSlug', () => {
     const result = validateSlug('rhel-9-custom')
     expect(result.warnings.some(w => w.includes('standard identifier'))).toBe(true)
   })
+
+  it('accepts stig-ready, srg-ready, and srg as known standard suffixes', () => {
+    for (const slug of ['rocky-9-stig-ready', 'nginx-srg-ready', 'apache-couchdb-srg']) {
+      const result = validateSlug(slug)
+      expect(result.valid, slug).toBe(true)
+      expect(result.warnings.some(w => w.includes('standard identifier')), slug).toBe(false)
+    }
+  })
 })
 
 // ============================================================================
