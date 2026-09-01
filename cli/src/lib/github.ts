@@ -17,6 +17,19 @@ export interface RepoInfo {
   htmlUrl: string
 }
 
+export interface ReleaseInfo {
+  tagName: string
+  publishedAt: string | null
+  htmlUrl: string
+}
+
+export interface OrgRepo {
+  name: string
+  htmlUrl: string
+  description: string | null
+  pushedAt: string | null
+}
+
 export interface InspecProfile {
   name: string
   title?: string
@@ -102,6 +115,105 @@ export async function fetchRepoInfo(owner: string, repo: string): Promise<RepoIn
 }
 
 /**
+ * Fetch a GitHub API endpoint and parse the JSON body.
+ *
+ * A 404 returns null (caller decides what "missing" means); any other
+ * failure throws in the same format as fetchRepoInfo.
+ */
+async function fetchGitHubJson<T>(url: string): Promise<T | null> {
+  const response = await fetch(url, { headers: getGitHubHeaders() })
+
+  if (response.ok) {
+    return await response.json() as T
+  }
+
+  if (response.status === 404) {
+    return null
+  }
+
+  throw new Error(`GitHub API error: ${response.status} ${response.statusText}`)
+}
+
+/**
+ * Fetch the latest published release of a repository
+ *
+ * Returns null when the repo has no releases (repos that tag without
+ * publishing releases should fall back to fetchLatestTag).
+ */
+export async function fetchLatestRelease(owner: string, repo: string): Promise<ReleaseInfo | null> {
+  const data = await fetchGitHubJson<{ tag_name: string, published_at: string | null, html_url: string }>(
+    `https://api.github.com/repos/${owner}/${repo}/releases/latest`,
+  )
+
+  if (!data) {
+    return null
+  }
+
+  return {
+    tagName: data.tag_name,
+    publishedAt: data.published_at,
+    htmlUrl: data.html_url,
+  }
+}
+
+/**
+ * Fetch the most recent tag of a repository
+ *
+ * Fallback for repos that tag versions but never publish GitHub releases.
+ * Returns null when the repo has no tags.
+ */
+export async function fetchLatestTag(owner: string, repo: string): Promise<{ tagName: string } | null> {
+  const data = await fetchGitHubJson<Array<{ name: string }>>(
+    `https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`,
+  )
+
+  if (!data || data.length === 0) {
+    return null
+  }
+
+  return { tagName: data[0].name }
+}
+
+/**
+ * List all non-archived repositories of an organization
+ *
+ * Follows pagination until a short page (GitHub caps per_page at 100).
+ */
+export async function listOrgRepos(org: string): Promise<OrgRepo[]> {
+  const perPage = 100
+  const repos: OrgRepo[] = []
+
+  for (let page = 1; ; page++) {
+    const data = await fetchGitHubJson<Array<{
+      name: string
+      html_url: string
+      description: string | null
+      pushed_at: string | null
+      archived: boolean
+    }>>(`https://api.github.com/orgs/${org}/repos?per_page=${perPage}&page=${page}`)
+
+    if (!data) {
+      throw new Error(`GitHub API error: 404 organization ${org} not found`)
+    }
+
+    repos.push(...data
+      .filter(r => !r.archived)
+      .map(r => ({
+        name: r.name,
+        htmlUrl: r.html_url,
+        description: r.description,
+        pushedAt: r.pushed_at,
+      })))
+
+    if (data.length < perPage) {
+      break
+    }
+  }
+
+  return repos
+}
+
+/**
  * Fetch raw file content from GitHub
  */
 export async function fetchRawFile(
@@ -141,8 +253,10 @@ export async function fetchInspecYml(
   owner: string,
   repo: string,
   branch = 'main',
+  path?: string,
 ): Promise<InspecProfile | null> {
-  const content = await fetchRawFile(owner, repo, 'inspec.yml', branch)
+  const filePath = path ? `${path.replace(/\/$/, '')}/inspec.yml` : 'inspec.yml'
+  const content = await fetchRawFile(owner, repo, filePath, branch)
 
   if (!content) {
     return null
