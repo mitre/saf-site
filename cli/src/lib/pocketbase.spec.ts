@@ -15,6 +15,7 @@ import {
   loadFkMaps,
   resolveFK,
   updateContent,
+  upsertContentRelease,
 } from './pocketbase.js'
 
 // ============================================================================
@@ -675,5 +676,106 @@ describe('updateContent', () => {
     await expect(updateContent('nonexistent-id', { name: 'Test' }, mockPb as any))
       .rejects
       .toThrow('Record not found')
+  })
+})
+
+describe('updateContent releaseDate mapping', () => {
+  it('maps releaseDate to release_date for Pocketbase', async () => {
+    const mockUpdate = vi.fn().mockResolvedValue({ id: 'content-123' })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({ update: mockUpdate }),
+    }
+
+    await updateContent('content-123', { version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' }, mockPb as any)
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'content-123',
+      expect.objectContaining({
+        version: '1.2.0',
+        release_date: '2026-07-01T00:00:00Z',
+      }),
+    )
+    expect(mockUpdate.mock.calls[0][1]).not.toHaveProperty('releaseDate')
+  })
+})
+
+describe('upsertContentRelease', () => {
+  it('creates a new latest release row and clears the prior latest', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([{ id: 'rel-old', slug: 'rhel-9-stig-v1-0-0' }])
+    const mockGetFirstListItem = vi.fn().mockRejectedValue(new Error('not found'))
+    const mockUpdate = vi.fn().mockResolvedValue({})
+    const mockCreate = vi.fn().mockResolvedValue({ id: 'rel-new' })
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList,
+        getFirstListItem: mockGetFirstListItem,
+        update: mockUpdate,
+        create: mockCreate,
+      }),
+    }
+
+    await upsertContentRelease('content-123', {
+      slug: 'rhel-9-stig-v1-2-0',
+      version: '1.2.0',
+      releaseDate: '2026-07-01T00:00:00Z',
+    }, mockPb as any)
+
+    expect(mockPb.collection).toHaveBeenCalledWith('releases')
+    expect(mockUpdate).toHaveBeenCalledWith('rel-old', { is_latest: false })
+    expect(mockCreate).toHaveBeenCalledWith({
+      entity_type: 'content',
+      entity_id: 'content-123',
+      slug: 'rhel-9-stig-v1-2-0',
+      version: '1.2.0',
+      is_latest: true,
+      release_date: '2026-07-01T00:00:00Z',
+    })
+  })
+
+  it('updates the existing row when the release slug already exists, without flipping itself', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([{ id: 'rel-same', slug: 'rhel-9-stig-v1-2-0' }])
+    const mockGetFirstListItem = vi.fn().mockResolvedValue({ id: 'rel-same', slug: 'rhel-9-stig-v1-2-0' })
+    const mockUpdate = vi.fn().mockResolvedValue({})
+    const mockCreate = vi.fn()
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList,
+        getFirstListItem: mockGetFirstListItem,
+        update: mockUpdate,
+        create: mockCreate,
+      }),
+    }
+
+    await upsertContentRelease('content-123', {
+      slug: 'rhel-9-stig-v1-2-0',
+      version: '1.2.0',
+    }, mockPb as any)
+
+    expect(mockCreate).not.toHaveBeenCalled()
+    expect(mockUpdate).toHaveBeenCalledTimes(1)
+    expect(mockUpdate).toHaveBeenCalledWith('rel-same', expect.objectContaining({
+      entity_type: 'content',
+      entity_id: 'content-123',
+      version: '1.2.0',
+      is_latest: true,
+    }))
+  })
+
+  it('omits release_date when the release has no date', async () => {
+    const mockGetFullList = vi.fn().mockResolvedValue([])
+    const mockGetFirstListItem = vi.fn().mockRejectedValue(new Error('not found'))
+    const mockCreate = vi.fn().mockResolvedValue({})
+    const mockPb = {
+      collection: vi.fn().mockReturnValue({
+        getFullList: mockGetFullList,
+        getFirstListItem: mockGetFirstListItem,
+        update: vi.fn(),
+        create: mockCreate,
+      }),
+    }
+
+    await upsertContentRelease('content-123', { slug: 'x-v1-0-0', version: '1.0.0' }, mockPb as any)
+
+    expect(mockCreate.mock.calls[0][0]).not.toHaveProperty('release_date')
   })
 })

@@ -6,7 +6,7 @@
  */
 
 import type { FkMaps } from '../lib/pocketbase.js'
-import type { ServiceDeps } from './content.logic.js'
+import type { ServiceDeps, SyncableRecord, SyncDeps } from './content.logic.js'
 import * as p from '@clack/prompts'
 import { Command } from 'commander'
 import pc from 'picocolors'
@@ -19,6 +19,8 @@ import {
 import {
   extractControlCount,
   fetchInspecYml,
+  fetchLatestRelease,
+  fetchLatestTag,
   fetchReadme,
   fetchRepoInfo,
   generateSlug,
@@ -30,18 +32,21 @@ import {
   listContent,
   loadFkMaps,
   updateContent,
+  upsertContentRelease,
 } from '../lib/pocketbase.js'
 import {
   formatAddResult,
   formatListResult,
+  formatSyncResult,
   formatUpdateResult,
   parseAddArgs,
   parseUpdateArgs,
 } from './content.cli.js'
 import {
+  executeSyncPlans,
+  planContentSync,
   prepareContentAdd,
   prepareContentUpdate,
-
 } from './content.logic.js'
 
 export const contentCommand = new Command('content')
@@ -56,6 +61,13 @@ const serviceDeps: ServiceDeps = {
   fetchRepoInfo,
   fetchInspecYml,
   fetchReadme,
+}
+
+const syncDeps: SyncDeps = {
+  parseGitHubUrl,
+  fetchInspecYml,
+  fetchLatestRelease,
+  fetchLatestTag,
 }
 
 // ============================================================================
@@ -576,6 +588,65 @@ contentCommand
       else {
         console.log(pc.green(`✓ Updated: ${id}`))
       }
+    }
+    catch (error) {
+      exitWithError(error instanceof Error ? error.message : String(error), format)
+    }
+  })
+
+// ============================================================================
+// SYNC COMMAND
+// ============================================================================
+
+contentCommand
+  .command('sync [slugs...]')
+  .description('Sync content versions from GitHub (inspec.yml is the source of truth)')
+  .option('--dry-run', 'Report drift without writing')
+  .option('--json', 'Output as JSON')
+  .option('--quiet', 'Output only drifted slugs')
+  .action(async (slugs: string[], options) => {
+    const format = getOutputFormat(options)
+    const dryRun = Boolean(options.dryRun)
+
+    try {
+      const pb = await getPocketBase()
+
+      let records = await pb.collection('content').getFullList({
+        filter: 'github != ""',
+        sort: 'slug',
+      })
+
+      if (slugs.length > 0) {
+        const known = new Set(records.map(r => r.slug))
+        const missing = slugs.filter(slug => !known.has(slug))
+        if (missing.length > 0) {
+          exitWithErrors(missing.map(slug => `No content record with slug "${slug}" and a GitHub URL`), format)
+        }
+        records = records.filter(r => slugs.includes(r.slug))
+      }
+
+      const plans = []
+      for (const record of records) {
+        const syncable: SyncableRecord = {
+          id: record.id,
+          slug: record.slug,
+          name: record.name,
+          github: record.github,
+          version: record.version || null,
+        }
+        if (format === 'text') {
+          console.log(pc.dim(`Checking ${record.slug}...`))
+        }
+        plans.push(await planContentSync(syncable, syncDeps))
+      }
+
+      const summary = await executeSyncPlans(plans, {
+        updateContent: (id, update) => updateContent(id, update, pb),
+        upsertRelease: (entityId, release) => upsertContentRelease(entityId, release, pb),
+      }, { dryRun })
+
+      console.log(formatSyncResult(plans, summary, format, dryRun))
+      process.exit(summary.errors > 0 ? 1 : 0)
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : String(error), format)

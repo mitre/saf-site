@@ -8,7 +8,7 @@
 import type { OutputFormat } from '../lib/cli-utils.js'
 import type { ContentFKNames } from '../lib/content-service.js'
 import type { UpdateContentInput } from '../lib/pocketbase.js'
-import type { PrepareAddInput, PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
+import type { ContentSyncPlan, PrepareAddInput, PrepareAddResult, PrepareUpdateResult, SyncSummary } from './content.logic.js'
 import Table from 'cli-table3'
 import pc from 'picocolors'
 import {
@@ -327,4 +327,77 @@ export function formatListResult(
   }
 
   return table.toString()
+}
+
+// ============================================================================
+// FORMAT SYNC RESULT
+// ============================================================================
+
+const SYNC_STATUS_COLORS: Record<ContentSyncPlan['status'], (s: string) => string> = {
+  'up-to-date': pc.dim,
+  'drift': pc.yellow,
+  'warning': pc.magenta,
+  'error': pc.red,
+}
+
+/**
+ * Format the sync report for output
+ */
+export function formatSyncResult(
+  plans: ContentSyncPlan[],
+  summary: SyncSummary,
+  format: OutputFormat,
+  dryRun: boolean,
+): string {
+  if (format === 'json') {
+    return JSON.stringify({ dryRun, summary, plans }, null, 2)
+  }
+
+  if (format === 'quiet') {
+    return plans.filter(plan => plan.status === 'drift').map(plan => plan.slug).join('\n')
+  }
+
+  // Text format - table + summary
+  const table = new Table({
+    head: [
+      pc.bold('Slug'),
+      pc.bold('Status'),
+      pc.bold('Current'),
+      pc.bold('inspec.yml'),
+      pc.bold('Release'),
+      pc.bold('Notes'),
+    ],
+    colWidths: [32, 12, 10, 12, 10, 50],
+    wordWrap: true,
+  })
+
+  for (const plan of plans) {
+    const colorize = SYNC_STATUS_COLORS[plan.status]
+    table.push([
+      plan.slug,
+      colorize(plan.status),
+      plan.currentVersion || '-',
+      plan.inspecVersion || '-',
+      plan.releaseTag || '-',
+      plan.messages.join('; ') || '-',
+    ])
+  }
+
+  const counts = [
+    `${summary.upToDate} up-to-date`,
+    `${summary.drift} drift`,
+    `${summary.warnings} warning${summary.warnings === 1 ? '' : 's'}`,
+    `${summary.errors} error${summary.errors === 1 ? '' : 's'}`,
+  ].join(', ')
+
+  const lines = [table.toString(), '', `${summary.total} records: ${counts}`]
+
+  if (dryRun) {
+    lines.push(pc.yellow('Dry run \u2014 no changes were written'))
+  }
+  else if (summary.drift > 0) {
+    lines.push(pc.green(`Applied ${summary.applied} of ${summary.drift} drift update${summary.drift === 1 ? '' : 's'}`))
+  }
+
+  return lines.join('\n')
 }

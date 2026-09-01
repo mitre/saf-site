@@ -567,3 +567,82 @@ describe('output Formatting Integration', () => {
     expect(textOutput).toContain('2.0.0')
   })
 })
+
+// ============================================================================
+// INTEGRATION TEST: SYNC FLOW (plan -> execute)
+// ============================================================================
+
+describe('content Sync Flow Integration', () => {
+  it('plans drift from mocked GitHub state and applies it through the write deps', async () => {
+    const { planContentSync, executeSyncPlans } = await import('./content.logic.js')
+
+    const records = [
+      { id: 'content-123', slug: 'rhel-9-stig', name: 'RHEL 9 STIG', github: 'https://github.com/mitre/rhel-9-stig-baseline', version: '1.0.0' },
+      { id: 'content-456', slug: 'ubuntu-2204-stig', name: 'Ubuntu 22.04 STIG', github: 'https://github.com/mitre/ubuntu-2204-stig-baseline', version: '2.0.0' },
+    ]
+
+    const syncDeps = {
+      parseGitHubUrl: vi.fn((url: string) => {
+        const m = /github\.com\/([^/]+)\/([^/]+)/.exec(url)
+        return m ? { owner: m[1], repo: m[2] } : null
+      }),
+      fetchInspecYml: vi.fn(async (_owner: string, repo: string) =>
+        repo === 'rhel-9-stig-baseline'
+          ? { name: 'rhel-9', version: '1.2.0' }
+          : { name: 'ubuntu-2204', version: '2.0.0' }),
+      fetchLatestRelease: vi.fn(async (_owner: string, repo: string) =>
+        repo === 'rhel-9-stig-baseline'
+          ? { tagName: 'v1.2.0', publishedAt: '2026-07-01T00:00:00Z', htmlUrl: 'https://example.com' }
+          : { tagName: 'v2.0.0', publishedAt: '2026-01-01T00:00:00Z', htmlUrl: 'https://example.com' }),
+      fetchLatestTag: vi.fn(),
+    }
+
+    const plans = []
+    for (const record of records) {
+      plans.push(await planContentSync(record, syncDeps))
+    }
+
+    expect(plans[0].status).toBe('drift')
+    expect(plans[1].status).toBe('up-to-date')
+
+    const writeUpdateContent = vi.fn().mockResolvedValue({})
+    const writeUpsertRelease = vi.fn().mockResolvedValue({})
+
+    const summary = await executeSyncPlans(plans, {
+      updateContent: writeUpdateContent,
+      upsertRelease: writeUpsertRelease,
+    }, { dryRun: false })
+
+    expect(summary).toEqual({ total: 2, upToDate: 1, drift: 1, applied: 1, warnings: 0, errors: 0 })
+    expect(writeUpdateContent).toHaveBeenCalledWith('content-123', { version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' })
+    expect(writeUpsertRelease).toHaveBeenCalledWith('content-123', {
+      slug: 'rhel-9-stig-v1-2-0',
+      version: '1.2.0',
+      releaseDate: '2026-07-01T00:00:00Z',
+    })
+  })
+
+  it('formats the executed plans with formatSyncResult without loss', async () => {
+    const { planContentSync, executeSyncPlans } = await import('./content.logic.js')
+    const { formatSyncResult } = await import('./content.cli.js')
+
+    const record = { id: 'content-123', slug: 'rhel-9-stig', name: 'RHEL 9 STIG', github: 'https://github.com/mitre/rhel-9-stig-baseline', version: '1.0.0' }
+    const syncDeps = {
+      parseGitHubUrl: vi.fn().mockReturnValue({ owner: 'mitre', repo: 'rhel-9-stig-baseline' }),
+      fetchInspecYml: vi.fn().mockResolvedValue({ name: 'rhel-9', version: '1.2.0' }),
+      fetchLatestRelease: vi.fn().mockResolvedValue(null),
+      fetchLatestTag: vi.fn().mockResolvedValue(null),
+    }
+
+    const plans = [await planContentSync(record, syncDeps)]
+    const summary = await executeSyncPlans(plans, {
+      updateContent: vi.fn(),
+      upsertRelease: vi.fn(),
+    }, { dryRun: true })
+
+    const parsed = JSON.parse(formatSyncResult(plans, summary, 'json', true))
+    expect(parsed.summary.drift).toBe(1)
+    expect(parsed.plans[0].update.version).toBe('1.2.0')
+    expect(parsed.dryRun).toBe(true)
+  })
+})

@@ -564,3 +564,246 @@ describe('prepareContentUpdate', () => {
     })
   })
 })
+
+// ============================================================================
+// CONTENT SYNC (planContentSync / executeSyncPlans)
+// ============================================================================
+
+describe('planContentSync', () => {
+  function createSyncDeps(overrides: Partial<import('./content.logic.js').SyncDeps> = {}) {
+    return {
+      parseGitHubUrl: vi.fn().mockReturnValue({ owner: 'mitre', repo: 'rhel-9-stig-baseline' }),
+      fetchInspecYml: vi.fn().mockResolvedValue(createMockInspecProfile({ version: '1.2.0' })),
+      fetchLatestRelease: vi.fn().mockResolvedValue({
+        tagName: 'v1.2.0',
+        publishedAt: '2026-07-01T00:00:00Z',
+        htmlUrl: 'https://github.com/mitre/rhel-9-stig-baseline/releases/tag/v1.2.0',
+      }),
+      fetchLatestTag: vi.fn().mockResolvedValue({ tagName: 'v1.2.0' }),
+      ...overrides,
+    }
+  }
+
+  const record = {
+    id: 'content-123',
+    slug: 'rhel-9-stig',
+    name: 'RHEL 9 STIG',
+    github: 'https://github.com/mitre/rhel-9-stig-baseline',
+    version: '1.0.0',
+  }
+
+  it('reports drift and builds update + release row when inspec.yml version is ahead', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps())
+
+    expect(plan.status).toBe('drift')
+    expect(plan.currentVersion).toBe('1.0.0')
+    expect(plan.inspecVersion).toBe('1.2.0')
+    expect(plan.update).toEqual({ version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' })
+    expect(plan.release).toEqual({
+      slug: 'rhel-9-stig-v1-2-0',
+      version: '1.2.0',
+      releaseDate: '2026-07-01T00:00:00Z',
+    })
+  })
+
+  it('reports up-to-date and no update when versions match', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync({ ...record, version: '1.2.0' }, createSyncDeps())
+
+    expect(plan.status).toBe('up-to-date')
+    expect(plan.update).toBeUndefined()
+    expect(plan.release).toBeUndefined()
+  })
+
+  it('normalizes the release tag v-prefix when comparing against inspec.yml', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync({ ...record, version: '1.0.0' }, createSyncDeps({
+      fetchLatestRelease: vi.fn().mockResolvedValue({
+        tagName: 'V1.2.0',
+        publishedAt: '2026-07-01T00:00:00Z',
+        htmlUrl: 'https://example.com',
+      }),
+    }))
+
+    expect(plan.status).toBe('drift')
+    expect(plan.releaseTag).toBe('1.2.0')
+  })
+
+  it('warns and does NOT update when inspec.yml and release tag disagree', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchLatestRelease: vi.fn().mockResolvedValue({
+        tagName: 'v1.3.0',
+        publishedAt: '2026-07-01T00:00:00Z',
+        htmlUrl: 'https://example.com',
+      }),
+    }))
+
+    expect(plan.status).toBe('warning')
+    expect(plan.update).toBeUndefined()
+    expect(plan.messages.join(' ')).toMatch(/mismatch/i)
+  })
+
+  it('warns and does NOT update when inspec.yml has no version', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchInspecYml: vi.fn().mockResolvedValue(createMockInspecProfile({ version: undefined })),
+    }))
+
+    expect(plan.status).toBe('warning')
+    expect(plan.update).toBeUndefined()
+  })
+
+  it('falls back to the latest tag when the repo has no releases', async () => {
+    const fetchLatestTag = vi.fn().mockResolvedValue({ tagName: 'v1.2.0' })
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchLatestRelease: vi.fn().mockResolvedValue(null),
+      fetchLatestTag,
+    }))
+
+    expect(fetchLatestTag).toHaveBeenCalledWith('mitre', 'rhel-9-stig-baseline')
+    expect(plan.status).toBe('drift')
+    expect(plan.releaseTag).toBe('1.2.0')
+    expect(plan.update).toEqual({ version: '1.2.0' })
+  })
+
+  it('still updates from inspec.yml alone when the repo has neither releases nor tags', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchLatestRelease: vi.fn().mockResolvedValue(null),
+      fetchLatestTag: vi.fn().mockResolvedValue(null),
+    }))
+
+    expect(plan.status).toBe('drift')
+    expect(plan.update).toEqual({ version: '1.2.0' })
+    expect(plan.release).toEqual({ slug: 'rhel-9-stig-v1-2-0', version: '1.2.0', releaseDate: undefined })
+  })
+
+  it('fetches inspec.yml from the subdirectory for monorepo tree URLs and skips release lookup', async () => {
+    const fetchInspecYml = vi.fn().mockResolvedValue(createMockInspecProfile({ version: '2.0.0' }))
+    const fetchLatestRelease = vi.fn()
+    const { planContentSync } = await import('./content.logic.js')
+
+    const plan = await planContentSync({
+      ...record,
+      github: 'https://github.com/mitre/profiles-monorepo/tree/main/profiles/rhel-9',
+    }, createSyncDeps({ fetchInspecYml, fetchLatestRelease }))
+
+    expect(fetchInspecYml).toHaveBeenCalledWith('mitre', 'profiles-monorepo', 'main', 'profiles/rhel-9')
+    expect(fetchLatestRelease).not.toHaveBeenCalled()
+    expect(plan.status).toBe('drift')
+    expect(plan.update).toEqual({ version: '2.0.0' })
+  })
+
+  it('warns and does NOT update when the inspec.yml version is not semver', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchInspecYml: vi.fn().mockResolvedValue(createMockInspecProfile({ version: 'V1R3' })),
+      fetchLatestRelease: vi.fn().mockResolvedValue(null),
+      fetchLatestTag: vi.fn().mockResolvedValue(null),
+    }))
+
+    expect(plan.status).toBe('warning')
+    expect(plan.update).toBeUndefined()
+  })
+
+  it('reports an error for records with an unparseable GitHub URL', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync({ ...record, github: 'not-a-url' }, createSyncDeps({
+      parseGitHubUrl: vi.fn().mockReturnValue(null),
+    }))
+
+    expect(plan.status).toBe('error')
+    expect(plan.update).toBeUndefined()
+  })
+
+  it('reports an error when the GitHub fetch throws', async () => {
+    const { planContentSync } = await import('./content.logic.js')
+    const plan = await planContentSync(record, createSyncDeps({
+      fetchInspecYml: vi.fn().mockRejectedValue(new Error('GitHub API error: 500')),
+    }))
+
+    expect(plan.status).toBe('error')
+    expect(plan.messages.join(' ')).toContain('GitHub API error: 500')
+  })
+})
+
+describe('executeSyncPlans', () => {
+  function driftPlan(overrides: Record<string, unknown> = {}) {
+    return {
+      id: 'content-123',
+      slug: 'rhel-9-stig',
+      status: 'drift' as const,
+      currentVersion: '1.0.0',
+      inspecVersion: '1.2.0',
+      releaseTag: '1.2.0',
+      messages: [],
+      update: { version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' },
+      release: { slug: 'rhel-9-stig-v1-2-0', version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' },
+      ...overrides,
+    }
+  }
+
+  it('applies updates and upserts release rows for drift plans', async () => {
+    const updateContent = vi.fn().mockResolvedValue({})
+    const upsertRelease = vi.fn().mockResolvedValue({})
+    const { executeSyncPlans } = await import('./content.logic.js')
+
+    const summary = await executeSyncPlans([driftPlan()], { updateContent, upsertRelease }, { dryRun: false })
+
+    expect(updateContent).toHaveBeenCalledWith('content-123', { version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' })
+    expect(upsertRelease).toHaveBeenCalledWith('content-123', { slug: 'rhel-9-stig-v1-2-0', version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' })
+    expect(summary.applied).toBe(1)
+    expect(summary.errors).toBe(0)
+  })
+
+  it('writes nothing in dry-run mode', async () => {
+    const updateContent = vi.fn()
+    const upsertRelease = vi.fn()
+    const { executeSyncPlans } = await import('./content.logic.js')
+
+    const summary = await executeSyncPlans([driftPlan()], { updateContent, upsertRelease }, { dryRun: true })
+
+    expect(updateContent).not.toHaveBeenCalled()
+    expect(upsertRelease).not.toHaveBeenCalled()
+    expect(summary.applied).toBe(0)
+    expect(summary.drift).toBe(1)
+  })
+
+  it('skips non-drift plans and counts warnings and errors', async () => {
+    const updateContent = vi.fn()
+    const upsertRelease = vi.fn()
+    const { executeSyncPlans } = await import('./content.logic.js')
+
+    const summary = await executeSyncPlans([
+      driftPlan({ status: 'up-to-date', update: undefined, release: undefined }),
+      driftPlan({ status: 'warning', update: undefined, release: undefined }),
+      driftPlan({ status: 'error', update: undefined, release: undefined }),
+    ], { updateContent, upsertRelease }, { dryRun: false })
+
+    expect(updateContent).not.toHaveBeenCalled()
+    expect(summary.applied).toBe(0)
+    expect(summary.upToDate).toBe(1)
+    expect(summary.warnings).toBe(1)
+    expect(summary.errors).toBe(1)
+  })
+
+  it('counts a plan as an error when the write fails, and continues with the rest', async () => {
+    const updateContent = vi.fn()
+      .mockRejectedValueOnce(new Error('PB down'))
+      .mockResolvedValueOnce({})
+    const upsertRelease = vi.fn().mockResolvedValue({})
+    const { executeSyncPlans } = await import('./content.logic.js')
+
+    const summary = await executeSyncPlans([
+      driftPlan(),
+      driftPlan({ id: 'content-456', slug: 'other' }),
+    ], { updateContent, upsertRelease }, { dryRun: false })
+
+    expect(summary.applied).toBe(1)
+    expect(summary.errors).toBe(1)
+    expect(updateContent).toHaveBeenCalledTimes(2)
+  })
+})
