@@ -364,6 +364,19 @@ summary: A test profile
     expect(result).toBeNull()
   })
 
+  it('tolerates duplicate map keys the way InSpec\'s Ruby parser does (last wins)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: async () => 'name: dup-profile\nversion: 0.9.0\nversion: 1.0.0\ninputs:\n  - name: paths\n    value:\n      \'/usr/bin/umount\': \'privileged-mount\'\n      \'/usr/bin/umount\': \'privileged-umount\'\n',
+    })
+
+    const result = await fetchInspecYml('mitre', 'test')
+
+    expect(result?.name).toBe('dup-profile')
+    // last occurrence wins, matching Ruby's psych behavior
+    expect(result?.version).toBe('1.0.0')
+  })
+
   it('reads inspec.yml from a subdirectory when a path is given', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,

@@ -263,7 +263,9 @@ export async function fetchInspecYml(
   }
 
   try {
-    return parseYaml(content) as InspecProfile
+    // InSpec's Ruby YAML parser accepts duplicate map keys (last wins), and
+    // real profiles in the wild rely on that — match its behavior here
+    return parseYaml(content, { uniqueKeys: false }) as InspecProfile
   }
   catch {
     return null
