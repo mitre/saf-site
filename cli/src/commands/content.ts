@@ -24,6 +24,7 @@ import {
   fetchReadme,
   fetchRepoInfo,
   generateSlug,
+  listOrgRepos,
   parseGitHubUrl,
 } from '../lib/github.js'
 import {
@@ -36,6 +37,7 @@ import {
 } from '../lib/pocketbase.js'
 import {
   formatAddResult,
+  formatDiscoverResult,
   formatListResult,
   formatSyncResult,
   formatUpdateResult,
@@ -43,6 +45,7 @@ import {
   parseUpdateArgs,
 } from './content.cli.js'
 import {
+  discoverContent,
   executeSyncPlans,
   planContentSync,
   prepareContentAdd,
@@ -647,6 +650,42 @@ contentCommand
 
       console.log(formatSyncResult(plans, summary, format, dryRun))
       process.exit(summary.errors > 0 ? 1 : 0)
+    }
+    catch (error) {
+      exitWithError(error instanceof Error ? error.message : String(error), format)
+    }
+  })
+
+// ============================================================================
+// DISCOVER COMMAND
+// ============================================================================
+
+contentCommand
+  .command('discover')
+  .description('Report org repos matching profile naming conventions with no content record (read-only)')
+  .option('--org <org>', 'GitHub organization to scan', 'mitre')
+  .option('--json', 'Output as JSON')
+  .option('--quiet', 'Output only repo names')
+  .action(async (options) => {
+    const format = getOutputFormat(options)
+
+    try {
+      const pb = await getPocketBase()
+
+      const records = await pb.collection('content').getFullList({
+        filter: 'github != ""',
+        fields: 'github',
+      })
+
+      if (format === 'text') {
+        console.log(pc.dim(`Scanning ${options.org} org repos...`))
+      }
+      const repos = await listOrgRepos(options.org)
+
+      const candidates = discoverContent(repos, records.map(r => r.github))
+
+      console.log(formatDiscoverResult(candidates, options.org, format))
+      process.exit(0)
     }
     catch (error) {
       exitWithError(error instanceof Error ? error.message : String(error), format)

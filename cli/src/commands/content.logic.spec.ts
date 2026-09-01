@@ -807,3 +807,128 @@ describe('executeSyncPlans', () => {
     expect(updateContent).toHaveBeenCalledTimes(2)
   })
 })
+
+// ============================================================================
+// CONTENT DISCOVER (discoverContent)
+// ============================================================================
+
+describe('discoverContent', () => {
+  function repo(name: string, overrides: Record<string, unknown> = {}) {
+    return {
+      name,
+      htmlUrl: `https://github.com/mitre/${name}`,
+      description: `InSpec profile for ${name}`,
+      pushedAt: '2026-08-01T00:00:00Z',
+      ...overrides,
+    }
+  }
+
+  it('returns repos matching baseline patterns that have no content record with a matching GitHub URL', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [
+      repo('debian-12-stig-baseline'),
+      repo('redhat-enterprise-linux-10-stig-baseline'),
+      repo('canonical-ubuntu-22.04-lts-stig-baseline'),
+      repo('saf-site-vitepress'), // tooling repo, no pattern match
+    ]
+    const existing = ['https://github.com/mitre/canonical-ubuntu-22.04-lts-stig-baseline']
+
+    const candidates = discoverContent(repos, existing)
+
+    expect(candidates.map(c => c.name)).toEqual([
+      'debian-12-stig-baseline',
+      'redhat-enterprise-linux-10-stig-baseline',
+    ])
+  })
+
+  it('matches hardening, benchmark, and baseline-overlay naming conventions', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [
+      repo('ansible-pg12-stig-hardening'),
+      repo('inspec-gcp-cis-benchmark'),
+      repo('couchbase-community-srg-baseline-overlay'),
+      repo('chef-workstation'),
+      repo('inspec_profile_coding_conventions'),
+    ]
+
+    const candidates = discoverContent(repos, [])
+
+    expect(candidates.map(c => c.name)).toEqual(expect.arrayContaining([
+      'ansible-pg12-stig-hardening',
+      'inspec-gcp-cis-benchmark',
+      'couchbase-community-srg-baseline-overlay',
+    ]))
+    expect(candidates).toHaveLength(3)
+  })
+
+  it('normalizes existing URLs: case, trailing slash, and .git suffix all count as present', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [
+      repo('debian-11-stig-baseline'),
+      repo('debian-12-stig-baseline'),
+      repo('debian-13-stig-baseline'),
+    ]
+    const existing = [
+      'https://github.com/MITRE/Debian-11-STIG-Baseline',
+      'https://github.com/mitre/debian-12-stig-baseline/',
+      'https://github.com/mitre/debian-13-stig-baseline.git',
+    ]
+
+    expect(discoverContent(repos, existing)).toEqual([])
+  })
+
+  it('does not treat a same-named repo in a different org as present', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [repo('rhel-9-stig-baseline')]
+    const existing = ['https://github.com/someone-else/rhel-9-stig-baseline']
+
+    expect(discoverContent(repos, existing).map(c => c.name)).toEqual(['rhel-9-stig-baseline'])
+  })
+
+  it('sorts candidates newest push first, null push dates last', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [
+      repo('old-thing-stig-baseline', { pushedAt: '2020-01-01T00:00:00Z' }),
+      repo('dateless-stig-baseline', { pushedAt: null }),
+      repo('new-thing-stig-baseline', { pushedAt: '2026-08-15T00:00:00Z' }),
+    ]
+
+    expect(discoverContent(repos, []).map(c => c.name)).toEqual([
+      'new-thing-stig-baseline',
+      'old-thing-stig-baseline',
+      'dateless-stig-baseline',
+    ])
+  })
+
+  it('silently skips unparseable entries in the existing URL list', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [repo('debian-12-stig-baseline')]
+    const existing = ['not a url at all \u0000', '']
+
+    expect(discoverContent(repos, existing).map(c => c.name)).toEqual(['debian-12-stig-baseline'])
+  })
+
+  it('falls back to the repo name when its htmlUrl does not parse', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    const repos = [repo('debian-12-stig-baseline', { htmlUrl: 'not-github' })]
+
+    expect(discoverContent(repos, []).map(c => c.name)).toEqual(['debian-12-stig-baseline'])
+  })
+
+  it('skips monorepo tree URLs without marking the whole repo present', async () => {
+    const { discoverContent } = await import('./content.logic.js')
+
+    // A content record pointing INTO a repo subdirectory still means the repo is covered
+    const repos = [repo('profiles-monorepo-stig-baseline')]
+    const existing = ['https://github.com/mitre/profiles-monorepo-stig-baseline/tree/main/profiles/rhel-9']
+
+    expect(discoverContent(repos, existing)).toEqual([])
+  })
+})

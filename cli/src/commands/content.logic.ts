@@ -6,7 +6,7 @@
  */
 
 import type { ContentDiff, ContentFKNames, RepoData } from '../lib/content-service.js'
-import type { InspecProfile, RepoInfo } from '../lib/github.js'
+import type { InspecProfile, OrgRepo, RepoInfo } from '../lib/github.js'
 import type { CreateContentInput, FkMaps, UpdateContentInput } from '../lib/pocketbase.js'
 import { validateSlug } from '@schema/validation.js'
 import {
@@ -17,6 +17,7 @@ import {
 
   resolveContentFKs,
 } from '../lib/content-service.js'
+import { parseGitHubUrl } from '../lib/github.js'
 import {
   semverSchema,
   slugSchema,
@@ -138,6 +139,14 @@ export interface SyncSummary {
 
 // Monorepo profile URLs point at a subdirectory: /owner/repo/tree/branch/path
 const GITHUB_TREE_URL_REGEX = /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+?)\/?$/
+
+// Profile repo naming conventions across the MITRE org: InSpec validation
+// baselines (incl. overlays), Ansible/Chef hardening content, CIS benchmarks
+const DISCOVER_REPO_PATTERNS = [
+  /-baseline(?:-overlay)?$/i,
+  /-hardening$/i,
+  /-benchmark$/i,
+]
 
 // ============================================================================
 // PREPARE CONTENT ADD
@@ -538,4 +547,48 @@ export async function executeSyncPlans(
   }
 
   return summary
+}
+
+// ============================================================================
+// CONTENT DISCOVER
+// ============================================================================
+
+/**
+ * Report org repos that look like profile/hardening content but have no
+ * content record pointing at them.
+ *
+ * Pure diff: callers fetch the repo list (listOrgRepos already excludes
+ * archived repos) and the existing GitHub URLs. URLs are normalized via
+ * the shared parseGitHubUrl (case, trailing slash, .git suffix, and
+ * monorepo /tree/ paths all resolve to owner/repo). Read-only by design:
+ * discovered repos are candidates for human review, never auto-added.
+ */
+export function discoverContent(
+  repos: OrgRepo[],
+  existingGithubUrls: string[],
+): OrgRepo[] {
+  const existing = new Set<string>()
+  for (const url of existingGithubUrls) {
+    const parsed = parseGitHubUrl(url)
+    if (parsed) {
+      existing.add(`${parsed.owner}/${parsed.repo}`.toLowerCase())
+    }
+  }
+
+  return repos
+    .filter(repo => DISCOVER_REPO_PATTERNS.some(pattern => pattern.test(repo.name)))
+    .filter((repo) => {
+      const parsed = parseGitHubUrl(repo.htmlUrl)
+      const key = parsed ? `${parsed.owner}/${parsed.repo}`.toLowerCase() : repo.name.toLowerCase()
+      return !existing.has(key)
+    })
+    .sort((a, b) => {
+      if (a.pushedAt === b.pushedAt)
+        return a.name.localeCompare(b.name)
+      if (!a.pushedAt)
+        return 1
+      if (!b.pushedAt)
+        return -1
+      return b.pushedAt.localeCompare(a.pushedAt)
+    })
 }

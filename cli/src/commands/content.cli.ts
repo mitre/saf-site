@@ -7,6 +7,7 @@
 
 import type { OutputFormat } from '../lib/cli-utils.js'
 import type { ContentFKNames } from '../lib/content-service.js'
+import type { OrgRepo } from '../lib/github.js'
 import type { UpdateContentInput } from '../lib/pocketbase.js'
 import type { ContentSyncPlan, PrepareAddInput, PrepareAddResult, PrepareUpdateResult, SyncSummary } from './content.logic.js'
 import Table from 'cli-table3'
@@ -400,4 +401,53 @@ export function formatSyncResult(
   }
 
   return lines.join('\n')
+}
+
+// ============================================================================
+// FORMAT DISCOVER RESULT
+// ============================================================================
+
+/**
+ * Format the discover report for output
+ */
+export function formatDiscoverResult(
+  candidates: OrgRepo[],
+  org: string,
+  format: OutputFormat,
+): string {
+  if (format === 'json') {
+    return JSON.stringify({ org, count: candidates.length, candidates }, null, 2)
+  }
+
+  if (format === 'quiet') {
+    return candidates.map(candidate => candidate.name).join('\n')
+  }
+
+  if (candidates.length === 0) {
+    return pc.green(`No new ${org} repos discovered — every matching repo already has a content record`)
+  }
+
+  const table = new Table({
+    head: [
+      pc.bold('Repo'),
+      pc.bold('Last Push'),
+      pc.bold('Description'),
+    ],
+    colWidths: [50, 12, 55],
+    wordWrap: true,
+  })
+
+  for (const candidate of candidates) {
+    table.push([
+      `${candidate.name}\n${pc.dim(candidate.htmlUrl)}`,
+      candidate.pushedAt ? candidate.pushedAt.slice(0, 10) : '-',
+      candidate.description || '-',
+    ])
+  }
+
+  return [
+    table.toString(),
+    '',
+    `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} not present in Pocketbase (review and add with: saf-site content add <url>)`,
+  ].join('\n')
 }

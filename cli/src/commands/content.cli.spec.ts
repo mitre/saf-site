@@ -9,6 +9,7 @@ import type { PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
 import { describe, expect, it } from 'vitest'
 import {
   formatAddResult,
+  formatDiscoverResult,
   formatListResult,
   formatSyncResult,
   formatUpdateResult,
@@ -483,6 +484,68 @@ describe('formatSyncResult', () => {
       const output = formatSyncResult(plans, summary, 'text', true)
 
       expect(output.toLowerCase()).toContain('dry run')
+    })
+  })
+})
+
+// ============================================================================
+// FORMAT DISCOVER RESULT
+// ============================================================================
+
+describe('formatDiscoverResult', () => {
+  const candidates = [
+    {
+      name: 'debian-12-stig-baseline',
+      htmlUrl: 'https://github.com/mitre/debian-12-stig-baseline',
+      description: 'InSpec profile for Debian 12 STIG',
+      pushedAt: '2026-08-15T00:00:00Z',
+    },
+    {
+      name: 'redhat-enterprise-linux-10-stig-baseline',
+      htmlUrl: 'https://github.com/mitre/redhat-enterprise-linux-10-stig-baseline',
+      description: null,
+      pushedAt: '2026-07-01T00:00:00Z',
+    },
+  ]
+
+  describe('json format', () => {
+    it('emits parseable JSON with org, count, and candidates', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'json')
+      const parsed = JSON.parse(output)
+
+      expect(parsed.org).toBe('mitre')
+      expect(parsed.count).toBe(2)
+      expect(parsed.candidates[0].name).toBe('debian-12-stig-baseline')
+      expect(parsed.candidates[0].htmlUrl).toContain('github.com/mitre/')
+    })
+  })
+
+  describe('quiet format', () => {
+    it('outputs only repo names', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'quiet')
+
+      expect(output.trim().split('\n')).toEqual([
+        'debian-12-stig-baseline',
+        'redhat-enterprise-linux-10-stig-baseline',
+      ])
+    })
+  })
+
+  describe('text format', () => {
+    it('shows name, URL, push date, description, and a count line', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'text')
+
+      expect(output).toContain('debian-12-stig-baseline')
+      expect(output).toContain('github.com/mitre/debian-12-stig-baseline')
+      expect(output).toContain('2026-08-15')
+      expect(output).toContain('InSpec profile for Debian 12 STIG')
+      expect(output).toContain('2 candidate')
+    })
+
+    it('reports when nothing new was found', () => {
+      const output = formatDiscoverResult([], 'mitre', 'text')
+
+      expect(output.toLowerCase()).toContain('no new')
     })
   })
 })
