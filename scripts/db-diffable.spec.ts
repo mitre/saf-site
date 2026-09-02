@@ -222,6 +222,54 @@ describe('db-diffable', () => {
       expect(typeof row1[4]).toBe('string')
     })
 
+    it('excludeRows keeps the table schema but writes an empty data file', () => {
+      createTwoTablesDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true, excludeRows: ['one_table'] })
+      expect(result).toBe(0)
+
+      // Schema preserved so a fresh load() can recreate the table
+      const meta = JSON.parse(readFileSync(join(diffableDir, 'one_table.metadata.json'), 'utf-8'))
+      expect(meta.schema).toContain('CREATE TABLE one_table')
+
+      // Rows excluded
+      expect(readFileSync(join(diffableDir, 'one_table.ndjson'), 'utf-8')).toBe('')
+
+      // Other tables unaffected
+      const otherLines = readFileSync(join(diffableDir, 'second_table.ndjson'), 'utf-8').trim().split('\n')
+      expect(otherLines).toHaveLength(1)
+    })
+
+    it('excludeWhere filters matching rows out of the export', () => {
+      createOneTableDb(dbPath)
+
+      const result = dump(dbPath, diffableDir, { quiet: true, excludeWhere: { one_table: 'name = \'Tilda\'' } })
+      expect(result).toBe(0)
+
+      const lines = readFileSync(join(diffableDir, 'one_table.ndjson'), 'utf-8').trim().split('\n')
+      expect(lines).toHaveLength(2)
+      expect(lines.join('')).not.toContain('Tilda')
+      expect(lines.join('')).toContain('Stacey')
+    })
+
+    it('excludeRows round-trips through load() as an empty table', () => {
+      createTwoTablesDb(dbPath)
+      dump(dbPath, diffableDir, { quiet: true, excludeRows: ['one_table'] })
+
+      const restoredPath = join(testDir, 'restored.db')
+      const result = load(restoredPath, diffableDir, { quiet: true })
+      expect(result).toBe(0)
+
+      const db = new Database(restoredPath)
+      const count = db.prepare('SELECT COUNT(*) AS n FROM one_table').get() as { n: number }
+      const other = db.prepare('SELECT COUNT(*) AS n FROM second_table').get() as { n: number }
+      db.close()
+
+      // Table exists (schema restored) but holds no rows
+      expect(count.n).toBe(0)
+      expect(other.n).toBe(1)
+    })
+
     it('returns error for non-existent database', () => {
       const result = dump('/nonexistent/path.db', diffableDir, { quiet: true })
       expect(result).toBe(1)
@@ -793,5 +841,28 @@ describe('db-diffable', () => {
       expect(result).toBe(0)
       expect(output).toHaveLength(0) // Newline-delimited: empty = no output
     })
+  })
+})
+
+// ============================================================================
+// REPO DATA INVARIANTS (guards against export exclusions breaking restore)
+// ============================================================================
+
+describe('diffable/ repo invariants', () => {
+  const diffable = join(process.cwd(), '..', '.pocketbase', 'pb_data', 'diffable')
+  const diffableAlt = join(process.cwd(), '.pocketbase', 'pb_data', 'diffable')
+  const dir = existsSync(diffable) ? diffable : diffableAlt
+
+  it('every non-view collection has a metadata file so load() can recreate its table', () => {
+    const meta = JSON.parse(readFileSync(join(dir, '_collections.metadata.json'), 'utf-8'))
+    const nameIdx = meta.columns.indexOf('name')
+    const typeIdx = meta.columns.indexOf('type')
+    const rows = readFileSync(join(dir, '_collections.ndjson'), 'utf-8').trim().split('\n').map(l => JSON.parse(l))
+
+    for (const row of rows) {
+      if (row[typeIdx] === 'view')
+        continue
+      expect(existsSync(join(dir, `${row[nameIdx]}.metadata.json`)), `missing schema for collection ${row[nameIdx]} — a fresh restore would boot Pocketbase without its table`).toBe(true)
+    }
   })
 })

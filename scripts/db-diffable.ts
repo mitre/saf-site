@@ -55,9 +55,10 @@ function toJsonValue(value: unknown): unknown {
   return value
 }
 
-export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], tables?: string[] } = {}): number {
+export function dump(dbPath: string, outDir: string, options: { quiet?: boolean, exclude?: string[], excludeRows?: string[], excludeWhere?: Record<string, string>, tables?: string[] } = {}): number {
   const log = options.quiet ? () => {} : console.log
   const excludeSet = new Set(options.exclude || [])
+  const excludeRowsSet = new Set(options.excludeRows || [])
   const tablesSet = options.tables ? new Set(options.tables) : null
 
   if (!existsSync(dbPath)) {
@@ -120,8 +121,22 @@ export function dump(dbPath: string, outDir: string, options: { quiet?: boolean,
     }
     writeFileSync(join(outDir, `${table.name}.metadata.json`), `${JSON.stringify(metadata, null, 4)}\n`)
 
-    // Write data as NDJSON (convert non-JSON types before serializing)
-    const rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
+    // Write data as NDJSON (convert non-JSON types before serializing).
+    // Row-excluded tables keep their schema (so load() recreates the table)
+    // but export no data — used for runtime state like auth sessions.
+    // excludeWhere drops individual rows that are runtime state (e.g. the
+    // aux_init migration timestamp Pocketbase rewrites on every fresh boot).
+    const whereNot = options.excludeWhere?.[table.name]
+    let rows: Record<string, unknown>[]
+    if (excludeRowsSet.has(table.name)) {
+      rows = []
+    }
+    else if (whereNot) {
+      rows = db.prepare(`SELECT * FROM "${table.name}" WHERE NOT (${whereNot})`).all() as Record<string, unknown>[]
+    }
+    else {
+      rows = db.prepare(`SELECT * FROM "${table.name}"`).all() as Record<string, unknown>[]
+    }
     const ndjsonLines = rows.map((row) => {
       const values = columnNames.map(col => toJsonValue(row[col]))
       return JSON.stringify(values)
@@ -328,7 +343,9 @@ Commands:
 
 Options:
   --replace    Drop existing tables before loading (load command)
-  --exclude    Skip specific tables (dump command)
+  --exclude       Skip specific tables entirely (dump command)
+  --exclude-rows  Keep a table's schema but export no rows (dump command)
+  --exclude-where Drop rows matching 'table:sql-condition' from the export (dump command)
   --array      Output as JSON array instead of newline-delimited (objects command)
 
 Examples:
@@ -348,10 +365,21 @@ Examples:
     const dbPath = args[1]
     const dirPath = args[2]
     const excludeArgs: string[] = []
+    const excludeRowsArgs: string[] = []
+    const excludeWhereArgs: Record<string, string> = {}
     let i = 3
     while (i < args.length) {
       if (args[i] === '--exclude' && args[i + 1]) {
         excludeArgs.push(args[i + 1])
+        i += 2
+      }
+      else if (args[i] === '--exclude-rows' && args[i + 1]) {
+        excludeRowsArgs.push(args[i + 1])
+        i += 2
+      }
+      else if (args[i] === '--exclude-where' && args[i + 1]) {
+        const sep = args[i + 1].indexOf(':')
+        excludeWhereArgs[args[i + 1].slice(0, sep)] = args[i + 1].slice(sep + 1)
         i += 2
       }
       else {
@@ -362,7 +390,7 @@ Examples:
       console.error('Error: dump requires <database.db> <output-dir>')
       process.exit(1)
     }
-    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined })
+    exitCode = dump(dbPath, dirPath, { exclude: excludeArgs.length > 0 ? excludeArgs : undefined, excludeRows: excludeRowsArgs.length > 0 ? excludeRowsArgs : undefined, excludeWhere: Object.keys(excludeWhereArgs).length > 0 ? excludeWhereArgs : undefined })
   }
   else if (command === 'load') {
     const dbPath = args[1]
