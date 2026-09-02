@@ -28,6 +28,7 @@
     "pb:setup": "./scripts/setup-pb-cli.sh",
     "reload-data": "touch 'docs/content/[slug].paths.ts' 'docs/apps/[slug].paths.ts'",
     "cli": "./scripts/cli.sh",
+    "content:refresh": "tsx scripts/content-refresh.ts",
     "cli:test": "pnpm --filter @saf-site/cli test:run",
     "cli:build": "pnpm --filter @saf-site/cli build",
     "story:dev": "pnpm story:docs && histoire dev",
