@@ -8,10 +8,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   extractControlCount,
   fetchInspecYml,
+  fetchLatestRelease,
+  fetchLatestTag,
   fetchRawFile,
   fetchReadme,
   fetchRepoInfo,
   generateSlug,
+  listOrgRepos,
   parseGitHubUrl,
 } from './github.js'
 
@@ -361,6 +364,34 @@ summary: A test profile
     expect(result).toBeNull()
   })
 
+  it('tolerates duplicate map keys the way InSpec\'s Ruby parser does (last wins)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: async () => 'name: dup-profile\nversion: 0.9.0\nversion: 1.0.0\ninputs:\n  - name: paths\n    value:\n      \'/usr/bin/umount\': \'privileged-mount\'\n      \'/usr/bin/umount\': \'privileged-umount\'\n',
+    })
+
+    const result = await fetchInspecYml('mitre', 'test')
+
+    expect(result?.name).toBe('dup-profile')
+    // last occurrence wins, matching Ruby's psych behavior
+    expect(result?.version).toBe('1.0.0')
+  })
+
+  it('reads inspec.yml from a subdirectory when a path is given', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: async () => 'name: nested-profile\nversion: 2.0.0\n',
+    })
+
+    const result = await fetchInspecYml('mitre', 'profiles-monorepo', 'main', 'profiles/rhel-9')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.github.com/repos/mitre/profiles-monorepo/contents/profiles/rhel-9/inspec.yml?ref=main',
+      expect.anything(),
+    )
+    expect(result).toEqual({ name: 'nested-profile', version: '2.0.0' })
+  })
+
   it('returns null for invalid YAML', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -419,5 +450,227 @@ describe('fetchReadme', () => {
     const result = await fetchReadme('mitre', 'test')
 
     expect(result).toBeNull()
+  })
+})
+
+describe('fetchLatestRelease', () => {
+  const mockFetch = vi.fn()
+
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.stubGlobal('fetch', mockFetch)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('returns tag name and published date for a repo with GitHub releases', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        tag_name: 'v1.4.0',
+        published_at: '2026-07-15T12:00:00Z',
+        html_url: 'https://github.com/mitre/test-baseline/releases/tag/v1.4.0',
+      }),
+    })
+
+    const result = await fetchLatestRelease('mitre', 'test-baseline')
+
+    expect(result).toEqual({
+      tagName: 'v1.4.0',
+      publishedAt: '2026-07-15T12:00:00Z',
+      htmlUrl: 'https://github.com/mitre/test-baseline/releases/tag/v1.4.0',
+    })
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.github.com/repos/mitre/test-baseline/releases/latest',
+      expect.any(Object),
+    )
+  })
+
+  it('returns null when the repo has no releases (404)', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' })
+
+    const result = await fetchLatestRelease('mitre', 'no-releases')
+
+    expect(result).toBeNull()
+  })
+
+  it('throws on non-404 API errors', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' })
+
+    await expect(fetchLatestRelease('mitre', 'test'))
+      .rejects
+      .toThrow('GitHub API error: 500 Internal Server Error')
+  })
+
+  it('includes authorization header when GITHUB_TOKEN is set', async () => {
+    process.env.GITHUB_TOKEN = 'test-token'
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ tag_name: 'v1.0.0', published_at: null, html_url: 'https://example.com' }),
+    })
+
+    await fetchLatestRelease('mitre', 'test')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+        }),
+      }),
+    )
+
+    delete process.env.GITHUB_TOKEN
+  })
+})
+
+describe('fetchLatestTag', () => {
+  const mockFetch = vi.fn()
+
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.stubGlobal('fetch', mockFetch)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('returns the first tag for repos that tag without publishing releases', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ([
+        { name: 'v2.1.0' },
+        { name: 'v2.0.0' },
+      ]),
+    })
+
+    const result = await fetchLatestTag('mitre', 'tagged-repo')
+
+    expect(result).toEqual({ tagName: 'v2.1.0' })
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.github.com/repos/mitre/tagged-repo/tags?per_page=1',
+      expect.any(Object),
+    )
+  })
+
+  it('returns null when the repo has no tags', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ([]),
+    })
+
+    const result = await fetchLatestTag('mitre', 'untagged')
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null on 404', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' })
+
+    const result = await fetchLatestTag('mitre', 'missing')
+
+    expect(result).toBeNull()
+  })
+
+  it('throws on non-404 API errors', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden' })
+
+    await expect(fetchLatestTag('mitre', 'test'))
+      .rejects
+      .toThrow('GitHub API error: 403 Forbidden')
+  })
+})
+
+describe('listOrgRepos', () => {
+  const mockFetch = vi.fn()
+
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.stubGlobal('fetch', mockFetch)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  function repoPayload(name: string, overrides: Record<string, unknown> = {}) {
+    return {
+      name,
+      html_url: `https://github.com/mitre/${name}`,
+      description: `Description of ${name}`,
+      pushed_at: '2026-08-01T00:00:00Z',
+      archived: false,
+      ...overrides,
+    }
+  }
+
+  it('returns repo name, url, description, and pushed date', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ([repoPayload('debian-13-stig-baseline')]),
+    })
+
+    const result = await listOrgRepos('mitre')
+
+    expect(result).toEqual([{
+      name: 'debian-13-stig-baseline',
+      htmlUrl: 'https://github.com/mitre/debian-13-stig-baseline',
+      description: 'Description of debian-13-stig-baseline',
+      pushedAt: '2026-08-01T00:00:00Z',
+    }])
+  })
+
+  it('follows pagination until a short page', async () => {
+    const fullPage = Array.from({ length: 100 }, (_, i) => repoPayload(`repo-${i}`))
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => fullPage })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ([repoPayload('repo-100')]) })
+
+    const result = await listOrgRepos('mitre')
+
+    expect(result).toHaveLength(101)
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      'https://api.github.com/orgs/mitre/repos?per_page=100&page=1',
+      expect.any(Object),
+    )
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      'https://api.github.com/orgs/mitre/repos?per_page=100&page=2',
+      expect.any(Object),
+    )
+  })
+
+  it('excludes archived repos', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ([
+        repoPayload('active-repo'),
+        repoPayload('dead-repo', { archived: true }),
+      ]),
+    })
+
+    const result = await listOrgRepos('mitre')
+
+    expect(result.map(r => r.name)).toEqual(['active-repo'])
+  })
+
+  it('throws on API errors', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 401, statusText: 'Unauthorized' })
+
+    await expect(listOrgRepos('mitre'))
+      .rejects
+      .toThrow('GitHub API error: 401 Unauthorized')
+  })
+
+  it('throws (not empty list) when the organization does not exist', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' })
+
+    await expect(listOrgRepos('nonexistent-org'))
+      .rejects
+      .toThrow('GitHub API error: 404 organization nonexistent-org not found')
   })
 })

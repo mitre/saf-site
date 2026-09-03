@@ -184,6 +184,27 @@ npx tsx scripts/fetch-readmes.ts --refs-only  # Only update reference URLs
 npx tsx scripts/fetch-readmes.ts --limit 10   # Process first 10 records
 ```
 
+### Content Refresh (Sync from GitHub)
+
+Update the content database from mitre GitHub in one command — versions are
+read from each repo's `inspec.yml` (the source of truth), applied to
+Pocketbase, and exported to the git-tracked `diffable/` format:
+
+| Command | Description |
+|---------|-------------|
+| `pnpm content:refresh` | Sync versions, discover new repos, export, print an update report |
+| `pnpm content:refresh --dry-run` | Report what would change without writing anything |
+
+Requires Pocketbase running. Uses `GITHUB_TOKEN` if set (falls back to
+`gh auth token`) — without a token, a full run hits GitHub's anonymous
+rate limit (60 requests/hour).
+
+The printed report lists version updates applied (old → new), any errors,
+and newly published mitre repos that have no content record yet (import
+those with `pnpm cli content add <url>`). For finer control, use the
+underlying CLI commands directly: `pnpm cli content sync [slug...]` and
+`pnpm cli content discover`.
+
 ### SAF Site CLI
 
 Interactive CLI for managing content and database operations.
@@ -313,6 +334,30 @@ pnpm dev:setup
 # Restart Pocketbase if it was running
 cd .pocketbase && ./pocketbase serve
 ```
+
+### Syncing Content Versions from GitHub
+
+When MITRE publishes profile updates (new `inspec.yml` versions, new
+releases), pull them in without touching the Admin UI:
+
+```bash
+# Terminal 1: Pocketbase must be running
+cd .pocketbase && ./pocketbase serve
+
+# Terminal 2: preview, then apply
+pnpm content:refresh --dry-run   # see what would change
+pnpm content:refresh             # apply updates + export to diffable/
+
+# Review and ship
+git diff .pocketbase/pb_data/diffable/
+git add .pocketbase/pb_data/diffable/
+git commit -m "chore: content sync $(date +%Y-%m-%d)"
+git push
+```
+
+The report also lists newly published repos with no content record —
+review those and import with `pnpm cli content add <url>` (taxonomy
+fields are a human decision, so discovery never writes anything).
 
 ### Adding/Editing Content
 
@@ -687,6 +732,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 ## License
 
 Apache 2.0 - See [LICENSE.md](LICENSE.md)
+
+## Public Release
+
+Approved for Public Release; Distribution Unlimited. Public Release Case Number 26-0705.
 
 ## Support
 

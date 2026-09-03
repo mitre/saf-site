@@ -130,8 +130,16 @@ else
     info "Exporting database..."
     cd "$PROJECT_ROOT"
 
-    # Use TypeScript db-diffable script
-    npx tsx scripts/db-diffable.ts dump "$DB_PATH" "$DIFFABLE_DIR"
+    # Use TypeScript db-diffable script.
+    # _authOrigins rows are login-session state, not content — exporting them
+    # makes every environment's auth churn show up as diffable/ changes. The
+    # schema stays so a fresh restore still creates the (empty) table.
+    # The aux_init migration row is likewise runtime state: Pocketbase re-runs
+    # it (and rewrites its timestamp) whenever auxiliary.db is missing, which
+    # is every fresh restore.
+    npx tsx scripts/db-diffable.ts dump "$DB_PATH" "$DIFFABLE_DIR" \
+        --exclude-rows _authOrigins \
+        --exclude-where "_migrations:file = '1640988000_aux_init.go'"
 
     NEW_TABLES=$(find "$DIFFABLE_DIR" -name "*.ndjson" | wc -l | tr -d ' ')
     ok "Exported $NEW_TABLES tables to diffable/"

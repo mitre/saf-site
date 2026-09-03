@@ -6,7 +6,7 @@
  */
 
 import type { ContentDiff, ContentFKNames, RepoData } from '../lib/content-service.js'
-import type { InspecProfile, RepoInfo } from '../lib/github.js'
+import type { InspecProfile, OrgRepo, RepoInfo } from '../lib/github.js'
 import type { CreateContentInput, FkMaps, UpdateContentInput } from '../lib/pocketbase.js'
 import { validateSlug } from '@schema/validation.js'
 import {
@@ -17,6 +17,7 @@ import {
 
   resolveContentFKs,
 } from '../lib/content-service.js'
+import { parseGitHubUrl } from '../lib/github.js'
 import {
   semverSchema,
   slugSchema,
@@ -78,7 +79,74 @@ export interface PrepareUpdateResult {
   errors: string[]
 }
 
+/**
+ * Service dependencies for content sync (for testing/mocking)
+ */
+export interface SyncDeps {
+  parseGitHubUrl: (url: string) => { owner: string, repo: string } | null
+  fetchInspecYml: (owner: string, repo: string, branch?: string, path?: string) => Promise<InspecProfile | null>
+  fetchLatestRelease: (owner: string, repo: string) => Promise<{ tagName: string, publishedAt: string | null, htmlUrl: string } | null>
+  fetchLatestTag: (owner: string, repo: string) => Promise<{ tagName: string } | null>
+}
+
+/**
+ * The subset of a content record the sync planner needs
+ */
+export interface SyncableRecord {
+  id: string
+  slug: string
+  name: string
+  github: string
+  version: string | null
+}
+
+/**
+ * Result of planning a sync for one content record
+ */
+export interface ContentSyncPlan {
+  id: string
+  slug: string
+  status: 'up-to-date' | 'drift' | 'warning' | 'error'
+  currentVersion: string | null
+  inspecVersion: string | null
+  releaseTag: string | null
+  messages: string[]
+  update?: { version: string, releaseDate?: string }
+  release?: { slug: string, version: string, releaseDate?: string }
+}
+
+/**
+ * Write operations executeSyncPlans needs (for testing/mocking)
+ */
+export interface SyncWriteDeps {
+  updateContent: (id: string, updates: { version: string, releaseDate?: string }) => Promise<unknown>
+  upsertRelease: (entityId: string, release: { slug: string, version: string, releaseDate?: string }) => Promise<unknown>
+}
+
+/**
+ * Counts of what executeSyncPlans did (or would do)
+ */
+export interface SyncSummary {
+  total: number
+  upToDate: number
+  drift: number
+  applied: number
+  warnings: number
+  errors: number
+}
+
 // Validation schemas imported from ../lib/validation-schemas.js
+
+// Monorepo profile URLs point at a subdirectory: /owner/repo/tree/branch/path
+const GITHUB_TREE_URL_REGEX = /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+?)\/?$/
+
+// Profile repo naming conventions across the MITRE org: InSpec validation
+// baselines (incl. overlays), Ansible/Chef hardening content, CIS benchmarks
+const DISCOVER_REPO_PATTERNS = [
+  /-baseline(?:-overlay)?$/i,
+  /-hardening$/i,
+  /-benchmark$/i,
+]
 
 // ============================================================================
 // PREPARE CONTENT ADD
@@ -310,4 +378,217 @@ export function prepareContentUpdate(
     warnings,
     errors: [],
   }
+}
+
+// ============================================================================
+// CONTENT SYNC
+// ============================================================================
+
+/**
+ * Strip a leading v/V from a release tag so it compares against
+ * the schema's unprefixed semver convention
+ */
+function normalizeTag(tag: string): string {
+  return tag.replace(/^v/i, '')
+}
+
+/**
+ * Plan a sync for one content record.
+ *
+ * Version source of truth is inspec.yml's `version`; the latest
+ * release/tag is recorded alongside and a disagreement between the two
+ * is surfaced as a warning rather than silently resolved. Monorepo
+ * profiles (github URLs pointing at /tree/<branch>/<path>) read
+ * inspec.yml from the subdirectory and skip the release lookup, since
+ * repo-level releases don't describe a single nested profile.
+ */
+export async function planContentSync(
+  record: SyncableRecord,
+  deps: SyncDeps,
+): Promise<ContentSyncPlan> {
+  const plan: ContentSyncPlan = {
+    id: record.id,
+    slug: record.slug,
+    status: 'up-to-date',
+    currentVersion: record.version,
+    inspecVersion: null,
+    releaseTag: null,
+    messages: [],
+  }
+
+  // Resolve where inspec.yml lives (monorepo subdirectory vs repo root)
+  const treeMatch = GITHUB_TREE_URL_REGEX.exec(record.github)
+  let owner: string
+  let repo: string
+  let branch: string | undefined
+  let path: string | undefined
+
+  if (treeMatch) {
+    [, owner, repo, branch, path] = treeMatch
+  }
+  else {
+    const parsed = deps.parseGitHubUrl(record.github)
+    if (!parsed) {
+      plan.status = 'error'
+      plan.messages.push(`Cannot parse GitHub URL: ${record.github}`)
+      return plan
+    }
+    ;({ owner, repo } = parsed)
+  }
+
+  let releaseDate: string | undefined
+
+  try {
+    const inspecProfile = await deps.fetchInspecYml(owner, repo, branch, path)
+    plan.inspecVersion = inspecProfile?.version ?? null
+
+    // Releases/tags describe the whole repo — meaningless for one profile
+    // nested in a monorepo, so only consult them for root-level profiles
+    if (!treeMatch) {
+      const release = await deps.fetchLatestRelease(owner, repo)
+      if (release) {
+        plan.releaseTag = normalizeTag(release.tagName)
+        releaseDate = release.publishedAt ?? undefined
+      }
+      else {
+        const tag = await deps.fetchLatestTag(owner, repo)
+        if (tag)
+          plan.releaseTag = normalizeTag(tag.tagName)
+      }
+    }
+  }
+  catch (error) {
+    plan.status = 'error'
+    plan.messages.push(error instanceof Error ? error.message : String(error))
+    return plan
+  }
+
+  if (!plan.inspecVersion) {
+    plan.status = 'warning'
+    plan.messages.push('inspec.yml has no version field — cannot determine the canonical version')
+    return plan
+  }
+
+  if (!semverSchema.safeParse(plan.inspecVersion).success) {
+    plan.status = 'warning'
+    plan.messages.push(`inspec.yml version "${plan.inspecVersion}" is not semver — fix the profile before syncing`)
+    return plan
+  }
+
+  if (plan.releaseTag && plan.releaseTag !== plan.inspecVersion) {
+    plan.status = 'warning'
+    plan.messages.push(`Version mismatch: inspec.yml says ${plan.inspecVersion} but the latest release/tag is ${plan.releaseTag} — resolve upstream before syncing`)
+    return plan
+  }
+
+  if (plan.inspecVersion === record.version) {
+    plan.status = 'up-to-date'
+    return plan
+  }
+
+  plan.status = 'drift'
+  plan.messages.push(`${record.version ?? '(none)'} → ${plan.inspecVersion}`)
+  plan.update = { version: plan.inspecVersion, releaseDate }
+  plan.release = {
+    slug: `${record.slug}-v${plan.inspecVersion.replace(/\./g, '-')}`,
+    version: plan.inspecVersion,
+    releaseDate,
+  }
+  return plan
+}
+
+/**
+ * Apply sync plans (or just tally them in dry-run mode).
+ *
+ * Drift plans get their content update and release upsert; a failed
+ * write counts as an error and processing continues with the rest.
+ */
+export async function executeSyncPlans(
+  plans: ContentSyncPlan[],
+  writes: SyncWriteDeps,
+  options: { dryRun: boolean },
+): Promise<SyncSummary> {
+  const summary: SyncSummary = {
+    total: plans.length,
+    upToDate: 0,
+    drift: 0,
+    applied: 0,
+    warnings: 0,
+    errors: 0,
+  }
+
+  for (const plan of plans) {
+    switch (plan.status) {
+      case 'up-to-date':
+        summary.upToDate++
+        break
+      case 'warning':
+        summary.warnings++
+        break
+      case 'error':
+        summary.errors++
+        break
+      case 'drift': {
+        summary.drift++
+        if (options.dryRun || !plan.update || !plan.release)
+          break
+        try {
+          await writes.updateContent(plan.id, plan.update)
+          await writes.upsertRelease(plan.id, plan.release)
+          summary.applied++
+        }
+        catch (error) {
+          summary.errors++
+          plan.messages.push(`Write failed: ${error instanceof Error ? error.message : String(error)}`)
+        }
+        break
+      }
+    }
+  }
+
+  return summary
+}
+
+// ============================================================================
+// CONTENT DISCOVER
+// ============================================================================
+
+/**
+ * Report org repos that look like profile/hardening content but have no
+ * content record pointing at them.
+ *
+ * Pure diff: callers fetch the repo list (listOrgRepos already excludes
+ * archived repos) and the existing GitHub URLs. URLs are normalized via
+ * the shared parseGitHubUrl (case, trailing slash, .git suffix, and
+ * monorepo /tree/ paths all resolve to owner/repo). Read-only by design:
+ * discovered repos are candidates for human review, never auto-added.
+ */
+export function discoverContent(
+  repos: OrgRepo[],
+  existingGithubUrls: string[],
+): OrgRepo[] {
+  const existing = new Set<string>()
+  for (const url of existingGithubUrls) {
+    const parsed = parseGitHubUrl(url)
+    if (parsed) {
+      existing.add(`${parsed.owner}/${parsed.repo}`.toLowerCase())
+    }
+  }
+
+  return repos
+    .filter(repo => DISCOVER_REPO_PATTERNS.some(pattern => pattern.test(repo.name)))
+    .filter((repo) => {
+      const parsed = parseGitHubUrl(repo.htmlUrl)
+      const key = parsed ? `${parsed.owner}/${parsed.repo}`.toLowerCase() : repo.name.toLowerCase()
+      return !existing.has(key)
+    })
+    .sort((a, b) => {
+      if (a.pushedAt === b.pushedAt)
+        return a.name.localeCompare(b.name)
+      if (!a.pushedAt)
+        return 1
+      if (!b.pushedAt)
+        return -1
+      return b.pushedAt.localeCompare(a.pushedAt)
+    })
 }

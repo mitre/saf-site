@@ -322,6 +322,7 @@ Documentation is auto-generated from JSDoc comments into Histoire story files:
 | `pnpm dev:setup:force` | Force fresh database restore |
 | `pnpm db:export` | Export Pocketbase to diffable/ |
 | `pnpm db:populate` | Fetch README content from GitHub repos |
+| `pnpm content:refresh` | Sync versions from mitre GitHub, export, print update report (then git diff/commit manually) |
 | `pnpm reload-data` | Trigger data loader refresh |
 | `pnpm story:docs` | Generate component docs for Histoire |
 | `pnpm cli --help` | SAF Site CLI (content management) |

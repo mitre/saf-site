@@ -9,7 +9,9 @@ import type { PrepareAddResult, PrepareUpdateResult } from './content.logic.js'
 import { describe, expect, it } from 'vitest'
 import {
   formatAddResult,
+  formatDiscoverResult,
   formatListResult,
+  formatSyncResult,
   formatUpdateResult,
   parseAddArgs,
   parseUpdateArgs,
@@ -404,6 +406,146 @@ describe('formatListResult', () => {
       expect(lines).toHaveLength(2)
       expect(lines[0]).toBe('content-1')
       expect(lines[1]).toBe('content-2')
+    })
+  })
+})
+
+// ============================================================================
+// FORMAT SYNC RESULT
+// ============================================================================
+
+describe('formatSyncResult', () => {
+  const plans = [
+    {
+      id: 'content-1',
+      slug: 'rhel-9-stig',
+      status: 'drift' as const,
+      currentVersion: '1.0.0',
+      inspecVersion: '1.2.0',
+      releaseTag: '1.2.0',
+      messages: ['1.0.0 \u2192 1.2.0'],
+      update: { version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' },
+      release: { slug: 'rhel-9-stig-v1-2-0', version: '1.2.0', releaseDate: '2026-07-01T00:00:00Z' },
+    },
+    {
+      id: 'content-2',
+      slug: 'ubuntu-2204-stig',
+      status: 'up-to-date' as const,
+      currentVersion: '2.0.0',
+      inspecVersion: '2.0.0',
+      releaseTag: '2.0.0',
+      messages: [],
+    },
+    {
+      id: 'content-3',
+      slug: 'windows-2022-stig',
+      status: 'warning' as const,
+      currentVersion: '1.0.0',
+      inspecVersion: '1.1.0',
+      releaseTag: '1.3.0',
+      messages: ['Version mismatch: inspec.yml says 1.1.0 but the latest release/tag is 1.3.0 \u2014 resolve upstream before syncing'],
+    },
+  ]
+  const summary = { total: 3, upToDate: 1, drift: 1, applied: 0, warnings: 1, errors: 0 }
+
+  describe('json format', () => {
+    it('emits parseable JSON with summary and plans', () => {
+      const output = formatSyncResult(plans, summary, 'json', true)
+      const parsed = JSON.parse(output)
+
+      expect(parsed.dryRun).toBe(true)
+      expect(parsed.summary).toEqual(summary)
+      expect(parsed.plans).toHaveLength(3)
+      expect(parsed.plans[0].slug).toBe('rhel-9-stig')
+    })
+  })
+
+  describe('quiet format', () => {
+    it('outputs only drifted slugs', () => {
+      const output = formatSyncResult(plans, summary, 'quiet', false)
+
+      expect(output.trim()).toBe('rhel-9-stig')
+    })
+  })
+
+  describe('text format', () => {
+    it('shows each record status and a summary line', () => {
+      const output = formatSyncResult(plans, summary, 'text', false)
+
+      expect(output).toContain('rhel-9-stig')
+      expect(output).toContain('drift')
+      expect(output).toContain('up-to-date')
+      expect(output).toContain('warning')
+      expect(output).toContain('1 drift')
+      expect(output).toContain('1 warning')
+    })
+
+    it('notes dry-run mode', () => {
+      const output = formatSyncResult(plans, summary, 'text', true)
+
+      expect(output.toLowerCase()).toContain('dry run')
+    })
+  })
+})
+
+// ============================================================================
+// FORMAT DISCOVER RESULT
+// ============================================================================
+
+describe('formatDiscoverResult', () => {
+  const candidates = [
+    {
+      name: 'debian-12-stig-baseline',
+      htmlUrl: 'https://github.com/mitre/debian-12-stig-baseline',
+      description: 'InSpec profile for Debian 12 STIG',
+      pushedAt: '2026-08-15T00:00:00Z',
+    },
+    {
+      name: 'redhat-enterprise-linux-10-stig-baseline',
+      htmlUrl: 'https://github.com/mitre/redhat-enterprise-linux-10-stig-baseline',
+      description: null,
+      pushedAt: '2026-07-01T00:00:00Z',
+    },
+  ]
+
+  describe('json format', () => {
+    it('emits parseable JSON with org, count, and candidates', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'json')
+      const parsed = JSON.parse(output)
+
+      expect(parsed.org).toBe('mitre')
+      expect(parsed.count).toBe(2)
+      expect(parsed.candidates[0].name).toBe('debian-12-stig-baseline')
+      expect(parsed.candidates[0].htmlUrl).toContain('github.com/mitre/')
+    })
+  })
+
+  describe('quiet format', () => {
+    it('outputs only repo names', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'quiet')
+
+      expect(output.trim().split('\n')).toEqual([
+        'debian-12-stig-baseline',
+        'redhat-enterprise-linux-10-stig-baseline',
+      ])
+    })
+  })
+
+  describe('text format', () => {
+    it('shows name, URL, push date, description, and a count line', () => {
+      const output = formatDiscoverResult(candidates, 'mitre', 'text')
+
+      expect(output).toContain('debian-12-stig-baseline')
+      expect(output).toContain('github.com/mitre/debian-12-stig-baseline')
+      expect(output).toContain('2026-08-15')
+      expect(output).toContain('InSpec profile for Debian 12 STIG')
+      expect(output).toContain('2 candidate')
+    })
+
+    it('reports when nothing new was found', () => {
+      const output = formatDiscoverResult([], 'mitre', 'text')
+
+      expect(output.toLowerCase()).toContain('no new')
     })
   })
 })

@@ -100,6 +100,9 @@ export const STANDARD_IDENTIFIERS: Record<string, string> = {
   'fedramp': 'fedramp',
   'soc 2': 'soc2',
   'soc2': 'soc2',
+  'stig-ready': 'stig-ready',
+  'srg-ready': 'srg-ready',
+  'srg': 'srg',
 }
 
 /**

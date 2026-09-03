@@ -200,6 +200,7 @@ export interface UpdateContentInput {
   isFeatured?: boolean
   featuredOrder?: number
   license?: string
+  releaseDate?: string
   target?: string
   standard?: string
   technology?: string
@@ -243,6 +244,7 @@ function toSnakeCase(input: CreateContentInput | UpdateContentInput): Record<str
     automationLevel: 'automation_level',
     isFeatured: 'is_featured',
     featuredOrder: 'featured_order',
+    releaseDate: 'release_date',
   }
 
   for (const [key, value] of Object.entries(input)) {
@@ -362,6 +364,62 @@ export async function createContent(
   const data = toSnakeCase(input)
 
   return pb.collection('content').create(data)
+}
+
+/**
+ * Input for upserting a content release row
+ */
+export interface ContentReleaseInput {
+  slug: string
+  version: string
+  releaseDate?: string
+}
+
+/**
+ * Upsert a row in the polymorphic releases table for a content record.
+ *
+ * The new/updated row becomes is_latest=true; any other latest rows for
+ * the same entity are flipped to is_latest=false first.
+ */
+export async function upsertContentRelease(
+  entityId: string,
+  release: ContentReleaseInput,
+  pb: PocketBase,
+): Promise<RecordModel> {
+  const releases = pb.collection('releases')
+
+  // Clear prior latest rows for this entity (skip the row we're about to upsert)
+  const priorLatest = await releases.getFullList({
+    filter: `entity_type = "content" && entity_id = "${entityId}" && is_latest = true`,
+  })
+  for (const row of priorLatest) {
+    if (row.slug !== release.slug) {
+      await releases.update(row.id, { is_latest: false })
+    }
+  }
+
+  const data: Record<string, unknown> = {
+    entity_type: 'content',
+    entity_id: entityId,
+    slug: release.slug,
+    version: release.version,
+    is_latest: true,
+  }
+  if (release.releaseDate) {
+    data.release_date = release.releaseDate
+  }
+
+  let existing: RecordModel | null = null
+  try {
+    existing = await releases.getFirstListItem(`slug = "${release.slug}"`)
+  }
+  catch {
+    existing = null
+  }
+
+  return existing
+    ? releases.update(existing.id, data)
+    : releases.create(data)
 }
 
 /**
