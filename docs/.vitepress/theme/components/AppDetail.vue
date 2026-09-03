@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ToolItem } from '../../loaders/tools.data'
 import { BookOpen, Github } from 'lucide-vue-next'
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 import AppDeploymentCard from './AppDeploymentCard.vue'
 import AppFeatureSection from './AppFeatureSection.vue'
@@ -138,7 +139,7 @@ function distHeroLabel(dist: typeof props.tool.distributions[0]): string {
           <Button
             v-if="tool.primaryCapability"
             as="a"
-            :href="`/framework/${tool.primaryCapability.slug}`"
+            :href="withBase(`/framework/${tool.primaryCapability.slug}`)"
             variant="outline"
             size="lg"
             class="flex items-center gap-2 no-underline"

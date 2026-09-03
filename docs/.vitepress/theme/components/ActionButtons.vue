@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
+import { withBase } from 'vitepress'
 
 export interface ActionItem {
   label: string
@@ -20,7 +21,7 @@ defineProps<{
     <a
       v-for="action in actions"
       :key="action.url"
-      :href="action.url"
+      :href="withBase(action.url)"
       target="_blank"
       rel="noopener noreferrer"
       class="action-btn"

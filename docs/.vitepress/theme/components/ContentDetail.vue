@@ -4,6 +4,7 @@ import type { ActionItem } from './ActionButtons.vue'
 import type { PillarType } from './PillarBadge.vue'
 import { Marked } from 'marked'
 import { createHighlighter } from 'shiki'
+import { withBase } from 'vitepress'
 import { computed, onMounted, ref } from 'vue'
 import { buildMetadataItems, createMetadataItem } from '@/lib/metadata'
 import { useContentDetail } from '../composables/useContentDetail'
@@ -158,7 +159,7 @@ const relatedContent = computed(() => props.relatedContent || [])
   <div class="content-detail">
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-      <a href="/content/">Content Library</a>
+      <a :href="withBase('/content/')">Content Library</a>
       <span class="separator">/</span>
       <span class="current">{{ content.name }}</span>
     </nav>
@@ -214,7 +215,7 @@ const relatedContent = computed(() => props.relatedContent || [])
         <a
           v-for="related in relatedContent"
           :key="related.id"
-          :href="`/content/${related.slug}.html`"
+          :href="withBase(`/content/${related.slug}.html`)"
           class="related-card"
         >
           <div class="related-card-header">

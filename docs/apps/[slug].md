@@ -5,7 +5,7 @@ wideLayout: true
 ---
 
 <script setup>
-import { useData } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import { computed } from 'vue'
 import AppDetail from '../.vitepress/theme/components/AppDetail.vue'
 import { data as toolsData } from '../.vitepress/loaders/tools.data'
@@ -28,7 +28,7 @@ const pageTitle = computed(() => {
 <div v-else class="not-found">
   <h1>Tool Not Found</h1>
   <p>The tool "{{ params.slug }}" could not be found.</p>
-  <p><a href="/apps/">← Back to Apps</a></p>
+  <p><a :href="withBase('/apps/')">← Back to Apps</a></p>
 </div>
 
 <style scoped>

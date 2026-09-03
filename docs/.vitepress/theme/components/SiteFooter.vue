@@ -4,6 +4,8 @@
 // Single source of truth for footer links + the Osano cookie-consent trigger,
 // so the two layouts can never drift apart.
 
+import { withBase } from 'vitepress'
+
 function showCookiePreferences() {
   if (typeof window !== 'undefined' && (window as any).Osano?.cm) {
     (window as any).Osano.cm.showDrawer('osano-cm-dom-info-dialog-open')
@@ -14,9 +16,9 @@ function showCookiePreferences() {
 <template>
   <footer class="custom-footer">
     <div class="footer-links">
-      <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
+      <a :href="withBase('/privacy-policy')" class="footer-link">Privacy Policy</a>
       <span class="footer-separator">•</span>
-      <a href="/accessibility" class="footer-link">Accessibility</a>
+      <a :href="withBase('/accessibility')" class="footer-link">Accessibility</a>
       <span class="footer-separator">•</span>
       <a
         href="javascript:void(0)"

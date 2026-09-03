@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
 /**
  * @component PageSection - Flexible two-column layout for feature/CTA sections.
  * Supports vertical (stacked) and horizontal (side-by-side) orientations,
@@ -145,7 +146,7 @@ const hasVisual = computed(() => !!slots.default)
                   v-for="(link, index) in links"
                   :key="index"
                   as="a"
-                  :href="link.href"
+                  :href="link.href ? withBase(link.href) : undefined"
                   :target="link.external ? '_blank' : undefined"
                   :rel="link.external ? 'noopener noreferrer' : undefined"
                   :variant="link.variant || (index === 0 ? 'default' : 'outline')"

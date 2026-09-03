@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { Download, FileText, Presentation, Video } from 'lucide-vue-next'
+import { withBase } from 'vitepress'
 import { computed } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -39,7 +40,7 @@ const iconComponent = computed(() => props.icon ? iconComponents[props.icon] : n
 
 <template>
   <a
-    :href="href"
+    :href="withBase(href)"
     :download="download ? '' : undefined"
     :target="external ? '_blank' : undefined"
     :rel="external ? 'noopener noreferrer' : undefined"
