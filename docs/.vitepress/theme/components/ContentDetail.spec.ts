@@ -1,6 +1,6 @@
 import type { ContentItem } from '../composables/useContentDetail'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import ContentDetail from './ContentDetail.vue'
 
 // Factory for creating test content items
@@ -334,4 +334,57 @@ describe('contentDetail', () => {
       expect(npmBtn?.attributes('href')).toContain('npmjs.com/package/@mitre/inspecjs')
     })
   })
+})
+
+// ============================================================================
+// README MARKDOWN RENDERING
+//
+// Regression guard for the bug where content.readme_markdown was stored as
+// rich-text HTML ("<p># Heading</p>") instead of markdown, so the detail page
+// showed raw '#' characters. Rendering happens in onMounted via async shiki,
+// so this is the only automated way to observe the rendered output — the SSG
+// HTML always ships an empty div.
+// ============================================================================
+
+describe('contentDetail README rendering', () => {
+  async function mountAndRenderReadme(readme: string) {
+    const wrapper = mount(ContentDetail, {
+      props: { content: createContentItem({ readme_markdown: readme }) },
+    })
+    // onMounted kicks off async shiki highlighting; wait for the v-html
+    // content itself to land (the empty wrapper div exists immediately)
+    await vi.waitFor(() => {
+      const el = wrapper.find('.readme-content')
+      expect(el.exists()).toBe(true)
+      expect(el.element.innerHTML.length).toBeGreaterThan(0)
+    }, { timeout: 15000, interval: 50 })
+    return wrapper.find('.readme-content').element.innerHTML
+  }
+
+  it('renders markdown headings as real heading elements, not literal characters', async () => {
+    const html = await mountAndRenderReadme('# RHEL 9 STIG Profile\n\nSome description text.\n')
+
+    expect(html).toContain('<h1')
+    expect(html).toContain('RHEL 9 STIG Profile')
+    // the '#' must be consumed by the renderer, not shown to the reader
+    expect(html).not.toContain('# RHEL 9 STIG Profile')
+  }, 20000)
+
+  it('renders fenced code blocks', async () => {
+    const html = await mountAndRenderReadme('# Title\n\n```bash\ninspec exec profile\n```\n')
+
+    expect(html).toMatch(/<pre|shiki/)
+    // shiki tokenizes the code into spans, so assert on the text content
+    expect(html.replace(/<[^>]+>/g, '')).toContain('inspec exec profile')
+  }, 20000)
+
+  it('surfaces the corruption if HTML-wrapped markdown is ever stored again', async () => {
+    // This is what the bad rhel9 record looked like: markdown wrapped in <p>
+    const html = await mountAndRenderReadme('<p># RHEL 9 STIG Profile</p>\n')
+
+    // The '#' survives as literal text and no heading is produced — exactly
+    // the reported bug. If this assertion ever flips, the renderer changed.
+    expect(html).toContain('# RHEL 9 STIG Profile')
+    expect(html).not.toContain('<h1')
+  }, 20000)
 })
