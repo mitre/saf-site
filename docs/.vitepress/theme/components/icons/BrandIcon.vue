@@ -37,6 +37,8 @@ const localSvgMap: Record<string, string> = {
   'emasser': '/icons/saf-logo.svg',
   'vulcan': '/icons/saf-logo.svg',
   'heimdall': '/icons/heimdall.svg',
+  'cinc': '/icons/cinc.svg',
+  'cinc auditor': '/icons/cinc.svg',
 }
 
 // Wide logos that need height-only constraint (wordmarks)

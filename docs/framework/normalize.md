@@ -127,6 +127,13 @@ const toolCategories = [
   />
 </PageSection>
 
+::: info The OHDF schema is under active development
+The OASIS Heimdall Data Format schema is being actively developed in the
+[mitre/hdf-libs](https://github.com/mitre/hdf-libs) repository. Because that library is
+still in development, its newer features are **not yet reflected in the rest of the SAF
+toolset**. If you'd like a sneak preview of where OHDF is heading, take a look there.
+:::
+
 <PageSection
   variant="muted"
   orientation="vertical"
