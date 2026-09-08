@@ -9,6 +9,7 @@ import { ref, computed, onMounted } from 'vue'
 import { data } from '../.vitepress/loaders/content.data'
 import { inBrowser } from 'vitepress'
 import { createFuzzyMatcher } from '../.vitepress/theme/composables/useFuzzySearch'
+import { matchesTargetFamily } from '../.vitepress/theme/composables/useFilterOptions'
 
 const allItems = data.items
 
@@ -53,9 +54,10 @@ const filteredItems = computed(() => {
     result = result.filter(item => item.pillar === selectedPillar.value)
   }
 
-  // Filter by target (what the content secures)
+  // Filter by target (what the content secures). A general target such as
+  // "Red Hat Enterprise Linux" also matches its versioned records (RHEL 8/9/10).
   if (selectedTarget.value !== 'all') {
-    result = result.filter(item => item.target_name === selectedTarget.value)
+    result = result.filter(item => matchesTargetFamily(selectedTarget.value, item.target_name))
   }
 
   // Filter by technology (InSpec, Ansible, etc.)

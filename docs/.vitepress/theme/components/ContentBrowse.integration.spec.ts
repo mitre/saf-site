@@ -7,6 +7,7 @@ import { flushPromises, mount } from '@vue/test-utils'
  */
 import { describe, expect, it } from 'vitest'
 import { computed, defineComponent, ref } from 'vue'
+import { matchesTargetFamily } from '@/composables/useFilterOptions'
 import { createFuzzyMatcher } from '@/composables/useFuzzySearch'
 import ContentCard from './ContentCard.vue'
 import ContentFilters from './ContentFilters.vue'
@@ -128,7 +129,9 @@ const ContentBrowseWrapper = defineComponent({
       }
 
       if (selectedTarget.value !== 'all') {
-        result = result.filter(item => item.target_name === selectedTarget.value)
+        // same helper docs/content/index.md uses, so this harness cannot
+        // silently diverge from the page it mirrors
+        result = result.filter(item => matchesTargetFamily(selectedTarget.value, item.target_name))
       }
 
       if (selectedTech.value !== 'all') {
@@ -447,5 +450,141 @@ describe('content Browse Integration', () => {
       expect(wrapper.text()).toContain('Showing 6 of 6 items')
       expect(wrapper.findAllComponents(ContentCard)).toHaveLength(6)
     })
+  })
+})
+
+// ============================================================================
+// TARGET FAMILY FILTERING (browse layer)
+//
+// Regression guard for the reported bug: selecting the general target
+// "Red Hat Enterprise Linux" showed only the one profile literally assigned
+// to it, instead of the whole RHEL family. Exercised at the browse layer
+// (ContentFilters -> filter -> ContentCard) rather than on the pure helper,
+// so a regression in matchesTargetFamily's behaviour surfaces as missing
+// rendered cards rather than as an abstract unit-test failure.
+//
+// SCOPE LIMIT, so nobody over-reads these tests: the wrapper below calls
+// matchesTargetFamily itself, mirroring docs/content/index.md. It does NOT
+// import that page (vitest has no markdown plugin and its include globs
+// exclude docs/content), so these tests would NOT catch the page dropping
+// the helper and reverting to exact equality. They guard the helper's
+// behaviour, not the page's wiring. Closing that gap properly means
+// extracting the page's filteredItems pipeline into a shared composable
+// that both the page and this harness import — tracked separately.
+// ============================================================================
+
+const familyContent = [
+  {
+    id: 'f1',
+    slug: 'rhel-cve-scan',
+    name: 'Red Hat CVE Scan',
+    description: 'CVE scan for the RHEL family',
+    content_type: 'validation' as const,
+    pillar: 'validate',
+    status: 'active',
+    target_name: 'Red Hat Enterprise Linux',
+    technology_name: 'InSpec',
+    vendor_name: 'MITRE',
+    standard_name: 'DISA STIG',
+    standard_short_name: 'STIG',
+  },
+  {
+    id: 'f2',
+    slug: 'rhel8-stig',
+    name: 'Red Hat Enterprise Linux 8 STIG',
+    description: 'InSpec profile for RHEL 8',
+    content_type: 'validation' as const,
+    pillar: 'validate',
+    status: 'active',
+    target_name: 'Red Hat Enterprise Linux 8',
+    technology_name: 'InSpec',
+    vendor_name: 'MITRE',
+    standard_name: 'DISA STIG',
+    standard_short_name: 'STIG',
+  },
+  {
+    id: 'f3',
+    slug: 'rhel9-stig',
+    name: 'Red Hat Enterprise Linux 9 STIG',
+    description: 'InSpec profile for RHEL 9',
+    content_type: 'validation' as const,
+    pillar: 'validate',
+    status: 'active',
+    target_name: 'Red Hat Enterprise Linux 9',
+    technology_name: 'InSpec',
+    vendor_name: 'MITRE',
+    standard_name: 'DISA STIG',
+    standard_short_name: 'STIG',
+  },
+  {
+    id: 'f4',
+    slug: 'ubuntu-stig',
+    name: 'Ubuntu 20.04 STIG',
+    description: 'Unrelated family, must never be swept in',
+    content_type: 'validation' as const,
+    pillar: 'validate',
+    status: 'active',
+    target_name: 'Ubuntu 20.04',
+    technology_name: 'InSpec',
+    vendor_name: 'MITRE',
+    standard_name: 'DISA STIG',
+    standard_short_name: 'STIG',
+  },
+]
+
+const FamilyBrowseWrapper = defineComponent({
+  name: 'FamilyBrowseWrapper',
+  components: { ContentFilters, ContentCard },
+  setup() {
+    const selectedTarget = ref('all')
+    const filteredItems = computed(() =>
+      selectedTarget.value === 'all'
+        ? familyContent
+        : familyContent.filter(item => matchesTargetFamily(selectedTarget.value, item.target_name)),
+    )
+    return { allItems: familyContent, filteredItems, selectedTarget }
+  },
+  template: `
+    <div>
+      <ContentFilters :items="allItems" @update:target="selectedTarget = $event" />
+      <div class="results-count">Showing {{ filteredItems.length }} of {{ allItems.length }} items</div>
+      <div class="content-grid">
+        <ContentCard v-for="item in filteredItems" :key="item.id" :content="item" />
+      </div>
+    </div>
+  `,
+})
+
+describe('content Browse target family filtering', () => {
+  const mountFamily = () => mount(FamilyBrowseWrapper, {
+    global: { stubs: { 'router-link': { template: '<a><slot /></a>' } } },
+  })
+
+  async function selectTarget(wrapper: ReturnType<typeof mountFamily>, target: string) {
+    await wrapper.findComponent(ContentFilters).vm.$emit('update:target', target)
+    await flushPromises()
+  }
+
+  it('shows the whole RHEL family when the general target is selected', async () => {
+    const wrapper = mountFamily()
+    await selectTarget(wrapper, 'Red Hat Enterprise Linux')
+
+    expect(wrapper.text()).toContain('Showing 3 of 4 items')
+    expect(wrapper.text()).toContain('Red Hat CVE Scan')
+    expect(wrapper.text()).toContain('Red Hat Enterprise Linux 8 STIG')
+    expect(wrapper.text()).toContain('Red Hat Enterprise Linux 9 STIG')
+    // a different family must not be swept in
+    expect(wrapper.text()).not.toContain('Ubuntu 20.04 STIG')
+  })
+
+  it('stays narrow when a specific version is selected', async () => {
+    const wrapper = mountFamily()
+    await selectTarget(wrapper, 'Red Hat Enterprise Linux 9')
+
+    expect(wrapper.text()).toContain('Showing 1 of 4 items')
+    expect(wrapper.text()).toContain('Red Hat Enterprise Linux 9 STIG')
+    // must not widen back to the general record or sibling versions
+    expect(wrapper.text()).not.toContain('Red Hat CVE Scan')
+    expect(wrapper.text()).not.toContain('Red Hat Enterprise Linux 8 STIG')
   })
 })
