@@ -39,7 +39,7 @@
     "picocolors": "^1.1.1",
     "pocketbase": "^0.28.0",
     "yaml": "^2.9.0",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.19.0",
