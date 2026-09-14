@@ -32,14 +32,14 @@
     "pnpm": ">=10"
   },
   "dependencies": {
-    "@clack/prompts": "^1.7.0",
+    "@clack/prompts": "^1.8.0",
     "cli-table3": "^0.6.5",
     "commander": "^15.0.0",
     "ora": "^9.4.1",
     "picocolors": "^1.1.1",
-    "pocketbase": "^0.28.0",
+    "pocketbase": "^0.28.1",
     "yaml": "^2.9.0",
-    "zod": "^4.5.4"
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.19.0",
