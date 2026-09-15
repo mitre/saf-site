@@ -43,10 +43,10 @@ wideLayout: true
 />
 
 <MediaCard
-  href="/SAF-Executive-Level-Summary.pdf"
+  href="/MITRE-SAF-Overview-2026.pdf"
   icon="document"
-  title="Executive Summary"
-  meta="Leadership overview • PDF"
+  title="MITRE SAF Overview"
+  meta="Full overview deck • 42 slides • PDF"
   description="High-level overview of MITRE SAF capabilities and benefits for organizational leadership and decision makers."
   action="Download PDF"
   download
