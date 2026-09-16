@@ -63,3 +63,33 @@ export function useStandardOptions<T extends { standard_name?: string, standard_
       .sort((a, b) => a.shortName.localeCompare(b.shortName))
   })
 }
+
+/**
+ * Match a content item's target against the selected target filter.
+ *
+ * Targets are stored as separate records per major version ("Red Hat
+ * Enterprise Linux 8", "... 9"), alongside a general record with no version
+ * ("Red Hat Enterprise Linux"). Selecting the general target should surface
+ * the whole family; selecting a specific version stays narrow.
+ *
+ * The match is therefore one-directional: general -> versioned, never the
+ * reverse. A separator is required after the selected name so that
+ * "Debian 1" does not sweep up "Debian 11".
+ *
+ * @param selected - The target chosen in the filter dropdown
+ * @param itemTarget - The target_name on the content item (optional in the
+ *   loader's ContentItem type, so undefined is an expected input)
+ */
+export function matchesTargetFamily(
+  selected: string | undefined,
+  itemTarget: string | undefined,
+): boolean {
+  const sel = (selected || '').trim().toLowerCase()
+  const target = (itemTarget || '').trim().toLowerCase()
+
+  if (!sel || !target) {
+    return false
+  }
+
+  return target === sel || target.startsWith(`${sel} `)
+}

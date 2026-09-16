@@ -7,7 +7,7 @@ wideLayout: true
 
 # HDF Examples
 
-The MITRE Heimdall™ Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up—starting with a minimal example, building to real-world conversions.
+The MITRE Heimdall Data Format (HDF) is a standardized JSON structure for representing security findings from any tool. This page walks through HDF from the ground up—starting with a minimal example, building to real-world conversions.
 
 **[HDF Schema](/resources/schema)** | **[Normalize](/framework/normalize)**
 
