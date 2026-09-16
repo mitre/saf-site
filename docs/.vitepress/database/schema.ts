@@ -285,7 +285,13 @@ export const content = sqliteTable('content', {
   documentationUrl: text('documentation_url'),
   referenceUrl: text('reference_url'), // Link to official standard (cyber.mil, cisecurity.org)
   readmeUrl: text('readme_url'), // GitHub raw README URL for fetching/syncing
-  readmeMarkdown: text('readme_markdown'), // Full/curated README content (long markdown)
+  // Full/curated README content. MUST be raw markdown, never HTML: the detail
+  // page renders it through marked+shiki, so stored HTML shows up as literal
+  // '#' characters. The Pocketbase field is deliberately a plain "text" field
+  // (not "editor") so admin-UI edits cannot convert it to rich text, and it
+  // carries an explicit max (Pocketbase text fields cap at 5000 otherwise;
+  // max:0 does NOT mean unlimited).
+  readmeMarkdown: text('readme_markdown'),
 
   // Domain-specific (validation profiles)
   controlCount: integer('control_count'), // Number of controls/checks

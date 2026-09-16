@@ -10,7 +10,8 @@ import { TestTube2, Repeat2, Zap } from 'lucide-vue-next'
 import PillarIcon from '../.vitepress/theme/components/icons/PillarIcon.vue'
 
 const validateTools = [
-  { name: 'InSpec', href: '/content/?technology=InSpec' },
+  { name: 'Cinc Auditor', iconName: 'cinc', href: 'https://cinc.sh/docs/auditor/' },
+  { name: 'Validation Profiles', iconName: 'saf', href: '/content/?pillar=validate' },
   { name: 'MITRE SAF CLI™', href: '/apps/saf-cli' }
 ]
 </script>
@@ -48,7 +49,7 @@ const validateTools = [
       {
         icon: TestTube2,
         title: 'Security Compliance Testing',
-        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the MITRE Heimdall™ Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
+        description: 'Test systems against government and industry security standards. Run InSpec profiles that implement STIGs, CIS Benchmarks, and other compliance frameworks. Generate detailed reports in the MITRE Heimdall Data Format (HDF) showing which controls pass, fail, or are not applicable to your systems.'
       },
       {
         icon: Repeat2,
@@ -89,7 +90,7 @@ const validateTools = [
     />
   </template>
 
-  <LogoGrid :items="validateTools" :size="56" :showNames="true" variant="card" :columns="2" />
+  <LogoGrid :items="validateTools" :size="56" :showNames="true" variant="card" :columns="3" />
 </PageSection>
 
 <style>
