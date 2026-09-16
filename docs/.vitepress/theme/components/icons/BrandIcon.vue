@@ -41,6 +41,15 @@ const localSvgMap: Record<string, string> = {
   'cinc auditor': '/icons/cinc.svg',
 }
 
+// Dark-background variants of the local marks. Keys mirror localSvgMap; a
+// brand with no entry here simply keeps its light mark in dark mode.
+// Needed because these render through <img>, so page CSS (and currentColor)
+// cannot recolour them — the asset itself has to change.
+const localSvgDarkMap: Record<string, string> = {
+  'cinc': '/icons/cinc-white.svg',
+  'cinc auditor': '/icons/cinc-white.svg',
+}
+
 // Wide logos that need height-only constraint (wordmarks)
 const wideLogos = new Set<string>()
 
@@ -173,11 +182,22 @@ const iconMap: Record<string, string> = {
 // Check for local SVG first
 const localSvg = computed(() => {
   const key = props.name.toLowerCase()
-  if (localSvgMap[key])
-    return withBase(localSvgMap[key])
-  for (const [name, path] of Object.entries(localSvgMap)) {
-    if (key.includes(name) || name.includes(key)) {
-      return withBase(path)
+  // In dark mode prefer a dark-background variant, falling back to the
+  // light mark for brands that do not ship one. isDark is reactive, so the
+  // src swaps on theme toggle without any extra markup.
+  //
+  // Ordering caveat: the exact-then-fuzzy pass runs fully against the dark map
+  // before the light map is consulted, so a brand that only FUZZY-matches a
+  // dark key would beat its own EXACT light entry. Unreachable with the two
+  // keys currently in localSvgDarkMap, but keep it in mind if that map grows.
+  const maps = isDark.value ? [localSvgDarkMap, localSvgMap] : [localSvgMap]
+  for (const map of maps) {
+    if (map[key])
+      return withBase(map[key])
+    for (const [name, path] of Object.entries(map)) {
+      if (key.includes(name) || name.includes(key)) {
+        return withBase(path)
+      }
     }
   }
   return null
