@@ -73,7 +73,7 @@ const toolCategories = [
 <PageSection
   orientation="vertical"
   headline="The Solution"
-  title="MITRE Heimdall™ Data Format (HDF)"
+  title="MITRE Heimdall Data Format (HDF)"
   description="MITRE SAF uses the Heimdall Data Format (HDF) as the common language for security data. HDF is a standardized JSON schema that represents security findings in a consistent structure, regardless of the source tool. MITRE SAF CLI™ provides converters that transform outputs from popular security tools into HDF, enabling unified analysis and visualization."
   :links="[
     { label: 'OHDF Converters', href: '/content/ohdf-converters', variant: 'default' },

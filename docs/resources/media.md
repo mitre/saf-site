@@ -57,7 +57,7 @@ wideLayout: true
   icon="document"
   title="The New Normalized OHDF"
   meta="Technical deep dive • PDF"
-  description="Technical overview of the OASIS MITRE Heimdall™ Data Format (OHDF) and how it enables unified security data analysis."
+  description="Technical overview of the OASIS MITRE Heimdall Data Format (OHDF) and how it enables unified security data analysis."
   action="Download PDF"
   download
 />
