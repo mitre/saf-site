@@ -13,9 +13,13 @@ import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 // eslint-disable-next-line antfu/no-top-level-await
 const trainingSidebar = await getTrainingSidebar()
 
-// GitHub Pages serves project sites from a subpath (mitre.github.io/saf-site/);
-// Cloudflare Pages serves from the root. GITHUB_PAGES is set by pages.yml only.
-const base = process.env.GITHUB_PAGES ? '/saf-site/' : '/'
+// Both hosts serve from the root: Cloudflare Pages natively, and GitHub Pages
+// because the site has the custom domain saf.mitre.org, which is served at its
+// root rather than at the /saf-site/ project subpath. (GitHub 301s the old
+// mitre.github.io/saf-site/ URL to the custom domain, so nothing needs the
+// subpath.) Keep this a named constant: buildEnd and the favicon href below
+// both prefix with it.
+const base = '/'
 
 // Static string props: headline="...", title="...", description="..."
 const STATIC_STRING_PROP_REGEX = /\b(?:headline|title|description)\s*=\s*"([^"]+)"/g
