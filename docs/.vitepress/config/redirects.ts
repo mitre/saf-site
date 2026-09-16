@@ -8,6 +8,9 @@
  * <meta http-equiv="refresh"> redirect at the source path.
  */
 export const redirects: Record<string, string> = {
+  // Superseded public-release PDF -> current overview deck (keeps old links alive)
+  'SAF-Executive-Level-Summary.pdf': '/MITRE-SAF-Overview-2026.pdf',
+
   // Pillar verb forms (old saf.mitre.org /libs/<pillar> paths)
   'libs/validate': '/content/?pillar=validate',
   'libs/harden': '/content/?pillar=harden',

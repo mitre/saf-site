@@ -1,11 +1,12 @@
 import type { HeadConfig } from 'vitepress'
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
 import { redirects } from './config/redirects'
 import { getTrainingSidebar } from './config/trainingSidebar'
+import { buildRedirectOutputs } from './lib/build-redirects'
 import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 
 // VitePress config supports top-level await for dynamic data loading
@@ -61,25 +62,26 @@ export default defineConfig({
   base,
 
   buildEnd(siteConfig) {
-    for (const [from, to] of Object.entries(redirects)) {
-      // Redirect targets are root-relative; prefix them with the base
-      const target = to.startsWith('/') ? base + to.slice(1) : to
-      const filePath = join(siteConfig.outDir, from, 'index.html')
+    const { redirectsFile, metaRefreshPages } = buildRedirectOutputs(redirects, base)
+
+    // Cloudflare Pages: real 301s, which non-browser clients actually follow
+    writeFileSync(join(siteConfig.outDir, '_redirects'), redirectsFile)
+
+    // GitHub Pages has no _redirects support, so page redirects also ship as
+    // meta-refresh stubs. Asset-looking sources are excluded upstream: a
+    // directory named "foo.pdf" would collide with the real asset.
+    for (const page of metaRefreshPages) {
+      const filePath = join(siteConfig.outDir, page.path)
       const dir = dirname(filePath)
+      if (existsSync(dir) && !statSync(dir).isDirectory()) {
+        throw new Error(
+          `Cannot write redirect stub: ${dir} exists but is not a directory. `
+          + 'A redirect source collides with a real file at the same path.',
+        )
+      }
       if (!existsSync(dir))
         mkdirSync(dir, { recursive: true })
-      writeFileSync(filePath, [
-        '<!DOCTYPE html>',
-        '<html>',
-        '<head>',
-        `  <meta http-equiv="refresh" content="0;url=${target}">`,
-        `  <link rel="canonical" href="${target}">`,
-        '</head>',
-        '<body>',
-        `  <p>This page has moved to <a href="${target}">${target}</a>.</p>`,
-        '</body>',
-        '</html>',
-      ].join('\n'))
+      writeFileSync(filePath, page.html)
     }
   },
 
