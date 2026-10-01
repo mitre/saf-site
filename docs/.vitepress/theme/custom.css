@@ -152,6 +152,33 @@
   transition: border-color 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 
+/* Safari: let the navbar dropdowns escape the header.
+
+   VitePress sets `overflow-x: clip` on .VPNav (VPNav.vue). WebKit applies that
+   clip to the Y axis too, so the flyout menus — positioned at top: 52px and
+   ~218px tall, well outside the 64px header — get cut off: they flicker and
+   never render. Upstream bug, open as of 2.0.0-alpha.15:
+   https://github.com/vuejs/vitepress/issues/5050
+
+   Scoped to >=960px on purpose. Below that, .VPNav is `position: relative`, so
+   its overflowing content extends the document's scroll area and the clip is
+   load-bearing — removing it adds a horizontal scrollbar (measured at 375, 640,
+   768 and 850px). At >=960px upstream switches .VPNav to `position: fixed`,
+   where overflow no longer contributes to document scroll, so the clip costs
+   nothing and the dropdowns can paint. Same breakpoint, same reason.
+
+   Remove this block once vitepress#5050 is fixed upstream. */
+@media (min-width: 960px) {
+  .VPNav {
+    /* !important is required, not lazy: VPNav.vue declares this in a <style
+       scoped> block, which compiles to `.VPNav[data-v-d4867331]` — specificity
+       (0,2,0). A plain `.VPNav` here is (0,1,0) and loses on specificity no
+       matter where it sits in the cascade, and .VPNav belongs to VitePress, so
+       there is no component definition of ours to put it in. */
+    overflow-x: visible !important;
+  }
+}
+
 /* Wide layout for app and framework pages */
 @media (min-width: 960px) {
   /* Narrower sidebar to give more space to content */
