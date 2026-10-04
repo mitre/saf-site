@@ -5,6 +5,11 @@ minimumReleaseAge: 10080
 overrides:
   esbuild: '>=0.25.0'
   mdast-util-to-hast: '>=13.2.1'
+  'axios@1': '>=1.20.0 <2'
+  'brace-expansion@1': '>=1.1.20 <2'
+  'brace-expansion@2': '>=2.1.6 <3'
+  'brace-expansion@5': '>=5.0.11 <6'
+  'joi@18': '>=18.2.6 <19'
   'js-yaml@3': '>=3.15.2 <4'
   'js-yaml@4': '>=4.3.2 <5'
   'nanoid@3': '>=3.3.18 <4'
@@ -12,6 +17,9 @@ overrides:
   'postcss@8': '>=8.5.18 <9'
   'rollup@4': '>=4.59.0 <5'
   'ws@8': '>=8.21.0 <9'
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
 allowBuilds:
   better-sqlite3: true
   esbuild: true
