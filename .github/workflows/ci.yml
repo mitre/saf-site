@@ -84,7 +84,7 @@ jobs:
         run: pnpm --filter @saf-site/cli test:run
 
   e2e:
-    name: Accessibility E2E (Playwright)
+    name: E2E (Playwright, Chromium + WebKit)
     runs-on: ubuntu-latest
 
     steps:
@@ -103,15 +103,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+      # WebKit is not optional here: Safari-only rendering bugs are invisible
+      # to Chromium, and e2e/navbar-dropdown.spec.ts exists to catch one
+      # (vuejs/vitepress#5050). Chromium stays for the accessibility-tree checks.
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
 
       # Starts Pocketbase (port 8090) in the background; the Playwright config's
       # webServer launches `vitepress dev`, whose data loaders query it.
       - name: Setup Pocketbase
         uses: ./.github/actions/setup-pocketbase
 
-      - name: Run accessibility E2E tests
+      - name: Run E2E tests (both engines)
         run: pnpm test:e2e
 
       - name: Upload Playwright report
