@@ -105,7 +105,8 @@ jobs:
 
       # WebKit is not optional here: Safari-only rendering bugs are invisible
       # to Chromium, and e2e/navbar-dropdown.spec.ts exists to catch one
-      # (vuejs/vitepress#5050). Chromium stays for the accessibility-tree checks.
+      # (vuejs/vitepress#5050). Chromium stays because it is the dominant
+      # engine, not because any spec requires it -- all of them pass on both.
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium webkit
 

@@ -6,15 +6,18 @@ import { expect, test } from '@playwright/test'
  * VitePress sets `overflow-x: clip` on `.VPNav` (VPNav.vue). WebKit applies
  * that clip to the Y axis as well, so Safari cuts off the flyout menus, which
  * are positioned below the 64px-tall header — they flicker and never render.
- * Upstream: https://github.com/vuejs/vitepress/issues/5050 (open as of
- * 2.0.0-alpha.15). custom.css lifts the clip at the widths where it is not
- * needed; these tests pin that contract from both sides.
+ * Upstream: https://github.com/vuejs/vitepress/issues/5050, fixed upstream
+ * (closed 2025-12-08) but after our pinned 2.0.0-alpha.15, so custom.css still
+ * lifts the clip at the widths where it is not needed; these tests pin that
+ * contract from both sides.
  *
- * NOTE ON COVERAGE: these run in Chromium, which honours `overflow-y: visible`
- * and so never reproduced the Safari symptom in the first place. They verify
- * the CSS contract and the no-horizontal-scroll property that constrains the
- * fix — they are NOT evidence that Safari renders correctly. That requires a
- * real WebKit run.
+ * NOTE ON COVERAGE: these run under both chromium and webkit (see
+ * playwright.config.ts). Under Chromium they verify the CSS contract and the
+ * no-horizontal-scroll property only — Chromium honours `overflow-y: visible`
+ * and never reproduced the Safari symptom. Under WebKit the computed-style
+ * assertions below do run on the engine that has the bug, so reverting the
+ * custom.css fix would flip them. What NO engine here asserts is painting:
+ * every assertion reads computed style or layout boxes, never pixels.
  */
 
 // Below 960px `.VPNav` is `position: relative`, so its overflow extends the
@@ -107,11 +110,11 @@ test.describe('navbar dropdown is not clipped by the nav', () => {
     // This asserts LAYOUT, not painting. getBoundingClientRect() reports the
     // layout box, which clipping does not affect, so this assertion does NOT
     // detect a reintroduced Y-axis clip — it still passes with the clip in
-    // place (verified). Nor could any Chromium-observable assertion detect it,
-    // since Chromium honours `overflow-y: visible` and never clips here. Its
-    // value is as a guard that the flyout still opens and is positioned below
-    // the header; the overflow-x assertions above are what pin the fix itself,
-    // and a real WebKit run is what would catch the painting bug.
+    // place (verified under Chromium across 20 observables, incl. hit-testing
+    // and a screenshot hash). Its value is as a guard that the flyout still
+    // opens and is positioned below the header. The overflow-x assertions
+    // above are what pin the fix, and under the webkit project they do so on
+    // the engine that actually has the bug.
     expect(
       geometry!.menuBottom,
       'dropdown should be laid out below the navbar',

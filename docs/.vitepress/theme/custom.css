@@ -157,8 +157,9 @@
    VitePress sets `overflow-x: clip` on .VPNav (VPNav.vue). WebKit applies that
    clip to the Y axis too, so the flyout menus — positioned at top: 52px and
    ~218px tall, well outside the 64px header — get cut off: they flicker and
-   never render. Upstream bug, open as of 2.0.0-alpha.15:
-   https://github.com/vuejs/vitepress/issues/5050
+   never render. Upstream bug, FIXED upstream (vuejs/vitepress#5050, closed
+   2025-12-08) but after our pinned 2.0.0-alpha.15, so the override is still
+   load-bearing here: https://github.com/vuejs/vitepress/issues/5050
 
    Scoped to >=960px on purpose. Below that, .VPNav is `position: relative`, so
    its overflowing content extends the document's scroll area and the clip is
@@ -167,7 +168,8 @@
    where overflow no longer contributes to document scroll, so the clip costs
    nothing and the dropdowns can paint. Same breakpoint, same reason.
 
-   Remove this block once vitepress#5050 is fixed upstream. */
+   Remove this block when VitePress is upgraded past 2.0.0-alpha.15 (the fix
+   landed in alpha.16+); re-check the dropdowns in Safari when doing so. */
 @media (min-width: 960px) {
   .VPNav {
     /* !important is required, not lazy: VPNav.vue declares this in a <style
