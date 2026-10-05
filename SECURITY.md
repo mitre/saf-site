@@ -69,3 +69,34 @@ pnpm test:run
 ### External Links
 - Profile links point to external GitHub repositories
 - Users should verify repository authenticity before use
+
+### Accepted Advisories
+
+`pnpm audit --audit-level=high` gates CI. One advisory is deliberately
+excluded, via `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml` (that file is
+kept comment-free, so the rationale lives here):
+
+| Advisory | Package | Why it is accepted |
+|---|---|---|
+| [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | `braces` | No fix exists, and it is not reachable in production. |
+
+Details, as of 2026-10-04:
+
+- **No patched version exists.** `braces@3.0.3` is the latest published release
+  and the advisory covers `<=3.0.3`. There is nothing to upgrade to.
+- **It cannot be removed.** `braces` is a hard dependency of `micromatch`, and
+  every published `micromatch` (through 4.0.8, the latest) requires it. We reach
+  `micromatch` from several independent roots: `histoire` depends on it
+  directly, and both `histoire` and `vue-docgen-cli` reach it through
+  `globby` → `fast-glob`. The latest `globby` (16.x) and `fast-glob` (3.3.3)
+  still require `micromatch`, so no upgrade anywhere in the chain drops it.
+  Eliminating it would mean dropping the entire component-story toolchain
+  (`histoire` + `vue-docgen-cli`, i.e. `pnpm story:dev` and `pnpm story:docs`).
+- **It is not reachable in production.** Both roots are `devDependencies` used
+  for the component workbench and story docs. The deployed artifact is static
+  HTML; `braces` never ships. The vulnerability is stack exhaustion from deeply
+  nested brace patterns, and the only patterns it sees are our own globs.
+
+The exclusion is scoped to this single advisory ID, so any *new* high-severity
+finding still fails CI. Re-check when `braces` or `micromatch` publishes a fix:
+remove the entry and run `pnpm audit --audit-level=high`.
