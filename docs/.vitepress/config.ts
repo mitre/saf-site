@@ -7,6 +7,7 @@ import { defineConfig } from 'vitepress'
 import { redirects } from './config/redirects'
 import { getTrainingSidebar } from './config/trainingSidebar'
 import { buildRedirectOutputs } from './lib/build-redirects'
+import { resolveSrcExclude } from './lib/internal-pages'
 import { markdownItSmartScript } from './plugins/markdown-it-smartscript'
 
 // VitePress config supports top-level await for dynamic data loading
@@ -64,6 +65,10 @@ function extractVueComponentText(src: string, relativePath: string): string {
 
 export default defineConfig({
   base,
+
+  // Maintainer-only pages under docs/internal/ are served in dev but never
+  // built. See lib/internal-pages.ts for why this is keyed on NODE_ENV.
+  srcExclude: resolveSrcExclude(process.env.NODE_ENV),
 
   buildEnd(siteConfig) {
     const { redirectsFile, metaRefreshPages } = buildRedirectOutputs(redirects, base)
